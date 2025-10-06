@@ -15,7 +15,7 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Bell, BookOpen, Check, FileSpreadsheet, Folder, Key, LayoutGrid, PackageOpen, Users } from 'lucide-react';
 import AppLogo from './app-logo';
-import { about, releasing, report, status } from '@/routes/sidebar';
+import { releasing } from '@/routes/sidebar';
 
 const mainNavItems: NavItem[] = [
     {
@@ -30,27 +30,27 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Check Status',
-        href: status(),
+        href: 'status()',
         icon: Check,
     },
     {
         title: 'Report',
-        href: report(),
+        href: 'report()',
         icon: FileSpreadsheet,
     },
     {
         title: 'About Us',
-        href: about(),
+        href: 'about()',
         icon: Users,
     },
     {
         title: 'Change Password',
-        href: changePassword(),
+        href: 'changePassword()',
         icon: Key,
     },
     {
         title: 'Notifications',
-        href: notifications(),
+        href: 'notifications()',
         icon: Bell,
     },
 ];

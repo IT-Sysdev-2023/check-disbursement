@@ -12,9 +12,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('check-releasing', function () {
-        return Inertia::render('dashboard');
-    })->name('check-releasing');
+    Route::get('releasing', function () {
+        return Inertia::render('releasing');
+    })->name('releasing');
 
     Route::get('check-status', function () {
         return Inertia::render('dashboard');
