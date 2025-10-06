@@ -10,11 +10,12 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { changePassword, dashboard, notifications } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { Bell, BookOpen, Check, FileSpreadsheet, Folder, Key, LayoutGrid, PackageOpen, Users } from 'lucide-react';
 import AppLogo from './app-logo';
+import { about, releasing, report, status } from '@/routes/sidebar';
 
 const mainNavItems: NavItem[] = [
     {
@@ -22,16 +23,41 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    {
+        title: 'Check Releasing',
+        href: releasing(),
+        icon: PackageOpen,
+    },
+    {
+        title: 'Check Status',
+        href: status(),
+        icon: Check,
+    },
+    {
+        title: 'Report',
+        href: report(),
+        icon: FileSpreadsheet,
+    },
+    {
+        title: 'About Us',
+        href: about(),
+        icon: Users,
+    },
+    {
+        title: 'Change Password',
+        href: changePassword(),
+        icon: Key,
+    },
+    {
+        title: 'Notifications',
+        href: notifications(),
+        icon: Bell,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
     {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
+        title: 'Get Started',
         href: 'https://laravel.com/docs/starter-kits#react',
         icon: BookOpen,
     },

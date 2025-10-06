@@ -19,7 +19,7 @@ interface LoginProps {
 export default function Login({ status, canResetPassword }: LoginProps) {
     return (
         <AuthLayout
-            title="Log in to your account"
+            title="Check Disbursement Monitoring"
             description="Enter your email and password below to log in"
         >
             <Head title="Log in" />
