@@ -4,6 +4,13 @@ import { releasing } from '@/routes/sidebar';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,7 +29,8 @@ type Project = {
 
 export default function Releasing() {
 
-    const [progress, setProgress] = useState(0);
+const [progress, setProgress] = useState(0);
+const [darkmode, setDarkmode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<Project[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -171,58 +179,35 @@ export default function Releasing() {
                     )}
 
                     {/* Data Display */}
-                    {data && (
-                        <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
-                        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                            <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                            Retrieved Data
-                            </h2>
-                            <p className="text-sm text-gray-600 dark:text-gray-400">
-                            {data.length} projects found
-                            </p>
-                        </div>
-                        
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                            <thead className="bg-gray-50 dark:bg-gray-700/50">
-                                <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Project
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Status
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Value
-                                </th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                {data.map((item) => (
-                                <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                                    {item.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                        item.status === 'Completed' 
-                                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                                        : item.status === 'In Progress'
-                                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                                    }`}>
-                                        {item.status}
-                                    </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                    {item.value}
-                                    </td>
-                                </tr>
-                                ))}
-                            </tbody>
-                            </table>
-                        </div>
-                        </div>
+                        {data && (
+                         <TableContainer component={Paper} >
+                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                         <TableHead>
+                             <TableRow>
+                             <TableCell>Id</TableCell>
+                             <TableCell align="right">Name</TableCell>
+                             <TableCell align="right">Status</TableCell>
+                             <TableCell align="right">Value</TableCell>
+                             </TableRow>
+                         </TableHead>
+                         <TableBody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                             {data.map((row) => (
+                             <TableRow
+                                 key={row.name}
+                                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                     className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                             >
+                                 <TableCell component="th" scope="row">
+                                 {row.id}
+                                 </TableCell>
+                                 <TableCell align="right">{row.name}</TableCell>
+                                 <TableCell align="right" >{row.status}</TableCell>
+                                 <TableCell align="right" >{row.value}</TableCell>
+                             </TableRow>
+                             ))}
+                         </TableBody>
+                         </Table>
+                         </TableContainer>
                     )}
 
                     {/* Empty State */}
