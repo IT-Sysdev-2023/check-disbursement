@@ -45,12 +45,12 @@ const mainNavItems: NavItem[] = [
     },
     {
         title: 'Change Password',
-        href: 'changePassword()',
+        href: changePassword(),
         icon: Key,
     },
     {
         title: 'Notifications',
-        href: 'notifications()',
+        href: notifications(),
         icon: Bell,
     },
 ];
