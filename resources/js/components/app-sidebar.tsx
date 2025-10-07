@@ -10,12 +10,11 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { changePassword, dashboard, notifications } from '@/routes';
+import { changePassword, dashboard, notifications, releasing } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Bell, BookOpen, Check, FileSpreadsheet, Folder, Key, LayoutGrid, PackageOpen, Users } from 'lucide-react';
 import AppLogo from './app-logo';
-import { releasing } from '@/routes/sidebar';
 
 const mainNavItems: NavItem[] = [
     {

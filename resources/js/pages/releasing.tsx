@@ -1,6 +1,5 @@
 import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { releasing } from '@/routes/sidebar';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
@@ -11,6 +10,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import { releasing } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,7 +30,6 @@ type Project = {
 export default function Releasing() {
 
 const [progress, setProgress] = useState(0);
-const [darkmode, setDarkmode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<Project[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -180,6 +179,15 @@ const [darkmode, setDarkmode] = useState(false);
 
                     {/* Data Display */}
                         {data && (
+                             <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl border border-gray-200 dark:border-gray-700 shadow-lg overflow-hidden">
+                             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                               <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                                 Retrieved Data
+                               </h2>
+                               <p className="text-sm text-gray-600 dark:text-gray-400">
+                                 {data.length} projects found
+                               </p>
+                             </div>
                          <TableContainer component={Paper} >
                          <Table sx={{ minWidth: 650 }} aria-label="simple table">
                          <TableHead>
@@ -190,7 +198,7 @@ const [darkmode, setDarkmode] = useState(false);
                              <TableCell align="right">Value</TableCell>
                              </TableRow>
                          </TableHead>
-                         <TableBody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                         <TableBody>
                              {data.map((row) => (
                              <TableRow
                                  key={row.name}
@@ -207,7 +215,8 @@ const [darkmode, setDarkmode] = useState(false);
                              ))}
                          </TableBody>
                          </Table>
-                         </TableContainer>
+                                </TableContainer>
+                                </div>
                     )}
 
                     {/* Empty State */}
