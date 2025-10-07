@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RetrieveDataController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -35,6 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('notifications', function () {
         return Inertia::render('dashboard');
     })->name('notifications');
+
+
+    Route::get('retrieve-data', [RetrieveDataController::class, 'index'])->name('retrieveData');
 });
 
 require __DIR__ . '/settings.php';

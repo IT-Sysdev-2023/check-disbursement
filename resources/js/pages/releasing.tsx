@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,7 +11,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { releasing } from '@/routes';
+import { releasing, retrieveData } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -41,23 +42,30 @@ const [progress, setProgress] = useState(0);
     { id: 4, name: 'Project Delta', status: 'Completed', value: '$9,850' },
   ];
 
-  const simulateDataRetrieval = () => {
-    setIsLoading(true);
-    setProgress(0);
-    setError(null);
-    setData(null);
+  const simulateDataRetrieval = async() => {
+    // setIsLoading(true);
+    // setProgress(0);
+    // setError(null);
+      //   setData(null);
 
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setData(mockData);
-          setIsLoading(false);
-          return 100;
-        }
-        return prev + Math.random() * 15;
-      });
-    }, 300);
+      const { url, method } = retrieveData();
+      const response = await axios({url, method});
+
+      console.log(response.data);
+
+    // const interval = setInterval(() => {
+    //   setProgress(prev => {
+    //     if (prev >= 100) {
+    //       clearInterval(interval);
+    //       setData(mockData);
+    //       setIsLoading(false);
+    //       return 100;
+    //     }
+    //     return prev + Math.random() * 15;
+    //   });
+      // }, 300);
+      
+    //   await axios.get();
   };
 
   const simulateError = () => {
