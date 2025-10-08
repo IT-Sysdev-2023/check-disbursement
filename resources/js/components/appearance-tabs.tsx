@@ -1,13 +1,25 @@
 import { Appearance, useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
+import { useColorScheme } from '@mui/material';
 import { LucideIcon, Monitor, Moon, Sun } from 'lucide-react';
-import { HTMLAttributes } from 'react';
+import { HTMLAttributes, useEffect } from 'react';
 
 export default function AppearanceToggleTab({
     className = '',
     ...props
 }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
+
+    const { setMode } = useColorScheme(); // <-- MUI color scheme hook
+
+    useEffect(() => {
+      // Sync MUI with current appearance mode
+      if (appearance === 'system') {
+        setMode('system');
+      } else {
+        setMode(appearance);
+      }
+    }, [appearance, setMode]);
 
     const tabs: { value: Appearance; icon: LucideIcon; label: string }[] = [
         { value: 'light', icon: Sun, label: 'Light' },

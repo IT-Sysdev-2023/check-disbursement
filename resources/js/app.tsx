@@ -7,7 +7,7 @@ import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { initializeTheme } from './hooks/use-appearance';
 import ThemeProviderWithAppearance from './components/ThemeProviderWithAppearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'Check Disbursement';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
