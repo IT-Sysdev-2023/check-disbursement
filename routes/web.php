@@ -13,8 +13,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
+    Route::get('dataRetrieval', function () {
+        return Inertia::render('dataRetrieval');
+    })->name('dataRetrieval');
+
     Route::get('releasing', function () {
-        return Inertia::render('releasing');
+        return Inertia::render('checkReleasing');
     })->name('releasing');
 
     Route::get('check-status', function () {

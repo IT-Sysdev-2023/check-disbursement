@@ -10,10 +10,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { about, changePassword, checkStatus, dashboard, notifications, releasing, report } from '@/routes';
+import { about, changePassword, checkStatus, dashboard, dataRetrieval, notifications, releasing, report } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Bell, BookOpen, Check, FileSpreadsheet, Folder, Key, LayoutGrid, PackageOpen, Users } from 'lucide-react';
+import { Bell, BookOpen, Check, Database, FileSpreadsheet, Folder, Key, LayoutGrid, PackageOpen, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -21,6 +21,11 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+    },
+    {
+        title: 'Data Retrieval',
+        href: dataRetrieval(),
+        icon: Database,
     },
     {
         title: 'Check Releasing',
