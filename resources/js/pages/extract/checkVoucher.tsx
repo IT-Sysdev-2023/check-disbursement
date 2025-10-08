@@ -29,7 +29,7 @@ type Project = {
     value: string;
 };
 
-export default function DataRetrieval() {
+export default function CheckVoucher() {
     const [progress, setProgress] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState<Project[] | null>(null);
@@ -89,7 +89,7 @@ export default function DataRetrieval() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Check-Releasing" />
+            <Head title="Check Voucher" />
             <Box
                 id="hero"
                 sx={(theme) => ({
@@ -130,7 +130,7 @@ export default function DataRetrieval() {
                                 fontSize: 'clamp(3rem, 10vw, 3.5rem)',
                             }}
                         >
-                            Data&nbsp;Retrieval&nbsp;
+                            Retrieve&nbsp;Check&nbsp;
                             <Typography
                                 component="span"
                                 variant="h1"
@@ -142,7 +142,7 @@ export default function DataRetrieval() {
                                     }),
                                 })}
                             >
-                                System
+                                Voucher
                             </Typography>
                         </Typography>
                         <Typography

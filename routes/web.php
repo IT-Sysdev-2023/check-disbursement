@@ -13,9 +13,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('dataRetrieval', function () {
-        return Inertia::render('dataRetrieval');
-    })->name('dataRetrieval');
+    Route::get('check-voucher', function () {
+        return Inertia::render('extract/checkVoucher');
+    })->name('check-voucher');
+
+    Route::get('check-request-form', function () {
+        return Inertia::render('extract/checkRequestForm');
+    })->name('check-request-form');
 
     Route::get('releasing', function () {
         return Inertia::render('checkReleasing');

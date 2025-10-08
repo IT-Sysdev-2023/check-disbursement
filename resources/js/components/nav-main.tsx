@@ -7,31 +7,116 @@ import {
 } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
+import { ChevronDown, ChevronRight } from "lucide-react";
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage();
+
+    const [openItem, setOpenItem] = useState<string | null>(null);
+
+      // 👇 Automatically open submenu if current page belongs to it
+    useEffect(() => {
+        for (const item of items) {
+            if (item.submenu) {
+                for (const sub of item.submenu) {
+                    const subHref =
+                        typeof sub.href === "string"
+                            ? sub.href
+                            : sub.href.url;
+                    if (page.url.startsWith(subHref)) {
+                        setOpenItem(item.title);
+                        return;
+                    }
+                }
+            }
+        }
+    }, [page.url, items]);
+
+    const handleToggle = (title: string) => {
+        setOpenItem((prev) => (prev === title ? null : title));
+    };
+
     return (
         <SidebarGroup className="px-2 py-0">
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton
-                            asChild
-                            isActive={page.url.startsWith(
-                                typeof item.href === 'string'
-                                    ? item.href
-                                    : item.href.url,
+                {items.map((item) => {
+                    const href =
+                        typeof item.href === "string"
+                            ? item.href
+                            : item.href.url;
+
+                    const isActive = page.url.startsWith(href);
+                    const hasSubmenu = Array.isArray(item.submenu);
+                    const isOpen = openItem === item.title;
+
+                    return (
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                                asChild={!hasSubmenu}
+                                isActive={isActive}
+                                tooltip={{ children: item.title }}
+                                onClick={
+                                    hasSubmenu
+                                        ? () => handleToggle(item.title)
+                                        : undefined
+                                }
+                            >
+                                {hasSubmenu ? (
+                                    <div className="flex items-center justify-between w-full cursor-pointer">
+                                        <div className="flex items-center gap-2">
+                                            {item.icon && <item.icon />}
+                                            <span>{item.title}</span>
+                                        </div>
+                                        {isOpen ? (
+                                            <ChevronDown size={16} />
+                                        ) : (
+                                            <ChevronRight size={16} />
+                                        )}
+                                    </div>
+                                ) : (
+                                    <Link href={href} prefetch>
+                                        {item.icon && <item.icon />}
+                                        <span>{item.title}</span>
+                                    </Link>
+                                )}
+                            </SidebarMenuButton>
+
+                            {/* Submenu */}
+                            {hasSubmenu && isOpen && (
+                                <div className="ml-6 mt-1 space-y-1">
+                                    {item.submenu?.map((sub) => {
+                                        const subHref =
+                                            typeof sub.href === "string"
+                                                ? sub.href
+                                                : sub.href.url;
+                                        const isSubActive =
+                                            page.url.startsWith(subHref);
+
+                                        return (
+                                            <SidebarMenuButton
+                                                key={sub.title}
+                                                asChild
+                                                isActive={isSubActive}
+                                                tooltip={{ children: sub.title }}
+                                            >
+                                                <Link
+                                                    href={subHref}
+                                                    prefetch
+                                                    className="flex items-center gap-2 pl-4 text-sm"
+                                                >
+                                                    {sub.icon && <sub.icon />}
+                                                    <span>{sub.title}</span>
+                                                </Link>
+                                            </SidebarMenuButton>
+                                        );
+                                    })}
+                                </div>
                             )}
-                            tooltip={{ children: item.title }}
-                        >
-                            <Link href={item.href} prefetch>
-                                {item.icon && <item.icon />}
-                                <span>{item.title}</span>
-                            </Link>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                ))}
+                        </SidebarMenuItem>
+                    );
+                })}
             </SidebarMenu>
         </SidebarGroup>
     );
