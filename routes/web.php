@@ -21,9 +21,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('extract/checkRequestForm');
     })->name('check-request-form');
 
-    Route::get('releasing', function () {
-        return Inertia::render('checkReleasing');
-    })->name('releasing');
+    Route::get('retrieve', function () {
+        return Inertia::render('retrieveCvCrf');
+    })->name('retrieve');
 
     Route::get('check-status', function () {
         return Inertia::render('dashboard');

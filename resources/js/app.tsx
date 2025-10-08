@@ -5,7 +5,6 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { initializeTheme } from './hooks/use-appearance';
-import ThemeProviderWithAppearance from './components/ThemeProviderWithAppearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Check Disbursement';
 
@@ -19,10 +18,24 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
+        const defaultTheme = createTheme({
+            colorSchemes: { light: true, dark: true },
+            cssVariables: {
+              colorSchemeSelector: 'data-mui-color-scheme',
+            },
+            // typography: {
+            //   fontFamily: 'Segoe UI Emoji'
+            // }
+          });
+
         root.render(
-            <ThemeProviderWithAppearance>
-              <App {...props} />
-            </ThemeProviderWithAppearance>
+            <ThemeProvider theme={defaultTheme}>
+            <CssBaseline />
+            <App {...props} />
+          </ThemeProvider>
+            // <ThemeProviderWithAppearance>
+            //   <App {...props} />
+            // </ThemeProviderWithAppearance>
           );
     },
     progress: {

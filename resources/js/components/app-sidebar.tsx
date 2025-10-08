@@ -10,7 +10,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { about, changePassword, checkRequestForm, checkStatus, checkVoucher, dashboard, notifications, releasing, report } from '@/routes';
+import { about, changePassword, checkRequestForm, checkStatus, checkVoucher, dashboard, notifications, report, retrieve } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Bell, BookOpen, Check, Database, FileSpreadsheet, Folder, Key, LayoutGrid, PackageOpen, Tickets, Users } from 'lucide-react';
@@ -32,8 +32,8 @@ const mainNavItems: NavItem[] = [
           ],
     },
     {
-        title: 'Check Releasing',
-        href: releasing(),
+        title: 'Retrieved CV/CRF',
+        href: retrieve(),
         icon: PackageOpen,
     },
     {
