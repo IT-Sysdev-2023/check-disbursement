@@ -51,13 +51,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 });
 Route::get('retrieve-data', [RetrieveDataController::class, 'index'])->name('retrieveData');
-Route::get('/test', function () {
-    $con = Schema::connection('sqlsrvCaf')->getTables();
-    $tables = collect($con)->filter(function ($table) {
-        return Str::contains($table['name'], 'CRF');
-    });
-    dd($tables);
-})->name('test');
+// Route::get('/test', function () {
+//     $con = Schema::connection('sqlsrvCaf')->getTables();
+//     $tables = collect($con)->filter(function ($table) {
+//         return Str::contains($table['name'], 'CRF');
+//     });
+//     dd($tables);
+// })->name('test');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
