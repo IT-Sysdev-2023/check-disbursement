@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('caf_line', function (Blueprint $table) {
+        Schema::create('cv_lines', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('nav_table_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('cv_no');
             $table->string('line_no');
             $table->string('vendor_no');
@@ -39,6 +40,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('caf_line');
+        Schema::dropIfExists('cv_lines');
     }
 };

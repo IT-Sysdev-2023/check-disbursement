@@ -15,47 +15,41 @@ class RetrieveDataController extends Controller
 {
     public function index()
     {
-        $con = Schema::connection('sqlsrvCaf')->getTables();
-        $tables = collect($con)->filter(function ($table) {
-            return Str::contains($table['name'], 'CRF');
-        });
-        dd($tables);
-        
-        $servers = NavServer::with('navDbNames.navDbTable')->first()->navDbNames->first();
+        // $con = Schema::connection('sqlsrvCaf')->getTables();
+        // $tables = collect($con)->filter(function ($table) {
+        //     return Str::contains($table['name'], 'CRF');
+        // });
+        // dd($tables);
 
-        dd($servers);
-        $con = self::getConnection()->table('CARMEN AGRI FARM$CRF Header')
-            ->get();
-        dd($con);
+        // $servers = NavServer::with('navDbNames.navDbTable')->first()->navDbNames->first();
+
+        // dd($servers);
+        // $con = self::getConnection()->table('CARMEN AGRI FARM$CV Check Payment')
+        //     ->limit(10)->get();
+        // dd($con);
 
         $con = DB::connection('sqlsrvCaf')
-            ->table('CARMEN AGRI FARM$CRF Header')
-            ->orderBy('CRF No_')
+            ->table('CARMEN AGRI FARM$CV Check Payment')
+            ->orderBy('CV No_')
             ->chunkById(100, function ($headers) {
                 $data = $headers->map(function ($item) {
                     return [
-                        'crf_no' => $item->{'CRF No_'},
-                        'crf_date' => $item->{'CRF Date'} ? Date::parse($item->{'CRF Date'}) : null,
-                        'crf_status' => $item->{'CRF Status'},
-                        'collection_schedule_date' => $item->{'Collection Schedule Date'} ? Date::parse($item->{'Collection Schedule Date'}) : null,
-                        'collector_name' => $item->{'Collector Name'},
-                        'vendor_no' => $item->{'Vendor No_'},
-                        'vendor_name' => $item->{'Vendor Name'},
-                        'fully_paid' => $item->{'Fully Paid'},
-                        'no_series' => $item->{'No_ Series'},
-                        'remarks' => $item->{'Remarks'},
-                        'crf_type' => $item->{'CRF Type'},
+                        'nav_table_id' => 1,
+                        'cv_number' => $item->{'CV No_'},
+                        'check_number' => $item->{'Check Number'},
+                        'check_amount' => $item->{'Check Amount'},
                         'check_date' => $item->{'Check Date'} ? Date::parse($item->{'Check Date'}) : null,
-                        'journal_batch_name' => $item->{'Journal Batch Name'},
-                        'total_amt_for_allocation' => $item->{'Total Amt_ for Allocation'},
-                        'journal_template_name' => $item->{'Journal Template Name'},
+                        'payee' => $item->{'Payee'},
+                        'created_at' => now(),
+                        'updated_at' => now(),
+
                     ];
                 })->toArray();
-
+                // dd($data);
                 // Single bulk insert per chunk
-                DB::table('caf_header')->insertOrIgnore($data);
+                DB::table('cvs')->insertOrIgnore($data);
 
-            }, 'CRF No_');
+            }, 'CV No_');
 
 
 
