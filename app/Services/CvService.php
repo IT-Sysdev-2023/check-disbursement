@@ -2,16 +2,8 @@
 
 namespace App\Services;
 use App\Jobs\CvServer;
-use App\Models\NavDatabase;
-use App\Models\NavDbName;
 use App\Models\NavServer;
 use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 class CvService
 {
     /**

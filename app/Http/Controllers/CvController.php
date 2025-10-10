@@ -11,7 +11,6 @@ class CvController extends Controller
     public function index()
     {
         return $this->service->retrieveData();
-
     }
    
 }

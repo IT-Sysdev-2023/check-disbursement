@@ -48,10 +48,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('notifications');
 
   
+    Route::get('retrieve-check-voucher', [CvController::class, 'index'])->name('retrieveCheckVoucher');
 
 
 });
-Route::get('retrieve-data', [CvController::class, 'index'])->name('retrieveData');
 // Route::get('/test', function () {
 //     $con = Schema::connection('sqlsrvCaf')->getTables();
 //     $tables = collect($con)->filter(function ($table) {

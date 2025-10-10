@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { releasing, retrieveData } from '@/routes';
+import { checkRequestForm, retrieveCheckVoucher } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import {
@@ -17,8 +17,8 @@ import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Data Retrieval',
-        href: releasing().url,
+        title: 'Check Request Form',
+        href: checkRequestForm().url,
     },
 ];
 
@@ -48,7 +48,7 @@ export default function CheckVoucher() {
         // setError(null);
         //   setData(null);
 
-        const { url, method } = retrieveData();
+        const { url, method } = retrieveCheckVoucher();
         const response = await axios({ url, method });
 
         console.log(response.data);
