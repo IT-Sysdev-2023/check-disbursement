@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NavDatabase;
 use App\Models\NavDbName;
 use App\Models\NavServer;
 use Illuminate\Http\Request;
@@ -17,14 +18,17 @@ class RetrieveDataController extends Controller
     {
         // $con = Schema::connection('sqlsrvCaf')->getTables();
         // $tables = collect($con)->filter(function ($table) {
-        //     return Str::contains($table['name'], 'CRF');
+        //     return Str::contains($table['name'], 'CV');
         // });
         // dd($tables);
+
+        $databaseNames = NavDatabase::get();
+        dd($databaseNames);
 
         // $servers = NavServer::with('navDbNames.navDbTable')->first()->navDbNames->first();
 
         // dd($servers);
-        // $con = self::getConnection()->table('CARMEN AGRI FARM$CV Check Payment')
+        // $con = self::getConnection()->table('CHOWKING ALTA CITTA$CV Check Payment')
         //     ->limit(10)->get();
         // dd($con);
 
@@ -63,7 +67,7 @@ class RetrieveDataController extends Controller
             'driver' => 'sqlsrv',
             'host' => env('DB_HOST_CAF', '172.16.161.11'),
             'port' => env('DB_PORT_CAF', '1433'),
-            'database' => env('DB_DATABASE_CAF', 'CARMEN AGRI FARM'),
+            'database' => 'CHOWKING_ALTACITTA_ACCTG',
             'username' => env('DB_USERNAME_CAF', 'super'),
             'password' => env('DB_PASSWORD_CAF', 'fsasya1941'),
             'charset' => 'utf8',

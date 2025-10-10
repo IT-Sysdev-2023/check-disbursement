@@ -430,19 +430,87 @@ class NavSeeder extends Seeder
             
         ];
 
+        //Unfinished
         $tables = [
             [
                 'nav_database_id' => 1,
-                'name' => 'CARMEN AGRI FARM$CRF Header',
+                'name' => 'CARMEN AGRI FARM$CV Check Payment',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
-                'nav_database_id' => 1,
-                'name' => 'CARMEN AGRI FARM$CRF Line',
+                'nav_database_id' => 2,
+                'name' => 'CHOWKING ALTA CITTA$CV Check Payment',
                 'created_at' => now(),
                 'updated_at' => now()
-            ]
+            ],
+            [
+                'nav_database_id' => 3,
+                'name' => 'CORTES FERTILIZER PLANT_ACCTG$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 4,
+                'name' => 'Dao Water Pumping Accounting$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 5,
+                'name' => 'Delivery & Trucking Accounting$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 6,
+                'name' => 'MFI_CORTES_PIGGERY_ACCTG$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 7,
+                'name' => 'MFI_CORTES_POULTRY_ACCTG$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 8,
+                'name' => 'MFI - ICE PLANT$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 9,
+                'name' => 'MFI SLAUGHTER HOUSE II$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 11,
+                'name' => 'MPDI ACCTG$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 12,
+                'name' => 'NOODLES FACTORY ACCTG$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 13,
+                'name' => 'PRAWNFARM_ICM_ACCTG$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'nav_database_id' => 14,
+                'name' => 'SON-OK AGRI FARM$CV Check Payment',
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+
         ];
 
         DB::table('nav_servers')->insert($servers);
