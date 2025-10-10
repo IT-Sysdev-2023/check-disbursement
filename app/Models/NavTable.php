@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class NavTable extends Model
 {
-    public function navDatabase(){
-        return $this->hasOne(NavDatabase::class);
+    public function cvs(){
+        return $this->hasMany(Cv::class);
     }
 }

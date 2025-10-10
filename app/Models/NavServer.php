@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class NavServer extends Model
 {
     public function navDatabases(){
-        return $this->hasMany(NavDatabase::class)->chaperone();
+        return $this->hasMany(NavDatabase::class);
     }
 }

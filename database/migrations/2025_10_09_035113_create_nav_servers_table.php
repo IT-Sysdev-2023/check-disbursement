@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('nav_servers', function (Blueprint $table) {
             $table->id();
-            $table->string('server');
+            $table->string('name');
             $table->string('username');
             $table->string('password');
             $table->integer('port');

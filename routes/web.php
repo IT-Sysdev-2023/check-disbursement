@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
@@ -50,7 +51,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 });
-Route::get('retrieve-data', [RetrieveDataController::class, 'index'])->name('retrieveData');
+Route::get('retrieve-data', [CvController::class, 'index'])->name('retrieveData');
 // Route::get('/test', function () {
 //     $con = Schema::connection('sqlsrvCaf')->getTables();
 //     $tables = collect($con)->filter(function ($table) {
