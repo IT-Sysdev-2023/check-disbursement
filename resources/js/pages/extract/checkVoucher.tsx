@@ -1,7 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
 import { checkVoucher, retrieveCheckVoucher } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { SharedData, type BreadcrumbItem } from '@/types';
+import { Head, usePage } from '@inertiajs/react';
 import {
     Box,
     Button,
@@ -35,13 +35,13 @@ export default function CheckVoucher() {
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState<Project[] | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const { auth } = usePage<SharedData>().props;
 
     useEcho(
-        `cv-progress.1`,
+        `cv-progress.${auth.user.id}`,
         "CvProgress",
         (e: any) => {
             console.log(e);
-    
         },
     );
 
@@ -60,11 +60,9 @@ export default function CheckVoucher() {
         //   setData(null);
 
         const { url, method } = retrieveCheckVoucher();
-        const response = await axios({ url, method });
+        await axios({ url, method });
 
-        console.log(response.data);
-
-        // const interval = setInterval(() => {
+        // const interval = setInterval(() => {`
         //   setProgress(prev => {
         //     if (prev >= 100) {
         //       clearInterval(interval);
