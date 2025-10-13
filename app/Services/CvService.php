@@ -1,15 +1,18 @@
 <?php
 
 namespace App\Services;
+use App\Events\CvPercentage;
+use App\Events\CvProgress;
 use App\Jobs\CvServer;
 use App\Models\NavServer;
+use App\Models\User;
 use Illuminate\Contracts\Database\Query\Builder;
 class CvService
 {
     /**
      * Create a new class instance.
      */
-    public function retrieveData()
+    public function retrieveData(User $user)
     {
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) {
@@ -17,8 +20,13 @@ class CvService
             })
             ->lazy();
 
-        $nav->each(function (NavServer $server) {
+        $start = 1;
+        $total = $nav->count();
+
+        $nav->each(function (NavServer $server) use ($user, &$start, $total) {
+            $start++;
             CvServer::dispatch($server);
+            CvProgress::dispatch("Generating CV in progress.. ", $start, $total, $user);
         });
     }
 
@@ -30,7 +38,7 @@ class CvService
         // });
         // dd($tables);
 
-         // dd($servers);
+        // dd($servers);
         // $con = self::getConnection()->table('CHOWKING ALTA CITTA$CV Check Payment')
         //     ->limit(10)->get();
         // dd($con);

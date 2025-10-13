@@ -14,6 +14,7 @@ import {
 import axios from 'axios';
 import { Link } from 'lucide-react';
 import { useState } from 'react';
+import { useEcho } from "@laravel/echo-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -34,6 +35,16 @@ export default function CheckVoucher() {
     const [isLoading, setIsLoading] = useState(false);
     const [data, setData] = useState<Project[] | null>(null);
     const [error, setError] = useState<string | null>(null);
+
+    useEcho(
+        `cv-progress.1`,
+        "CvProgress",
+        (e: any) => {
+            console.log(e);
+    
+        },
+    );
+
 
     const mockData: Project[] = [
         { id: 1, name: 'Project Alpha', status: 'Completed', value: '$12,450' },

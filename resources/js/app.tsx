@@ -1,10 +1,26 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
+import { configureEcho } from '@laravel/echo-react';
+import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { initializeTheme } from './hooks/use-appearance';
+
+configureEcho({
+    broadcaster: 'reverb',
+    key: import.meta.env.VITE_REVERB_APP_KEY,
+
+    wsHost: import.meta.env.VITE_REVERB_HOST,
+
+    wsPort: import.meta.env.VITE_REVERB_PORT,
+
+    wssPort: import.meta.env.VITE_REVERB_PORT,
+
+    forceTLS: (import.meta.env.VITE_REVERB_SCHEME ?? 'https') === 'https',
+
+    enabledTransports: ['ws', 'wss'],
+});
 
 const appName = import.meta.env.VITE_APP_NAME || 'Check Disbursement';
 
@@ -21,22 +37,22 @@ createInertiaApp({
         const defaultTheme = createTheme({
             colorSchemes: { light: true, dark: true },
             cssVariables: {
-              colorSchemeSelector: 'data-mui-color-scheme',
+                colorSchemeSelector: 'data-mui-color-scheme',
             },
             // typography: {
             //   fontFamily: 'Segoe UI Emoji'
             // }
-          });
+        });
 
         root.render(
             <ThemeProvider theme={defaultTheme}>
-            <CssBaseline />
-            <App {...props} />
-          </ThemeProvider>
+                <CssBaseline />
+                <App {...props} />
+            </ThemeProvider>,
             // <ThemeProviderWithAppearance>
             //   <App {...props} />
             // </ThemeProviderWithAppearance>
-          );
+        );
     },
     progress: {
         color: '#4B5563',
