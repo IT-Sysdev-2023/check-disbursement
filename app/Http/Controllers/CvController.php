@@ -13,5 +13,9 @@ class CvController extends Controller
     {
         return $this->service->retrieveData($request->user());
     }
+
+    public function retrieveCv(){
+        return $this->service->cvs();
+    }
    
 }

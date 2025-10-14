@@ -4,9 +4,11 @@ namespace App\Services;
 use App\Events\CvPercentage;
 use App\Events\CvProgress;
 use App\Jobs\CvServer;
+use App\Models\Cv;
 use App\Models\NavServer;
 use App\Models\User;
 use Illuminate\Contracts\Database\Query\Builder;
+use Inertia\Inertia;
 class CvService
 {
     /**
@@ -24,6 +26,12 @@ class CvService
         $nav->each(function (NavServer $server) use  ($id) {
             CvServer::dispatch($server, $id);
         });
+    }
+
+    public function cvs(){
+        return Inertia::render('retrieveCvCrf', [
+            'cv' => Cv::paginate()
+        ]);
     }
 
     private function checkDatabase()

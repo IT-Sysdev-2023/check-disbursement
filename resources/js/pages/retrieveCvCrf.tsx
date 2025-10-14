@@ -1,11 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import { retrieve } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
+import { Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import CustomizedDataGrid from './dashboard/components/CustomizedDataGrid';
-import Copyright from './dashboard/internals/components/Copyright';
 import Search from './dashboard/components/Search';
+import Copyright from './dashboard/internals/components/Copyright';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -14,7 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function RetrieveCvCrf() {
+export default function RetrieveCvCrf({ cv }: {cv: inertiaPagination<Cv>}) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Check-Releasing" />
@@ -23,12 +23,13 @@ export default function RetrieveCvCrf() {
                     Details
                 </Typography>
                 <Stack direction="row" sx={{ gap: 1 }}>
-        <Search />
-        {/* <CustomDatePicker /> */}
-      </Stack>
+                    <Search />
+                    {/* <CustomDatePicker /> */}
+                </Stack>
                 <Grid container spacing={2} columns={12}>
                     {/* <Grid size={{ xs: 12, lg: 9 }}> */}
-                    <CustomizedDataGrid />
+                    <CustomizedDataGrid cvs={cv} />
+                    
                     {/* </Grid> */}
                     {/* <Grid size={{ xs: 12, lg: 3 }}>
                             <Stack

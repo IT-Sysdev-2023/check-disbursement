@@ -1,19 +1,23 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { columns, rows } from '../internals/data/gridData';
+import { columns } from '../internals/data/gridData';
+import { Cv, inertiaPagination } from '@/types';
 
-export default function CustomizedDataGrid() {
+export default function CustomizedDataGrid({ cvs }: {cvs: inertiaPagination<Cv>}) {
   return (
     <DataGrid
-      rows={rows}
+      rows={cvs.data}
       columns={columns}
+      rowCount={cvs.total}
+      paginationModel={{
+        page: cvs.current_page - 1,
+        pageSize: cvs.per_page,
+      }}
+      pageSizeOptions={[10, 15, 25, 50]}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
       }
-      initialState={{
-        pagination: { paginationModel: { pageSize: 20 } },
-      }}
-      pageSizeOptions={[10, 20, 50]}
+      onPaginationModelChange={handlePagination}
       disableColumnResize
       density="compact"
       slotProps={{

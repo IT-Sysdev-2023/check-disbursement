@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { checkVoucher, retrieveCheckVoucher } from '@/routes';
-import { SharedData, type BreadcrumbItem } from '@/types';
+import { Auth, SharedData, type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
@@ -14,13 +14,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: checkVoucher().url,
     },
 ];
-
-type Project = {
-    id: number;
-    name: string;
-    status: string;
-    value: string;
-};
 interface ProgressState {
     [message: string]: {
         progress: number;
@@ -28,9 +21,8 @@ interface ProgressState {
         message: string;
     };
 }
-export default function CheckVoucher() {
+export default function CheckVoucher({auth}: {auth: Auth}) {
     const [progress, setProgress] = useState<ProgressState>({});
-    const { auth } = usePage<SharedData>().props;
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: any) => {
         const { percentage, total, message } = e;

@@ -46,3 +46,31 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface Cv{
+    id: number;
+    nav_table_id: number;
+    cv_number: string;
+    check_number: number;
+    check_amount: string;
+    check_date: string;
+    payee: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface inertiaPagination<T>{
+    total: number,
+    per_page: number,
+    current_page: number,
+    last_page: number,
+    current_page_url: string,
+    first_page_url: string,
+    last_page_url?: string,
+    next_page_url?: string,
+    prev_page_url?: string,
+    path?: string,
+    from: number,
+    to: number,
+    data:T[]
+}
