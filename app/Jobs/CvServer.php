@@ -14,7 +14,7 @@ class CvServer implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public NavServer $server)
+    public function __construct(public NavServer $server, public int $userId)
     {
         //
     }
@@ -25,7 +25,7 @@ class CvServer implements ShouldQueue
     public function handle(): void
     {
         $this->server->navDatabases->each(function ($db) {
-            CvDatabase::dispatch($this->server, $db);
+            CvDatabase::dispatch($this->server, $this->userId,$db);
         });
     }
 }

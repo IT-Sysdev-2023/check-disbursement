@@ -19,14 +19,10 @@ class CvService
                 $query->with('navTable');
             })
             ->lazy();
-
-        $start = 1;
-        $total = $nav->count();
-
-        $nav->each(function (NavServer $server) use ($user, &$start, $total) {
-            $start++;
-            CvServer::dispatch($server);
-            CvProgress::dispatch("Generating CV in progress.. ", $start, $total, $user);
+        $id = $user->id;
+        
+        $nav->each(function (NavServer $server) use  ($id) {
+            CvServer::dispatch($server, $id);
         });
     }
 

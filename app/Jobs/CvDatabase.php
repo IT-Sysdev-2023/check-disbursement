@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Events\CvProgress;
 use App\Models\NavDatabase;
 use App\Models\NavServer;
+use App\Models\User;
 use App\Services\NavConnection;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -18,7 +20,7 @@ class CvDatabase implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public NavServer $server, public NavDatabase $database)
+    public function __construct(public NavServer $server, public int $userId, public NavDatabase $database)
     {
         //
     }
@@ -36,28 +38,41 @@ class CvDatabase implements ShouldQueue
             $this->database->name
         );
 
-        if ($this->database->navTable)
+
+        if ($this->database->navTable) {
+
+            $start = 1;
+            $userId = User::findOrFail($this->userId);
+            $total = $connection->table($this->database->navTable->name)->count();
+
             $connection
                 ->table($this->database->navTable->name)
                 ->orderBy('CV No_')
-                ->chunkById(500, function ($cv) {
+                ->chunkById(500, function ($cv) use ($userId, &$start, $total) {
+
                     $data = $cv->map(
-                        fn($item) =>
-                        [
-                            'nav_table_id' => $this->database->navTable->id,
-                            'cv_number' => $item->{'CV No_'},
-                            'check_number' => $item->{'Check Number'},
-                            'check_amount' => $item->{'Check Amount'},
-                            'check_date' => $item->{'Check Date'} ? Date::parse($item->{'Check Date'}) : null,
-                            'payee' => $item->{'Payee'},
-                            'created_at' => now(),
-                            'updated_at' => now(),
-                        ]
+                        function ($item) use ($userId, &$start, $total) {
+
+                            $start++;
+                            CvProgress::dispatch("Generating " . $this->database->name . " in progress.. ", $start, $total, $userId);
+                            return [
+                                'nav_table_id' => $this->database->navTable->id,
+                                'cv_number' => $item->{'CV No_'},
+                                'check_number' => $item->{'Check Number'},
+                                'check_amount' => $item->{'Check Amount'},
+                                'check_date' => $item->{'Check Date'} ? Date::parse($item->{'Check Date'}) : null,
+                                'payee' => $item->{'Payee'},
+                                'created_at' => now(),
+                                'updated_at' => now(),
+                            ];
+
+                        }
                     )->toArray();
 
                     DB::transaction(function () use ($data) {
                         DB::table('cvs')->insertOrIgnore($data);
                     });
                 }, 'CV No_');
+        }
     }
 }

@@ -2,19 +2,11 @@ import AppLayout from '@/layouts/app-layout';
 import { checkVoucher, retrieveCheckVoucher } from '@/routes';
 import { SharedData, type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import {
-    Box,
-    Button,
-    Container,
-    InputLabel,
-    Stack,
-    TextField,
-    Typography,
-} from '@mui/material';
+import { useEcho } from '@laravel/echo-react';
+import { Box, Button, Container, Stack, Typography } from '@mui/material';
+import LinearProgress from '@mui/material/LinearProgress';
 import axios from 'axios';
-import { Link } from 'lucide-react';
 import { useState } from 'react';
-import { useEcho } from "@laravel/echo-react";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,71 +21,35 @@ type Project = {
     status: string;
     value: string;
 };
-
+interface ProgressState {
+    [message: string]: {
+        progress: number;
+        buffer: number;
+        message: string;
+    };
+}
 export default function CheckVoucher() {
-    const [progress, setProgress] = useState(0);
-    const [isLoading, setIsLoading] = useState(false);
-    const [data, setData] = useState<Project[] | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [progress, setProgress] = useState<ProgressState>({});
     const { auth } = usePage<SharedData>().props;
 
-    useEcho(
-        `cv-progress.${auth.user.id}`,
-        "CvProgress",
-        (e: any) => {
-            console.log(e);
-        },
-    );
+    useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: any) => {
+        const { percentage, total, message } = e;
 
+        const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
-    const mockData: Project[] = [
-        { id: 1, name: 'Project Alpha', status: 'Completed', value: '$12,450' },
-        { id: 2, name: 'Project Beta', status: 'In Progress', value: '$8,720' },
-        { id: 3, name: 'Project Gamma', status: 'Pending', value: '$15,300' },
-        { id: 4, name: 'Project Delta', status: 'Completed', value: '$9,850' },
-    ];
+        setProgress((prev) => ({
+            ...prev,
+            [message]: {
+                progress: percentage,
+                buffer,
+                message,
+            },
+        }));
+    });
 
     const simulateDataRetrieval = async () => {
-        // setIsLoading(true);
-        // setProgress(0);
-        // setError(null);
-        //   setData(null);
-
         const { url, method } = retrieveCheckVoucher();
         await axios({ url, method });
-
-        // const interval = setInterval(() => {`
-        //   setProgress(prev => {
-        //     if (prev >= 100) {
-        //       clearInterval(interval);
-        //       setData(mockData);
-        //       setIsLoading(false);
-        //       return 100;
-        //     }
-        //     return prev + Math.random() * 15;
-        //   });
-        // }, 300);
-
-        //   await axios.get();
-    };
-
-    const simulateError = () => {
-        setIsLoading(true);
-        setProgress(0);
-        setError(null);
-        setData(null);
-
-        const interval = setInterval(() => {
-            setProgress((prev) => {
-                if (prev >= 60) {
-                    clearInterval(interval);
-                    setError('Failed to retrieve data. Please try again.');
-                    setIsLoading(false);
-                    return 60;
-                }
-                return prev + Math.random() * 12;
-            });
-        }, 300);
     };
 
     return (
@@ -161,32 +117,58 @@ export default function CheckVoucher() {
                                 width: { sm: '100%', md: '80%' },
                             }}
                         >
-                            Explore our cutting-edge dashboard, delivering
-                            high-quality solutions tailored to your needs.
-                            Elevate your experience with top-tier features and
-                            services.
+                            Experience a smarter way to manage payments —
+                            organized, verified, and transparent with our Check
+                            Voucher module
                         </Typography>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                size="large"
-                            sx={{ minWidth: 'fit-content' }}
-                            onClick={simulateDataRetrieval}
-                            >
-                                Get Data
-                            </Button>
-                        <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ textAlign: 'center' }}
-                        >
-                            Click the &quot;Get Data&quot; to start generate&nbsp;
-                            <Link href="#" color="primary">
-                                Terms & Conditions
-                            </Link>
-                            .
-                        </Typography>
+                        {Object.keys(progress).length === 0 && (
+                            <>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    size="large"
+                                    sx={{ minWidth: 'fit-content' }}
+                                    onClick={simulateDataRetrieval}
+                                >
+                                    Get Data
+                                </Button>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                    sx={{ textAlign: 'center' }}
+                                >
+                                    Click the &quot;Get Data&quot; to start
+                                    generate&nbsp;
+                                </Typography>
+                            </>
+                        )}
                     </Stack>
+                    <Box sx={{ width: '100%', p: 2 }}>
+                        {Object.keys(progress).length === 0 && (
+                            <Typography variant="body2" color="text.secondary">
+                                Waiting for progress updates...
+                            </Typography>
+                        )}
+
+                        {Object.entries(progress).map(([key, item]) => (
+                            <Box key={key} sx={{ mb: 3 }}>
+                                <Typography variant="body2" sx={{ mb: 1 }}>
+                                    {item.message}
+                                </Typography>
+                                <LinearProgress
+                                    variant="buffer"
+                                    value={item.progress}
+                                    valueBuffer={item.buffer}
+                                />
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    {item.progress}%
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Box>
                 </Container>
             </Box>
         </AppLayout>
