@@ -1,12 +1,17 @@
 import AppLayout from '@/layouts/app-layout';
 import { checkVoucher, retrieveCheckVoucher } from '@/routes';
-import { Auth, SharedData, type BreadcrumbItem } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Auth, type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import axios from 'axios';
 import { useState } from 'react';
+
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { Dayjs } from 'dayjs';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,12 +26,14 @@ interface ProgressState {
         message: string;
     };
 }
-export default function CheckVoucher({auth}: {auth: Auth}) {
+export default function CheckVoucher({ auth }: { auth: Auth }) {
     const [progress, setProgress] = useState<ProgressState>({});
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: any) => {
         const { percentage, total, message } = e;
-
+        // console.log(e);
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
         setProgress((prev) => ({
@@ -40,8 +47,17 @@ export default function CheckVoucher({auth}: {auth: Auth}) {
     });
 
     const simulateDataRetrieval = async () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+        }
+
         const { url, method } = retrieveCheckVoucher();
-        await axios({ url, method });
+        await axios({
+            url, method, params: {
+                start_date: startDate.format('YYYY-MM-DD'),
+                end_date: endDate.format('YYYY-MM-DD')
+            } });
     };
 
     return (
@@ -115,6 +131,30 @@ export default function CheckVoucher({auth}: {auth: Auth}) {
                         </Typography>
                         {Object.keys(progress).length === 0 && (
                             <>
+                                <LocalizationProvider
+                                    dateAdapter={AdapterDayjs}
+                                >
+                                    <Box
+                                        sx={{ display: 'flex', gap: 2, mt: 2 }}
+                                    >
+                                        <DatePicker
+                                            label="Start Date"
+                                            value={startDate}
+                                            onChange={(newValue) =>
+                                                setStartDate(newValue)
+                                            }
+                                            maxDate={endDate || undefined}
+                                        />
+                                        <DatePicker
+                                            label="End Date"
+                                            value={endDate}
+                                            onChange={(newValue) =>
+                                                setEndDate(newValue)
+                                            }
+                                            minDate={startDate || undefined}
+                                        />
+                                    </Box>
+                                </LocalizationProvider>
                                 <Button
                                     variant="contained"
                                     color="primary"
@@ -124,14 +164,14 @@ export default function CheckVoucher({auth}: {auth: Auth}) {
                                 >
                                     Get Data
                                 </Button>
-                                <Typography
+                                {/* <Typography
                                     variant="caption"
                                     color="text.secondary"
                                     sx={{ textAlign: 'center' }}
                                 >
                                     Click the &quot;Get Data&quot; to start
                                     generate&nbsp;
-                                </Typography>
+                                </Typography> */}
                             </>
                         )}
                     </Stack>

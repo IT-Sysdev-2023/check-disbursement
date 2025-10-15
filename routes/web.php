@@ -46,7 +46,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('notifications');
 
   
-    Route::get('retrieve-check-voucher', [CvController::class, 'index'])->name('retrieveCheckVoucher');
+    Route::post('retrieve-check-voucher', [CvController::class, 'index'])->name('retrieveCheckVoucher');
 
 
 });

@@ -20,8 +20,12 @@ class CvDatabase implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public NavServer $server, public int $userId, public NavDatabase $database)
-    {
+    public function __construct(
+        public NavServer $server,
+        public int $userId,
+        public object $date,
+        public NavDatabase $database
+    ) {
         //
     }
 
@@ -42,19 +46,21 @@ class CvDatabase implements ShouldQueue
         if ($this->database->navTable) {
 
             $start = 1;
-            $userId = User::findOrFail($this->userId);
-            $total = $connection->table($this->database->navTable->name)->count();
+            $userId = User::find($this->userId);
 
-            $connection
-                ->table($this->database->navTable->name)
-                ->orderBy('CV No_')
+            $con = $connection->table($this->database->navTable->name)
+                ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$this->date->start, $this->date->end]);
+
+            $total = $con->count();
+
+            $con->orderBy('CV No_')
                 ->chunkById(500, function ($cv) use ($userId, &$start, $total) {
 
                     $data = $cv->map(
                         function ($item) use ($userId, &$start, $total) {
 
-                            $start++;
                             CvProgress::dispatch("Generating " . $this->database->name . " in progress.. ", $start, $total, $userId);
+                            $start++;
                             return [
                                 'nav_table_id' => $this->database->navTable->id,
                                 'cv_number' => $item->{'CV No_'},

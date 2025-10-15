@@ -8,13 +8,16 @@ use App\Models\Cv;
 use App\Models\NavServer;
 use App\Models\User;
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 class CvService
 {
     /**
      * Create a new class instance.
      */
-    public function retrieveData(User $user)
+    public function retrieveData(User $user, object $date)
     {
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) {
@@ -23,8 +26,8 @@ class CvService
             ->lazy();
         $id = $user->id;
         
-        $nav->each(function (NavServer $server) use  ($id) {
-            CvServer::dispatch($server, $id);
+        $nav->each(function (NavServer $server) use  ($id, $date) {
+            CvServer::dispatch($server, $id, $date);
         });
     }
 
@@ -43,8 +46,11 @@ class CvService
         // dd($tables);
 
         // dd($servers);
-        // $con = self::getConnection()->table('CHOWKING ALTA CITTA$CV Check Payment')
-        //     ->limit(10)->get();
+        // $start = "2017-08-05";
+        // $end = "2017-09-08";
+        // $con = DB::connection('sqlsrvCaf')->table('ALTA CITTA ACCOUNTING$CV Check Payment')
+        // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
+        // ->limit(10)->get();
         // dd($con);
     }
 }

@@ -17,7 +17,7 @@ export default function CustomizedDataGrid({ cvs }: {cvs: inertiaPagination<Cv>}
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
       }
-      onPaginationModelChange={handlePagination}
+      // onPaginationModelChange={handlePagination}
       disableColumnResize
       density="compact"
       slotProps={{
