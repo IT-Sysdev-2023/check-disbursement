@@ -30,6 +30,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
     const [progress, setProgress] = useState<ProgressState>({});
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
+    const [loading, setLoading] = useState(false);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: any) => {
         const { percentage, total, message } = e;
@@ -51,7 +52,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             alert('Please select both start and end dates');
             return;
         }
-
+        setLoading(true);
         const { url, method } = retrieveCheckVoucher();
         await axios({
             url, method, params: {
@@ -164,19 +165,11 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                                 >
                                     Get Data
                                 </Button>
-                                {/* <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{ textAlign: 'center' }}
-                                >
-                                    Click the &quot;Get Data&quot; to start
-                                    generate&nbsp;
-                                </Typography> */}
                             </>
                         )}
                     </Stack>
                     <Box sx={{ width: '100%', p: 2 }}>
-                        {Object.keys(progress).length === 0 && (
+                        {loading && Object.keys(progress).length === 0 && (
                             <Typography variant="body2" color="text.secondary">
                                 Waiting for progress updates...
                             </Typography>
