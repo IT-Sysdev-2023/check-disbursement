@@ -75,9 +75,10 @@ class CvDatabase implements ShouldQueue
                         }
                     )->toArray();
 
-                    DB::transaction(function () use ($data) {
-                        DB::table('cvs')->insertOrIgnore($data);
-                    });
+                    DB::transaction(
+                        fn() =>
+                        DB::table('cvs')->insertOrIgnore($data)
+                    );
                 }, 'CV No_');
         }
     }

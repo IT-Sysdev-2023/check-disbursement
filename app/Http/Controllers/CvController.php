@@ -23,8 +23,9 @@ class CvController extends Controller
         return $this->service->retrieveData($request->user(), $date);
     }
 
-    public function retrieveCv(){
-        return $this->service->cvs();
+    public function retrieveCv(Request $request){
+        $perPage = $request->per_page;
+        return $this->service->cvs($perPage);
     }
    
 }

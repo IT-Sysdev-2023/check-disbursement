@@ -9,7 +9,7 @@ import Copyright from './dashboard/internals/components/Copyright';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Retrived CV/CRF',
+        title: 'Retrieved CV/CRF',
         href: retrieve().url,
     },
 ];
@@ -20,7 +20,7 @@ export default function RetrieveCvCrf({ cv }: {cv: inertiaPagination<Cv>}) {
             <Head title="Check-Releasing" />
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                    Details
+                    Check Vouchers
                 </Typography>
                 <Stack direction="row" sx={{ gap: 1 }}>
                     <Search />

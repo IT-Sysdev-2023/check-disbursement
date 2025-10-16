@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Services;
-use App\Events\CvPercentage;
+
 use App\Events\CvProgress;
 use App\Jobs\CvServer;
 use App\Models\Cv;
 use App\Models\NavServer;
 use App\Models\User;
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -19,21 +20,26 @@ class CvService
      */
     public function retrieveData(User $user, object $date)
     {
+        // Get all the Navition Servers
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) {
                 $query->with('navTable');
             })
             ->lazy();
+
         $id = $user->id;
-        
-        $nav->each(function (NavServer $server) use  ($id, $date) {
-            CvServer::dispatch($server, $id, $date);
-        });
+        $nav->each(
+            fn(NavServer $server) =>
+            CvServer::dispatch($server, $id, $date)
+        );
+
+
     }
 
-    public function cvs(){
+    public function cvs(?int $page)
+    {
         return Inertia::render('retrieveCvCrf', [
-            'cv' => Cv::paginate()
+            'cv' => Cv::paginate($page)
         ]);
     }
 
