@@ -23,8 +23,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('extract/checkRequestForm');
     })->name('check-request-form');
 
-    Route::get('retrieve', [CvController::class, 'retrieveCv'])->name('retrieve');
-
+    
+    Route::prefix('retrieve')->controller(CvController::class)->group(function () {
+        Route::get('index',  'retrieveCv')->name('retrieve');
+        Route::get('details/{id}',  'details')->name('details');
+    });
     Route::get('check-status', function () {
         return Inertia::render('dashboard');
     })->name('check-status');

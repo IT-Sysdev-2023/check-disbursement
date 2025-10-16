@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Cv;
 use App\Services\CvService;
 use Illuminate\Http\Request;
 
@@ -26,6 +27,9 @@ class CvController extends Controller
     public function retrieveCv(Request $request){
         $perPage = $request->per_page;
         return $this->service->cvs($perPage);
+    }
+    public function details(Cv $id){
+        return $this->service->details($id);
     }
    
 }

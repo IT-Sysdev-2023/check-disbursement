@@ -43,6 +43,12 @@ class CvService
         ]);
     }
 
+    public function details(Cv $cv){
+        return Inertia::render('dashboard/cv/cvDetails', [
+            'cv' => $cv
+        ]);
+    }
+
     private function checkDatabase()
     {
         //  $con = Schema::connection('sqlsrvCaf')->getTables();
