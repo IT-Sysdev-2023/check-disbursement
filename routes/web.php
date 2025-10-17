@@ -53,13 +53,32 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 });
-// Route::get('/test', function () {
-//     $con = Schema::connection('sqlsrvCaf')->getTables();
-//     $tables = collect($con)->filter(function ($table) {
-//         return Str::contains($table['name'], 'CRF');
-//     });
-//     dd($tables);
-// })->name('test');
+Route::get('/test', function () {
+    // $con = Schema::connection('sqlsrvCaf')->getTables();
+    // $tables = collect($con)->filter(function ($table) {
+    //     return Str::contains($table['name'], 'CV');
+    // });
+    // dd($tables);
+        $start = "2017-08-05";
+        $end = "2017-09-08";
+    $con = DB::connection('sqlsrvCaf');
+        // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
+        // ->table('ALTA CITTA ACCOUNTING$CV Line')
+        $head = $con->table('ALTA CITTA ACCOUNTING$CV Header')
+
+        // ->where('CV Status', "")//CV25080289
+        // ->where('CV No_', "CRF0000002")//CV25080289
+        // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
+        ->first();
+        $line = $con->table('ALTA CITTA ACCOUNTING$CV Line')
+        ->first();
+        $check = $con->table('ALTA CITTA ACCOUNTING$CV Check Payment')
+        ->first();
+
+
+
+        dd($head, $line, $check);
+})->name('test');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

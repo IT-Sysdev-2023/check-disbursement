@@ -35,6 +35,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: any) => {
         const { percentage, total, message } = e;
         // console.log(e);
+        setLoading(false)
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
         setProgress((prev) => ({
