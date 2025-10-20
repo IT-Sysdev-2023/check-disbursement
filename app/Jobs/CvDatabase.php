@@ -48,6 +48,10 @@ class CvDatabase implements ShouldQueue
             $start = 1;
             $userId = User::find($this->userId);
 
+            // $this->database->navTable->each(function ($table) {
+            //     $table->;
+            // });
+
             $con = $connection->table($this->database->navTable->name)
                 ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$this->date->start, $this->date->end]);
 
@@ -58,7 +62,7 @@ class CvDatabase implements ShouldQueue
 
                     $data = $cv->map(
                         function ($item) use ($userId, &$start, $total) {
-
+                            
                             CvProgress::dispatch("Generating " . $this->database->name . " in progress.. ", $start, $total, $userId);
                             $start++;
                             return [
@@ -81,5 +85,12 @@ class CvDatabase implements ShouldQueue
                     );
                 }, 'CV No_');
         }
+    }
+
+    public function getHeader(){
+        
+    }
+    public function getLine(){
+
     }
 }

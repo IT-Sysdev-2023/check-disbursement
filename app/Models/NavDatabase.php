@@ -12,6 +12,6 @@ class NavDatabase extends Model
     }
 
     public function navTable(){
-        return $this->hasOne(NavTable::class);
+        return $this->hasMany(NavTable::class);
     }
 }
