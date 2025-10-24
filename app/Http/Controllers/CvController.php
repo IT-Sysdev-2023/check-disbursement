@@ -28,7 +28,7 @@ class CvController extends Controller
         $perPage = $request->per_page;
         return $this->service->cvs($perPage);
     }
-    public function details(Cv $id){
+    public function details($id){
         return $this->service->details($id);
     }
    

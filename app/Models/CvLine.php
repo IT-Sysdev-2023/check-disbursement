@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class NavTable extends Model
+class CvLine extends Model
 {
-  
+    //
 }

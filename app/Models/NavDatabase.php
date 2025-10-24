@@ -11,7 +11,13 @@ class NavDatabase extends Model
         return $this->belongsTo(NavServer::class);
     }
 
-    public function navTable(){
-        return $this->hasMany(NavTable::class);
+    public function navCheckPaymentTable(){
+        return $this->hasOne(NavCheckPaymentTable::class);
+    }
+    public function navHeaderTable(){
+        return $this->hasOne(NavHeaderTable::class);
+    }
+    public function navLineTable(){
+        return $this->hasOne(NavLineTable::class);
     }
 }

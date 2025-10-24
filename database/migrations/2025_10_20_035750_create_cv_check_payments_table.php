@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('cv_check_payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cv_line_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('cv_line_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unsignedBigInteger('check_number');
             $table->decimal('check_amount', 20);
             $table->string('bank_account_no');

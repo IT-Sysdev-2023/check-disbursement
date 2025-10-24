@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('cv_lines', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cv_header_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('cv_no');
+            $table->foreignId('cv_header_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('line_no');
             $table->string('crf_no');
             $table->string('document_no');

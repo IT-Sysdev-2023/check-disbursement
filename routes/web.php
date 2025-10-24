@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
@@ -59,6 +60,7 @@ Route::get('/test', function () {
     //     return Str::contains($table['name'], 'CV');
     // });
     // dd($tables);
+
         $start = "2017-08-05";
         $end = "2017-09-08";
     $con = DB::connection('sqlsrvCaf');
