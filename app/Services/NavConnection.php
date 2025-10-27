@@ -47,13 +47,18 @@ class NavConnection
 
         return $record;
     }
-    public function getLineRecord()
+    public function filterLineRecord(string $name)
     {
+        $record = $this->connection->table($name);
+        // ->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
 
+        return $record;
     }
-    public function getCheckPaymentRecord()
+    public function filterCheckPaymentRecord(string $name)
     {
-
+        $record = $this->connection->table($name)
+        ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
+        return $record;
     }
 
 

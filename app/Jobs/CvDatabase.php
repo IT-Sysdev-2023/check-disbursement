@@ -43,7 +43,9 @@ class CvDatabase implements ShouldQueue
             )
             ->setDateFilter($this->date)
             ->setUser($user)
-            ->storeHeaderRecord($this->database->navHeaderTable);
+            ->storeHeaderRecord($this->database->navHeaderTable)
+            ->storeLineRecord($this->database->navLineTable)
+            ->storeCheckPaymentRecord($this->database->navCheckPaymentTable);
 
 
     }
