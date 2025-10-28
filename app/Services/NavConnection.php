@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\NavServer;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class NavConnection
 {
@@ -15,7 +16,6 @@ class NavConnection
     public function setConnection(NavServer $server, string $database)
     {
         $key = "{$server->name}_{$database}";
-
         if (!isset(self::$cache[$key])) {
             $connectionName = 'nav_' . $key;
 
@@ -44,7 +44,6 @@ class NavConnection
     {
         $record = $this->connection->table($name)
             ->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
-
         return $record;
     }
     public function filterLineRecord(string $name)

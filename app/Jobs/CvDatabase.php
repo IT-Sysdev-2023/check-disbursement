@@ -34,7 +34,8 @@ class CvDatabase implements ShouldQueue
      */
     public function handle(): void
     {
-        $user = User::find($this->userId)->first();
+        // Log::info($this->userId);
+        // $user = User::find($this->userId)->first();
 
         (new CvService())
             ->setConnection(
@@ -42,10 +43,10 @@ class CvDatabase implements ShouldQueue
                 $this->database->name
             )
             ->setDateFilter($this->date)
-            ->setUser($user)
-            ->storeHeaderRecord($this->database->navHeaderTable)
-            ->storeLineRecord($this->database->navLineTable)
-            ->storeCheckPaymentRecord($this->database->navCheckPaymentTable);
+            ->setUser($this->userId)
+            ->storeHeaderRecord($this->database->navHeaderTable);
+            // ->storeLineRecord($this->database->navLineTable)
+            // ->storeCheckPaymentRecord($this->database->navCheckPaymentTable);
 
 
     }

@@ -16,6 +16,7 @@ use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -27,7 +28,7 @@ class CvService extends NavConnection
      */
 
 
-    protected User $user;
+    protected int $userId;
    
     public function __construct()
     {
@@ -42,6 +43,7 @@ class CvService extends NavConnection
             ->lazy();
 
         $id = $user->id;
+
         $nav->each(
             fn(NavServer $server) =>
             CvServer::dispatch($server, $id, $date)
@@ -61,7 +63,6 @@ class CvService extends NavConnection
 
             $tableName = $navHeaderTable->name;
             $tableId = $navHeaderTable->id;
-
             $query = $this->filterHeaderRecord($tableName);
             $total = $query->count();
 
@@ -69,8 +70,7 @@ class CvService extends NavConnection
                 ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId) {
                     $data = $cv->map(
                         function ($item) use (&$start, $total, $tableName, $tableId) {
-
-                            CvProgress::dispatch("Generating Cv Header" . $tableName . " in progress.. ", $start, $total, $this->user);
+                            CvProgress::dispatch("Generating Cv Header" . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
                                 'nav_header_table_id' => $tableId,
@@ -122,7 +122,7 @@ class CvService extends NavConnection
                     $data = $cv->map(
                         function ($item) use (&$start, $total, $tableName, $tableId) {
 
-                            CvProgress::dispatch("Generating Cv Line" . $tableName . " in progress.. ", $start, $total, $this->user);
+                            CvProgress::dispatch("Generating Cv Line" . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
                                 'cv_header_id' => $tableId,
@@ -169,7 +169,7 @@ class CvService extends NavConnection
                     $data = $cv->map(
                         function ($item) use (&$start, $total, $tableName, $tableId) {
 
-                            CvProgress::dispatch("Generating Cv Check Payment" . $tableName . " in progress.. ", $start, $total, $this->user);
+                            CvProgress::dispatch("Generating Cv Check Payment" . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
                                 'cv_line_id' => $tableId,
@@ -201,7 +201,7 @@ class CvService extends NavConnection
         }
     }
 
-    public function setUser(User $user)
+    public function setUser(int $user)
     {
         $this->user = $user;
         return $this;

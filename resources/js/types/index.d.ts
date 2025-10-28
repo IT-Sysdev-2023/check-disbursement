@@ -74,3 +74,17 @@ export interface inertiaPagination<T>{
     to: number,
     data:T[]
 }
+
+export interface ProgressState {
+    [message: string]: {
+        progress: number;
+        buffer: number;
+        message: string;
+    };
+}
+
+export interface EventType{
+    percentage: number;
+    total: number;
+    message: string;
+}

@@ -19,7 +19,7 @@ class CvProgress implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(protected string $message, protected int $currentRow, protected int $totalRows, protected User $user)
+    public function __construct(protected string $message, protected int $currentRow, protected int $totalRows, protected int $userId)
     {
         //
         $this->percentage = NumberHelper::percentage($currentRow, $totalRows);
@@ -33,11 +33,11 @@ class CvProgress implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('cv-progress.' . $this->user->id),
+            new PrivateChannel('cv-progress.' . $this->userId),
         ];
     }
 
-    public function broadcastWith()
+    public function broadcastWith() 
     {
         return [
             'message' => $this->message,

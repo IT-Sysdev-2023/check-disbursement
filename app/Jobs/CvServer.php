@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\NavDatabase;
 use App\Models\NavServer;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -24,7 +25,7 @@ class CvServer implements ShouldQueue
      */
     public function handle(): void
     {
-        $this->server->navDatabases->each(function ($db) {
+        $this->server->navDatabases->each(function (NavDatabase $db) {
             CvDatabase::dispatch($this->server, $this->userId, $this->date,$db);
         });
     }

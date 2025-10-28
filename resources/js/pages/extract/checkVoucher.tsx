@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { checkVoucher, retrieveCheckVoucher } from '@/routes';
-import { Auth, type BreadcrumbItem } from '@/types';
+import { Auth, EventType, ProgressState, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import { Box, Button, Container, Stack, Typography } from '@mui/material';
@@ -19,22 +19,16 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: checkVoucher().url,
     },
 ];
-interface ProgressState {
-    [message: string]: {
-        progress: number;
-        buffer: number;
-        message: string;
-    };
-}
+
 export default function CheckVoucher({ auth }: { auth: Auth }) {
     const [progress, setProgress] = useState<ProgressState>({});
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
     const [loading, setLoading] = useState(false);
 
-    useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: any) => {
-        const { percentage, total, message } = e;
-        console.log(e);
+    useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
+        const { percentage, message } = e;
+        
         setLoading(false)
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 

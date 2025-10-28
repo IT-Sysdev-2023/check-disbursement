@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Events\CvProgress;
 use App\Models\Cv;
 use App\Services\CvService;
 use Illuminate\Http\Request;
