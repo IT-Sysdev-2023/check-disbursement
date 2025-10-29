@@ -121,8 +121,8 @@ class CvService extends NavConnection
                 ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId) {
                     $data = $cv->map(
                         function ($item) use (&$start, $total, $tableName, $tableId) {
-
-                            CvProgress::dispatch("Generating Cv Line" . $tableName . " in progress.. ", $start, $total, $this->userId);
+                            Log::info($item->{'Line No_'});
+                            CvProgress::dispatch("Generating Cv Line " . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
                                 'cv_header_id' => $tableId,
@@ -146,10 +146,10 @@ class CvService extends NavConnection
                         }
                     )->toArray();
 
-                    DB::transaction(
-                        fn() =>
-                        DB::table('cv_lines')->insertOrIgnore($data)
-                    );
+                    // DB::transaction(
+                    // fn() =>
+                        DB::table('cv_lines')->insertOrIgnore($data);
+                    // );
                 }, 'CV No_');
         }
         return $this;
@@ -169,7 +169,7 @@ class CvService extends NavConnection
                     $data = $cv->map(
                         function ($item) use (&$start, $total, $tableName, $tableId) {
 
-                            CvProgress::dispatch("Generating Cv Check Payment" . $tableName . " in progress.. ", $start, $total, $this->userId);
+                            CvProgress::dispatch("Generating Cv Check Payment " . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
                                 'cv_line_id' => $tableId,
@@ -203,7 +203,7 @@ class CvService extends NavConnection
 
     public function setUser(int $user)
     {
-        $this->user = $user;
+        $this->userId = $user;
         return $this;
     }
 

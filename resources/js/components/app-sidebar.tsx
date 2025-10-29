@@ -13,7 +13,7 @@ import {
 import { about, changePassword, checkRequestForm, checkStatus, checkVoucher, dashboard, notifications, report, retrieve } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Bell, BookOpen, Check, Database, FileSpreadsheet, Folder, Key, LayoutGrid, PackageOpen, Tickets, Users } from 'lucide-react';
+import { Bell, BookOpen, Check, Database, FileSpreadsheet, Key, LayoutGrid, PackageOpen, Tickets, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
