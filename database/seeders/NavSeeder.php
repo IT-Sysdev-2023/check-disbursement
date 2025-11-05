@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\NavDatabase;
+use App\Models\NavServer;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -430,9 +432,10 @@ class NavSeeder extends Seeder
             
         ];
 
-       
 
+        // NavServer::create($servers);
         DB::table('nav_servers')->insert($servers);
+        // NavDatabase::create($dbNames);
         DB::table('nav_databases')->insert($dbNames);
     }
 }

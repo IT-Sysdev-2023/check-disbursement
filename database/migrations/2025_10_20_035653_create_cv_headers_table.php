@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cv_headers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('nav_header_table_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('cv_no')->unique();
+            $table->string('cv_no');
             $table->dateTime('cv_date')->nullable();
             $table->string('cv_status');
             $table->string('collector_name');
@@ -30,8 +30,8 @@ return new class extends Migration
             $table->string('no_printed');
             $table->string('cancelled_by');
             $table->dateTime('cancelled_date')->nullable();
-            // $table->string('checked_by'); not Included
-            // $table->string('approved_by'); not Included
+            $table->string('checked_by'); 
+            $table->string('approved_by'); 
             $table->timestamps();
         });
     }

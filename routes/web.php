@@ -66,7 +66,7 @@ Route::get('/test', function () {
     $end = "2017-09-08";
     $con = DB::connection('sqlsrvCaf')
     // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
-    ->table('CARMEN AGRI FARM$CV Check Payment')
+    ->table('CARMEN AGRI FARM$CV Header')
     // $head = $con->table('ALTA CITTA ACCOUNTING$CV Header')
 
     // // ->where('CV Status', "")//CV25080289

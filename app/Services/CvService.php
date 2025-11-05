@@ -125,13 +125,17 @@ class CvService extends NavConnection
                             $start++;
                             return [
                                 // 'cv_header_id' => $tableId,
+                                'nav_line_table_id' => $tableId, //new
+                                'cv_no' => $item->{'CV No_'}, //new
                                 'line_no' => $item->{'Line No_'},
+                                'vendor_no' => $item->{'Vendor No_'}, //new
                                 'crf_no' => $item->{'CRF No_'},
                                 'document_no' => $item->{'Document No_'},
                                 'gl_entry_no' =>$item->{'G_L Entry No_'},
                                 'forwarded_amount' =>$item->{'Forwarded Amount'},
                                 'paid_amount' =>$item->{'Paid Amount'},
                                 'balance' =>$item->{'Balance'},
+                                'cv_status' =>$item->{'CV Status'}, //new
                                 'document_type' =>$item->{'Document Type'},
                                 'applies_to_doc_no' =>$item->{'Applies To Doc_ No_'},
                                 'invoice_no' => $item->{'Invoice No_'},
@@ -172,6 +176,10 @@ class CvService extends NavConnection
                             $start++;
                             return [
                                 // 'cv_line_id' => $tableId,
+                                'nav_check_payment_table_id' => $tableId, //new
+                                'cv_no' => $item->{'CV No_'}, // new
+                                'line_no' => $item->{'Line No_'}, //new
+                                'cv_status' => $item->{'CV Status'}, //new
                                 'check_number' => $item->{'Check Number'},
                                 'check_amount' => $item->{'Check Amount'},
                                 'bank_account_no' => $item->{'Bank Account No_'},
@@ -184,8 +192,11 @@ class CvService extends NavConnection
                                 'cancelled_by' => $item->{'Cancelled By'},
                                 'cancellation_reason' => $item->{'Cancellation Reason'},
                                 'cancelled_with_check_number' => $item->{'Cancelled with Check Number'},
+                                'company_dimension_code' => $item->{'Company Dimension Code'}, //new
+                                'department_dimension_code' => $item->{'Department Dimension Code'}, //new
                                 'check_class' => $item->{'Check Class'},
                                 'check_class_location' =>$item->{'Check Class Location'},
+                                'payee' =>$item->{'Payee'}, //new
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ];
