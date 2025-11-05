@@ -29,7 +29,7 @@ class CvService extends NavConnection
 
 
     protected int $userId;
-   
+
     public function __construct()
     {
     }
@@ -56,23 +56,29 @@ class CvService extends NavConnection
         return $this;
     }
 
-    public function storeHeaderRecord(?NavHeaderTable $navHeaderTable)
+    public function storeHeaderRecord(?NavHeaderTable $navHeaderTable, ?NavLineTable $navLineTable, ?NavCheckPaymentTable $navCheckPaymentTable)
     {
         if ($navHeaderTable) {
             $start = 1;
 
             $tableName = $navHeaderTable->name;
             $tableId = $navHeaderTable->id;
-            $query = $this->filterHeaderRecord($tableName);
-            $total = $query->count();
+            $header = $this->filterHeaderRecord($tableName);
+            $lineDb = $this->filterLineRecord($navLineTable->name);
+            $cpDb = $this->filterCheckPaymentRecord($navCheckPaymentTable->name);
+            $total = $header->count();
 
-            $query->orderBy('Check Voucher No_')
-                ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId) {
-                    $data = $cv->map(
-                        function ($item) use (&$start, $total, $tableName, $tableId) {
-                            CvProgress::dispatch("Generating Cv Header" . $tableName . " in progress.. ", $start, $total, $this->userId);
+            $header->orderBy('Check Voucher No_')
+                ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId, $lineDb, $cpDb) {
+
+                    $cv->each(
+                        function ($item) use (&$start, $total, $tableName, $tableId, $lineDb, $cpDb) {
+
+                            CvProgress::dispatch("Generating Cv Header " . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
-                            return [
+                            
+                            DB::beginTransaction();
+                            $header = [
                                 'nav_header_table_id' => $tableId,
                                 'cv_no' => $item->{'Check Voucher No_'},
                                 'cv_date' => $item->{'CV Date'} ? Date::parse($item->{'CV Date'}) : null,
@@ -95,20 +101,78 @@ class CvService extends NavConnection
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ];
-                        }
-                    )->toArray();
 
-                    DB::transaction(
-                        fn() =>
-                        DB::table('cv_headers')->insertOrIgnore($data)
+                            $headerId = DB::table('cv_headers')->insertGetId($header);
+
+                            // Query lines for this header
+                            $lines = (clone $lineDb)
+                                ->where('CV No_', $item->{'Check Voucher No_'})
+                                ->get()
+                                ->map(function ($lineItem) use ($headerId) {
+                                return [
+                                    'cv_header_id' => $headerId,
+                                    'line_no' => $lineItem->{'Line No_'},
+                                    'crf_no' => $lineItem->{'CRF No_'},
+                                    'document_no' => $lineItem->{'Document No_'},
+                                    'gl_entry_no' => $lineItem->{'G_L Entry No_'},
+                                    'forwarded_amount' => $lineItem->{'Forwarded Amount'},
+                                    'paid_amount' => $lineItem->{'Paid Amount'},
+                                    'balance' => $lineItem->{'Balance'},
+                                    'document_type' => $lineItem->{'Document Type'},
+                                    'applies_to_doc_no' => $lineItem->{'Applies To Doc_ No_'},
+                                    'invoice_no' => $lineItem->{'Invoice No_'},
+                                    'account_name' => $lineItem->{'Account Name'},
+                                    'company_dimension_code' => $lineItem->{'Company Dimension Code'},
+                                    'department_dimension_code' => $lineItem->{'Department Dimension Code'},
+                                    'payment_type' => $lineItem->{'Payment Type'},
+                                    'created_at' => now(),
+                                    'updated_at' => now(),
+                                ];
+                            });
+
+                            $checkPayments = (clone $cpDb)
+                                ->where('CV No_', $item->{'Check Voucher No_'})
+                                ->get()
+                                ->map(function ($checkPayment) use ($headerId) {
+                                    return [
+                                        'cv_header_id' => $headerId,
+                                        'check_number' => $checkPayment->{'Check Number'},
+                                        'check_amount' => $checkPayment->{'Check Amount'},
+                                        'bank_account_no' => $checkPayment->{'Bank Account No_'},
+                                        'bank_name' => $checkPayment->{'Bank Name'},
+                                        'check_date' => $checkPayment->{'Check Date'} ? Date::parse($checkPayment->{'Check Date'}) : null,
+                                        'clearing_date' => $checkPayment->{'Clearing Date'} ? Date::parse($checkPayment->{'Clearing Date'}) : null,
+                                        'cleared_flag' => $checkPayment->{'Cleared Flag'},
+                                        'cancelled_flag' => $checkPayment->{'Cancelled Flag'},
+                                        'cancelled_date' => $checkPayment->{'Cancelled Date'} ? Date::parse($checkPayment->{'Cancelled Date'}) : null,
+                                        'cancelled_by' => $checkPayment->{'Cancelled By'},
+                                        'cancellation_reason' => $checkPayment->{'Cancellation Reason'},
+                                        'cancelled_with_check_number' => $checkPayment->{'Cancelled with Check Number'},
+                                        'check_class' => $checkPayment->{'Check Class'},
+                                        'check_class_location' => $checkPayment->{'Check Class Location'},
+                                        'created_at' => now(),
+                                        'updated_at' => now(),
+                                    ];
+                                });
+
+                            if ($lines->isNotEmpty()) {
+                                DB::table('cv_lines')->insertOrIgnore($lines->toArray());
+                            }
+
+                            if ($checkPayments->isNotEmpty()) {
+                                DB::table('cv_check_payments')->insertOrIgnore($checkPayments->toArray());
+                            }
+                            DB::commit();
+                        }
                     );
                 }, 'Check Voucher No_');
         }
 
         return $this;
     }
-    public function storeLineRecord(?NavLineTable $navLineTable){
-         if ($navLineTable) {
+    public function storeLineRecord(?NavLineTable $navLineTable)
+    {
+        if ($navLineTable) {
 
             $start = 1;
             $tableName = $navLineTable->name;
@@ -124,25 +188,22 @@ class CvService extends NavConnection
                             CvProgress::dispatch("Generating Cv Line " . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
-                                // 'cv_header_id' => $tableId,
-                                'nav_line_table_id' => $tableId, //new
-                                'cv_no' => $item->{'CV No_'}, //new
+                                'nav_line_table_id' => $tableId,
                                 'line_no' => $item->{'Line No_'},
-                                'vendor_no' => $item->{'Vendor No_'}, //new
+                                'cv_no' => $item->{'CV No_'},
                                 'crf_no' => $item->{'CRF No_'},
                                 'document_no' => $item->{'Document No_'},
-                                'gl_entry_no' =>$item->{'G_L Entry No_'},
-                                'forwarded_amount' =>$item->{'Forwarded Amount'},
-                                'paid_amount' =>$item->{'Paid Amount'},
-                                'balance' =>$item->{'Balance'},
-                                'cv_status' =>$item->{'CV Status'}, //new
-                                'document_type' =>$item->{'Document Type'},
-                                'applies_to_doc_no' =>$item->{'Applies To Doc_ No_'},
+                                'gl_entry_no' => $item->{'G_L Entry No_'},
+                                'forwarded_amount' => $item->{'Forwarded Amount'},
+                                'paid_amount' => $item->{'Paid Amount'},
+                                'balance' => $item->{'Balance'},
+                                'document_type' => $item->{'Document Type'},
+                                'applies_to_doc_no' => $item->{'Applies To Doc_ No_'},
                                 'invoice_no' => $item->{'Invoice No_'},
                                 'account_name' => $item->{'Account Name'},
                                 'company_dimension_code' => $item->{'Company Dimension Code'},
                                 'department_dimension_code' => $item->{'Department Dimension Code'},
-                                'payment_type' =>$item->{'Payment Type'},
+                                'payment_type' => $item->{'Payment Type'},
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ];
@@ -150,15 +211,16 @@ class CvService extends NavConnection
                     )->toArray();
 
                     DB::transaction(
-                    fn() =>
+                        fn() =>
                         DB::table('cv_lines')->insertOrIgnore($data)
                     );
                 }, 'CV No_');
         }
         return $this;
     }
-    public function storeCheckPaymentRecord(?NavCheckPaymentTable $navCheckPaymentTable){
-         if ($navCheckPaymentTable) {
+    public function storeCheckPaymentRecord(?NavCheckPaymentTable $navCheckPaymentTable)
+    {
+        if ($navCheckPaymentTable) {
 
             $start = 1;
             $tableName = $navCheckPaymentTable->name;
@@ -175,28 +237,22 @@ class CvService extends NavConnection
                             CvProgress::dispatch("Generating Cv Check Payment " . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
-                                // 'cv_line_id' => $tableId,
-                                'nav_check_payment_table_id' => $tableId, //new
-                                'cv_no' => $item->{'CV No_'}, // new
-                                'line_no' => $item->{'Line No_'}, //new
-                                'cv_status' => $item->{'CV Status'}, //new
+                                'nav_cp_table_id' => $tableId,
+                                'cv_no' => $item->{'CV No_'},
                                 'check_number' => $item->{'Check Number'},
                                 'check_amount' => $item->{'Check Amount'},
                                 'bank_account_no' => $item->{'Bank Account No_'},
-                                'bank_name' =>$item->{'Bank Name'},
+                                'bank_name' => $item->{'Bank Name'},
                                 'check_date' => $item->{'Check Date'} ? Date::parse($item->{'Check Date'}) : null,
                                 'clearing_date' => $item->{'Clearing Date'} ? Date::parse($item->{'Clearing Date'}) : null,
-                                'cleared_flag' =>$item->{'Cleared Flag'},
-                                'cancelled_flag' =>$item->{'Cancelled Flag'},
+                                'cleared_flag' => $item->{'Cleared Flag'},
+                                'cancelled_flag' => $item->{'Cancelled Flag'},
                                 'cancelled_date' => $item->{'Cancelled Date'} ? Date::parse($item->{'Cancelled Date'}) : null,
                                 'cancelled_by' => $item->{'Cancelled By'},
                                 'cancellation_reason' => $item->{'Cancellation Reason'},
                                 'cancelled_with_check_number' => $item->{'Cancelled with Check Number'},
-                                'company_dimension_code' => $item->{'Company Dimension Code'}, //new
-                                'department_dimension_code' => $item->{'Department Dimension Code'}, //new
                                 'check_class' => $item->{'Check Class'},
-                                'check_class_location' =>$item->{'Check Class Location'},
-                                'payee' =>$item->{'Payee'}, //new
+                                'check_class_location' => $item->{'Check Class Location'},
                                 'created_at' => now(),
                                 'updated_at' => now(),
                             ];

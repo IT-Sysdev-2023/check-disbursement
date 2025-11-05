@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('cv_headers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('nav_header_table_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('cv_no');
+            $table->string('cv_no')->unique();
             $table->dateTime('cv_date')->nullable();
             $table->string('cv_status');
             $table->string('collector_name');

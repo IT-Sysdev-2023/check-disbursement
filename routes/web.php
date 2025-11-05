@@ -62,17 +62,28 @@ Route::get('/test', function () {
     // });
     // dd($tables);
 
-    $start = "2017-08-05";
-    $end = "2017-09-08";
+    $start = "2025-11-03";
+    $end = "2025-11-04";
     $con = DB::connection('sqlsrvCaf')
     // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
-    ->table('CARMEN AGRI FARM$CV Header')
+    ->table('MFI_CORTES_PIGGERY_ACCTG$CV Line')
     // $head = $con->table('ALTA CITTA ACCOUNTING$CV Header')
 
     // // ->where('CV Status', "")//CV25080289
-    // // ->where('CV No_', "CRF0000002")//CV25080289
-    // // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
-    ->first();
+    ->whereIn('CV No_', ["CRF2511001","CRF2511002","CRF2511003","CRF2511004","CRF2511005","CRF2511006",
+    "CRF2511007","CRF2511008","CRF2511009","CRF2511010","CRF2511011","CRF2511012","CRF2511013","CRF2511014","CRF2511015","CRF2511016",])//CV25080289
+    // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
+    ->count();
+    // $con1 = DB::connection('sqlsrvCaf')
+    // ->table('CARMEN AGRI FARM$CV Line')
+    // ->where('CV No_', "CRF0000118")//CV25080289
+    // // // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
+    // ->get();
+    // $con2 = DB::connection('sqlsrvCaf')
+    // ->table('CARMEN AGRI FARM$CV Check Payment')
+    // // ->where('CV No_', "CRF0000118")//CV25080289
+    // // // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
+    // ->first();
     dd($con);
     $str = [];
     // $line = $con->table('CARMEN AGRI FARM$CV Line')
