@@ -13,14 +13,18 @@ return new class extends Migration
     {
         Schema::create('cv_lines', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('cv_header_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('nav_line_table_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete(); //new
+            // $table->foreignId('cv_header_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('cv_no'); //new
             $table->string('line_no');
+            $table->string('vendor_no'); //new
             $table->string('crf_no');
             $table->string('document_no');
             $table->string('gl_entry_no');
             $table->string('forwarded_amount');
             $table->string('paid_amount');
             $table->string('balance');
+            $table->string('cv_status'); //new
             $table->string('document_type');
             $table->string('applies_to_doc_no');
             $table->string('invoice_no');

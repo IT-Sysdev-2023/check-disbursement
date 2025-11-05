@@ -30,8 +30,8 @@ return new class extends Migration
             $table->string('no_printed');
             $table->string('cancelled_by');
             $table->dateTime('cancelled_date')->nullable();
-            $table->string('checked_by');
-            $table->string('approved_by');
+            // $table->string('checked_by'); not Included
+            // $table->string('approved_by'); not Included
             $table->timestamps();
         });
     }

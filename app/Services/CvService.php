@@ -121,11 +121,10 @@ class CvService extends NavConnection
                 ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId) {
                     $data = $cv->map(
                         function ($item) use (&$start, $total, $tableName, $tableId) {
-                            Log::info($item->{'Line No_'});
                             CvProgress::dispatch("Generating Cv Line " . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
-                                'cv_header_id' => $tableId,
+                                // 'cv_header_id' => $tableId,
                                 'line_no' => $item->{'Line No_'},
                                 'crf_no' => $item->{'CRF No_'},
                                 'document_no' => $item->{'Document No_'},
@@ -146,10 +145,10 @@ class CvService extends NavConnection
                         }
                     )->toArray();
 
-                    // DB::transaction(
-                    // fn() =>
-                        DB::table('cv_lines')->insertOrIgnore($data);
-                    // );
+                    DB::transaction(
+                    fn() =>
+                        DB::table('cv_lines')->insertOrIgnore($data)
+                    );
                 }, 'CV No_');
         }
         return $this;
@@ -172,7 +171,7 @@ class CvService extends NavConnection
                             CvProgress::dispatch("Generating Cv Check Payment " . $tableName . " in progress.. ", $start, $total, $this->userId);
                             $start++;
                             return [
-                                'cv_line_id' => $tableId,
+                                // 'cv_line_id' => $tableId,
                                 'check_number' => $item->{'Check Number'},
                                 'check_amount' => $item->{'Check Amount'},
                                 'bank_account_no' => $item->{'Bank Account No_'},
