@@ -58,8 +58,8 @@ class CvService extends NavConnection
 
     public function storeHeaderRecord(
         ?NavHeaderTable $navHeaderTable,
-        ?NavLineTable $navLineTable,
-        ?NavCheckPaymentTable $navCheckPaymentTable
+        ?string $navLineTable,
+        ?string $navCheckPaymentTable
     ) {
         if (!$navHeaderTable) {
             return $this;
@@ -70,8 +70,8 @@ class CvService extends NavConnection
         $tableId = $navHeaderTable->id;
 
         $headerQuery = $this->headerConnection($tableName);
-        $lineQuery = $this->lineConnection($navLineTable->name);
-        $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable->name);
+        $lineQuery = $this->lineConnection($navLineTable);
+        $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable);
 
         $total = $headerQuery->count();
 
