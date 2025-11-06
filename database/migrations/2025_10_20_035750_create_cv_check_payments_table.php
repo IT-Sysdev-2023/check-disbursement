@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('cancelled_with_check_number');
             $table->string('check_class');
             $table->string('check_class_location');
+            $table->string('payee');
             $table->timestamps();
         });
     }

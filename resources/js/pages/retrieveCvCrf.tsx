@@ -14,7 +14,8 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function RetrieveCvCrf({ cv }: {cv: inertiaPagination<Cv>}) {
+export default function RetrieveCvCrf({ cv }: { cv: inertiaPagination<Cv> }) {
+    // console.log(cv);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Check-Releasing" />

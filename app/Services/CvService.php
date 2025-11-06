@@ -158,6 +158,7 @@ class CvService extends NavConnection
                                 'cancelled_with_check_number' => $check->{'Cancelled with Check Number'},
                                 'check_class' => $check->{'Check Class'},
                                 'check_class_location' => $check->{'Check Class Location'},
+                                'payee' => $check->{'Payee'},
                                 'created_at' => $now,
                                 'updated_at' => $now,
                             ])
@@ -191,8 +192,11 @@ class CvService extends NavConnection
 
     public function cvs(?int $page)
     {
+        // $r = CvCheckPayment::with('cvHeader')->paginate($page);
+
+        // dd($r);
         return Inertia::render('retrieveCvCrf', [
-            'cv' => CvCheckPayment::paginate($page)
+            'cv' => CvCheckPayment::with('cvHeader')->paginate($page)
         ]);
     }
 

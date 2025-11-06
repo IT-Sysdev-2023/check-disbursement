@@ -3,52 +3,7 @@ import { router } from '@inertiajs/react';
 import { Button, Stack } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
-import { SparkLineChart } from '@mui/x-charts/SparkLineChart';
 import { GridCellParams, GridColDef } from '@mui/x-data-grid';
-
-type SparkLineData = number[];
-
-function getDaysInMonth(month: number, year: number) {
-    const date = new Date(year, month, 0);
-    const monthName = date.toLocaleDateString('en-US', {
-        month: 'short',
-    });
-    const daysInMonth = date.getDate();
-    const days = [];
-    let i = 1;
-    while (days.length < daysInMonth) {
-        days.push(`${monthName} ${i}`);
-        i += 1;
-    }
-    return days;
-}
-
-function renderSparklineCell(params: GridCellParams<SparkLineData, any>) {
-    const data = getDaysInMonth(4, 2024);
-    const { value, colDef } = params;
-
-    if (!value || value.length === 0) {
-        return null;
-    }
-
-    return (
-        <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <SparkLineChart
-                data={value}
-                width={colDef.computedWidth || 100}
-                height={32}
-                plotType="bar"
-                showHighlight
-                showTooltip
-                color="hsl(210, 98%, 42%)"
-                xAxis={{
-                    scaleType: 'band',
-                    data,
-                }}
-            />
-        </div>
-    );
-}
 
 function renderStatus(status: 'Online' | 'Offline') {
     const colors: { [index: string]: 'success' | 'default' } = {
@@ -81,25 +36,37 @@ export function renderAvatar(
 }
 
 export const columns: GridColDef[] = [
-    { field: 'cv_number', headerName: 'CV Number', minWidth: 200 },
-    // {
-    //   field: 'status',
-    //   headerName: 'Status',
-    //   flex: 0.5,
-    //   minWidth: 80,
-    //   renderCell: (params) => renderStatus(params.value as any),
-    // },
+    {
+        field: 'cv_header', headerName: 'CV Number', minWidth: 150,
+        valueGetter: (params) => params.cv_no,
+     },
     {
         field: 'check_number',
         headerName: 'Check Number',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        minWidth: 80,
+        minWidth: 50,
     },
     {
         field: 'check_amount',
         headerName: 'Check Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+    },
+    {
+        field: 'bank_account_no',
+        headerName: 'Bank Account No.',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+    },
+    {
+        field: 'bank_name',
+        headerName: 'Bank Name',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -111,16 +78,32 @@ export const columns: GridColDef[] = [
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        minWidth: 120,
-    },
-    {
-        field: 'payee',
-        headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 2,
         minWidth: 100,
     },
+    //  {
+    //     field: 'payee',
+    //     headerName: 'Payee',
+    //     headerAlign: 'right',
+    //     align: 'right',
+    //     flex: 2,
+    //     minWidth: 100,
+    // },
+    // {
+    //     field: 'cv_header',
+    //     headerName: 'Payee',
+    //     headerAlign: 'right',
+    //     align: 'right',
+    //     flex: 1,
+    //     minWidth: 200,
+    //     valueGetter: (params) => params.collector_name,
+    // },
+    // {
+    //   field: 'status',
+    //   headerName: 'Status',
+    //   flex: 0.5,
+    //   minWidth: 80,
+    //   renderCell: (params) => renderStatus('Online'),
+    // },
     {
         field: 'actions',
         headerName: 'Actions',

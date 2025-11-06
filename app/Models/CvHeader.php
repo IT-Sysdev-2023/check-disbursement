@@ -6,5 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CvHeader extends Model
 {
-    //
+    public function cvCheckPayment(){
+        return $this->hasOne(CvCheckPayment::class);
+    }
 }
