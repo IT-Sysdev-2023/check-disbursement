@@ -40,23 +40,24 @@ class NavConnection
         return $this;
     }
 
-    public function filterHeaderRecord(string $name)
+    public function headerConnection(string $name): mixed
     {
         $record = $this->connection->table($name)
-            ->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
+            ->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end])
+            ->orderBy('Check Voucher No_');
         return $record;
     }
-    public function filterLineRecord(string $name)
+    public function lineConnection(string $name)
     {
         $record = $this->connection->table($name);
         // ->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
 
         return $record;
     }
-    public function filterCheckPaymentRecord(string $name)
+    public function checkPaymentConnection(string $name)
     {
-        $record = $this->connection->table($name)
-        ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
+        $record = $this->connection->table($name);
+            // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
         return $record;
     }
 

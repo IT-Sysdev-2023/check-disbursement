@@ -56,215 +56,131 @@ class CvService extends NavConnection
         return $this;
     }
 
-    public function storeHeaderRecord(?NavHeaderTable $navHeaderTable, ?NavLineTable $navLineTable, ?NavCheckPaymentTable $navCheckPaymentTable)
-    {
-        if ($navHeaderTable) {
-            $start = 1;
-
-            $tableName = $navHeaderTable->name;
-            $tableId = $navHeaderTable->id;
-            $header = $this->filterHeaderRecord($tableName);
-            $lineDb = $this->filterLineRecord($navLineTable->name);
-            $cpDb = $this->filterCheckPaymentRecord($navCheckPaymentTable->name);
-            $total = $header->count();
-
-            $header->orderBy('Check Voucher No_')
-                ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId, $lineDb, $cpDb) {
-
-                    $cv->each(
-                        function ($item) use (&$start, $total, $tableName, $tableId, $lineDb, $cpDb) {
-
-                            CvProgress::dispatch("Generating Cv Header " . $tableName . " in progress.. ", $start, $total, $this->userId);
-                            $start++;
-                            
-                            DB::beginTransaction();
-                            $header = [
-                                'nav_header_table_id' => $tableId,
-                                'cv_no' => $item->{'Check Voucher No_'},
-                                'cv_date' => $item->{'CV Date'} ? Date::parse($item->{'CV Date'}) : null,
-                                'cv_status' => $item->{'CV Status'},
-                                'collector_name' => $item->{'Collector Name'},
-                                'vendor_no' => $item->{'Vendor No_'},
-                                'batch_name' => $item->{'Batch Name'},
-                                'bal_account_type' => $item->{'Bal_ Account Type'},
-                                'bal_account_no' => $item->{'Bal_ Account No_'},
-                                'gl_document_no' => $item->{'G_L Document No_'},
-                                'remarks' => $item->{'Remarks'},
-                                'no_series' => $item->{'No_ Series'},
-                                'vendor_name' => $item->{'Vendor Name'},
-                                'cv_type' => $item->{'CV Type'},
-                                'no_printed' => $item->{'No_ Printed'},
-                                'cancelled_by' => $item->{'Cancelled By'},
-                                'cancelled_date' => $item->{'Cancelled Date'} ? Date::parse($item->{'Cancelled Date'}) : null,
-                                'checked_by' => $item->{'Checked By'},
-                                'approved_by' => $item->{'Approved By'},
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ];
-
-                            $headerId = DB::table('cv_headers')->insertGetId($header);
-
-                            // Query lines for this header
-                            $lines = (clone $lineDb)
-                                ->where('CV No_', $item->{'Check Voucher No_'})
-                                ->get()
-                                ->map(function ($lineItem) use ($headerId) {
-                                return [
-                                    'cv_header_id' => $headerId,
-                                    'line_no' => $lineItem->{'Line No_'},
-                                    'crf_no' => $lineItem->{'CRF No_'},
-                                    'document_no' => $lineItem->{'Document No_'},
-                                    'gl_entry_no' => $lineItem->{'G_L Entry No_'},
-                                    'forwarded_amount' => $lineItem->{'Forwarded Amount'},
-                                    'paid_amount' => $lineItem->{'Paid Amount'},
-                                    'balance' => $lineItem->{'Balance'},
-                                    'document_type' => $lineItem->{'Document Type'},
-                                    'applies_to_doc_no' => $lineItem->{'Applies To Doc_ No_'},
-                                    'invoice_no' => $lineItem->{'Invoice No_'},
-                                    'account_name' => $lineItem->{'Account Name'},
-                                    'company_dimension_code' => $lineItem->{'Company Dimension Code'},
-                                    'department_dimension_code' => $lineItem->{'Department Dimension Code'},
-                                    'payment_type' => $lineItem->{'Payment Type'},
-                                    'created_at' => now(),
-                                    'updated_at' => now(),
-                                ];
-                            });
-
-                            $checkPayments = (clone $cpDb)
-                                ->where('CV No_', $item->{'Check Voucher No_'})
-                                ->get()
-                                ->map(function ($checkPayment) use ($headerId) {
-                                    return [
-                                        'cv_header_id' => $headerId,
-                                        'check_number' => $checkPayment->{'Check Number'},
-                                        'check_amount' => $checkPayment->{'Check Amount'},
-                                        'bank_account_no' => $checkPayment->{'Bank Account No_'},
-                                        'bank_name' => $checkPayment->{'Bank Name'},
-                                        'check_date' => $checkPayment->{'Check Date'} ? Date::parse($checkPayment->{'Check Date'}) : null,
-                                        'clearing_date' => $checkPayment->{'Clearing Date'} ? Date::parse($checkPayment->{'Clearing Date'}) : null,
-                                        'cleared_flag' => $checkPayment->{'Cleared Flag'},
-                                        'cancelled_flag' => $checkPayment->{'Cancelled Flag'},
-                                        'cancelled_date' => $checkPayment->{'Cancelled Date'} ? Date::parse($checkPayment->{'Cancelled Date'}) : null,
-                                        'cancelled_by' => $checkPayment->{'Cancelled By'},
-                                        'cancellation_reason' => $checkPayment->{'Cancellation Reason'},
-                                        'cancelled_with_check_number' => $checkPayment->{'Cancelled with Check Number'},
-                                        'check_class' => $checkPayment->{'Check Class'},
-                                        'check_class_location' => $checkPayment->{'Check Class Location'},
-                                        'created_at' => now(),
-                                        'updated_at' => now(),
-                                    ];
-                                });
-
-                            if ($lines->isNotEmpty()) {
-                                DB::table('cv_lines')->insertOrIgnore($lines->toArray());
-                            }
-
-                            if ($checkPayments->isNotEmpty()) {
-                                DB::table('cv_check_payments')->insertOrIgnore($checkPayments->toArray());
-                            }
-                            DB::commit();
-                        }
-                    );
-                }, 'Check Voucher No_');
+    public function storeHeaderRecord(
+        ?NavHeaderTable $navHeaderTable,
+        ?NavLineTable $navLineTable,
+        ?NavCheckPaymentTable $navCheckPaymentTable
+    ) {
+        if (!$navHeaderTable) {
+            return $this;
         }
+
+        $start = 1;
+        $tableName = $navHeaderTable->name;
+        $tableId = $navHeaderTable->id;
+
+        $headerQuery = $this->headerConnection($tableName);
+        $lineQuery = $this->lineConnection($navLineTable->name);
+        $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable->name);
+
+        $total = $headerQuery->count();
+
+        $headerQuery->chunkById(500, function ($chunk) use (&$start, $total, $tableName, $tableId, $lineQuery, $checkPaymentQuery) {
+
+            DB::beginTransaction();
+            try {
+                $now = now();
+
+                $lines = collect();
+                $checkPayments = collect();
+
+                foreach ($chunk as $item) {
+
+                    CvProgress::dispatch("Generating Cv Header " . $tableName . " in progress.. ", $start, $total, $this->userId); 
+                    $start++;
+
+                    $headerId = DB::table('cv_headers')->insertGetId([
+                        'nav_header_table_id' => $tableId,
+                        'cv_no' => $item->{'Check Voucher No_'},
+                        'cv_date' => optional($item->{'CV Date'}, fn($d) => Date::parse($d)),
+                        'cv_status' => $item->{'CV Status'},
+                        'collector_name' => $item->{'Collector Name'},
+                        'vendor_no' => $item->{'Vendor No_'},
+                        'batch_name' => $item->{'Batch Name'},
+                        'bal_account_type' => $item->{'Bal_ Account Type'},
+                        'bal_account_no' => $item->{'Bal_ Account No_'},
+                        'gl_document_no' => $item->{'G_L Document No_'},
+                        'remarks' => $item->{'Remarks'},
+                        'no_series' => $item->{'No_ Series'},
+                        'vendor_name' => $item->{'Vendor Name'},
+                        'cv_type' => $item->{'CV Type'},
+                        'no_printed' => $item->{'No_ Printed'},
+                        'cancelled_by' => $item->{'Cancelled By'},
+                        'cancelled_date' => optional($item->{'Cancelled Date'}, fn($d) => Date::parse($d)),
+                        'checked_by' => $item->{'Checked By'},
+                        'approved_by' => $item->{'Approved By'},
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ]);
+
+                    // Collect CV Lines
+                    $lines = $lines->merge(
+                        (clone $lineQuery)->where('CV No_', $item->{'Check Voucher No_'})
+                            ->get()
+                            ->map(fn($line) => [
+                                'cv_header_id' => $headerId,
+                                'line_no' => $line->{'Line No_'},
+                                'crf_no' => $line->{'CRF No_'},
+                                'document_no' => $line->{'Document No_'},
+                                'gl_entry_no' => $line->{'G_L Entry No_'},
+                                'forwarded_amount' => $line->{'Forwarded Amount'},
+                                'paid_amount' => $line->{'Paid Amount'},
+                                'balance' => $line->{'Balance'},
+                                'document_type' => $line->{'Document Type'},
+                                'applies_to_doc_no' => $line->{'Applies To Doc_ No_'},
+                                'invoice_no' => $line->{'Invoice No_'},
+                                'account_name' => $line->{'Account Name'},
+                                'company_dimension_code' => $line->{'Company Dimension Code'},
+                                'department_dimension_code' => $line->{'Department Dimension Code'},
+                                'payment_type' => $line->{'Payment Type'},
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                            ])
+                    );
+
+                    // Collect Check Payments
+                    $checkPayments = $checkPayments->merge(
+                        (clone $checkPaymentQuery)->where('CV No_', $item->{'Check Voucher No_'})
+                            ->get()
+                            ->map(fn($check) => [
+                                'cv_header_id' => $headerId,
+                                'check_number' => $check->{'Check Number'},
+                                'check_amount' => $check->{'Check Amount'},
+                                'bank_account_no' => $check->{'Bank Account No_'},
+                                'bank_name' => $check->{'Bank Name'},
+                                'check_date' => optional($check->{'Check Date'}, fn($d) => Date::parse($d)),
+                                'clearing_date' => optional($check->{'Clearing Date'}, fn($d) => Date::parse($d)),
+                                'cleared_flag' => $check->{'Cleared Flag'},
+                                'cancelled_flag' => $check->{'Cancelled Flag'},
+                                'cancelled_date' => optional($check->{'Cancelled Date'}, fn($d) => Date::parse($d)),
+                                'cancelled_by' => $check->{'Cancelled By'},
+                                'cancellation_reason' => $check->{'Cancellation Reason'},
+                                'cancelled_with_check_number' => $check->{'Cancelled with Check Number'},
+                                'check_class' => $check->{'Check Class'},
+                                'check_class_location' => $check->{'Check Class Location'},
+                                'created_at' => $now,
+                                'updated_at' => $now,
+                            ])
+                    );
+                }
+
+                if ($lines->isNotEmpty()) {
+                    DB::table('cv_lines')->insertOrIgnore($lines->toArray());
+                }
+
+                if ($checkPayments->isNotEmpty()) {
+                    DB::table('cv_check_payments')->insertOrIgnore($checkPayments->toArray());
+                }
+
+                DB::commit();
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                Log::error("Failed storing CV Header chunk: " . $e->getMessage());
+                throw $e;
+            }
+        }, 'Check Voucher No_');
 
         return $this;
-    }
-    public function storeLineRecord(?NavLineTable $navLineTable)
-    {
-        if ($navLineTable) {
-
-            $start = 1;
-            $tableName = $navLineTable->name;
-            $tableId = $navLineTable->id;
-
-            $query = $this->filterLineRecord($tableName);
-            $total = $query->count();
-
-            $query->orderBy('CV No_')
-                ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId) {
-                    $data = $cv->map(
-                        function ($item) use (&$start, $total, $tableName, $tableId) {
-                            CvProgress::dispatch("Generating Cv Line " . $tableName . " in progress.. ", $start, $total, $this->userId);
-                            $start++;
-                            return [
-                                'nav_line_table_id' => $tableId,
-                                'line_no' => $item->{'Line No_'},
-                                'cv_no' => $item->{'CV No_'},
-                                'crf_no' => $item->{'CRF No_'},
-                                'document_no' => $item->{'Document No_'},
-                                'gl_entry_no' => $item->{'G_L Entry No_'},
-                                'forwarded_amount' => $item->{'Forwarded Amount'},
-                                'paid_amount' => $item->{'Paid Amount'},
-                                'balance' => $item->{'Balance'},
-                                'document_type' => $item->{'Document Type'},
-                                'applies_to_doc_no' => $item->{'Applies To Doc_ No_'},
-                                'invoice_no' => $item->{'Invoice No_'},
-                                'account_name' => $item->{'Account Name'},
-                                'company_dimension_code' => $item->{'Company Dimension Code'},
-                                'department_dimension_code' => $item->{'Department Dimension Code'},
-                                'payment_type' => $item->{'Payment Type'},
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ];
-                        }
-                    )->toArray();
-
-                    DB::transaction(
-                        fn() =>
-                        DB::table('cv_lines')->insertOrIgnore($data)
-                    );
-                }, 'CV No_');
-        }
-        return $this;
-    }
-    public function storeCheckPaymentRecord(?NavCheckPaymentTable $navCheckPaymentTable)
-    {
-        if ($navCheckPaymentTable) {
-
-            $start = 1;
-            $tableName = $navCheckPaymentTable->name;
-            $tableId = $navCheckPaymentTable->id;
-
-            $query = $this->filterCheckPaymentRecord($tableName);
-            $total = $query->count();
-
-            $query->orderBy('CV No_')
-                ->chunkById(500, function ($cv) use (&$start, $total, $tableName, $tableId) {
-                    $data = $cv->map(
-                        function ($item) use (&$start, $total, $tableName, $tableId) {
-
-                            CvProgress::dispatch("Generating Cv Check Payment " . $tableName . " in progress.. ", $start, $total, $this->userId);
-                            $start++;
-                            return [
-                                'nav_cp_table_id' => $tableId,
-                                'cv_no' => $item->{'CV No_'},
-                                'check_number' => $item->{'Check Number'},
-                                'check_amount' => $item->{'Check Amount'},
-                                'bank_account_no' => $item->{'Bank Account No_'},
-                                'bank_name' => $item->{'Bank Name'},
-                                'check_date' => $item->{'Check Date'} ? Date::parse($item->{'Check Date'}) : null,
-                                'clearing_date' => $item->{'Clearing Date'} ? Date::parse($item->{'Clearing Date'}) : null,
-                                'cleared_flag' => $item->{'Cleared Flag'},
-                                'cancelled_flag' => $item->{'Cancelled Flag'},
-                                'cancelled_date' => $item->{'Cancelled Date'} ? Date::parse($item->{'Cancelled Date'}) : null,
-                                'cancelled_by' => $item->{'Cancelled By'},
-                                'cancellation_reason' => $item->{'Cancellation Reason'},
-                                'cancelled_with_check_number' => $item->{'Cancelled with Check Number'},
-                                'check_class' => $item->{'Check Class'},
-                                'check_class_location' => $item->{'Check Class Location'},
-                                'created_at' => now(),
-                                'updated_at' => now(),
-                            ];
-                        }
-                    )->toArray();
-
-                    DB::transaction(
-                        fn() =>
-                        DB::table('cv_check_payments')->insertOrIgnore($data)
-                    );
-                }, 'CV No_');
-        }
     }
 
     public function setUser(int $user)
