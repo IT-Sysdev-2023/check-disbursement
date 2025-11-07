@@ -56,7 +56,7 @@ class CvService extends NavConnection
         return $this;
     }
 
-    public function storeHeaderRecord(
+    public function storeRecord(
         ?NavHeaderTable $navHeaderTable,
         ?string $navLineTable,
         ?string $navCheckPaymentTable
