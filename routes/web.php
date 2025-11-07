@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
 use App\Models\CvLine;
@@ -17,18 +18,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('check-voucher', function () {
-        return Inertia::render('extract/checkVoucher');
-    })->name('check-voucher');
+    Route::prefix('check-voucher')->controller(CvController::class)->group(function () {
 
-    Route::get('check-request-form', function () {
-        return Inertia::render('extract/checkRequestForm');
-    })->name('check-request-form');
+        Route::get('/', 'index')->name('check-voucher');
+        Route::post('extract-cv', 'extractCv')->name('extractCv');
 
-
-    Route::prefix('retrieve')->controller(CvController::class)->group(function () {
-        Route::get('index', 'retrieveCv')->name('retrieve');
+        Route::get('retrieved', 'retrievedRecords')->name('retrievedRecords');
         Route::get('details/{id}', 'details')->name('details');
+    });
+
+    Route::prefix('crf')->controller(CrfController::class)->group(function () {
+
+        Route::get('/', 'index')->name('check-request-form');
+         Route::post('extract-crf', 'extractCrf')->name('extractCrf');
+
+        Route::get('retrieved', 'retrieve')->name('retrieveCrfRecords');
     });
     Route::get('check-status', function () {
         return Inertia::render('dashboard');
@@ -50,10 +54,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('notifications');
 
-
-    Route::post('retrieve-check-voucher', [CvController::class, 'index'])->name('retrieveCheckVoucher');
-
-
 });
 Route::get('/test', function () {
     // $con = Schema::connection('sqlsrvCaf')->getTables();
@@ -65,15 +65,31 @@ Route::get('/test', function () {
     $start = "2025-11-03";
     $end = "2025-11-04";
     $con = DB::connection('sqlsrvCaf')
-    // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
-    ->table('MFI_CORTES_PIGGERY_ACCTG$CV Line')
-    // $head = $con->table('ALTA CITTA ACCOUNTING$CV Header')
+        // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
+        ->table('MFI_CORTES_PIGGERY_ACCTG$CV Line')
+        // $head = $con->table('ALTA CITTA ACCOUNTING$CV Header')
 
-    // // ->where('CV Status', "")//CV25080289
-    ->whereIn('CV No_', ["CRF2511001","CRF2511002","CRF2511003","CRF2511004","CRF2511005","CRF2511006",
-    "CRF2511007","CRF2511008","CRF2511009","CRF2511010","CRF2511011","CRF2511012","CRF2511013","CRF2511014","CRF2511015","CRF2511016",])//CV25080289
-    // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
-    ->count();
+        // // ->where('CV Status', "")//CV25080289
+        ->whereIn('CV No_', [
+            "CRF2511001",
+            "CRF2511002",
+            "CRF2511003",
+            "CRF2511004",
+            "CRF2511005",
+            "CRF2511006",
+            "CRF2511007",
+            "CRF2511008",
+            "CRF2511009",
+            "CRF2511010",
+            "CRF2511011",
+            "CRF2511012",
+            "CRF2511013",
+            "CRF2511014",
+            "CRF2511015",
+            "CRF2511016",
+        ])//CV25080289
+        // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
+        ->count();
     // $con1 = DB::connection('sqlsrvCaf')
     // ->table('CARMEN AGRI FARM$CV Line')
     // ->where('CV No_', "CRF0000118")//CV25080289
@@ -118,7 +134,7 @@ Route::get('/test', function () {
     //         )->toArray();
 
     //         // DB::table('cv_lines')->insertOrIgnore($data);
-    
+
     //     }, 'CV No_');
     // $check = $con->table('ALTA CITTA ACCOUNTING$CV Check Payment')
     // ->first();

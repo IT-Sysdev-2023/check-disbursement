@@ -3,7 +3,7 @@ import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
 import { columns } from '../internals/data/gridData';
 import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
-import { retrieve } from '@/routes';
+import { retrievedRecords } from '@/routes';
 
 export default function CustomizedDataGrid({ cvs }: { cvs: inertiaPagination<Cv> }) {
   
@@ -11,7 +11,7 @@ export default function CustomizedDataGrid({ cvs }: { cvs: inertiaPagination<Cv>
     const page = model.page + 1; // MUI DataGrid uses 0-based index
     const per_page = model.pageSize;
 
-    router.get(retrieve(), { page, per_page }, {
+    router.get(retrievedRecords(), { page, per_page }, {
       preserveScroll: true,
       preserveState: true,
       replace: true,

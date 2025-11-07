@@ -5,32 +5,43 @@ use App\Events\CvProgress;
 use App\Models\Cv;
 use App\Services\CvService;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class CvController extends Controller
 {
-    public function __construct(protected CvService $service ){
+    public function __construct(protected CvService $service)
+    {
 
     }
-    public function index(Request $request)
+
+    public function index()
+    {
+        return Inertia::render('extract/checkVoucher');
+    }
+    
+    public function extractCv(Request $request)
     {
         $request->validate([
-            'start_date' => ['required','date'],
-            'end_date' => ['required','date','after_or_equal:start_date'],
-            
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+
         ]);
-        $date = (object)[
+        $date = (object) [
             'start' => $request->start_date,
             'end' => $request->end_date
         ];
         return $this->service->retrieveData($request->user(), $date);
     }
 
-    public function retrieveCv(Request $request){
+    public function retrievedRecords(Request $request)
+    {
         $perPage = $request->per_page;
         return $this->service->cvs($perPage);
     }
-    public function details($id){
+
+    public function details($id)
+    {
         return $this->service->details($id);
     }
-   
+
 }

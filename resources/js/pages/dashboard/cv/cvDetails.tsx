@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { retrieve } from '@/routes';
+import { retrievedRecords } from '@/routes';
 import { Cv, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Typography } from '@mui/material';
@@ -9,7 +9,7 @@ import EmployeeForm from './components/checkForm';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: retrieve().url,
+        href: retrievedRecords().url,
     },
     {
         title: 'CV Details',

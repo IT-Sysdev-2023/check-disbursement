@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { checkVoucher, retrieveCheckVoucher } from '@/routes';
+import { checkVoucher, extractCv } from '@/routes';
 import { Auth, EventType, ProgressState, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
@@ -48,7 +48,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             return;
         }
         setLoading(true);
-        const { url, method } = retrieveCheckVoucher();
+        const { url, method } = extractCv();
         await axios({
             url, method, params: {
                 start_date: startDate.format('YYYY-MM-DD'),

@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { retrieve } from '@/routes';
+import { retrieveCrfRecords } from '@/routes';
 import { Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
@@ -10,7 +10,7 @@ import Copyright from './dashboard/internals/components/Copyright';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: retrieve().url,
+        href: retrieveCrfRecords().url,
     },
 ];
 
