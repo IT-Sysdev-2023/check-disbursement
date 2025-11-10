@@ -9,7 +9,8 @@ use Inertia\Inertia;
 class CrfController extends Controller
 {
 
-    public function __construct(protected CrfService $service){
+    public function __construct(protected CrfService $service)
+    {
 
     }
     public function index()
@@ -19,10 +20,10 @@ class CrfController extends Controller
 
     public function extractCrf(Request $request)
     {
-         $request->validate([
+        $request->validate([
             'files' => 'required',
             'files.*' => 'file|max:5120|unique:crfs,filename',
         ]);
-       return $this->service->extract($request->file('files'));
+        return $this->service->extract($request->file('files'), $request->user()->id);
     }
 }

@@ -1,7 +1,14 @@
 import AppLayout from '@/layouts/app-layout';
 import { checkRequestForm, extractCrf } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
+import {
+    Auth,
+    EventType,
+    FlashReponse,
+    ProgressState,
+    type BreadcrumbItem,
+} from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import {
@@ -9,6 +16,7 @@ import {
     Box,
     Button,
     Container,
+    LinearProgress,
     List,
     ListItem,
     ListItemIcon,
@@ -38,17 +46,35 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-export default function CheckVoucher() {
-    const [uploadResponse, setUploadResponse] = useState<{
-        status: boolean;
-        message: string;
-    }>({ status: false, message: '' });
+export default function CheckVoucher({ auth }: { auth: Auth }) {
+    const [progress, setProgress] = useState<ProgressState>({});
+    // const [loading, setLoading] = useState(false);
+    const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
+        status: false,
+        message: '',
+    });
     const [files, setFiles] = useState<File[]>([]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!event.target.files) return;
         setFiles(Array.from(event.target.files));
     };
+
+    useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
+        const { percentage, message } = e;
+
+        // setLoading(false);
+        const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
+
+        setProgress((prev) => ({
+            ...prev,
+            [message]: {
+                progress: percentage,
+                buffer,
+                message,
+            },
+        }));
+    });
 
     const simulateDataRetrieval = async () => {
         console.log(files);
@@ -188,16 +214,36 @@ export default function CheckVoucher() {
                                 ))}
                             </List>
                         )}
-                        {files.length > 0 && (
-                            <Button
-                                variant="contained"
-                                size="large"
-                                sx={{ minWidth: 'fit-content' }}
-                                onClick={simulateDataRetrieval}
-                            >
-                                Get Data
-                            </Button>
-                        )}
+                        {files.length > 0 ||
+                            (Object.keys(progress).length === 0 && (
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    sx={{ minWidth: 'fit-content' }}
+                                    onClick={simulateDataRetrieval}
+                                >
+                                    Get Data
+                                </Button>
+                            ))}
+
+                        {Object.entries(progress).map(([key, item]) => (
+                            <Box key={key} sx={{ mb: 3 }}>
+                                <Typography variant="body2" sx={{ mb: 1 }}>
+                                    {item.message}
+                                </Typography>
+                                <LinearProgress
+                                    variant="buffer"
+                                    value={item.progress}
+                                    valueBuffer={item.buffer}
+                                />
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    {item.progress}%
+                                </Typography>
+                            </Box>
+                        ))}
                     </Stack>
                 </Container>
             </Box>

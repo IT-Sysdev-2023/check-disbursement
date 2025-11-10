@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('check-voucher')->controller(CvController::class)->group(function () {
 
-        Route::get('/', 'index')->name('check-voucher');
+        Route::get('index', 'index')->name('check-voucher');
         Route::post('extract-cv', 'extractCv')->name('extractCv');
 
         Route::get('retrieved', 'retrievedRecords')->name('retrievedRecords');

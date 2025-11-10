@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Events\CrfProgress;
 use App\Helpers\CrfHelper;
 use App\Models\Crf;
 use Illuminate\Support\Facades\DB;
@@ -8,14 +9,21 @@ use Illuminate\Support\Str;
 
 class CrfService
 {
-    public function extract($files)
+    public function extract($files, $userId)
     {
         $records = collect();
-        collect($files)->each(function ($item) use (&$records) {
+        $start = 1;
+
+        $files = collect($files);
+        $total = $files->count();
+
+
+        $files->each(function ($item) use (&$records, &$start, $total, $userId) {
             $contents = $item->get();
+            $fileName = $item->getClientOriginalName();
 
             $contentRecords = (new CrfHelper($contents))
-                ->setFilename($item->getClientOriginalName())
+                ->setFilename($fileName)
                 ->extractCompany()
                 ->extractNo()
                 ->extractLocation()
@@ -28,6 +36,9 @@ class CrfService
                 ->getRecords();
 
             $records->push($contentRecords);
+
+            CrfProgress::dispatch("Uploading Crf Filename " . $fileName . " in progress.. ", $start, $total, $userId);
+            $start++;
         });
 
         $validated = CrfHelper::checkProperties($records);
