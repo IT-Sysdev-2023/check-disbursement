@@ -26,9 +26,16 @@ export interface NavItem {
         icon:LucideIcon | null;
     }[];
 }
+interface Page<PageProps> {
+  component: string;
+  props: PageProps;
+  url: string;
+  version?: string;
+}
 
 export interface SharedData {
     name: string;
+     flash: { status: boolean; message?: string; };
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;

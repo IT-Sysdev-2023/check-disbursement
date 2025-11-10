@@ -2,6 +2,8 @@
 
 namespace App\Services;
 use App\Helpers\CrfHelper;
+use App\Models\Crf;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CrfService
@@ -24,12 +26,21 @@ class CrfService
                 ->extractCkNo()
                 ->extractPreparedBy()
                 ->getRecords();
-                
+
             $records->push($contentRecords);
-            ;
         });
 
-        dd($records);
+        $validated = CrfHelper::checkProperties($records);
+
+        if (!$validated) {
+            return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. Please try again.']);
+        }
+
+        DB::transaction(function () use ($records) {
+            Crf::insert($records->toArray());
+        });
+
+        return redirect()->back()->with(['status' => true, 'message' => ' Files Successfully uploaded, you may now view here.']);
     }
 
     public function validateRecord()

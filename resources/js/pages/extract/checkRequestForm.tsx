@@ -1,10 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import { checkRequestForm, extractCrf } from '@/routes';
-import { ProgressState, type BreadcrumbItem } from '@/types';
+import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import {
+    Alert,
     Box,
     Button,
     Container,
@@ -16,7 +17,6 @@ import {
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import axios from 'axios';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -42,6 +42,10 @@ export default function CheckVoucher() {
     // const [progress, setProgress] = useState<ProgressState>({});
     // const [startDate, setStartDate] = useState<Dayjs | null>(null);
     // const [endDate, setEndDate] = useState<Dayjs | null>(null);
+    const [uploadResponse, setUploadResponse] = useState<{
+        status: boolean;
+        message: string;
+    }>({ status: false, message: '' });
     const [loading, setLoading] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
 
@@ -51,19 +55,28 @@ export default function CheckVoucher() {
     };
 
     const simulateDataRetrieval = async () => {
-        
         console.log(files);
         setLoading(true);
 
-        router.post(extractCrf(), {
-           files
-        });
-        // const { url, method } = extractCrf();
-        // await axios({
-        //     url,
-        //     method,
-        //     data: files
-        // });
+        router.post(
+            extractCrf(),
+            {
+                files,
+            },
+            {
+                onSuccess: (page) => {
+                    const flash = page.props.flash as {
+                        message?: string;
+                        status?: boolean;
+                    };
+                    setUploadResponse({
+                        status: flash.status ?? false,
+                        message: flash?.message ?? '',
+                    });
+                    setFiles([]);
+                },
+            },
+        );
     };
 
     return (
@@ -100,6 +113,17 @@ export default function CheckVoucher() {
                             width: { xs: '100%', sm: '70%' },
                         }}
                     >
+                        {uploadResponse.message && (
+                            <Alert
+                                variant="outlined"
+                                severity={
+                                    uploadResponse.status ? 'success' : 'error'
+                                }
+                            >
+                                {uploadResponse.message}
+                            </Alert>
+                        )}
+
                         <Typography
                             variant="h1"
                             sx={{

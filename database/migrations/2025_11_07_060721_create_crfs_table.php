@@ -25,6 +25,8 @@ return new class extends Migration
             $table->unsignedBigInteger('ck_no');
             $table->string('prepared_by');
             $table->timestamps();
+
+            $table->unique(['filename', 'no']);
         });
     }
 

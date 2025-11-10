@@ -21,8 +21,8 @@ class CrfController extends Controller
     {
          $request->validate([
             'files' => 'required',
-            'files.*' => 'file|max:5120',
+            'files.*' => 'file|max:5120|unique:crfs,filename',
         ]);
-        $this->service->extract($request->file('files'));
+       return $this->service->extract($request->file('files'));
     }
 }

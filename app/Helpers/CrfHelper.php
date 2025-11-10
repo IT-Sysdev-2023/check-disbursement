@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -139,10 +140,23 @@ class CrfHelper
             'bank' => $this->bank,
             'ck_no' => $this->ckNo,
             'prepared_by' => $this->preparedBy,
-            'paidTo' => $this->paidTo,
+            'paid_to' => $this->paidTo,
             'amount' => $this->amount,
-            'particular' => $this->particular,
+            'particulars' => $this->particular,
+            'created_at' => now(),
+            'updated_at' => now()
         ];
+    }
+
+    public static function checkProperties(Collection $record)
+    {
+        return $record->every(function ($item) {
+            return !empty($item['company']) && !empty($item['no'])
+                && !empty($item['location']) && !empty($item['date'])
+                && !empty($item['bank']) && !empty($item['ck_no'])
+                && !empty($item['prepared_by']) && !empty($item['paid_to'])
+                && !empty($item['amount']) && !empty($item['particulars']);
+        });
     }
 
 
