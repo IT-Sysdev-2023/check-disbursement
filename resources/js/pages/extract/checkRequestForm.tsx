@@ -39,14 +39,10 @@ const VisuallyHiddenInput = styled('input')({
 });
 
 export default function CheckVoucher() {
-    // const [progress, setProgress] = useState<ProgressState>({});
-    // const [startDate, setStartDate] = useState<Dayjs | null>(null);
-    // const [endDate, setEndDate] = useState<Dayjs | null>(null);
     const [uploadResponse, setUploadResponse] = useState<{
         status: boolean;
         message: string;
     }>({ status: false, message: '' });
-    const [loading, setLoading] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -56,7 +52,6 @@ export default function CheckVoucher() {
 
     const simulateDataRetrieval = async () => {
         console.log(files);
-        setLoading(true);
 
         router.post(
             extractCrf(),
@@ -175,9 +170,6 @@ export default function CheckVoucher() {
                             <VisuallyHiddenInput
                                 type="file"
                                 onChange={handleFileChange}
-                                // onChange={(event) =>
-                                //     console.log(event.target.files)
-                                // }
                                 multiple
                             />
                         </Button>
@@ -206,19 +198,6 @@ export default function CheckVoucher() {
                                 Get Data
                             </Button>
                         )}
-
-                        {/* <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={{ textAlign: 'center' }}
-                        >
-                            Click the &quot;Get Data&quot; to start
-                            generate&nbsp;
-                            <Link href="#" color="primary">
-                                Terms & Conditions
-                            </Link>
-                            .
-                        </Typography> */}
                     </Stack>
                 </Container>
             </Box>
