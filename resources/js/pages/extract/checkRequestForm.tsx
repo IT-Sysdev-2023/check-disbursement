@@ -11,6 +11,7 @@ import { Head, router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
     Alert,
     Box,
@@ -21,6 +22,7 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
+    ListSubheader,
     Stack,
     Typography,
 } from '@mui/material';
@@ -52,6 +54,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
     const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
         status: false,
         message: '',
+        duplicates: [],
     });
     const [files, setFiles] = useState<File[]>([]);
 
@@ -77,8 +80,6 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
     });
 
     const simulateDataRetrieval = async () => {
-        console.log(files);
-
         router.post(
             extractCrf(),
             {
@@ -86,13 +87,16 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             },
             {
                 onSuccess: (page) => {
+                    console.log(page);
                     const flash = page.props.flash as {
                         message?: string;
                         status?: boolean;
+                        duplicates?: string[];
                     };
                     setUploadResponse({
                         status: flash.status ?? false,
                         message: flash?.message ?? '',
+                        duplicates: flash?.duplicates ?? [],
                     });
                     setFiles([]);
                 },
@@ -135,14 +139,53 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                         }}
                     >
                         {uploadResponse.message && (
-                            <Alert
-                                variant="outlined"
-                                severity={
-                                    uploadResponse.status ? 'success' : 'error'
-                                }
-                            >
-                                {uploadResponse.message}
-                            </Alert>
+                            <>
+                                <Alert
+                                    variant="outlined"
+                                    severity={
+                                        uploadResponse.status
+                                            ? 'success'
+                                            : 'error'
+                                    }
+                                >
+                                    {uploadResponse.message}
+                                </Alert>
+
+                                {/* Show duplicates if they exist */}
+                                {uploadResponse.duplicates?.length > 0 && (
+                                    <List
+                                        dense
+                                        sx={{
+                                            mt: 2,
+                                            width: '100%',
+                                            maxWidth: 400,
+                                            bgcolor: 'background.paper',
+                                            borderRadius: 2,
+                                            boxShadow: 1,
+                                        }}
+                                    >
+                                        <ListSubheader disableSticky>
+                                            Duplicate Records
+                                        </ListSubheader>
+
+                                        {uploadResponse.duplicates.map(
+                                            (item, index) => (
+                                                <ListItem key={index} divider>
+                                                    <ListItemIcon>
+                                                        <WarningAmberIcon color="warning" />
+                                                    </ListItemIcon>
+                                                    <ListItemText
+                                                        primary={`File #${index + 1}`}
+                                                        secondary={JSON.stringify(
+                                                            item,
+                                                        )}
+                                                    />
+                                                </ListItem>
+                                            ),
+                                        )}
+                                    </List>
+                                )}
+                            </>
                         )}
 
                         <Typography
@@ -200,22 +243,22 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             />
                         </Button>
                         {files.length > 0 && (
-                            <List sx={{ mt: 2, width: '100%', maxWidth: 360 }}>
-                                {files.map((file, index) => (
-                                    <ListItem key={index}>
-                                        <ListItemIcon>
-                                            <InsertDriveFileIcon color="action" />
-                                        </ListItemIcon>
-                                        <ListItemText
-                                            primary={file.name}
-                                            secondary={`${(file.size / 1024).toFixed(1)} KB`}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </List>
-                        )}
-                        {files.length > 0 ||
-                            (Object.keys(progress).length === 0 && (
+                            <>
+                                <List
+                                    sx={{ mt: 2, width: '100%', maxWidth: 360 }}
+                                >
+                                    {files.map((file, index) => (
+                                        <ListItem key={index}>
+                                            <ListItemIcon>
+                                                <InsertDriveFileIcon color="action" />
+                                            </ListItemIcon>
+                                            <ListItemText
+                                                primary={file.name}
+                                                secondary={`${(file.size / 1024).toFixed(1)} KB`}
+                                            />
+                                        </ListItem>
+                                    ))}
+                                </List>
                                 <Button
                                     variant="contained"
                                     size="large"
@@ -224,7 +267,8 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                                 >
                                     Get Data
                                 </Button>
-                            ))}
+                            </>
+                        )}
 
                         {Object.entries(progress).map(([key, item]) => (
                             <Box key={key} sx={{ mb: 3 }}>

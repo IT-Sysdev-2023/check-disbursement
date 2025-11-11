@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
                 return [
                     'message' => $request->session()->get('message'),
                     'status' => $request->session()->get('status'),
+                    'duplicates' => $request->session()->get('duplicates'),
                 ];
             },
             'quote' => ['message' => trim($message), 'author' => trim($author)],

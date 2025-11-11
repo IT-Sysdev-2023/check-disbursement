@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Events\CrfProgress;
 use App\Helpers\CrfHelper;
 use App\Models\Crf;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -12,11 +13,10 @@ class CrfService
     public function extract($files, $userId)
     {
         $records = collect();
-        $start = 1;
-
+        
         $files = collect($files);
         $total = $files->count();
-
+        $start = 1;
 
         $files->each(function ($item) use (&$records, &$start, $total, $userId) {
             $contents = $item->get();
@@ -47,11 +47,18 @@ class CrfService
             return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. Please try again.']);
         }
 
+        $uniqueKeys = $records->pluck('no');
+        $existing = Crf::whereIn('no', $uniqueKeys)->pluck('filename');
+
         DB::transaction(function () use ($records) {
-            Crf::insert($records->toArray());
+            Crf::insertOrIgnore($records->toArray());
         });
 
-        return redirect()->back()->with(['status' => true, 'message' => ' Files Successfully uploaded, you may now view here.']);
+        return redirect()->back()->with([
+            'status' => true,
+            'message' => ' Files Successfully uploaded, you may now view here.',
+            'duplicates' => $existing //retrieve duplicated files
+        ]);
     }
 
     public function validateRecord()
