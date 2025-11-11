@@ -278,10 +278,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                                                         <WarningAmberIcon color="warning" />
                                                     </ListItemIcon>
                                                     <ListItemText
-                                                        primary={`File #${index + 1}`}
-                                                        secondary={JSON.stringify(
-                                                            item,
-                                                        )}
+                                                        primary={`File #${item}`}
                                                     />
                                                 </ListItem>
                                             ),

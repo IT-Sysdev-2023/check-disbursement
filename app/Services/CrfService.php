@@ -60,9 +60,4 @@ class CrfService
             'duplicates' => $existing //retrieve duplicated files
         ]);
     }
-
-    public function validateRecord()
-    {
-
-    }
 }
