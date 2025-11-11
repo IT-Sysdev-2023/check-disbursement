@@ -138,55 +138,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             width: { xs: '100%', sm: '70%' },
                         }}
                     >
-                        {uploadResponse.message && (
-                            <>
-                                <Alert
-                                    variant="outlined"
-                                    severity={
-                                        uploadResponse.status
-                                            ? 'success'
-                                            : 'error'
-                                    }
-                                >
-                                    {uploadResponse.message}
-                                </Alert>
-
-                                {/* Show duplicates if they exist */}
-                                {uploadResponse.duplicates?.length > 0 && (
-                                    <List
-                                        dense
-                                        sx={{
-                                            mt: 2,
-                                            width: '100%',
-                                            maxWidth: 400,
-                                            bgcolor: 'background.paper',
-                                            borderRadius: 2,
-                                            boxShadow: 1,
-                                        }}
-                                    >
-                                        <ListSubheader disableSticky>
-                                            Duplicate Records
-                                        </ListSubheader>
-
-                                        {uploadResponse.duplicates.map(
-                                            (item, index) => (
-                                                <ListItem key={index} divider>
-                                                    <ListItemIcon>
-                                                        <WarningAmberIcon color="warning" />
-                                                    </ListItemIcon>
-                                                    <ListItemText
-                                                        primary={`File #${index + 1}`}
-                                                        secondary={JSON.stringify(
-                                                            item,
-                                                        )}
-                                                    />
-                                                </ListItem>
-                                            ),
-                                        )}
-                                    </List>
-                                )}
-                            </>
-                        )}
+                       
 
                         <Typography
                             variant="h1"
@@ -288,6 +240,56 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                                 </Typography>
                             </Box>
                         ))}
+
+                         {uploadResponse.message && (
+                            <>
+                                <Alert
+                                    variant="outlined"
+                                    severity={
+                                        uploadResponse.status
+                                            ? 'success'
+                                            : 'error'
+                                    }
+                                >
+                                    {uploadResponse.message}
+                                </Alert>
+
+                                {/* Show duplicates if they exist */}
+                                {uploadResponse.duplicates?.length > 0 && (
+                                    <List
+                                        dense
+                                        sx={{
+                                            mt: 2,
+                                            width: '100%',
+                                            maxWidth: 400,
+                                            bgcolor: 'background.paper',
+                                            borderRadius: 2,
+                                            boxShadow: 1,
+                                        }}
+                                    >
+                                        <ListSubheader disableSticky>
+                                            Duplicate Records
+                                        </ListSubheader>
+
+                                        {uploadResponse.duplicates.map(
+                                            (item, index) => (
+                                                <ListItem key={index} divider>
+                                                    <ListItemIcon>
+                                                        <WarningAmberIcon color="warning" />
+                                                    </ListItemIcon>
+                                                    <ListItemText
+                                                        primary={`File #${index + 1}`}
+                                                        secondary={JSON.stringify(
+                                                            item,
+                                                        )}
+                                                    />
+                                                </ListItem>
+                                            ),
+                                        )}
+                                    </List>
+                                )}
+                            </>
+                        )}
                     </Stack>
                 </Container>
             </Box>

@@ -56,7 +56,7 @@ class CrfService
 
         return redirect()->back()->with([
             'status' => true,
-            'message' => ' Files Successfully uploaded, you may now view here.',
+            'message' => ' Files Successfully uploadeded, duplicated records were ignored',
             'duplicates' => $existing //retrieve duplicated files
         ]);
     }
