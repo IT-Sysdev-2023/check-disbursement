@@ -5,7 +5,7 @@ import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { retrievedRecords } from '@/routes';
 
-export default function CustomizedDataGrid({ cvs }: { cvs: inertiaPagination<Cv> }) {
+export default function CvDataGrid({ cvs }: { cvs: inertiaPagination<Cv> }) {
   
   const handlePagination = (model: GridPaginationModel) => {
     const page = model.page + 1; // MUI DataGrid uses 0-based index

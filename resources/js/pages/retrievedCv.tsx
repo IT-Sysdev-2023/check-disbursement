@@ -1,20 +1,20 @@
 import AppLayout from '@/layouts/app-layout';
-import { retrieveCrfRecords } from '@/routes';
+// import { retrieveCrfRecords } from '@/routes';
 import { Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
-import CustomizedDataGrid from './dashboard/components/CustomizedDataGrid';
 import Search from './dashboard/components/Search';
 import Copyright from './dashboard/internals/components/Copyright';
+import CvDataGrid from './dashboard/components/CvDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: retrieveCrfRecords().url,
+        href: '#',
     },
 ];
 
-export default function RetrieveCvCrf({ cv }: { cv: inertiaPagination<Cv> }) {
+export default function RetrievedCv({ cv }: { cv: inertiaPagination<Cv> }) {
     // console.log(cv);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -29,8 +29,8 @@ export default function RetrieveCvCrf({ cv }: { cv: inertiaPagination<Cv> }) {
                 </Stack>
                 <Grid container spacing={2} columns={12}>
                     {/* <Grid size={{ xs: 12, lg: 9 }}> */}
-                    <CustomizedDataGrid cvs={cv} />
-                    
+                    <CvDataGrid cvs={cv} />
+
                     {/* </Grid> */}
                     {/* <Grid size={{ xs: 12, lg: 3 }}>
                             <Stack

@@ -66,6 +66,23 @@ export interface Cv {
     updated_at: string;
 }
 
+export interface Crf {
+    id: number;
+    filename: string;
+    company: string;
+    no: number;
+    location: string;
+    date: string;
+    paid_to: string;
+    particulars: string;
+    amount: number;
+    bank: string;
+    ck_no: number;
+    prepared_by: string;
+    created_at: string;
+    updated_at: string;
+}
+
 export interface inertiaPagination<T> {
     total: number;
     per_page: number;

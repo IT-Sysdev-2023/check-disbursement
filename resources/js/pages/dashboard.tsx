@@ -4,14 +4,10 @@ import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import ChartUserByCountry from './dashboard/components/ChartUserByCountry';
-import CustomizedDataGrid from './dashboard/components/CustomizedDataGrid';
 import PageViewsBarChart from './dashboard/components/PageViewsBarChart';
 import SessionsChart from './dashboard/components/SessionsChart';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
-import Copyright from './dashboard/internals/components/Copyright';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

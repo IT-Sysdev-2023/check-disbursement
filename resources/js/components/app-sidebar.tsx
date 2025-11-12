@@ -1,3 +1,4 @@
+import { retrievedCrf } from '@/actions/App/Http/Controllers/CrfController';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -10,10 +11,31 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { about, changePassword, checkRequestForm, checkStatus, checkVoucher, dashboard, notifications, report, retrievedRecords } from '@/routes';
+import {
+    about,
+    changePassword,
+    checkRequestForm,
+    checkStatus,
+    checkVoucher,
+    dashboard,
+    notifications,
+    report,
+    retrievedRecords,
+} from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { Bell, BookOpen, Check, Database, FileSpreadsheet, Key, LayoutGrid, PackageOpen, Tickets, Users } from 'lucide-react';
+import {
+    Bell,
+    BookOpen,
+    Check,
+    Database,
+    FileSpreadsheet,
+    Key,
+    LayoutGrid,
+    PackageOpen,
+    Tickets,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -27,13 +49,22 @@ const mainNavItems: NavItem[] = [
         href: '#',
         icon: Database,
         submenu: [
-            { title: "Check Voucher", href: checkVoucher(), icon: Tickets},
-            { title: "Check Request Form", href: checkRequestForm(), icon: BookOpen },
-          ],
+            { title: 'Check Voucher', href: checkVoucher(), icon: Tickets },
+            {
+                title: 'Check Request Form',
+                href: checkRequestForm(),
+                icon: BookOpen,
+            },
+        ],
     },
     {
-        title: 'Retrieved CV/CRF',
+        title: 'Retrieved CV',
         href: retrievedRecords(),
+        icon: PackageOpen,
+    },
+    {
+        title: 'Retrieved CRF',
+        href: retrievedCrf(),
         icon: PackageOpen,
     },
     {

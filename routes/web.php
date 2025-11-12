@@ -23,16 +23,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', 'index')->name('check-voucher');
         Route::post('extract-cv', 'extractCv')->name('extractCv');
 
-        Route::get('retrieved', 'retrievedRecords')->name('retrievedRecords');
+        Route::get('retrieved', 'retrievedCv')->name('retrievedRecords');
         Route::get('details/{id}', 'details')->name('details');
     });
 
     Route::prefix('crf')->controller(CrfController::class)->group(function () {
 
-        Route::get('/', 'index')->name('check-request-form');
+        Route::get('index', 'index')->name('check-request-form');
          Route::post('extract-crf', 'extractCrf')->name('extractCrf');
 
-        Route::get('retrieved', 'retrieve')->name('retrieveCrfRecords');
+        Route::get('retrieved', 'retrievedCrf')->name('retrieveCrf');
     });
     Route::get('check-status', function () {
         return Inertia::render('dashboard');

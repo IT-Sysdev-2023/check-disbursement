@@ -192,10 +192,8 @@ class CvService extends NavConnection
 
     public function cvs(?int $page)
     {
-        // $r = CvCheckPayment::with('cvHeader')->paginate($page);
-
-        // dd($r);
-        return Inertia::render('retrieveCvCrf', [
+        // dd(2);
+        return Inertia::render('retrievedCv', [
             'cv' => CvCheckPayment::with('cvHeader')->paginate($page)
         ]);
     }

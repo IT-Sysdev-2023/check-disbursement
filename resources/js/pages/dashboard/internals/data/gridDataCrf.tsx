@@ -6,14 +6,6 @@ import Avatar from '@mui/material/Avatar';
 import Chip from '@mui/material/Chip';
 import { GridCellParams, GridColDef } from '@mui/x-data-grid';
 
-function renderStatus(status: 'Online' | 'Offline') {
-    const colors: { [index: string]: 'success' | 'default' } = {
-        Online: 'success',
-        Offline: 'default',
-    };
-
-    return <Chip label={status} color={colors[status]} size="small" />;
-}
 
 export function renderAvatar(
     params: GridCellParams<{ name: string; color: string }, any, any>,
@@ -36,75 +28,95 @@ export function renderAvatar(
     );
 }
 
-export const columns: GridColDef[] = [
+export const columnsCrf: GridColDef[] = [
     {
-        field: 'cv_header', headerName: 'CV Number', minWidth: 150,
-        valueGetter: (params) => params.cv_no,
-     },
-    {
-        field: 'check_number',
-        headerName: 'Check Number',
+        field: 'filename',
+        headerName: 'Filename',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 50,
     },
     {
-        field: 'check_amount',
-        headerName: 'Check Amount',
+        field: 'company',
+        headerName: 'Company',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 80,
     },
     {
-        field: 'bank_account_no',
-        headerName: 'Bank Account No.',
+        field: 'no',
+        headerName: 'No.',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 80,
     },
     {
-        field: 'bank_name',
-        headerName: 'Bank Name',
+        field: 'location',
+        headerName: 'Location',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
     },
     {
-        field: 'check_date',
-        headerName: 'Check Date',
+        field: 'date',
+        headerName: 'Date',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
     },
-    //  {
-    //     field: 'payee',
-    //     headerName: 'Payee',
-    //     headerAlign: 'right',
-    //     align: 'right',
-    //     flex: 2,
-    //     minWidth: 100,
-    // },
-    // {
-    //     field: 'cv_header',
-    //     headerName: 'Payee',
-    //     headerAlign: 'right',
-    //     align: 'right',
-    //     flex: 1,
-    //     minWidth: 200,
-    //     valueGetter: (params) => params.collector_name,
-    // },
-    // {
-    //   field: 'status',
-    //   headerName: 'Status',
-    //   flex: 0.5,
-    //   minWidth: 80,
-    //   renderCell: (params) => renderStatus('Online'),
-    // },
+     {
+        field: 'paid_to',
+        headerName: 'Paid To',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+     {
+        field: 'particulars',
+        headerName: 'Particulars',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+     {
+        field: 'amount',
+        headerName: 'Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+     {
+        field: 'bank',
+        headerName: 'Bank',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+     {
+        field: 'ck_no',
+        headerName: 'CK No.',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+     {
+        field: 'prepared_by',
+        headerName: 'Prepared By',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
     {
         field: 'actions',
         headerName: 'Actions',

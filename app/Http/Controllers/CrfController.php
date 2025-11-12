@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Crf;
+use App\Models\CvCheckPayment;
 use App\Services\CrfService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -25,5 +27,12 @@ class CrfController extends Controller
             'files.*' => 'file|max:5120|unique:crfs,filename',
         ]);
         return $this->service->extract($request->file('files'), $request->user()->id);
+    }
+
+    public function retrievedCrf(){
+        
+           return Inertia::render('retrievedCrf', [
+            'crf' => Crf::paginate()
+        ]);
     }
 }
