@@ -4,12 +4,14 @@ use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
 use App\Models\Company;
+use App\Models\Crf;
 use App\Models\CvLine;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
@@ -146,11 +148,14 @@ Route::get('/test', function () {
 })->name('test');
 
 Route::get('/company', function () {
-    $ret = Company::select('name')->get();
+    // $ret = Company::select('name')->get();
 
-    $ret->each(function ($item) {
-        Permission::create(['name' => $item->name]);
-    });
+    // $ret->each(function ($item) {
+    //     Permission::create(['name' => $item->name]);
+    // });
+
+    $admin = Role::first();
+    $admin->givePermissionTo(Permission::all());
 })->name('company');
 
 require __DIR__ . '/settings.php';
