@@ -50,6 +50,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('about');
 
+    Route::get('users', function () {
+        return Inertia::render('users');
+    })->name('users');
+
     Route::get('change-password', function () {
         return Inertia::render('dashboard');
     })->name('change-password');
@@ -154,8 +158,11 @@ Route::get('/company', function () {
     //     Permission::create(['name' => $item->name]);
     // });
 
-    $admin = Role::first();
-    $admin->givePermissionTo(Permission::all());
+    // $admin = Role::first();
+    // $admin->givePermissionTo(Permission::all());
+
+    $user = User::first();
+    dd($user->assignRole('admin'));
 })->name('company');
 
 require __DIR__ . '/settings.php';

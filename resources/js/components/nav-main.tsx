@@ -5,25 +5,46 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
-    const page = usePage();
+    const page = usePage<SharedData>();
+    const user = page.props.auth.user;
 
+    // Memoize role names (array of strings)
+    const roles = useMemo(
+        () => user?.roles?.map((r) => r.name) || [],
+        [user?.roles],
+    );
+    const isAdmin = roles.includes('admin');
     const [openItem, setOpenItem] = useState<string | null>(null);
 
-      // 👇 Automatically open submenu if current page belongs to it
+    // 🔹 Append "Users" only if admin
+    const finalItems = useMemo(() => {
+        return [
+            ...items,
+            ...(isAdmin
+                ? [
+                      {
+                          title: 'Users',
+                          href: '#',
+                          icon: Users,
+                      } as NavItem,
+                  ]
+                : []),
+        ];
+    }, [items, isAdmin]);
+
+    // Automatically open submenu if current page belongs to it
     useEffect(() => {
-        for (const item of items) {
+        for (const item of finalItems) {
             if (item.submenu) {
                 for (const sub of item.submenu) {
                     const subHref =
-                        typeof sub.href === "string"
-                            ? sub.href
-                            : sub.href.url;
+                        typeof sub.href === 'string' ? sub.href : sub.href.url;
                     if (page.url.startsWith(subHref)) {
                         setOpenItem(item.title);
                         return;
@@ -31,7 +52,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 }
             }
         }
-    }, [page.url, items]);
+    }, [page.url, finalItems]);
 
     const handleToggle = (title: string) => {
         setOpenItem((prev) => (prev === title ? null : title));
@@ -41,9 +62,9 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         <SidebarGroup className="px-2 py-0">
             <SidebarGroupLabel>Platform</SidebarGroupLabel>
             <SidebarMenu>
-                {items.map((item) => {
+                {finalItems.map((item) => {
                     const href =
-                        typeof item.href === "string"
+                        typeof item.href === 'string'
                             ? item.href
                             : item.href.url;
 
@@ -64,7 +85,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                 }
                             >
                                 {hasSubmenu ? (
-                                    <div className="flex items-center justify-between w-full cursor-pointer">
+                                    <div className="flex w-full cursor-pointer items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             {item.icon && <item.icon />}
                                             <span>{item.title}</span>
@@ -85,10 +106,10 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
 
                             {/* Submenu */}
                             {hasSubmenu && isOpen && (
-                                <div className="ml-6 mt-1 space-y-1">
+                                <div className="mt-1 ml-6 space-y-1">
                                     {item.submenu?.map((sub) => {
                                         const subHref =
-                                            typeof sub.href === "string"
+                                            typeof sub.href === 'string'
                                                 ? sub.href
                                                 : sub.href.url;
                                         const isSubActive =
@@ -99,7 +120,9 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                                 key={sub.title}
                                                 asChild
                                                 isActive={isSubActive}
-                                                tooltip={{ children: sub.title }}
+                                                tooltip={{
+                                                    children: sub.title,
+                                                }}
                                             >
                                                 <Link
                                                     href={subHref}

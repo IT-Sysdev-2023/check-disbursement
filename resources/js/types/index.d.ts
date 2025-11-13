@@ -51,9 +51,23 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
+    roles?: Role[];
     [key: string]: unknown; // This allows for additional properties...
 }
 
+export interface Role {
+    created_at: string;
+    guard_name: string;
+    id: number;
+    name: string;
+    pivot: PivotRole;
+    updated_at: string;
+}
+export interface PivotRole {
+    model_id: number;
+    model_type: string;
+    role_id: number;
+}
 export interface Cv {
     id: number;
     nav_table_id: number;
@@ -116,5 +130,5 @@ export interface EventType {
 export interface FlashReponse {
     status: boolean;
     message: string;
-    duplicates: string[]
+    duplicates: string[];
 }
