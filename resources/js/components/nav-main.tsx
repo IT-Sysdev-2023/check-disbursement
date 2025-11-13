@@ -5,6 +5,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { users } from '@/routes';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronDown, ChevronRight, Users } from 'lucide-react';
@@ -30,7 +31,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 ? [
                       {
                           title: 'Users',
-                          href: '#',
+                          href: users(),
                           icon: Users,
                       } as NavItem,
                   ]

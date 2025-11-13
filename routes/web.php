@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
@@ -50,10 +51,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('about');
 
-    Route::get('users', function () {
-        return Inertia::render('users');
-    })->name('users');
-
     Route::get('change-password', function () {
         return Inertia::render('dashboard');
     })->name('change-password');
@@ -61,6 +58,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('notifications', function () {
         return Inertia::render('dashboard');
     })->name('notifications');
+
+    Route::prefix('admin')->group(function () {
+        Route::get('users', [AdminController::class, 'users'])->name('users');
+
+        Route::get('permissions', [AdminController::class, 'permissions'])->name('permissions');
+        Route::post('assign-permissions', [AdminController::class, 'assignPermissions'])->name('assignPermissions');
+
+
+    });
 
 });
 Route::get('/test', function () {

@@ -51,11 +51,12 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
-    roles?: Role[];
+    roles?: RolePermission[];
+    permissions: RolePermission[];
     [key: string]: unknown; // This allows for additional properties...
 }
 
-export interface Role {
+export interface RolePermission {
     created_at: string;
     guard_name: string;
     id: number;

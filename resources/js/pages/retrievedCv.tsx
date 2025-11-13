@@ -18,7 +18,7 @@ export default function RetrievedCv({ cv }: { cv: inertiaPagination<Cv> }) {
     // console.log(cv);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Check-Releasing" />
+            <Head title="CV" />
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
                     Check Vouchers

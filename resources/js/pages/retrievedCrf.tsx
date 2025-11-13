@@ -18,7 +18,7 @@ export default function RetrievedCrf({ crf }: { crf: inertiaPagination<Crf> }) {
     // console.log(cv);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Check-Releasing" />
+            <Head title="CRF" />
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
                     Check Request Form

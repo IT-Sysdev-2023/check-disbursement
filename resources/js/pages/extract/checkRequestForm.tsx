@@ -79,7 +79,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
         }));
     });
 
-    const simulateDataRetrieval = async () => {
+    const simulateDataRetrieval = () => {
         router.post(
             extractCrf(),
             {
@@ -106,7 +106,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Check Voucher" />
+            <Head title="Check Request Form" />
             <Box
                 id="hero"
                 sx={(theme) => ({
