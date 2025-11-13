@@ -100,6 +100,9 @@ class NavSeeder3 extends Seeder
             ],
         ];
 
+        
+
+
         DB::table('nav_line_tables')->insert($line);
     }
 }

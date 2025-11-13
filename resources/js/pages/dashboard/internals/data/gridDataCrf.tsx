@@ -3,7 +3,6 @@ import { Cv } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Stack } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
-import Chip from '@mui/material/Chip';
 import { GridCellParams, GridColDef } from '@mui/x-data-grid';
 
 
@@ -30,14 +29,6 @@ export function renderAvatar(
 
 export const columnsCrf: GridColDef[] = [
     {
-        field: 'filename',
-        headerName: 'Filename',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 50,
-    },
-    {
         field: 'company',
         headerName: 'Company',
         headerAlign: 'right',
@@ -53,33 +44,9 @@ export const columnsCrf: GridColDef[] = [
         flex: 1,
         minWidth: 80,
     },
-    {
-        field: 'location',
-        headerName: 'Location',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'date',
-        headerName: 'Date',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
      {
         field: 'paid_to',
         headerName: 'Paid To',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-     {
-        field: 'particulars',
-        headerName: 'Particulars',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -94,24 +61,8 @@ export const columnsCrf: GridColDef[] = [
         minWidth: 100,
     },
      {
-        field: 'bank',
-        headerName: 'Bank',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-     {
         field: 'ck_no',
         headerName: 'CK No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-     {
-        field: 'prepared_by',
-        headerName: 'Prepared By',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -133,7 +84,7 @@ export const columnsCrf: GridColDef[] = [
                     // startIcon={<VisibilityIcon />}
                     onClick={() => handleView(params.row)}
                 >
-                    Check Details
+                    View
                 </Button>
             </Stack>
         ),

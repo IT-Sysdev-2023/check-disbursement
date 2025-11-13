@@ -3,11 +3,13 @@
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
+use App\Models\Company;
 use App\Models\CvLine;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Permission;
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
@@ -30,7 +32,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('crf')->controller(CrfController::class)->group(function () {
 
         Route::get('index', 'index')->name('check-request-form');
-         Route::post('extract-crf', 'extractCrf')->name('extractCrf');
+        Route::post('extract-crf', 'extractCrf')->name('extractCrf');
 
         Route::get('retrieved', 'retrievedCrf')->name('retrieveCrf');
     });
@@ -142,6 +144,14 @@ Route::get('/test', function () {
 
     // dd($str);
 })->name('test');
+
+Route::get('/company', function () {
+    $ret = Company::select('name')->get();
+
+    $ret->each(function ($item) {
+        Permission::create(['name' => $item->name]);
+    });
+})->name('company');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

@@ -32,5 +32,14 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        // User::firstOrCreate(
+        //     ['email' => 'email@gmail.com'],
+        //     [
+        //         'name' => 'Teo',
+        //         'password' => Hash::make('12341234'),
+        //         'email_verified_at' => now(),
+        //     ]
+        // );
     }
 }
