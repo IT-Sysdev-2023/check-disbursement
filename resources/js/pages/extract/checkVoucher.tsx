@@ -3,7 +3,14 @@ import { checkVoucher, extractCv } from '@/routes';
 import { Auth, EventType, ProgressState, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Box, Button, Container, Stack, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Container,
+    SelectChangeEvent,
+    Stack,
+    Typography,
+} from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import axios from 'axios';
 import { useState } from 'react';
@@ -12,6 +19,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Dayjs } from 'dayjs';
+import SelectBuCv from './components/selectBuCv';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,11 +33,12 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
     const [loading, setLoading] = useState(false);
+    const [permissionList, setPermissionList] = useState<string[]>([]);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
         const { percentage, message } = e;
-        
-        setLoading(false)
+
+        setLoading(false);
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
         setProgress((prev) => ({
@@ -47,13 +56,34 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             alert('Please select both start and end dates');
             return;
         }
+        if (permissionList.length <= 0) {
+              alert('Please select Business Unit');
+            return;
+        }
+
         setLoading(true);
         const { url, method } = extractCv();
         await axios({
-            url, method, params: {
+            url,
+            method,
+            params: {
                 start_date: startDate.format('YYYY-MM-DD'),
-                end_date: endDate.format('YYYY-MM-DD')
-            } });
+                end_date: endDate.format('YYYY-MM-DD'),
+                bu: permissionList
+            },
+        });
+    };
+
+    const permissions = auth.user?.permissions?.map((r) => r.name) || [];
+
+    const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
+        const {
+            target: { value },
+        } = event;
+        setPermissionList(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
+        );
     };
 
     return (
@@ -125,6 +155,11 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             organized, verified, and transparent with our Check
                             Voucher module
                         </Typography>
+                        <SelectBuCv
+                            permissions={permissions}
+                            selectedPermission={permissionList}
+                            handleChange={handleChange}
+                        />
                         {Object.keys(progress).length === 0 && (
                             <>
                                 <LocalizationProvider

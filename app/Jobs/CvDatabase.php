@@ -22,10 +22,10 @@ class CvDatabase implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public NavServer $server,
+        public $server,
         public int $userId,
         public object $date,
-        public NavDatabase $database
+        public $database
     ) {
     }
 
@@ -34,8 +34,7 @@ class CvDatabase implements ShouldQueue
      */
     public function handle(): void
     {
-        // Log::info($this->userId);
-        // $user = User::find($this->userId)->first();
+        $tables = $this->database->load('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
 
         (new CvService())
             ->setConnection(
@@ -44,14 +43,12 @@ class CvDatabase implements ShouldQueue
             )
             ->setDateFilter($this->date)
             ->setUser($this->userId)
-            ->storeRecord($this->database->navHeaderTable, $this->database->navLineTable->name, $this->database->navCheckPaymentTable->name)
-            ;
+            ->storeRecord(
+                $tables->navHeaderTable,
+                $tables->navLineTable?->name,
+                $tables->navCheckPaymentTable?->name
+            );
 
-
-    }
-
-    public function getLine()
-    {
 
     }
 }

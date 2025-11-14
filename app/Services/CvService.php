@@ -33,21 +33,22 @@ class CvService extends NavConnection
     public function __construct()
     {
     }
-    public function retrieveData(User $user, object $date)
+    public function retrieveData(User $user, object $date, array $bu)
     {
         // Get all the Navition Servers
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
-            ->withWhereHas('navDatabases', function (Builder $query) {
-                $query->with('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
+            ->withWhereHas('navDatabases', function (Builder $query) use ($bu) {
+                $query->whereIn('company', $bu)
+                    ->with('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
             })
             ->lazy();
-
         $id = $user->id;
 
-        $nav->each(
-            fn(NavServer $server) =>
-            CvServer::dispatch($server, $id, $date)
-        );
+        $nav->each(function (NavServer $server) use ($id, $date) {
+            $databases = $server->navDatabases; // dont Change this cause it will re-hydrates inside the job(no Filtering on Records will happen)
+            CvServer::dispatch($server->id, $id, $date, $databases);
+        });
+
     }
 
     public function setDateFilter(object $date)
@@ -86,7 +87,7 @@ class CvService extends NavConnection
 
                 foreach ($chunk as $item) {
 
-                    CvProgress::dispatch("Generating Cv Header " . $tableName . " in progress.. ", $start, $total, $this->userId); 
+                    CvProgress::dispatch("Generating Cv Header " . $tableName . " in progress.. ", $start, $total, $this->userId);
                     $start++;
 
                     $headerId = DB::table('cv_headers')->insertGetId([
