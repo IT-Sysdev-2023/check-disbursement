@@ -1,12 +1,18 @@
 import { assignPermissions, permissions } from '@/routes';
-import { RolePermission, User } from '@/types';
-import { Button, SelectChangeEvent } from '@mui/material';
+import { FlashReponse, RolePermission, User } from '@/types';
+import { router } from '@inertiajs/react';
+import {
+    Alert,
+    Button,
+    SelectChangeEvent,
+    Snackbar,
+    SnackbarCloseReason,
+} from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { router } from '@inertiajs/react';
 import PermissionSelection from './permissionSelection';
 
 const style = {
@@ -30,6 +36,8 @@ export default function UserModal({
     details: User | undefined;
     onClose: () => void;
 }) {
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const [message, setMessage] = useState('');
     const [selectedPermission, setSelectedPermission] = useState<string[]>([]);
     const [permissionsList, setPermissionsList] = useState<RolePermission[]>(
         [],
@@ -66,9 +74,32 @@ export default function UserModal({
     };
 
     const onSave = () => {
-        router.post(assignPermissions(), {
-            selectedPermission
-        })
+        router.post(
+            assignPermissions(),
+            {
+                selectedPermission,
+                id: details?.id,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: (page) => {
+                    setOpenSnackBar(true);
+                    const m = page.props.flash as FlashReponse;
+                    setMessage(m.message);
+                },
+            },
+        );
+    };
+    const handleClose = (
+        event?: React.SyntheticEvent | Event,
+        reason?: SnackbarCloseReason,
+    ) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenSnackBar(false);
     };
 
     return (
@@ -104,6 +135,20 @@ export default function UserModal({
                     </Button>
                 </Box>
             </Modal>
+            <Snackbar
+                open={openSnackBar}
+                autoHideDuration={6000}
+                onClose={handleClose}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="success"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
         </div>
     );
 }

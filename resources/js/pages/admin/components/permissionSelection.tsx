@@ -30,9 +30,9 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
 export default function PermissionSelection({
     selectedPermission,
     handleChange,
-    permissions
+    permissions,
 }: {
-        permissions: RolePermission[];
+    permissions: RolePermission[];
     selectedPermission: string[];
     handleChange: (event: SelectChangeEvent<string[]>) => void;
 }) {

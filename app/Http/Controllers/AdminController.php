@@ -22,9 +22,16 @@ class AdminController extends Controller
     }
 
     public function assignPermissions(Request $request){
+
         $request->validate([
             'selectedPermission' => 'required|array|min:1',
+            'id' => 'required|int'
         ]);
-        dd($request->all());
+
+        $user = User::findOrFail($request->id);
+
+        $user->syncPermissions($request->selectedPermission);
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 }
