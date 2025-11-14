@@ -17,6 +17,14 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
+    $this->call([
+        CompanySeeder::class,
+        NavServerSeeder::class,
+        NavCpSeeder::class,
+        NavHeaderSeeder::class,
+        NavLineSeeder::class,
+    ]);
+
         User::firstOrCreate(
             ['username' => 'san'],
             [
