@@ -14,6 +14,7 @@ return new class extends Migration
        Schema::create('crfs', function (Blueprint $table) {
             $table->id();
             $table->string('filename');
+            $table->string('crf')->nullable();
             $table->string('company');
             $table->unsignedBigInteger('no');
             $table->string('location');

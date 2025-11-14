@@ -26,7 +26,7 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
     };
 }
 
-export default function MultipleSelectChip({
+export default function SelectBu({
     selectedPermission,
     handleChange,
     permissions,

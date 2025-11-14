@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 
 class CrfService
 {
-    public function extract($files, $userId)
+    public function extract($files, $userId, array $bu)
     {
         $records = collect();
         
@@ -30,6 +30,7 @@ class CrfService
                 ->extractDate()
                 ->extractPaidTo()
                 ->extractParticularsAndAmount()
+                ->extractCrf()
                 ->extractBank()
                 ->extractCkNo()
                 ->extractPreparedBy()
@@ -41,10 +42,10 @@ class CrfService
             $start++;
         });
 
-        $validated = CrfHelper::checkProperties($records);
+        $validated = CrfHelper::checkProperties($records, $bu);
 
         if (!$validated) {
-            return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. Please try again.']);
+            return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);
         }
 
         $uniqueKeys = $records->pluck('no');

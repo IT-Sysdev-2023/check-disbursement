@@ -23,11 +23,13 @@ import {
     ListItemIcon,
     ListItemText,
     ListSubheader,
+    SelectChangeEvent,
     Stack,
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
+import SelectBu from './components/selectBu';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -57,6 +59,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
         duplicates: [],
     });
     const [files, setFiles] = useState<File[]>([]);
+    const [permissionList, setPermissionList] = useState<string[]>([]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!event.target.files) return;
@@ -80,14 +83,20 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
     });
 
     const simulateDataRetrieval = () => {
+
+         if (permissionList.length <= 0) {
+            alert('Please select Business Unit');
+            return;
+        }
+
         router.post(
             extractCrf(),
             {
                 files,
+                bu: permissionList
             },
             {
                 onSuccess: (page) => {
-                    console.log(page);
                     const flash = page.props.flash as {
                         message?: string;
                         status?: boolean;
@@ -101,6 +110,18 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                     setFiles([]);
                 },
             },
+        );
+    };
+
+    const permissions = auth.user?.permissions?.map((r) => r.name) || [];
+
+    const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
+        const {
+            target: { value },
+        } = event;
+        setPermissionList(
+            // On autofill we get a stringified value.
+            typeof value === 'string' ? value.split(',') : value,
         );
     };
 
@@ -138,8 +159,6 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             width: { xs: '100%', sm: '70%' },
                         }}
                     >
-                       
-
                         <Typography
                             variant="h1"
                             sx={{
@@ -176,6 +195,11 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             Elevate your experience with top-tier features and
                             services.
                         </Typography>
+                        <SelectBu
+                            permissions={permissions}
+                            selectedPermission={permissionList}
+                            handleChange={handleChange}
+                        />
                         <Button
                             sx={{
                                 mt: 5,
@@ -241,7 +265,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             </Box>
                         ))}
 
-                         {uploadResponse.message && (
+                        {uploadResponse.message && (
                             <>
                                 <Alert
                                     variant="outlined"

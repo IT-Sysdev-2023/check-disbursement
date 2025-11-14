@@ -25,7 +25,7 @@ class CvDatabase implements ShouldQueue
         public $server,
         public int $userId,
         public object $date,
-        public $database
+        public NavDatabase $database
     ) {
     }
 

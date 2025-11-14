@@ -19,7 +19,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Dayjs } from 'dayjs';
-import SelectBuCv from './components/selectBuCv';
+import SelectBu from './components/selectBu';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -57,7 +57,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             return;
         }
         if (permissionList.length <= 0) {
-              alert('Please select Business Unit');
+            alert('Please select Business Unit');
             return;
         }
 
@@ -69,7 +69,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             params: {
                 start_date: startDate.format('YYYY-MM-DD'),
                 end_date: endDate.format('YYYY-MM-DD'),
-                bu: permissionList
+                bu: permissionList,
             },
         });
     };
@@ -155,7 +155,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             organized, verified, and transparent with our Check
                             Voucher module
                         </Typography>
-                        <SelectBuCv
+                        <SelectBu
                             permissions={permissions}
                             selectedPermission={permissionList}
                             handleChange={handleChange}

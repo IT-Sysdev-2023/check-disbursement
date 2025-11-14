@@ -6,6 +6,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
@@ -33,14 +34,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
         User::firstOrCreate(
-            ['username' => 'admin'],
+            ['username' => 'teo'],
             [
                 'name' => 'Teo',
                 'password' => Hash::make('12341234'),
             ]
         );
         
-        Role::create(['name' => 'admin']);
+        $admin = Role::create(['name' => 'admin']);
+         $admin->givePermissionTo(Permission::all());
+        $user = User::first();
+        $user->assignRole('admin');
     
     }
 }

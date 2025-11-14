@@ -22,11 +22,13 @@ class CrfController extends Controller
 
     public function extractCrf(Request $request)
     {
+
         $request->validate([
             'files' => 'required',
             'files.*' => 'file|max:5120|unique:crfs,filename',
+            'bu' => ['required', 'array', 'min:1']
         ]);
-        return $this->service->extract($request->file('files'), $request->user()->id);
+        return $this->service->extract($request->file('files'), $request->user()->id, $request->bu);
     }
 
     public function retrievedCrf(){

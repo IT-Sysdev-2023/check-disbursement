@@ -18,6 +18,7 @@ class CrfHelper
     private ?Carbon $date;
     private ?float $amount;
     private ?string $particular;
+    private ?string $crf;
     private string $bank;
     private ?int $ckNo;
     private string $preparedBy;
@@ -45,7 +46,7 @@ class CrfHelper
     {
         // Extract number (e.g., "No. : 11000212")
         preg_match('/No\.\s*:\s*(\d+)/', $this->fileContents, $numMatches);
-        // dd(optional($numMatches[1]));
+
         $this->no = Number::parseInt($numMatches[1]);
 
         return $this;
@@ -92,13 +93,22 @@ class CrfHelper
             $particular = preg_replace('/\*{2,}\s*[\d,]+\.\d{2}\s*\*{2,}/', '', $particularsBlock);
             $particular = preg_replace('/\|+/', ' ', $particular);
             $particular = preg_replace('/\s{2,}/', ' ', $particular);
-            $particular = preg_replace('/Particulars\s*:/i', '', $particular);
+
             $particularsText = Str::trim($particular);
         }
 
         $this->amount = Number::parseFloat($amount);
         $this->particular = $particularsText;
 
+        return $this;
+    }
+
+    public function extractCrf()
+    {
+        //Extract CRF# in Particular
+        preg_match('/CRF#\d+/', $this->particular, $match);
+            
+        $this->crf = $match[0];
         return $this;
     }
 
@@ -133,6 +143,7 @@ class CrfHelper
     {
         return [
             'filename' => $this->filename,
+            'crf' => $this->crf,
             'company' => $this->company,
             'no' => $this->no,
             'location' => $this->location,
@@ -148,14 +159,17 @@ class CrfHelper
         ];
     }
 
-    public static function checkProperties(Collection $record)
+    public static function checkProperties(Collection $record, array $bu)
     {
-        return $record->every(function ($item) {
-            return !empty($item['company']) && !empty($item['no'])
+
+
+        return $record->every(function ($item) use ($bu) {
+            return (!empty($item['company']) && !empty($item['no'])
                 && !empty($item['location']) && !empty($item['date'])
                 && !empty($item['bank']) && !empty($item['ck_no'])
                 && !empty($item['prepared_by']) && !empty($item['paid_to'])
-                && !empty($item['amount']) && !empty($item['particulars']);
+                && !empty($item['amount']) && !empty($item['particulars'])) &&
+                (Str::contains($item['company'], $bu, ignoreCase: true)); // disable case sensitivity
         });
     }
 
