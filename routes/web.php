@@ -158,11 +158,6 @@ Route::get('/test', function () {
 })->name('test');
 
 Route::get('/company', function () {
-    // $ret = Company::select('name')->get();
-
-    // $ret->each(function ($item) {
-    //     Permission::create(['name' => $item->name]);
-    // });
 
     // $admin = Role::first();
     // $admin->givePermissionTo(Permission::all());
@@ -170,6 +165,8 @@ Route::get('/company', function () {
     $user = User::first();
     dd($user->assignRole('admin'));
 })->name('company');
+
+
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,13 +19,13 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-    $this->call([
-        CompanySeeder::class,
-        NavServerSeeder::class,
-        NavCpSeeder::class,
-        NavHeaderSeeder::class,
-        NavLineSeeder::class,
-    ]);
+        $this->call([
+            CompanySeeder::class,
+            NavServerSeeder::class,
+            NavCpSeeder::class,
+            NavHeaderSeeder::class,
+            NavLineSeeder::class,
+        ]);
 
         User::firstOrCreate(
             ['username' => 'san'],
@@ -40,11 +41,17 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('12341234'),
             ]
         );
-        
+
+        $ret = Company::select('name')->get();
+
+        $ret->each(function ($item) {
+            Permission::create(['name' => $item->name]);
+        });
+
         $admin = Role::create(['name' => 'admin']);
-         $admin->givePermissionTo(Permission::all());
+        $admin->givePermissionTo(Permission::all());
         $user = User::first();
         $user->assignRole('admin');
-    
+
     }
 }
