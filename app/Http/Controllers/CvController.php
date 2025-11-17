@@ -16,7 +16,7 @@ class CvController extends Controller
 
     public function index()
     {
-        return Inertia::render('extract/checkVoucher');
+        return Inertia::render(component: 'extract/checkVoucher');
     }
     
     public function extractCv(Request $request)
@@ -36,8 +36,9 @@ class CvController extends Controller
     public function retrievedCv(Request $request)
     {
         // dd(1);
+     
         $perPage = $request->per_page;
-        return $this->service->cvs($perPage, $request->bu);
+        return $this->service->cvs($perPage, $request->bu, $request->search);
     }
 
     public function details($id)

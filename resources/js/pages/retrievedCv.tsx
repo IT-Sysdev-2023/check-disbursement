@@ -24,7 +24,12 @@ export default function RetrievedCv({
     cv: inertiaPagination<Cv>;
     auth: Auth;
 }) {
-    const [bu, setBu] = useState < {label: string, value: string}>({ label: '',  value: ''});
+    const [bu, setBu] = useState<{ label: string; value: string }>({
+        label: '',
+        value: '',
+    });
+
+    const [search, setSearch] = useState('');
     const permissions =
         auth.user?.permissions?.map((r) => ({ value: r.id, label: r.name })) ||
         [];
@@ -35,7 +40,10 @@ export default function RetrievedCv({
         );
 
         if (selectedItem) {
-            setBu({label: selectedItem?.label, value: String(selectedItem?.value)});
+            setBu({
+                label: selectedItem?.label,
+                value: String(selectedItem?.value),
+            });
         }
 
         router.get(
@@ -44,6 +52,7 @@ export default function RetrievedCv({
             {
                 preserveScroll: true,
                 preserveState: true,
+                replace: true
             },
         );
     };
@@ -62,6 +71,21 @@ export default function RetrievedCv({
             },
         );
     };
+
+    const handleSearch = (value: string) => {
+        setSearch(value);
+
+        router.get(
+            retrievedRecords(),
+            { search: value, bu: bu.label },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -70,7 +94,7 @@ export default function RetrievedCv({
                     Check Vouchers
                 </Typography>
                 <Stack direction="row" sx={{ gap: 3 }}>
-                    <Search />
+                    <Search onSearch={handleSearch} value={search} />
                     <SelectItem
                         handleChange={handleChange}
                         value={bu.value}

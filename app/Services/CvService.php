@@ -191,9 +191,15 @@ class CvService extends NavConnection
         return $this;
     }
 
-    public function cvs(?int $page, ?string $bu)
+    public function cvs(?int $page, ?string $bu, ?string $search)
     {
-        $query = CvCheckPayment::with('cvHeader');
+        $query = CvCheckPayment::with('cvHeader')->when($search, function ($query, $search) {
+             $query->whereHas('cvHeader', function (Builder $query) use ($search) {
+                $query->whereAny([
+                    'cv_no',
+                ], 'LIKE', '%' . $search . '%');
+            });
+        });
 
         if ($bu) {
             $query->whereRelation(
@@ -203,7 +209,7 @@ class CvService extends NavConnection
             );
         }
 
-        $records = $query->paginate($page)->withQueryString();
+        $records = $query->paginate(perPage: $page)->withQueryString();
 
         return Inertia::render('retrievedCv', [
             'cv' => $records
