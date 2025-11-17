@@ -1,23 +1,8 @@
-import * as React from 'react';
 import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
 import { columns } from '../internals/data/gridData';
 import { Cv, inertiaPagination } from '@/types';
-import { router } from '@inertiajs/react';
-import { retrievedRecords } from '@/routes';
 
-export default function CvDataGrid({ cvs }: { cvs: inertiaPagination<Cv> }) {
-  
-  const handlePagination = (model: GridPaginationModel) => {
-    const page = model.page + 1; // MUI DataGrid uses 0-based index
-    const per_page = model.pageSize;
-
-    router.get(retrievedRecords(), { page, per_page }, {
-      preserveScroll: true,
-      preserveState: true,
-      replace: true,
-    });
-    
-  };
+export default function CvDataGrid({ cvs, pagination }: { cvs: inertiaPagination<Cv>, pagination: (model: GridPaginationModel) => void }) {
 
   return (
     <DataGrid
@@ -33,7 +18,7 @@ export default function CvDataGrid({ cvs }: { cvs: inertiaPagination<Cv> }) {
       getRowClassName={(params) =>
         params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
       }
-      onPaginationModelChange={handlePagination}
+      onPaginationModelChange={pagination}
       disableColumnResize
       density="compact"
       slotProps={{

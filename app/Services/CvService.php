@@ -191,11 +191,22 @@ class CvService extends NavConnection
         return $this;
     }
 
-    public function cvs(?int $page)
+    public function cvs(?int $page, ?string $bu)
     {
-        // dd(2);
+        $query = CvCheckPayment::with('cvHeader');
+
+        if ($bu) {
+            $query->whereRelation(
+                'cvHeader.navHeaderTable.navDatabase',
+                'company',
+                $bu
+            );
+        }
+
+        $records = $query->paginate($page)->withQueryString();
+
         return Inertia::render('retrievedCv', [
-            'cv' => CvCheckPayment::with('cvHeader')->paginate($page)
+            'cv' => $records
         ]);
     }
 

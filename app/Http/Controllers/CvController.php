@@ -37,7 +37,7 @@ class CvController extends Controller
     {
         // dd(1);
         $perPage = $request->per_page;
-        return $this->service->cvs($perPage);
+        return $this->service->cvs($perPage, $request->bu);
     }
 
     public function details($id)
