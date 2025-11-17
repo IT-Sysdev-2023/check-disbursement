@@ -1,11 +1,13 @@
 import AppLayout from '@/layouts/app-layout';
 // import { retrieveCrfRecords } from '@/routes';
 import { Crf, inertiaPagination, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import CrfDataGrid from './dashboard/components/CrfDataGrid';
 import Search from './dashboard/components/Search';
 import Copyright from './dashboard/internals/components/Copyright';
+import { useState } from 'react';
+import { retrievedCrf } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -15,7 +17,22 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function RetrievedCrf({ crf }: { crf: inertiaPagination<Crf> }) {
-    // console.log(cv);
+
+    const [search, setSearch] = useState('');
+
+    const handleSearch = (value: string) => {
+            setSearch(value);
+    
+            router.get(
+                retrievedCrf(),
+                { search: value},
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    replace: true,
+                },
+            );
+        };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CRF" />
@@ -24,7 +41,7 @@ export default function RetrievedCrf({ crf }: { crf: inertiaPagination<Crf> }) {
                     Check Request Form
                 </Typography>
                 <Stack direction="row" sx={{ gap: 1 }}>
-                    <Search />
+                    <Search onSearch={handleSearch} value={search}/>
                     {/* <CustomDatePicker /> */}
                 </Stack>
                 <Grid container spacing={2} columns={12}>

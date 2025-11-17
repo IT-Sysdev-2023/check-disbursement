@@ -37,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', 'index')->name('check-request-form');
         Route::post('extract-crf', 'extractCrf')->name('extractCrf');
 
-        Route::get('retrieved', 'retrievedCrf')->name('retrieveCrf');
+        Route::get('retrieved', 'retrievedCrf')->name('retrievedCrf');
     });
     Route::get('check-status', function () {
         return Inertia::render('dashboard');

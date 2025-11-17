@@ -5,7 +5,6 @@ import { Button, Stack } from '@mui/material';
 import Avatar from '@mui/material/Avatar';
 import { GridCellParams, GridColDef } from '@mui/x-data-grid';
 
-
 export function renderAvatar(
     params: GridCellParams<{ name: string; color: string }, any, any>,
 ) {
@@ -28,6 +27,14 @@ export function renderAvatar(
 }
 
 export const columnsCrf: GridColDef[] = [
+     {
+        field: 'crf',
+        headerName: 'CRF #',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+    },
     {
         field: 'company',
         headerName: 'Company',

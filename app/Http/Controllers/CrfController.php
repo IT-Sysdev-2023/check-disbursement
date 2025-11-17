@@ -31,10 +31,15 @@ class CrfController extends Controller
         return $this->service->extract($request->file('files'), $request->user()->id, $request->bu);
     }
 
-    public function retrievedCrf(){
-        
+    public function retrievedCrf(Request $request){
+
+        $records = Crf::when($request->search, function ($query, $search) {
+            $query->whereAny([
+                    'crf',
+                ], 'LIKE', '%' . $search . '%');
+        })->paginate();
            return Inertia::render('retrievedCrf', [
-            'crf' => Crf::paginate()
+            'crf' => $records
         ]);
     }
 }
