@@ -10,10 +10,10 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { SelectChangeEvent, SelectProps } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs, { Dayjs } from 'dayjs';
+// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+// import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+// import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { Dayjs } from 'dayjs';
 import * as React from 'react';
 
 export interface EmployeeFormState {
@@ -128,10 +128,7 @@ export default function EmployeeForm(props: EmployeeFormProps) {
         }
     }, [formValues, onReset]);
 
-    //   const handleBack = React.useCallback(() => {
-    //     navigate(backButtonPath ?? '/employees');
-    //   }, [navigate, backButtonPath]);
-    function handleBack() {}
+
 
     return (
         <Box
@@ -143,7 +140,7 @@ export default function EmployeeForm(props: EmployeeFormProps) {
             sx={{ width: '100%', p: 6 }}
         >
             <Typography variant="h6" sx={{ mb: 2 }}>
-                CV Number: {cv.cv_number}
+                CV Number: {cv.cv_header.cv_no}
             </Typography>
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Payee: {cv.payee}
@@ -156,29 +153,38 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                 >
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
-                            value={formValues.name ?? ''}
+                            value={cv.check_number}
                             onChange={handleTextFieldChange}
-                            name="name"
+                            name="check_number"
                             label="Check Number"
-                            error={!!formErrors.name}
-                            helperText={formErrors.name ?? ' '}
+                            disabled
                             fullWidth
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="number"
-                            value={formValues.age ?? ''}
+                            value={cv.check_amount}
                             onChange={handleNumberFieldChange}
-                            name="age"
+                            name="check_amount"
                             label="Check Amount"
-                            error={!!formErrors.age}
-                            helperText={formErrors.age ?? ' '}
                             fullWidth
+                            disabled
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                        <TextField
+                            type="text"
+                            value={cv.check_date}
+                            onChange={handleNumberFieldChange}
+                            name="check_date"
+                            label="Check Date"
+                            fullWidth
+                            disabled
                         />
                     </Grid>
 
-                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                    {/* <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
                                 value={
@@ -198,55 +204,65 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                                 }}
                             />
                         </LocalizationProvider>
-                    </Grid>
+                    </Grid> */}
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
-                            type="number"
-                            value={formValues.age ?? ''}
-                            onChange={handleNumberFieldChange}
-                            name="age"
-                            label="Bank"
-                            error={!!formErrors.age}
-                            helperText={formErrors.age ?? ' '}
+                            type="text"
+                            value={cv.cv_header.vendor_no}
+                            label="Vendor"
                             fullWidth
+                            disabled
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
-                        <FormControl error={!!formErrors.role} fullWidth>
-                            <InputLabel id="employee-role-label">
-                                Location
-                            </InputLabel>
-                            <Select
-                                value={formValues.role ?? ''}
-                                onChange={
-                                    handleSelectFieldChange as SelectProps['onChange']
-                                }
-                                labelId="employee-role-label"
-                                name="role"
-                                label="Department"
-                                defaultValue=""
-                                fullWidth
-                            >
-                                <MenuItem value="cebu">Cebu</MenuItem>
-                                <MenuItem value="deposit">Deposit</MenuItem>
-                                <MenuItem value="internal">
-                                    Internal
-                                </MenuItem>
-                                <MenuItem value="Manila">
-                                    Manila
-                                </MenuItem>
-                                <MenuItem value="tagbPickup">
-                                    Tagbilaran Pick-up
-                                </MenuItem>
-                            </Select>
-                            <FormHelperText>
-                                {formErrors.role ?? ' '}
-                            </FormHelperText>
-                        </FormControl>
+                        <TextField
+                            type="text"
+                            value={cv.bank_account_no}
+                            label="Bank Account No."
+                            fullWidth
+                            disabled
+                        />
                     </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                        <TextField
+                            type="text"
+                            value={cv.bank_name}
+                            label="Bank Name"
+                            fullWidth
+                            disabled
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                        <TextField
+                            type="text"
+                            value={cv.check_class_location != '' ? cv.check_class_location : 'N/A'}
+                            label="Check Class Location"
+                            fullWidth
+                            disabled
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                        <TextField
+                            type="text"
+                            value={cv.clearing_date}
+                            label="Clearing Date"
+                            fullWidth
+                            disabled
+                        />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                        <TextField
+                            type="text"
+                            value={cv.cv_header.remarks}
+                            label="Remarks"
+                            fullWidth
+                            disabled
+                        />
+                    </Grid>
+                   
                 </Grid>
             </FormGroup>
-            <Box sx={{ textAlign: 'right', mt: 2 }}>
+            {/* <Box sx={{ textAlign: 'right', mt: 2 }}>
                 <Button
                     type="submit"
                     variant="contained"
@@ -255,7 +271,7 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                 >
                     {submitButtonLabel}
                 </Button>
-            </Box>
+            </Box> */}
         </Box>
     );
 }

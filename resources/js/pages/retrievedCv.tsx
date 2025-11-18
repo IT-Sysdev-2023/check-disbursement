@@ -57,6 +57,8 @@ export default function RetrievedCv({
         );
     };
 
+    console.log(cv);
+
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1; // MUI DataGrid uses 0-based index
         const per_page = model.pageSize;

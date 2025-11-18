@@ -193,13 +193,14 @@ class CvService extends NavConnection
 
     public function cvs(?int $page, ?string $bu, ?string $search)
     {
-        $query = CvCheckPayment::with('cvHeader')->when($search, function ($query, $search) {
-             $query->whereHas('cvHeader', function (Builder $query) use ($search) {
-                $query->whereAny([
-                    'cv_no',
-                ], 'LIKE', '%' . $search . '%');
+        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck')
+            ->when($search, function ($query, $search) {
+                $query->whereHas('cvHeader', function (Builder $query) use ($search) {
+                    $query->whereAny([
+                        'cv_no',
+                    ], 'LIKE', '%' . $search . '%');
+                });
             });
-        });
 
         if ($bu) {
             $query->whereRelation(
@@ -218,8 +219,9 @@ class CvService extends NavConnection
 
     public function details(CvCheckPayment $cv)
     {
+        $cv->check_date = Date::parse($cv->check_date)->toFormattedDateString();
         return Inertia::render('dashboard/cv/cvDetails', [
-            'cv' => $cv
+            'cv' => $cv->load('cvHeader:id,cv_no,vendor_no,remarks')
         ]);
     }
 

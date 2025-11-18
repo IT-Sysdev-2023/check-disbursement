@@ -30,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('retrieved', 'retrievedCv')->name('retrievedRecords');
         Route::get('details/{id}', 'details')->name('details');
+
     });
 
     Route::prefix('crf')->controller(CrfController::class)->group(function () {
@@ -39,6 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('retrieved', 'retrievedCrf')->name('retrievedCrf');
     });
+
+    Route::post('borrowed-check', [CvController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
+    Route::post('scan-check', [CvController::class, 'scanCheck'])->name('scanCheck');
+
     Route::get('check-status', function () {
         return Inertia::render('dashboard');
     })->name('check-status');

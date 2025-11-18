@@ -7,11 +7,11 @@ export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
             xmlns="http://www.w3.org/2000/svg"
             fill="#000000"
         >
-            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
             <g
                 id="SVGRepo_tracerCarrier"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             ></g>
             <g id="SVGRepo_iconCarrier">
                 {' '}
@@ -26,7 +26,7 @@ export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
                         d="M10.7071068,13.2928932 C11.0976311,13.6834175 11.0976311,14.3165825 10.7071068,14.7071068 C10.3165825,15.0976311 9.68341751,15.0976311 9.29289322,14.7071068 L0.292893219,5.70710678 C-0.0976310729,5.31658249 -0.0976310729,4.68341751 0.292893219,4.29289322 L4.29289322,0.292893219 C4.68341751,-0.0976310729 5.31658249,-0.0976310729 5.70710678,0.292893219 C6.09763107,0.683417511 6.09763107,1.31658249 5.70710678,1.70710678 L2.41421356,5 L10.7071068,13.2928932 Z"
                     ></path>{' '}
                 </defs>{' '}
-                <g fill="none" fill-rule="evenodd" transform="rotate(-90 11 7)">
+                <g fill="none" fillRule="evenodd" transform="rotate(-90 11 7)">
                     {' '}
                     <g transform="translate(1 1)">
                         {' '}
@@ -36,7 +36,7 @@ export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
                         </mask>{' '}
                         <use
                             fill="#D8D8D8"
-                            fill-rule="nonzero"
+                            fillRule="nonzero"
                             href="#check-a"
                         ></use>{' '}
                         <g fill="#FFA0A0" mask="url(#check-b)">
@@ -54,7 +54,7 @@ export default function AppLogoIcon(props: SVGAttributes<SVGElement>) {
                     </mask>{' '}
                     <use
                         fill="#000000"
-                        fill-rule="nonzero"
+                        fillRule="nonzero"
                         href="#check-c"
                     ></use>{' '}
                     <g fill="#7600FF" mask="url(#check-d)">
