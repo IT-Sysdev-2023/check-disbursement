@@ -11,7 +11,7 @@ class CvCheckPayment extends Model
     }
 
     public function borrowedCheck(){
-        return $this->hasOne(BorrowedCheck::class, 'check_id');
+        return $this->hasOne(BorrowedCheck::class, 'check_id')->where('check', 'cv');
     }
     public function scannedCheck(){
         return $this->hasOne(ScannedCheck::class, 'check_id');

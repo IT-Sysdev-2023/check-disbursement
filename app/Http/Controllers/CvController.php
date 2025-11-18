@@ -54,6 +54,7 @@ class CvController extends Controller
         $request->validate([
             "name" => "required| string",
             "reason" => "required| string",
+            'check' => 'required| string',
             'id' => 'required'
         ]);
 
@@ -61,6 +62,7 @@ class CvController extends Controller
             'check_id' => $request->id,
             'name' => $request->name,
             'reason' => $request->reason,
+            'check' => $request->check,
             'created_at' => now(),
             'updated_at' => now()
         ]);
@@ -68,8 +70,9 @@ class CvController extends Controller
         return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
-    public function scanCheck(){
-        
+    public function scanCheck()
+    {
+
     }
 
 }

@@ -38,7 +38,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', 'index')->name('check-request-form');
         Route::post('extract-crf', 'extractCrf')->name('extractCrf');
 
-        Route::get('retrieved', 'retrievedCrf')->name('retrievedCrf');
+        // Route::get('retrieved', 'retrievedCrf')->name('retrievedCrf');
     });
 
     Route::post('borrowed-check', [CvController::class, 'storeBorrowedCheck'])->name('borrowedCheck');

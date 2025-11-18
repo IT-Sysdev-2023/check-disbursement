@@ -58,15 +58,15 @@ const mainNavItems: NavItem[] = [
         ],
     },
     {
-        title: 'Retrieved CV',
+        title: 'Retrieved CV/CRF',
         href: retrievedRecords(),
         icon: PackageOpen,
     },
-    {
-        title: 'Retrieved CRF',
-        href: retrievedCrf(),
-        icon: PackageOpen,
-    },
+    // {
+    //     title: 'Retrieved CRF',
+    //     href: retrievedCrf(),
+    //     icon: PackageOpen,
+    // },
     {
         title: 'Check Status',
         href: checkStatus(),

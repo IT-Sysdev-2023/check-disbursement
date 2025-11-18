@@ -8,4 +8,8 @@ class Crf extends Model
 {
     protected $guarded = [];
     protected $table = 'crfs';
+
+    public function borrowedCheck(){
+        return $this->hasOne(BorrowedCheck::class, 'check_id')->where('check', 'crf');
+    }
 }

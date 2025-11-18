@@ -1,10 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
-import { retrievedRecords } from '@/routes';
-import { Auth, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
+import { retrievedCrf, retrievedRecords } from '@/routes';
+import { Auth, Crf, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
+import CrfDataGrid from './dashboard/components/CrfDataGrid';
 import CvDataGrid from './dashboard/components/CvDataGrid';
 import Search from './dashboard/components/Search';
 import SelectItem from './dashboard/components/SelectItem';
@@ -19,9 +20,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function RetrievedCv({
     cv,
+    crf,
     auth,
 }: {
     cv: inertiaPagination<Cv>;
+    crf: inertiaPagination<Crf>;
     auth: Auth;
 }) {
     const [bu, setBu] = useState<{ label: string; value: string }>({
@@ -29,10 +32,31 @@ export default function RetrievedCv({
         value: '',
     });
 
+    const [check, setCheck] = useState('1');
+
     const [search, setSearch] = useState('');
     const permissions =
         auth.user?.permissions?.map((r) => ({ value: r.id, label: r.name })) ||
         [];
+
+    const checks = [
+        { value: '1', label: 'CV' },
+        { value: '2', label: 'CRF' },
+    ];
+
+    const handleChangeCheck = (event: SelectChangeEvent) => {
+        setCheck(event.target.value);
+
+        router.get(
+            retrievedRecords(),
+            { page: 1, bu: bu.label },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
 
     const handleChange = (event: SelectChangeEvent) => {
         const selectedItem = permissions.find(
@@ -52,12 +76,10 @@ export default function RetrievedCv({
             {
                 preserveScroll: true,
                 preserveState: true,
-                replace: true
+                replace: true,
             },
         );
     };
-
-    console.log(cv);
 
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1; // MUI DataGrid uses 0-based index
@@ -93,7 +115,7 @@ export default function RetrievedCv({
             <Head title="CV" />
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                    Check Vouchers
+                    Check Vouchers/ Check Request Form
                 </Typography>
                 <Stack direction="row" sx={{ gap: 3 }}>
                     <Search onSearch={handleSearch} value={search} />
@@ -103,9 +125,19 @@ export default function RetrievedCv({
                         title="BU"
                         items={permissions}
                     />
+                    <SelectItem
+                        handleChange={handleChangeCheck}
+                        value={check}
+                        title="Check"
+                        items={checks}
+                    />
                 </Stack>
-                <Grid container spacing={2} columns={12}>
-                    <CvDataGrid cvs={cv} pagination={handlePagination} />
+                <Grid container spacing={2} columns={12} sx={{mt:3}}>
+                    {check === '1' && (
+                        <CvDataGrid cvs={cv} pagination={handlePagination} />
+                    )}
+
+                    {check === '2' && <CrfDataGrid crf={crf} pagination={handlePagination}/>}
                 </Grid>
                 <Copyright sx={{ my: 4 }} />
             </Box>

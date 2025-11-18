@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\CvProgress;
 use App\Jobs\CvServer;
+use App\Models\Crf;
 use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Models\NavCheckPaymentTable;
@@ -213,8 +214,16 @@ class CvService extends NavConnection
 
         $records = $query->paginate(perPage: $page)->withQueryString();
 
+        $crfs = Crf::with('borrowedCheck')
+            ->when($search, function ($query, $search) {
+                $query->whereAny([
+                    'crf',
+                ], 'LIKE', '%' . $search . '%');
+            })->paginate($page);
+
         return Inertia::render('retrievedCv', [
-            'cv' => $records
+            'cv' => $records,
+            'crf' => $crfs
         ]);
     }
 

@@ -20,11 +20,13 @@ const style = {
 
 export default function BorrowedCheckModal({
     checkId,
+    whichCheck,
     open,
     handleClose,
 }: {
     checkId: number | undefined;
-    open: boolean;
+        open: boolean;
+        whichCheck: string;
     handleClose: () => void;
 }) {
     // const [open, setOpen] = useState(false);
@@ -40,6 +42,7 @@ export default function BorrowedCheckModal({
         transform((data) => ({
             ...data,
             id: checkId,
+            check: whichCheck
         }));
 
         post(borrowedCheck().url, {

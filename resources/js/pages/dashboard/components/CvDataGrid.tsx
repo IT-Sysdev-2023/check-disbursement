@@ -6,6 +6,16 @@ import { Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
 
+const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
+        const colors: { [index: string]: 'success' | 'error' | 'info' } = {
+            Signature: 'info',
+            Releasing: 'success',
+            Borrowed: 'error',
+        };
+
+        return <Chip label={status} color={colors[status]} size="small" />;
+};
+    
 export default function CvDataGrid({
     cvs,
     pagination,
@@ -94,7 +104,9 @@ export default function CvDataGrid({
                         }
                     >
                         <MenuItem value="details">Check Details</MenuItem>
-                        <MenuItem value="borrow">Borrow Check</MenuItem>
+                        {params.row.borrowed_check == null && (
+                            <MenuItem value="borrow">Borrow Check</MenuItem>
+                        )}
                         <MenuItem value="scan">Scan</MenuItem>
                     </Select>
                 );
@@ -113,15 +125,7 @@ export default function CvDataGrid({
         }
     };
 
-    const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
-        const colors: { [index: string]: 'success' | 'error' | 'info' } = {
-            Signature: 'info',
-            Releasing: 'success',
-            Borrowed: 'error',
-        };
-
-        return <Chip label={status} color={colors[status]} size="small" />;
-    };
+    
 
     return (
         <>
@@ -170,6 +174,7 @@ export default function CvDataGrid({
             />
 
             <BorrowedCheckModal
+                whichCheck='cv'
                 checkId={checkId}
                 open={open}
                 handleClose={handleClose}
