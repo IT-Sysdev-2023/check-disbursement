@@ -77,12 +77,25 @@ export interface Cv {
     check_amount: string;
     check_date: string;
     payee: string;
+    cv_header?: CvHeader
+    bank_account_no: string;
+    bank_name: string;
+    check_class_location: string;
+    clearing_date: string;
     created_at: string;
     updated_at: string;
 }
 
+export interface CvHeader{
+    cv_no: number;
+    vendor_no: string;
+    remarks: string
+
+}
+
 export interface Crf {
     id: number;
+    crf: string;
     filename: string;
     company: string;
     no: number;

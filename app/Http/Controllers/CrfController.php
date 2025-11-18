@@ -6,6 +6,7 @@ use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\CrfService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Inertia\Inertia;
 
 class CrfController extends Controller
@@ -31,15 +32,25 @@ class CrfController extends Controller
         return $this->service->extract($request->file('files'), $request->user()->id, $request->bu);
     }
 
-    public function retrievedCrf(Request $request){
+    public function retrievedCrf(Request $request)
+    {
 
         $records = Crf::when($request->search, function ($query, $search) {
             $query->whereAny([
-                    'crf',
-                ], 'LIKE', '%' . $search . '%');
+                'crf',
+            ], 'LIKE', '%' . $search . '%');
         })->paginate();
-           return Inertia::render('retrievedCrf', [
+        return Inertia::render('retrievedCrf', [
             'crf' => $records
+        ]);
+    }
+
+    public function detailsCrf(Crf $id)
+    {
+
+        $id->date = Date::parse($id->date)->toFormattedDateString();
+        return Inertia::render('crf/crfDetails', [
+            'crf' => $id
         ]);
     }
 }

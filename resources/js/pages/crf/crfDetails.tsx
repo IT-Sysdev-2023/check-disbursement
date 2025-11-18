@@ -1,9 +1,9 @@
 import AppLayout from '@/layouts/app-layout';
 import { retrievedRecords } from '@/routes';
-import { Cv, type BreadcrumbItem } from '@/types';
+import { Crf, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import EmployeeForm from './components/checkForm';
 import { Typography } from '@mui/material';
+import CrfFields from './components/crfFields';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,16 +16,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CvDetails({ cv }: { cv: Cv }) {
+export default function CrfDetails({ crf }: { crf: Crf }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV Details" />
             <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                Check Voucher Details
+                Check Request Form Details
             </Typography>
-            <EmployeeForm
-                cv= {cv}
+            <CrfFields
+                crf= {crf}
             />
         </AppLayout>
     );

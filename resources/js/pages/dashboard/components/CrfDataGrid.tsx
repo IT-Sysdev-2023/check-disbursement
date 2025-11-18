@@ -1,5 +1,7 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
+import { detailsCrf } from '@/routes';
 import { Crf, inertiaPagination } from '@/types';
+import { router } from '@inertiajs/react';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
@@ -114,9 +116,9 @@ export default function CrfDataGrid({
     ];
 
     const handleStatusChange = (id: number, value: string) => {
-        // if (value === 'details') {
-        //     router.visit(details(id));
-        // }
+        if (value === 'details') {
+            router.visit(detailsCrf(id));
+        }
         if (value === 'borrow') {
             setCheckId(id);
             setOpen(true);

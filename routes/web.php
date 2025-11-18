@@ -39,6 +39,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('extract-crf', 'extractCrf')->name('extractCrf');
 
         // Route::get('retrieved', 'retrievedCrf')->name('retrievedCrf');
+        Route::get('details/{id}', 'detailsCrf')->name('detailsCrf');
     });
 
     Route::post('borrowed-check', [CvController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
