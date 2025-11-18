@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('check_id');
             $table->boolean('is_scanned');
             $table->enum('status', ['released', 'forward', 'Deposit', 'cancel']);
+             $table->enum('check', ['cv', 'crf']);
             $table->timestamps();
         });
     }

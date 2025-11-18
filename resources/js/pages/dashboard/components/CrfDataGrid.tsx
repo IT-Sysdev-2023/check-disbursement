@@ -25,6 +25,7 @@ export default function CrfDataGrid({
 }) {
     const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
+    const [bu, setBu] = useState('');
     const handleClose = () => setOpen(false);
 
     const columnsCrf: GridColDef[] = [
@@ -95,13 +96,18 @@ export default function CrfDataGrid({
             sortable: false,
             renderCell: (params) => {
                 const { status } = params.row;
+                console.log(params.row);
                 return (
                     <Select
                         size="small"
                         value={status ?? ''}
                         label="For Signature"
                         onChange={(e) =>
-                            handleStatusChange(params.row.id, e.target.value)
+                            handleStatusChange(
+                                params.row.id,
+                                e.target.value,
+                                params.row.company,
+                            )
                         }
                     >
                         <MenuItem value="details">Check Details</MenuItem>
@@ -115,11 +121,12 @@ export default function CrfDataGrid({
         },
     ];
 
-    const handleStatusChange = (id: number, value: string) => {
+    const handleStatusChange = (id: number, value: string, bu: string) => {
         if (value === 'details') {
             router.visit(detailsCrf(id));
         }
         if (value === 'borrow') {
+            setBu(bu);
             setCheckId(id);
             setOpen(true);
         }
@@ -171,6 +178,7 @@ export default function CrfDataGrid({
                 }}
             />
             <BorrowedCheckModal
+                bu={bu}
                 whichCheck="crf"
                 checkId={checkId}
                 open={open}

@@ -18,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function RetrievedCv({
+export default function CheckStatus({
     cv,
     crf,
     auth,
@@ -115,16 +115,16 @@ export default function RetrievedCv({
             <Head title="CV" />
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                    Check Vouchers/ Check Request Form
+                   Check Status
                 </Typography>
                 <Stack direction="row" sx={{ gap: 3 }}>
                     <Search onSearch={handleSearch} value={search} />
-                    <SelectItem
+                    {/* <SelectItem
                         handleChange={handleChange}
                         value={bu.value}
                         title="BU"
                         items={permissions}
-                    />
+                    /> */}
                     <SelectItem
                         handleChange={handleChangeCheck}
                         value={check}

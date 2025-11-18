@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
+use App\Http\Controllers\StatusController;
 use App\Models\Company;
 use App\Models\Crf;
 use App\Models\CvLine;
@@ -42,12 +43,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('details/{id}', 'detailsCrf')->name('detailsCrf');
     });
 
-    Route::post('borrowed-check', [CvController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
-    Route::post('scan-check', [CvController::class, 'scanCheck'])->name('scanCheck');
+    Route::post('borrowed-check', [StatusController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
+    Route::post('scan-check', [StatusController::class, 'scanCheck'])->name('scanCheck');
 
-    Route::get('check-status', function () {
-        return Inertia::render('dashboard');
-    })->name('check-status');
+    Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
 
     Route::get('report', function () {
         return Inertia::render('dashboard');

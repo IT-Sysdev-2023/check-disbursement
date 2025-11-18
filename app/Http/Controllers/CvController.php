@@ -49,30 +49,4 @@ class CvController extends Controller
         return $this->service->details($id);
     }
 
-    public function storeBorrowedCheck(Request $request)
-    {
-        $request->validate([
-            "name" => "required| string",
-            "reason" => "required| string",
-            'check' => 'required| string',
-            'id' => 'required'
-        ]);
-
-        BorrowedCheck::create([
-            'check_id' => $request->id,
-            'name' => $request->name,
-            'reason' => $request->reason,
-            'check' => $request->check,
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
-    }
-
-    public function scanCheck()
-    {
-
-    }
-
 }

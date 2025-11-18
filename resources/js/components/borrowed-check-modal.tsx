@@ -22,11 +22,13 @@ export default function BorrowedCheckModal({
     checkId,
     whichCheck,
     open,
+    bu,
     handleClose,
 }: {
     checkId: number | undefined;
-        open: boolean;
-        whichCheck: string;
+    open: boolean;
+    whichCheck: string;
+    bu: string;
     handleClose: () => void;
 }) {
     // const [open, setOpen] = useState(false);
@@ -42,7 +44,7 @@ export default function BorrowedCheckModal({
         transform((data) => ({
             ...data,
             id: checkId,
-            check: whichCheck
+            check: whichCheck,
         }));
 
         post(borrowedCheck().url, {
@@ -64,13 +66,21 @@ export default function BorrowedCheckModal({
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
+                    {/* <Typography
+                        id="modal-modal-title"
+                        variant="h6"
+                        component="h2"
+                    >
+                        
+                    </Typography> */}
                     <Typography
                         id="modal-modal-title"
                         variant="h6"
                         component="h2"
                     >
-                        Borrower Info
+                        Business Unit: {bu}
                     </Typography>
+
                     <form onSubmit={handleSubmit}>
                         <Grid
                             container
