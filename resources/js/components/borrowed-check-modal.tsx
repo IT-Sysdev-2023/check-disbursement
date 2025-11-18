@@ -46,7 +46,6 @@ export default function BorrowedCheckModal({
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {
-                // const m = page.props.flash as FlashReponse;
                 reset();
                 handleClose();
             },

@@ -194,6 +194,7 @@ class CvService extends NavConnection
     public function cvs(?int $page, ?string $bu, ?string $search)
     {
         $query = CvCheckPayment::with('cvHeader', 'borrowedCheck')
+            ->doesntHave('scannedCheck')
             ->when($search, function ($query, $search) {
                 $query->whereHas('cvHeader', function (Builder $query) use ($search) {
                     $query->whereAny([

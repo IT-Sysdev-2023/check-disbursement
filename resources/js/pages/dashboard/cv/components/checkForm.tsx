@@ -1,14 +1,9 @@
 import { Cv } from '@/types';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import FormControl from '@mui/material/FormControl';
 import FormGroup from '@mui/material/FormGroup';
-import FormHelperText from '@mui/material/FormHelperText';
 import Grid from '@mui/material/Grid';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import Select, { SelectChangeEvent, SelectProps } from '@mui/material/Select';
+import { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 // import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -128,8 +123,6 @@ export default function EmployeeForm(props: EmployeeFormProps) {
         }
     }, [formValues, onReset]);
 
-
-
     return (
         <Box
             component="form"
@@ -157,7 +150,11 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             onChange={handleTextFieldChange}
                             name="check_number"
                             label="Check Number"
-                            disabled
+                            slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                             fullWidth
                         />
                     </Grid>
@@ -169,7 +166,11 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             name="check_amount"
                             label="Check Amount"
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
@@ -180,7 +181,11 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             name="check_date"
                             label="Check Date"
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
 
@@ -211,7 +216,11 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             value={cv.cv_header.vendor_no}
                             label="Vendor"
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
@@ -220,7 +229,11 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             value={cv.bank_account_no}
                             label="Bank Account No."
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
@@ -229,16 +242,28 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             value={cv.bank_name}
                             label="Bank Name"
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.check_class_location != '' ? cv.check_class_location : 'N/A'}
+                            value={
+                                cv.check_class_location != ''
+                                    ? cv.check_class_location
+                                    : 'N/A'
+                            }
                             label="Check Class Location"
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
@@ -247,7 +272,11 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             value={cv.clearing_date}
                             label="Clearing Date"
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
@@ -256,10 +285,13 @@ export default function EmployeeForm(props: EmployeeFormProps) {
                             value={cv.cv_header.remarks}
                             label="Remarks"
                             fullWidth
-                            disabled
+                             slotProps={{
+                                input: {
+                                    readOnly: true,
+                                },
+                            }}
                         />
                     </Grid>
-                   
                 </Grid>
             </FormGroup>
             {/* <Box sx={{ textAlign: 'right', mt: 2 }}>
