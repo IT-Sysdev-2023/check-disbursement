@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
             Permission::create(['name' => $item->name]);
         });
 
+        Role::create(['name' => 'releasing']);
         $admin = Role::create(['name' => 'admin']);
         $admin->givePermissionTo(Permission::all());
         $user = User::first();

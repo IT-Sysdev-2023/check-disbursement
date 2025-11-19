@@ -16,7 +16,7 @@ class StatusController extends Controller
     public function checkStatus(Request $request)
     {
 
-        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck')
+        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'scannedCheck')
             ->has('scannedCheck')
             ->when($request->search, function ($query, $search) {
                 $query->whereHas('cvHeader', function (Builder $query) use ($search) {
@@ -36,7 +36,8 @@ class StatusController extends Controller
 
         $records = $query->paginate($request->page)->withQueryString();
 
-        $crfs = Crf::with('borrowedCheck')
+        $crfs = Crf::with('borrowedCheck', 'scannedCheck')
+            ->has('scannedCheck')
             ->when($request->search, function ($query, $search) {
                 $query->whereAny([
                     'crf',
@@ -44,6 +45,42 @@ class StatusController extends Controller
             })->paginate($request->page);
 
         return Inertia::render('checkStatus', [
+            'cv' => $records,
+            'crf' => $crfs
+        ]);
+    }
+
+    public function checkReleasing(Request $request)
+    {
+        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'scannedCheck')
+            ->has('scannedCheck')
+            ->when($request->search, function ($query, $search) {
+                $query->whereHas('cvHeader', function (Builder $query) use ($search) {
+                    $query->whereAny([
+                        'cv_no',
+                    ], 'LIKE', '%' . $search . '%');
+                });
+            });
+
+        // if ($bu) {
+        //     $query->whereRelation(
+        //         'cvHeader.navHeaderTable.navDatabase',
+        //         'company',
+        //         $bu
+        //     );
+        // }
+
+        $records = $query->paginate($request->page)->withQueryString();
+
+        $crfs = Crf::with('borrowedCheck', 'scannedCheck')
+            ->has('scannedCheck')
+            ->when($request->search, function ($query, $search) {
+                $query->whereAny([
+                    'crf',
+                ], 'LIKE', '%' . $search . '%');
+            })->paginate($request->page);
+
+        return Inertia::render('checkReleasing', [
             'cv' => $records,
             'crf' => $crfs
         ]);

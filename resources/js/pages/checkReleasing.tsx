@@ -1,25 +1,24 @@
 import AppLayout from '@/layouts/app-layout';
-import { checkStatus, retrievedRecords } from '@/routes';
+import { checkStatus } from '@/routes';
 import { Auth, Crf, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
 import CrfDataGrid from './dashboard/components/CrfDataGrid';
-import CvDataGrid from './dashboard/components/CvDataGrid';
 import Search from './dashboard/components/Search';
 import SelectItem from './dashboard/components/SelectItem';
 import Copyright from './dashboard/internals/components/Copyright';
-import CvStatusDataGrid from './dashboard/components/CvStatusDataGrid';
+import CvReleasingDataGrid from './dashboard/components/CvReleasingDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Status',
+        title: 'Check Releasing',
         href: '#',
     },
 ];
 
-export default function CheckStatus({
+export default function CheckReleasing({
     cv,
     crf,
     auth,
@@ -59,28 +58,28 @@ export default function CheckStatus({
         );
     };
 
-    const handleChange = (event: SelectChangeEvent) => {
-        const selectedItem = permissions.find(
-            (item) => item.value == Number(event.target.value),
-        );
+    // const handleChange = (event: SelectChangeEvent) => {
+    //     const selectedItem = permissions.find(
+    //         (item) => item.value == Number(event.target.value),
+    //     );
 
-        if (selectedItem) {
-            setBu({
-                label: selectedItem?.label,
-                value: String(selectedItem?.value),
-            });
-        }
+    //     if (selectedItem) {
+    //         setBu({
+    //             label: selectedItem?.label,
+    //             value: String(selectedItem?.value),
+    //         });
+    //     }
 
-        router.get(
-            checkStatus(),
-            { bu: selectedItem?.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
+    //     router.get(
+    //         checkStatus(),
+    //         { bu: selectedItem?.label },
+    //         {
+    //             preserveScroll: true,
+    //             preserveState: true,
+    //             replace: true,
+    //         },
+    //     );
+    // };
 
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1; // MUI DataGrid uses 0-based index
@@ -116,7 +115,7 @@ export default function CheckStatus({
             <Head title="CV" />
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                   Check Status
+                   Check Releasing
                 </Typography>
                 <Stack direction="row" sx={{ gap: 3 }}>
                     <Search onSearch={handleSearch} value={search} />
@@ -135,7 +134,7 @@ export default function CheckStatus({
                 </Stack>
                 <Grid container spacing={2} columns={12} sx={{mt:3}}>
                     {check === '1' && (
-                        <CvStatusDataGrid cvs={cv} pagination={handlePagination} />
+                        <CvReleasingDataGrid cvs={cv} pagination={handlePagination} />
                     )}
 
                     {check === '2' && <CrfDataGrid crf={crf} pagination={handlePagination}/>}

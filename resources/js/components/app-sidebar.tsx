@@ -14,6 +14,7 @@ import {
 import {
     about,
     changePassword,
+    checkReleasing,
     checkRequestForm,
     checkStatus,
     checkVoucher,
@@ -77,21 +78,21 @@ const mainNavItems: NavItem[] = [
         href: report(),
         icon: FileSpreadsheet,
     },
-    {
-        title: 'About Us',
-        href: about(),
-        icon: Users,
-    },
-    {
-        title: 'Change Password',
-        href: changePassword(),
-        icon: Key,
-    },
-    {
-        title: 'Notifications',
-        href: notifications(),
-        icon: Bell,
-    },
+    // {
+    //     title: 'About Us',
+    //     href: about(),
+    //     icon: Users,
+    // },
+    // {
+    //     title: 'Change Password',
+    //     href: changePassword(),
+    //     icon: Key,
+    // },
+    // {
+    //     title: 'Notifications',
+    //     href: notifications(),
+    //     icon: Bell,
+    // },
 ];
 
 const footerNavItems: NavItem[] = [

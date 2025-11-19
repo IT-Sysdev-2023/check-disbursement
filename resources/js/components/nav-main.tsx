@@ -5,10 +5,10 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { users } from '@/routes';
+import { checkReleasing, users } from '@/routes';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronDown, ChevronRight, Users } from 'lucide-react';
+import { Check, ChevronDown, ChevronRight, Users } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
@@ -21,12 +21,24 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         [user?.roles],
     );
     const isAdmin = roles.includes('admin');
+    const releasing = roles.includes('releasing');
+
+    
     const [openItem, setOpenItem] = useState<string | null>(null);
 
     // 🔹 Append "Users" only if admin
     const finalItems = useMemo(() => {
         return [
             ...items,
+            ...(isAdmin || releasing
+                ? [
+                      {
+                          title: 'Check Releasing',
+                          href: checkReleasing(),
+                          icon: Check,
+                      },
+                  ]
+                : []),
             ...(isAdmin
                 ? [
                       {
@@ -37,7 +49,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                   ]
                 : []),
         ];
-    }, [items, isAdmin]);
+    }, [items, isAdmin, releasing]);
 
     // Automatically open submenu if current page belongs to it
     useEffect(() => {

@@ -47,6 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('scan-check', [StatusController::class, 'scanCheck'])->name('scanCheck');
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+    Route::get('check-releasing', [StatusController::class, 'checkReleasing'])->name('check-releasing');
 
     Route::get('report', function () {
         return Inertia::render('dashboard');
@@ -85,30 +86,36 @@ Route::get('/test', function () {
     $end = "2025-11-04";
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
-        ->table('MFI_CORTES_PIGGERY_ACCTG$CV Line')
+        ->table('SON-OK AGRI FARM$CV Check Payment')
         // $head = $con->table('ALTA CITTA ACCOUNTING$CV Header')
-
-        // // ->where('CV Status', "")//CV25080289
-        ->whereIn('CV No_', [
-            "CRF2511001",
-            "CRF2511002",
-            "CRF2511003",
-            "CRF2511004",
-            "CRF2511005",
-            "CRF2511006",
-            "CRF2511007",
-            "CRF2511008",
-            "CRF2511009",
-            "CRF2511010",
-            "CRF2511011",
-            "CRF2511012",
-            "CRF2511013",
-            "CRF2511014",
-            "CRF2511015",
-            "CRF2511016",
-        ])//CV25080289
+        // ->where('CV Status', "")//CV25080289
+        // ->whereIn('CV No_', [
+        //     "CRF2511001",
+        //     "CRF2511002",
+        //     "CRF2511003",
+        //     "CRF2511004",
+        //     "CRF2511005",
+        //     "CRF2511006",
+        //     "CRF2511007",
+        //     "CRF2511008",
+        //     "CRF2511009",
+        //     "CRF2511010",
+        //     "CRF2511011",
+        //     "CRF2511012",
+        //     "CRF2511013",
+        //     "CRF2511014",
+        //     "CRF2511015",
+        //     "CRF2511016",
+        // ])//CV25080289
         // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
-        ->count();
+        // ->where('Check Class Location', '==',  '!=', '')
+        ->whereNot(function ($query) {
+
+            $query->where('Check Class Location', '');
+
+        })
+        ->limit(10)
+        ->get();
     // $con1 = DB::connection('sqlsrvCaf')
     // ->table('CARMEN AGRI FARM$CV Line')
     // ->where('CV No_', "CRF0000118")//CV25080289
