@@ -66,7 +66,7 @@ export default function SelectBu({
                     {permissions.map((item) => (
                         <MenuItem
                             key={item.value}
-                            value={item.value}
+                            value={item.label}
                             style={getStyles(
                                 item.label,
                                 selectedPermission,

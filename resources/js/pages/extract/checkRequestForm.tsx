@@ -83,8 +83,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
     });
 
     const simulateDataRetrieval = () => {
-
-         if (permissionList.length <= 0) {
+        if (permissionList.length <= 0) {
             alert('Please select Business Unit');
             return;
         }
@@ -93,7 +92,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             extractCrf(),
             {
                 files,
-                bu: permissionList
+                bu: permissionList,
             },
             {
                 onSuccess: (page) => {
@@ -113,12 +112,17 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
         );
     };
 
-    const permissions = auth.user?.permissions?.map((r) => r.name) || [];
+    const permissions =
+        auth.user?.company_permissions?.map((r) => ({
+            value: r.company.id,
+            label: r.company.name,
+        })) || [];
 
     const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
         const {
             target: { value },
         } = event;
+
         setPermissionList(
             // On autofill we get a stringified value.
             typeof value === 'string' ? value.split(',') : value,

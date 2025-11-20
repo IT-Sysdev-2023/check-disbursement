@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\CvProgress;
 use App\Jobs\CvServer;
+use App\Models\Company;
 use App\Models\Crf;
 use App\Models\Cv;
 use App\Models\CvCheckPayment;
@@ -36,11 +37,12 @@ class CvService extends NavConnection
     }
     public function retrieveData(User $user, object $date, array $bu)
     {
-        dd($bu);
         // Get all the Navition Servers
+        $companiesId = Company::whereIn('name', $bu)->pluck('id', 'name')->values();
+
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
-            ->withWhereHas('navDatabases', function (Builder $query) use ($bu) {
-                $query->whereIn('company', $bu)
+            ->withWhereHas('navDatabases', function (Builder $query) use ($companiesId) {
+                $query->whereIn('company_id', $companiesId)
                     ->with('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
             })
             ->lazy();
@@ -208,10 +210,11 @@ class CvService extends NavConnection
             });
 
         if ($bu) {
+            $companiesId = Company::where('name', $bu)->first('id');
             $query->whereRelation(
                 'cvHeader.navHeaderTable.navDatabase',
-                'company',
-                $bu
+                'company_id',
+                $companiesId->id
             );
         }
 

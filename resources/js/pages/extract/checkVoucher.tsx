@@ -84,6 +84,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
         const {
             target: { value },
         } = event;
+        console.log(event);
         setPermissionList(
             // On autofill we get a stringified value.
             typeof value === 'string' ? value.split(',') : value,

@@ -36,7 +36,7 @@ export default function RetrievedCv({
 
     const [search, setSearch] = useState('');
     const permissions =
-        auth.user?.permissions?.map((r) => ({ value: r.id, label: r.name })) ||
+        auth.user?.company_permissions?.map((r) => ({ value: r.company.id, label: r.company.name })) ||
         [];
 
     const checks = [
