@@ -1,15 +1,15 @@
 import AppLayout from '@/layouts/app-layout';
-import { checkStatus } from '@/routes';
+import { checkReleasing } from '@/routes';
 import { Auth, Crf, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
-import CrfDataGrid from './dashboard/components/CrfDataGrid';
+import CrfReleasingDataGrid from './dashboard/components/CrfReleasingDataGrid';
+import CvReleasingDataGrid from './dashboard/components/CvReleasingDataGrid';
 import Search from './dashboard/components/Search';
 import SelectItem from './dashboard/components/SelectItem';
 import Copyright from './dashboard/internals/components/Copyright';
-import CvReleasingDataGrid from './dashboard/components/CvReleasingDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,7 +31,7 @@ export default function CheckReleasing({
         label: '',
         value: '',
     });
-
+console.log(crf);
     const [check, setCheck] = useState('1');
 
     const [search, setSearch] = useState('');
@@ -48,8 +48,8 @@ export default function CheckReleasing({
         setCheck(event.target.value);
 
         router.get(
-            checkStatus(),
-            { page: 1, bu: bu.label },
+            checkReleasing(),
+            { bu: bu.label },
             {
                 preserveScroll: true,
                 preserveState: true,
@@ -58,35 +58,35 @@ export default function CheckReleasing({
         );
     };
 
-    // const handleChange = (event: SelectChangeEvent) => {
-    //     const selectedItem = permissions.find(
-    //         (item) => item.value == Number(event.target.value),
-    //     );
+    const handleChange = (event: SelectChangeEvent) => {
+        const selectedItem = permissions.find(
+            (item) => item.value == Number(event.target.value),
+        );
 
-    //     if (selectedItem) {
-    //         setBu({
-    //             label: selectedItem?.label,
-    //             value: String(selectedItem?.value),
-    //         });
-    //     }
+        if (selectedItem) {
+            setBu({
+                label: selectedItem?.label,
+                value: String(selectedItem?.value),
+            });
+        }
 
-    //     router.get(
-    //         checkStatus(),
-    //         { bu: selectedItem?.label },
-    //         {
-    //             preserveScroll: true,
-    //             preserveState: true,
-    //             replace: true,
-    //         },
-    //     );
-    // };
+        router.get(
+            checkReleasing(),
+            { bu: selectedItem?.label },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                replace: true,
+            },
+        );
+    };
 
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1; // MUI DataGrid uses 0-based index
         const per_page = model.pageSize;
 
         router.get(
-            checkStatus(),
+            checkReleasing(),
             { page, per_page, bu: bu.label },
             {
                 preserveScroll: true,
@@ -100,7 +100,7 @@ export default function CheckReleasing({
         setSearch(value);
 
         router.get(
-            checkStatus(),
+            checkReleasing(),
             { search: value, bu: bu.label },
             {
                 preserveScroll: true,
@@ -115,16 +115,16 @@ export default function CheckReleasing({
             <Head title="CV" />
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                   Check Releasing
+                    Check Releasing
                 </Typography>
                 <Stack direction="row" sx={{ gap: 3 }}>
                     <Search onSearch={handleSearch} value={search} />
-                    {/* <SelectItem
+                    <SelectItem
                         handleChange={handleChange}
                         value={bu.value}
                         title="BU"
                         items={permissions}
-                    /> */}
+                    />
                     <SelectItem
                         handleChange={handleChangeCheck}
                         value={check}
@@ -132,12 +132,20 @@ export default function CheckReleasing({
                         items={checks}
                     />
                 </Stack>
-                <Grid container spacing={2} columns={12} sx={{mt:3}}>
+                <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
                     {check === '1' && (
-                        <CvReleasingDataGrid cvs={cv} pagination={handlePagination} />
+                        <CvReleasingDataGrid
+                            cvs={cv}
+                            pagination={handlePagination}
+                        />
                     )}
 
-                    {check === '2' && <CrfDataGrid crf={crf} pagination={handlePagination}/>}
+                    {check === '2' && (
+                        <CrfReleasingDataGrid
+                            crf={crf}
+                            pagination={handlePagination}
+                        />
+                    )}
                 </Grid>
                 <Copyright sx={{ my: 4 }} />
             </Box>

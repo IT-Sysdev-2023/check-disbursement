@@ -13,9 +13,9 @@ return new class extends Migration {
         Schema::create('nav_databases', function (Blueprint $table) {
             $table->id();
             $table->foreignId('nav_server_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->string('module');
-            $table->string('company');
             $table->timestamps();
         });
     }

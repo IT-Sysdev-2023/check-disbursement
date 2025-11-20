@@ -111,8 +111,8 @@ class NavServerSeeder extends Seeder
             [
                 'nav_server_id' => 1,
                 'name' => 'CARMEN AGRI FARM',
+                'company_id' => 3,
                 'module' => 'CRF',
-                'company' => 'MFI',
                 'created_at' => now(),
                 'updated_at' => now()
 
@@ -121,7 +121,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'CHOWKING_ALTACITTA_ACCTG',
                 'module' => 'CV',
-                'company' => 'ROSE AND HONEY',
+                'company_id' => 11,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -129,7 +129,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'CORTES FERTILIZER PLANT_ACCTG',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -137,7 +137,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'DAO_WATER_PUMPING',
                 'module' => 'CRF',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -145,7 +145,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'DEL&TRUCK_ACCTG_SQL',
                 'module' => 'CRF',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -153,7 +153,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'MFI_CORTES_PIGGERY_ACCTG',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -161,7 +161,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'MFI_CORTES_POULTRY_ACCTG',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -169,7 +169,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'MFI_ICEPLANT_ACCTG_SQL',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -177,7 +177,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'MFI_SLAUGHTER_HOUSE_II',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -185,7 +185,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'MFI_TIPCAN_ACCTG',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -193,7 +193,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'MPDI_ACCTG_SQL',
                 'module' => 'CV',
-                'company' => 'MPDI',
+                'company_id' => 22,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -201,7 +201,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'NOODLES_FACTORY_ACCTG_SQL',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -209,7 +209,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'PRAWNFARM_ICM_ACCTG',
                 'module' => 'CV',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -217,7 +217,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 1,
                 'name' => 'SUN-OK AGRI FARM',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -225,7 +225,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'ALTA_CITTA_ACCTG',
                 'module' => 'CV',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -233,7 +233,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'ALTURAS GLASS SERVICE',
                 'module' => 'CV',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -241,7 +241,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'ASC_TECH_TAGBI',
                 'module' => 'CV',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -249,7 +249,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'GREENWICH ALTURAS SQL',
                 'module' => 'CV',
-                'company' => 'ROSE AND HONEY',
+                'company_id' => 11,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -257,7 +257,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'JOLLIBEE ALTA CITTA',
                 'module' => 'CV',
-                'company' => 'ROAST AND TOAST FOODLINE, INC.',
+                'company_id' => 19,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -265,7 +265,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'JOLLIBEE DRIVE THRU SQL',
                 'module' => 'CV',
-                'company' => 'ROAST AND TOAST FOODLINE, INC.',
+                'company_id' => 19,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -273,7 +273,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'JOLLIBEE PANGLAO',
                 'module' => 'CV',
-                'company' => 'ROAST AND TOAST FOODLINE, INC.',
+                'company_id' => 19,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -281,7 +281,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'JOLLIBEE PLAZA MARCELA',
                 'module' => 'CV',
-                'company' => 'ROSE AND HONEY',
+                'company_id' => 11,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -289,7 +289,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'JOLLIBEE_TALIBON_ACCTG',
                 'module' => 'CV',
-                'company' => 'CRUST AND PEPPER',
+                'company_id' => 12,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -297,7 +297,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'JOLLIBEE_TUBIGON_ACCTG',
                 'module' => 'CV',
-                'company' => 'CRUST AND PEPPER',
+                'company_id' => 12,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -305,7 +305,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'LDI_ACCTG_SQL',
                 'module' => 'CV',
-                'company' => 'LDI',
+                'company_id' => 6,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -313,7 +313,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'MANG_INASAL-ICM',
                 'module' => 'CV',
-                'company' => 'CHARCOAL AND CHOP FOODLINE',
+                'company_id' => 18,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -321,7 +321,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'MANG_INASAL-TALIBON',
                 'module' => 'CV',
-                'company' => 'CHARCOAL AND CHOP FOODLINE',
+                'company_id' => 18,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -329,7 +329,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'MEAL TIME EXPRESS ACCTG',
                 'module' => 'CV',
-                'company' => 'CHARCOAL AND CHOP FOODLINE',
+                'company_id' => 18,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -337,7 +337,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'MFI_RICEMILL_ACCTG 2',
                 'module' => 'CRF',
-                'company' => 'MFI',
+                'company_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -345,7 +345,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'NAUTICA_SHIPPING_ACCTG',
                 'module' => 'CV',
-                'company' => 'NAUTICA',
+                'company_id' => 16,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -353,7 +353,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'NETMAN_ACCTG',
                 'module' => 'CV',
-                'company' => 'NDI',
+                'company_id' => 15,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -361,7 +361,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'PANGLAO_FR_ACCTG',
                 'module' => 'CV',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -369,7 +369,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'PEANUTKISSES_ACCTG',
                 'module' => 'CV',
-                'company' => 'BUCAREZ',
+                'company_id' => 9,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -377,7 +377,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'PHARMA_DC_ACCTG',
                 'module' => 'CRF',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -385,7 +385,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'PLANNING_ACCTG_SQL',
                 'module' => 'CRF',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -393,7 +393,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'PRAWN FARM ALTA CITTA ACCTG',
                 'module' => 'CV',
-                'company' => 'CHARCOAL AND CHOP FOODLINE',
+                'company_id' => 18,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -401,7 +401,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'PRAWNFARM PANGLAO ACCTG',
                 'module' => 'CV',
-                'company' => 'ROAST AND TOAST FOODLINE, INC. ',
+                'company_id' => 19,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -409,7 +409,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'RED RIBBON TUBIGON ACCTG',
                 'module' => 'CV',
-                'company' => 'CRUST AND PEPPER',
+                'company_id' => 12,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -417,7 +417,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'RED_RIBBON_TALIBON_ACCTG',
                 'module' => 'CV',
-                'company' => 'CRUST AND PEPPER',
+                'company_id' => 12,
                 'created_at' => now(),
                 'updated_at' => now()
             ],
@@ -425,7 +425,7 @@ class NavServerSeeder extends Seeder
                 'nav_server_id' => 2,
                 'name' => 'WDG_ACCTG_SQL',
                 'module' => 'CV',
-                'company' => 'ASC',
+                'company_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now()
             ],

@@ -92,7 +92,7 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.cv_header?.vendor_no}
+                            value={cv.cv_header?.vendor_no != '' ? cv.cv_header?.vendor_no : 'N/A' }
                             label="Vendor"
                             fullWidth
                              slotProps={{

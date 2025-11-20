@@ -46,7 +46,8 @@ class CvDatabase implements ShouldQueue
             ->storeRecord(
                 $tables->navHeaderTable,
                 $tables->navLineTable?->name,
-                $tables->navCheckPaymentTable?->name
+                $tables->navCheckPaymentTable?->name,
+                $this->database->company_id
             );
 
 

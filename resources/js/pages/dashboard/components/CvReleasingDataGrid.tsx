@@ -1,8 +1,8 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { details } from '@/routes';
+import { updateStatus } from '@/routes';
 import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
-import { Chip, MenuItem, Select } from '@mui/material';
+import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
 
@@ -30,13 +30,7 @@ export default function CvReleasingDataGrid({
 
     const columns: GridColDef[] = [
         {
-            field: 'cv_header',
-            headerName: 'CV Number',
-            minWidth: 150,
-            valueGetter: (params) => params.cv_no,
-        },
-        {
-            field: 'check_number',
+            field: 'checkNumber',
             headerName: 'Check Number',
             headerAlign: 'right',
             align: 'right',
@@ -44,7 +38,29 @@ export default function CvReleasingDataGrid({
             minWidth: 50,
         },
         {
-            field: 'check_amount',
+            field: 'checkDate',
+            headerName: 'Check Date',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 100,
+        },
+        {
+            field: 'cvHeader',
+            headerName: 'CV Number',
+            minWidth: 150,
+            valueGetter: (params) => params.cvNo,
+        },
+        {
+            field: 'payee',
+            headerName: 'Payee',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 80,
+        },
+        {
+            field: 'checkAmount',
             headerName: 'Check Amount',
             headerAlign: 'right',
             align: 'right',
@@ -52,39 +68,40 @@ export default function CvReleasingDataGrid({
             minWidth: 80,
         },
         {
-            field: 'bank_account_no',
-            headerName: 'Bank Account No.',
+            field: 'details',
+            headerName: 'Check Details',
+            minWidth: 120,
+            renderCell: (params) => {
+                return (
+                    <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => {
+                            // Put your action here
+                            console.log('Clicked:', params.row);
+                        }}
+                    >
+                        View
+                    </Button>
+                );
+            },
+        },
+
+        {
+            field: 'businessUnit',
+            headerName: 'Business Unit',
             headerAlign: 'right',
             align: 'right',
             flex: 1,
             minWidth: 80,
+            renderCell: (params) => {
+                return (
+                    params.row.cvHeader?.navHeaderTable?.navDatabase?.company ||
+                    '—'
+                );
+            },
         },
-        {
-            field: 'bank_name',
-            headerName: 'Bank Name',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 100,
-        },
-        {
-            field: 'check_date',
-            headerName: 'Check Date',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 100,
-        },
-        // {
-        //     field: 'status',
-        //     headerName: 'Status',
-        //     minWidth: 120,
-        //     renderCell: (params) => {
-        //         return renderStatus(
-        //             params.row?.borrowed_check ? 'Borrowed' : 'Signature',
-        //         );
-        //     },
-        // },
+
         {
             field: 'actions',
             headerName: 'Action',
@@ -94,24 +111,33 @@ export default function CvReleasingDataGrid({
             headerAlign: 'center',
             sortable: false,
             renderCell: (params) => {
-                const { scanned_check } = params.row;
+                const { scannedCheck } = params.row;
+
                 return (
                     <Select
                         size="small"
-                        value={scanned_check.status ?? ''}
+                        value={scannedCheck.status ?? ''}
                         label="For Signature"
                         onChange={(e) =>
-                            handleStatusChange(
-                                params.row.id,
-                                e.target.value
-                            )
+                            handleStatusChange(scannedCheck.id, e.target.value)
                         }
                     >
-                        <MenuItem value="release"> <Chip label="Released Check" color="primary" /></MenuItem>
-                        <MenuItem value="forward"><Chip label="Forward Check" color="secondary" /></MenuItem>
-                        <MenuItem value="deposit"><Chip label="Deposit Check" color="info" /></MenuItem>
-                        <MenuItem value="stale"><Chip label="Stale Check" color="warning" /></MenuItem>
-                        <MenuItem value="cancel"><Chip label="Cancel Check" color="error" /></MenuItem>
+                        <MenuItem value="release">
+                            {' '}
+                            <Chip label="Released Check" color="primary" />
+                        </MenuItem>
+                        <MenuItem value="forward">
+                            <Chip label="Forward Check" color="secondary" />
+                        </MenuItem>
+                        <MenuItem value="deposit">
+                            <Chip label="Deposit Check" color="info" />
+                        </MenuItem>
+                        <MenuItem value="stale">
+                            <Chip label="Stale Check" color="warning" />
+                        </MenuItem>
+                        <MenuItem value="cancel">
+                            <Chip label="Cancel Check" color="error" />
+                        </MenuItem>
                     </Select>
                 );
             },
@@ -119,15 +145,16 @@ export default function CvReleasingDataGrid({
     ];
 
     const handleStatusChange = (id: number, value: string) => {
-        if (value === 'details') {
-            router.visit(details(id));
-        }
-
-        if (value === 'borrow') {
-            // setBu(bu);
-            setCheckId(id);
-            setOpen(true);
-        }
+        router.put(
+            updateStatus(id),
+            {
+                value: value,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
     };
 
     return (
@@ -135,12 +162,12 @@ export default function CvReleasingDataGrid({
             <DataGrid
                 rows={cvs.data}
                 columns={columns}
-                rowCount={cvs.total}
+                rowCount={cvs.meta.total}
                 rowHeight={70}
                 paginationMode="server"
                 paginationModel={{
-                    page: cvs.current_page - 1,
-                    pageSize: cvs.per_page,
+                    page: cvs.meta.current_page - 1,
+                    pageSize: cvs.meta.per_page,
                 }}
                 pageSizeOptions={[10, 15, 25, 50]}
                 getRowClassName={(params) =>

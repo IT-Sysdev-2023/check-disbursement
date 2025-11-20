@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
     Route::get('check-releasing', [StatusController::class, 'checkReleasing'])->name('check-releasing');
+    Route::put('update-status/{id}', [StatusController::class, 'updateStatus'])->name('update-status');
 
     Route::get('report', function () {
         return Inertia::render('dashboard');

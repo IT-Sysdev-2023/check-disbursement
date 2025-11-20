@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('cv_check_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('cv_header_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             // $table->string('cv_no')->unique();
             $table->unsignedBigInteger('check_number');
             $table->decimal('check_amount', 20);

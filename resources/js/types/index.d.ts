@@ -73,24 +73,43 @@ export interface Cv {
     id: number;
     nav_table_id: number;
     cv_number: string;
-    check_number: number;
-    check_amount: string;
-    check_date: string;
+    checkNumber: number;
+    checkAmount: string;
+    checkDate: string;
     payee: string;
-    cv_header?: CvHeader
     bank_account_no: string;
     bank_name: string;
     check_class_location: string;
     clearing_date: string;
+    cvHeader?: CvHeader;
+    borrowedCheck: BorrowedCheck;
+    scannedCheck: ScannedCheck;
     created_at: string;
     updated_at: string;
 }
 
-export interface CvHeader{
+export interface BorrowedCheck {
+    id: number;
+    check_id: number;
+    name: string;
+    reasong: string;
+    check: 'crf' | 'cv';
+}
+
+export interface ScannedCheck {
+    id: number;
+    check: 'crf' | 'cv';
+    check_id: number;
+    is_scanned: number;
+    status: 'release' | 'forward' | 'deposit' | 'cancel' | 'stale';
+    created_at: string;
+    updated_at: string;
+}
+
+export interface CvHeader {
     cv_no: number;
     vendor_no: string;
-    remarks: string
-
+    remarks: string;
 }
 
 export interface Crf {
@@ -101,29 +120,41 @@ export interface Crf {
     no: number;
     location: string;
     date: string;
-    paid_to: string;
+    paidTo: string;
     particulars: string;
     amount: number;
     bank: string;
-    ck_no: number;
+    ckNo: number;
     prepared_by: string;
     created_at: string;
     updated_at: string;
 }
 
-export interface inertiaPagination<T> {
-    total: number;
-    per_page: number;
+export interface Links {
+    first: string;
+    last: string;
+    next: string | null;
+    prev: string | null;
+}
+
+export interface Meta {
     current_page: number;
-    last_page: number;
-    current_page_url: string;
-    first_page_url: string;
-    last_page_url?: string;
-    next_page_url?: string;
-    prev_page_url?: string;
-    path?: string;
     from: number;
+    last_page: number;
+    links: {
+        active: boolean;
+        label: string;
+        page?: number;
+        url?: string;
+    }[];
+    path: string;
+    per_page: number;
     to: number;
+    total: number;
+}
+export interface inertiaPagination<T> {
+    links: Links;
+    meta: Meta;
     data: T[];
 }
 

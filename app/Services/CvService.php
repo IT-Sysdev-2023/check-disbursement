@@ -61,7 +61,8 @@ class CvService extends NavConnection
     public function storeRecord(
         ?NavHeaderTable $navHeaderTable,
         ?string $navLineTable,
-        ?string $navCheckPaymentTable
+        ?string $navCheckPaymentTable,
+        int $companyId
     ) {
         if (!$navHeaderTable) {
             return $this;
@@ -77,7 +78,7 @@ class CvService extends NavConnection
 
         $total = $headerQuery->count();
 
-        $headerQuery->chunkById(500, function ($chunk) use (&$start, $total, $tableName, $tableId, $lineQuery, $checkPaymentQuery) {
+        $headerQuery->chunkById(500, function ($chunk) use (&$start, $total, $tableName, $tableId, $lineQuery, $checkPaymentQuery, $companyId) {
 
             DB::beginTransaction();
             try {
@@ -146,6 +147,7 @@ class CvService extends NavConnection
                             ->get()
                             ->map(fn($check) => [
                                 'cv_header_id' => $headerId,
+                                'company_id' => $companyId,
                                 'check_number' => $check->{'Check Number'},
                                 'check_amount' => $check->{'Check Amount'},
                                 'bank_account_no' => $check->{'Bank Account No_'},

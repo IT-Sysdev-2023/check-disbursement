@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CvCheckPaymentCollection;
 use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
+use App\Models\ScannedCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Contracts\Database\Query\Builder;
@@ -50,9 +52,24 @@ class StatusController extends Controller
         ]);
     }
 
+    public function updateStatus(ScannedCheck $id, Request $request)
+    {
+
+        $request->validate([
+            'value' => 'required | string'
+        ]);
+
+        $id->update([
+            'status' => $request->value
+        ]);
+
+        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
+    }
+
     public function checkReleasing(Request $request)
     {
-        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'scannedCheck')
+        $query = CvCheckPayment::with('cvHeader.navHeaderTable.navDatabase', 'borrowedCheck', 'scannedCheck')
+            ->select('id', 'cv_header_id', 'check_number', 'check_date', 'check_amount', 'payee')
             ->has('scannedCheck')
             ->when($request->search, function ($query, $search) {
                 $query->whereHas('cvHeader', function (Builder $query) use ($search) {
@@ -62,27 +79,27 @@ class StatusController extends Controller
                 });
             });
 
-        // if ($bu) {
-        //     $query->whereRelation(
-        //         'cvHeader.navHeaderTable.navDatabase',
-        //         'company',
-        //         $bu
-        //     );
-        // }
-
-        $records = $query->paginate($request->page)->withQueryString();
+        if ($request->bu) {
+            $query->whereRelation(
+                'cvHeader.navHeaderTable.navDatabase',
+                'company',
+                $request->bu
+            );
+        }
 
         $crfs = Crf::with('borrowedCheck', 'scannedCheck')
+            ->select('id', 'crf', 'paid_to', 'amount', 'ck_no')
             ->has('scannedCheck')
             ->when($request->search, function ($query, $search) {
                 $query->whereAny([
                     'crf',
                 ], 'LIKE', '%' . $search . '%');
-            })->paginate($request->page);
+            })
+            ->paginate($request->page);
 
         return Inertia::render('checkReleasing', [
-            'cv' => $records,
-            'crf' => $crfs
+            'cv' => $query->paginate($request->page)->withQueryString()->toResourceCollection(),
+            'crf' => $crfs->toResourceCollection()
         ]);
     }
     public function storeBorrowedCheck(Request $request)
