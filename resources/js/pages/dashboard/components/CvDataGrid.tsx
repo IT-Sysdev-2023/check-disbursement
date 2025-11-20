@@ -27,24 +27,16 @@ export default function CvDataGrid({
     const [open, setOpen] = useState(false);
     const [bu, setBu] = useState('');
     const handleClose = () => setOpen(false);
-
+console.log(cvs.data);
     const columns: GridColDef[] = [
         {
-            field: 'cv_header',
+            field: 'cvHeader',
             headerName: 'CV Number',
             minWidth: 150,
-            valueGetter: (params) => params.cv_no,
+            valueGetter: (params) => params.cvNo,
         },
         {
-            field: 'check_number',
-            headerName: 'Check Number',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 0.5,
-            minWidth: 50,
-        },
-        {
-            field: 'check_amount',
+            field: 'checkAmount',
             headerName: 'Check Amount',
             headerAlign: 'right',
             align: 'right',
@@ -52,23 +44,22 @@ export default function CvDataGrid({
             minWidth: 80,
         },
         {
-            field: 'bank_account_no',
-            headerName: 'Bank Account No.',
+            field: 'payee',
+            headerName: 'Payee',
             headerAlign: 'right',
             align: 'right',
             flex: 1,
             minWidth: 80,
         },
         {
-            field: 'bank_name',
-            headerName: 'Bank Name',
+            field: 'company',
+            headerName: 'Company',
             headerAlign: 'right',
             align: 'right',
-            flex: 1,
-            minWidth: 100,
+            valueGetter: (params) => params.name,
         },
         {
-            field: 'check_date',
+            field: 'checkDate',
             headerName: 'Check Date',
             headerAlign: 'right',
             align: 'right',
@@ -133,11 +124,11 @@ export default function CvDataGrid({
             <DataGrid
                 rows={cvs.data}
                 columns={columns}
-                rowCount={cvs.total}
+                rowCount={cvs.meta.total}
                 paginationMode="server"
                 paginationModel={{
-                    page: cvs.current_page - 1,
-                    pageSize: cvs.per_page,
+                    page: cvs.meta.current_page - 1,
+                    pageSize: cvs.meta.per_page,
                 }}
                 pageSizeOptions={[10, 15, 25, 50]}
                 getRowClassName={(params) =>

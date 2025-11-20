@@ -199,7 +199,8 @@ class CvService extends NavConnection
 
     public function cvs(?int $page, ?string $bu, ?string $search)
     {
-        $query = CvCheckPayment::with('cvHeader.navHeaderTable.navDatabase', 'borrowedCheck')
+        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
+            ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('scannedCheck')
             ->when($search, function ($query, $search) {
                 $query->whereHas('cvHeader', function (Builder $query) use ($search) {
@@ -218,7 +219,7 @@ class CvService extends NavConnection
             );
         }
 
-        $records = $query->paginate($page)->withQueryString();
+        $records = $query->paginate($page)->withQueryString()->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck')
             ->when($search, function ($query, $search) {
