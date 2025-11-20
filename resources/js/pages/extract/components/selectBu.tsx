@@ -31,7 +31,7 @@ export default function SelectBu({
     handleChange,
     permissions,
 }: {
-    permissions: string[];
+    permissions: { label: string; value: number }[];
     selectedPermission: string[];
     handleChange: (event: SelectChangeEvent<string[]>) => void;
 }) {
@@ -63,13 +63,17 @@ export default function SelectBu({
                     )}
                     MenuProps={MenuProps}
                 >
-                    {permissions.map((name) => (
+                    {permissions.map((item) => (
                         <MenuItem
-                            key={name}
-                            value={name}
-                            style={getStyles(name, selectedPermission, theme)}
+                            key={item.value}
+                            value={item.value}
+                            style={getStyles(
+                                item.label,
+                                selectedPermission,
+                                theme,
+                            )}
                         >
-                            {name}
+                            {item.label}
                         </MenuItem>
                     ))}
                 </Select>

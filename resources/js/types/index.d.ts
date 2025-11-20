@@ -51,12 +51,43 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
-    roles?: RolePermission[];
-    permissions: RolePermission[];
+    roles?: Role[];
+    permissions: Permission[];
+    company_permissions: {
+        id: number;
+        user_id: number;
+        company_id: number;
+        company: Company;
+        created_at: string;
+        updated_at: string;
+    }[];
     [key: string]: unknown; // This allows for additional properties...
 }
 
-export interface RolePermission {
+export interface SelectionType {
+    label: string;
+    value: number;
+}
+
+export interface Company {
+    id: number;
+    code: string;
+    company: string;
+    name: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface Role {
+    created_at: string;
+    guard_name: string;
+    id: number;
+    name: string;
+    permissions: Permission[];
+    pivot: PivotRole;
+    updated_at: string;
+}
+export interface Permission {
     created_at: string;
     guard_name: string;
     id: number;

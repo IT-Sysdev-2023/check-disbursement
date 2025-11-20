@@ -1,6 +1,6 @@
 import UserModal from '@/pages/admin/components/userModal';
 import { users } from '@/routes';
-import { inertiaPagination, RolePermission, User } from '@/types';
+import { inertiaPagination, Permission, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Stack } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -28,8 +28,7 @@ export default function UsersDataGrid({
         );
     };
 
-  const handleModal = (user: User) => {
-      console.log(user);
+    const handleModal = (user: User) => {
         setUserDetails(user);
         setOpenModal(true);
     };
@@ -67,7 +66,7 @@ export default function UsersDataGrid({
             align: 'right',
             flex: 1,
             minWidth: 50,
-            valueGetter: (params: RolePermission[]) => {
+            valueGetter: (params: Permission[]) => {
                 return params?.map((r) => r.name).join(', ') || '-';
             },
         },
@@ -78,6 +77,7 @@ export default function UsersDataGrid({
             filterable: false,
             width: 150,
             renderCell: (params) => (
+                
                 <Stack direction="row" spacing={1}>
                     <Button
                         variant="outlined"

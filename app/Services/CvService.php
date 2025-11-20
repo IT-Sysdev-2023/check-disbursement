@@ -36,6 +36,7 @@ class CvService extends NavConnection
     }
     public function retrieveData(User $user, object $date, array $bu)
     {
+        dd($bu);
         // Get all the Navition Servers
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) use ($bu) {

@@ -42,15 +42,15 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $ret = Company::select('name')->get();
+        // $ret = Company::select('name')->get();
 
-        $ret->each(function ($item) {
-            Permission::create(['name' => $item->name]);
-        });
+        // $ret->each(function ($item) {
+        //     Permission::create(['name' => $item->name]);
+        // });
 
         Role::create(['name' => 'releasing']);
         $admin = Role::create(['name' => 'admin']);
-        $admin->givePermissionTo(Permission::all());
+        // $admin->givePermissionTo(Permission::all());
         $user = User::first();
         $user->assignRole('admin');
 

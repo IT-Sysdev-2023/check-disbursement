@@ -1,4 +1,4 @@
-import { RolePermission } from '@/types';
+import { Permission } from '@/types';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import FormControl from '@mui/material/FormControl';
@@ -32,7 +32,7 @@ export default function PermissionSelection({
     handleChange,
     permissions,
 }: {
-    permissions: RolePermission[];
+    permissions: Permission[];
     selectedPermission: string[];
     handleChange: (event: SelectChangeEvent<string[]>) => void;
 }) {

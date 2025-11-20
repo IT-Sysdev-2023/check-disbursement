@@ -6,6 +6,7 @@ use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
 use App\Http\Controllers\StatusController;
 use App\Models\Company;
+use App\Models\CompanyPermission;
 use App\Models\Crf;
 use App\Models\CvLine;
 use App\Models\User;
@@ -170,13 +171,17 @@ Route::get('/test', function () {
     // dd($str);
 })->name('test');
 
-Route::get('/company', function () {
+Route::get('/company', function (Request $request) {
 
     // $admin = Role::first();
     // $admin->givePermissionTo(Permission::all());
 
-    $user = User::first();
-    dd($user->assignRole('admin'));
+    $ret = Company::select('id')->get();
+
+    $ret->each(function ($item) use ($request) {
+        Auth::user()->companyPermission()->create(['company_id' => $item->id]);
+    });
+    dd();
 })->name('company');
 
 

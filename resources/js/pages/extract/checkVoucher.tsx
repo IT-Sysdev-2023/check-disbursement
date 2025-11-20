@@ -74,7 +74,11 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
         });
     };
 
-    const permissions = auth.user?.permissions?.map((r) => r.name) || [];
+    const permissions = auth.user?.company_permissions.map((r) => ({label: r.company.name, value: r.company.id}));
+
+    //if Admin show all Permissions
+    // const permissions = auth.user?.roles?.[0]?.name === 'admin' ? auth.user?.roles?.[0]?.permissions?.map((r) => r.name) : usersPermissions;
+    // console.log(role);
 
     const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
         const {

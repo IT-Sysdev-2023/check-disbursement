@@ -1,6 +1,5 @@
 import { assignPermissions, permissions } from '@/routes';
-import { FlashReponse, RolePermission, User } from '@/types';
-import { router } from '@inertiajs/react';
+import { FlashReponse, Permission, User } from '@/types';
 import {
     Alert,
     Button,
@@ -14,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import PermissionSelection from './permissionSelection';
+import { router } from '@inertiajs/react';
 
 const style = {
     position: 'absolute',
@@ -33,13 +33,15 @@ export default function UserModal({
     onClose,
 }: {
     open: boolean;
-    details: User | undefined;
+    details: User;
     onClose: () => void;
 }) {
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [message, setMessage] = useState('');
-    const [selectedPermission, setSelectedPermission] = useState<string[]>([]);
-    const [permissionsList, setPermissionsList] = useState<RolePermission[]>(
+    const [selectedPermission, setSelectedPermission] = useState<
+        string[]
+    >([]);
+    const [permissionsList, setPermissionsList] = useState<Permission[]>(
         [],
     );
 
@@ -56,11 +58,15 @@ export default function UserModal({
         fetchPermissions();
     }, []);
 
+    //Set Defaul User Permission to the UI
     useEffect(() => {
-        if (details?.permissions?.length) {
-            setSelectedPermission(details?.permissions.map((p) => p.name));
-        }
-    }, [details?.permissions]);
+            setSelectedPermission(
+                details?.company_permissions.map((p) => 
+                     p.company.name
+                ),
+            );
+        
+    }, [details?.company_permissions]);
 
     const handleChange = (
         event: SelectChangeEvent<typeof selectedPermission>,
