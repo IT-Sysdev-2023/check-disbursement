@@ -50,7 +50,13 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-export default function CheckVoucher({ auth }: { auth: Auth }) {
+export default function CheckVoucher({
+    auth,
+    bu,
+}: {
+    auth: Auth;
+    bu: { label: string; value: number }[];
+}) {
     const [progress, setProgress] = useState<ProgressState>({});
     // const [loading, setLoading] = useState(false);
     const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
@@ -111,12 +117,6 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
             },
         );
     };
-
-    const permissions =
-        auth.user?.company_permissions?.map((r) => ({
-            value: r.company.id,
-            label: r.company.name,
-        })) || [];
 
     const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
         const {
@@ -200,7 +200,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             services.
                         </Typography>
                         <SelectBu
-                            permissions={permissions}
+                            permissions={bu}
                             selectedPermission={permissionList}
                             handleChange={handleChange}
                         />

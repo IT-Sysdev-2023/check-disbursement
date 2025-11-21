@@ -198,9 +198,10 @@ class CvService extends NavConnection
         return $this;
     }
 
-    public function cvs(?int $page, ?string $bu, ?string $search)
+    public function cvs(?int $page, ?string $bu, ?string $search, User $user)
     {
-        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
+
+        $cv = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('scannedCheck')
             ->when($search, function ($query, $search) {
@@ -209,31 +210,33 @@ class CvService extends NavConnection
                         'cv_no',
                     ], 'LIKE', '%' . $search . '%');
                 });
-            });
-
-        if ($bu) {
-            $companiesId = Company::where('name', $bu)->first('id');
-            $query->whereRelation(
-                'cvHeader.navHeaderTable.navDatabase',
-                'company_id',
-                $companiesId->id
-            );
-        }
-
-        $records = $query->paginate($page)->withQueryString()->toResourceCollection();
+            })
+            ->when($bu, function ($query, $bu) {
+                $companiesId = Company::where('name', $bu)->first('id');
+                $query->where('company_id', $companiesId->id);
+            })
+            ->paginate($page)
+            ->withQueryString()
+            ->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck')
-        ->doesntHave('scannedCheck')
-        ->select('id', 'crf', 'company','no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
+            ->doesntHave('scannedCheck')
+            ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
             ->when($search, function ($query, $search) {
                 $query->whereAny([
                     'crf',
                 ], 'LIKE', '%' . $search . '%');
-            })->paginate($page)->toResourceCollection();
+            })
+            ->paginate($page)
+            ->withQueryString()
+            ->toResourceCollection();
+
+        $bu = PermissionService::getCompanyPermissions($user);
 
         return Inertia::render('retrievedCv', [
-            'cv' => $records,
-            'crf' => $crfs
+            'cv' => $cv,
+            'crf' => $crfs,
+            'company' => $bu
         ]);
     }
 

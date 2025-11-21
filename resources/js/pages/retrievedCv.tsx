@@ -22,10 +22,12 @@ export default function RetrievedCv({
     cv,
     crf,
     auth,
+    company
 }: {
     cv: inertiaPagination<Cv>;
     crf: inertiaPagination<Crf>;
-    auth: Auth;
+        auth: Auth;
+    company: { label: string; value: number }[];
 }) {
     const [bu, setBu] = useState<{ label: string; value: string }>({
         label: '',
@@ -35,9 +37,6 @@ export default function RetrievedCv({
     const [check, setCheck] = useState('1');
 
     const [search, setSearch] = useState('');
-    const permissions =
-        auth.user?.company_permissions?.map((r) => ({ value: r.company.id, label: r.company.name })) ||
-        [];
 
     const checks = [
         { value: '1', label: 'CV' },
@@ -59,7 +58,7 @@ export default function RetrievedCv({
     };
 
     const handleChange = (event: SelectChangeEvent) => {
-        const selectedItem = permissions.find(
+        const selectedItem = company.find(
             (item) => item.value == Number(event.target.value),
         );
 
@@ -123,7 +122,7 @@ export default function RetrievedCv({
                         handleChange={handleChange}
                         value={bu.value}
                         title="BU"
-                        items={permissions}
+                        items={company}
                     />
                     <SelectItem
                         handleChange={handleChangeCheck}

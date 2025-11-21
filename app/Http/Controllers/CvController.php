@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 use App\Events\CvProgress;
 use App\Models\BorrowedCheck;
+use App\Models\Company;
 use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Services\CvService;
+use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
@@ -17,9 +19,13 @@ class CvController extends Controller
 
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render(component: 'extract/checkVoucher');
+
+        $bu = PermissionService::getCompanyPermissions($request->user());
+        return Inertia::render('extract/checkVoucher', [
+            'bu' => $bu
+        ]);
     }
 
     public function extractCv(Request $request)
@@ -38,10 +44,8 @@ class CvController extends Controller
 
     public function retrievedCv(Request $request)
     {
-        // dd(1);
-
         $perPage = $request->per_page;
-        return $this->service->cvs($perPage, $request->bu, $request->search);
+        return $this->service->cvs($perPage, $request->bu, $request->search, $request->user());
     }
 
     public function details(CvCheckPayment $id)

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\CrfService;
+use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Inertia\Inertia;
@@ -16,9 +17,12 @@ class CrfController extends Controller
     {
 
     }
-    public function index()
+    public function index(Request $request)
     {
-        return Inertia::render('extract/checkRequestForm');
+         $bu = PermissionService::getCompanyPermissions($request->user());
+        return Inertia::render('extract/checkRequestForm', [
+            'bu' => $bu
+        ]);
     }
 
     public function extractCrf(Request $request)

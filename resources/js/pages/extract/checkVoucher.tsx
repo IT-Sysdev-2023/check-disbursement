@@ -28,7 +28,13 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CheckVoucher({ auth }: { auth: Auth }) {
+export default function CheckVoucher({
+    auth,
+    bu,
+}: {
+    auth: Auth;
+    bu: { label: string; value: number }[];
+}) {
     const [progress, setProgress] = useState<ProgressState>({});
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -74,7 +80,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
         });
     };
 
-    const permissions = auth.user?.company_permissions.map((r) => ({label: r.company.name, value: r.company.id}));
+    // const permissions = auth.user?.company_permissions.map((r) => ({label: r.company.name, value: r.company.id}));
 
     //if Admin show all Permissions
     // const permissions = auth.user?.roles?.[0]?.name === 'admin' ? auth.user?.roles?.[0]?.permissions?.map((r) => r.name) : usersPermissions;
@@ -161,7 +167,7 @@ export default function CheckVoucher({ auth }: { auth: Auth }) {
                             Voucher module
                         </Typography>
                         <SelectBu
-                            permissions={permissions}
+                            permissions={bu}
                             selectedPermission={permissionList}
                             handleChange={handleChange}
                         />
