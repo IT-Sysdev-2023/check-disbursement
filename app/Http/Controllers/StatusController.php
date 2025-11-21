@@ -127,7 +127,7 @@ class StatusController extends Controller
         $request->validate([
             'id' => 'required',
             'check' => 'required| string',
-            'status' => 'required| string',
+            'status' => 'nullable | string',
         ]);
 
         $request->user()->scannedChecks()->create([

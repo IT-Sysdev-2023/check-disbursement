@@ -8,7 +8,8 @@ import CrfFields from './components/crfFields';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: retrievedRecords().url,
+        href: '#',
+        // href: retrievedRecords().url,
     },
     {
         title: 'CV Details',

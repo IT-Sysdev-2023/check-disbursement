@@ -136,7 +136,7 @@ export default function CrfDataGrid({
                 scanCheck(),
                 {
                     check: 'crf',
-                    status: 'release',
+                    status: null,
                     id: id,
                 },
                 {

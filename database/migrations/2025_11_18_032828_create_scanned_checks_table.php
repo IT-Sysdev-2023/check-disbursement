@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('check_id');
-            $table->enum('status', ['release', 'forward', 'deposit', 'stale', 'cancel']);
+            $table->enum('status', ['release', 'forward', 'deposit', 'stale', 'cancel'])->nullable();
              $table->enum('check', ['cv', 'crf']);
             $table->timestamps();
         });

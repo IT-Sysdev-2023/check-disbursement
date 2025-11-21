@@ -1,20 +1,10 @@
-import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import { detailsCrf } from '@/routes';
 import { Crf, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
-import { useState } from 'react';
 
-const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
-    const colors: { [index: string]: 'success' | 'error' | 'info' } = {
-        Signature: 'info',
-        Releasing: 'success',
-        Borrowed: 'error',
-    };
 
-    return <Chip label={status} color={colors[status]} size="small" />;
-};
 
 export default function CrfStatusDataGrid({
     crf,
@@ -23,11 +13,6 @@ export default function CrfStatusDataGrid({
     crf: inertiaPagination<Crf>;
     pagination: (model: GridPaginationModel) => void;
 }) {
-    console.log(crf);
-    const [checkId, setCheckId] = useState<number | undefined>();
-    const [open, setOpen] = useState(false);
-    const [bu, setBu] = useState('');
-    const handleClose = () => setOpen(false);
 
     const columnsCrf: GridColDef[] = [
         {
@@ -91,7 +76,7 @@ export default function CrfStatusDataGrid({
                         color: 'primary' | 'success' | 'warning' | 'error';
                     }
                 > = {
-                    release: { label: 'For Releasing', color: 'primary' },
+                    release: { label: 'Released', color: 'primary' },
                     forward: { label: 'Forwarded', color: 'warning' },
                     deposit: { label: 'Deposit', color: 'success' },
                     cancel: { label: 'Cancelled', color: 'error' },
@@ -101,7 +86,7 @@ export default function CrfStatusDataGrid({
                     <Chip
                         label={
                             statusMap[params.row.scannedCheck.status]?.label ||
-                            'Unknown'
+                            'For Releasing'
                         }
                         color={
                             statusMap[params.row.scannedCheck.status]?.color ||
@@ -129,11 +114,10 @@ export default function CrfStatusDataGrid({
                             handleStatusChange(
                                 params.row.id,
                                 e.target.value,
-                                params.row.company,
                             )
                         }
                     >
-                        <MenuItem value="crfForm">
+                        <MenuItem value="details">
                             {' '}
                             Check Request Form Details
                         </MenuItem>
@@ -146,15 +130,11 @@ export default function CrfStatusDataGrid({
         },
     ];
 
-    const handleStatusChange = (id: number, value: string, bu: string) => {
+    const handleStatusChange = (id: number, value: string) => {
         if (value === 'details') {
             router.visit(detailsCrf(id));
         }
-        if (value === 'borrow') {
-            setBu(bu);
-            setCheckId(id);
-            setOpen(true);
-        }
+      
     };
 
     return (
@@ -201,13 +181,6 @@ export default function CrfStatusDataGrid({
                         },
                     },
                 }}
-            />
-            <BorrowedCheckModal
-                bu={bu}
-                whichCheck="crf"
-                checkId={checkId}
-                open={open}
-                handleClose={handleClose}
             />
         </>
     );

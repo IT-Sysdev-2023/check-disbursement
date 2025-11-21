@@ -1,10 +1,9 @@
-import BorrowedCheckModal from '@/components/borrowed-check-modal';
+
 import { details } from '@/routes';
 import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
-import { useState } from 'react';
 
 export default function CvStatusDataGrid({
     cvs,
@@ -13,10 +12,6 @@ export default function CvStatusDataGrid({
     cvs: inertiaPagination<Cv>;
     pagination: (model: GridPaginationModel) => void;
 }) {
-    const [checkId, setCheckId] = useState<number | undefined>();
-    const [open, setOpen] = useState(false);
-    const [bu, setBu] = useState('');
-    const handleClose = () => setOpen(false);
 
     const columns: GridColDef[] = [
         // {
@@ -78,7 +73,7 @@ export default function CvStatusDataGrid({
                         color: 'primary' | 'success' | 'warning' | 'error';
                     }
                 > = {
-                    release: { label: 'For Releasing', color: 'primary' },
+                    release: { label: 'Released', color: 'primary' },
                     forward: { label: 'Forwarded', color: 'warning' },
                     deposit: { label: 'Deposit', color: 'success' },
                     cancel: { label: 'Cancelled', color: 'error' },
@@ -88,7 +83,7 @@ export default function CvStatusDataGrid({
                     <Chip
                         label={
                             statusMap[params.row.scannedCheck.status]?.label ||
-                            'Unknown'
+                            'For Releasing'
                         }
                         color={
                             statusMap[params.row.scannedCheck.status]?.color ||
@@ -187,14 +182,6 @@ export default function CvStatusDataGrid({
                         },
                     },
                 }}
-            />
-
-            <BorrowedCheckModal
-                whichCheck="cv"
-                checkId={checkId}
-                open={open}
-                bu={bu}
-                handleClose={handleClose}
             />
         </>
     );

@@ -128,7 +128,7 @@ export default function CvDataGrid({
                 scanCheck(),
                 {
                     check: 'cv',
-                    status: 'release',
+                    status: null,
                     id: id,
                 },
                 {
