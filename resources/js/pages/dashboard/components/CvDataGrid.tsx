@@ -3,19 +3,23 @@ import { details } from '@/routes';
 import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Chip, MenuItem, Select } from '@mui/material';
-import { DataGrid, GridColDef, GridPaginationModel  } from '@mui/x-data-grid';
+import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
 
 const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
-        const colors: { [index: string]: 'success' | 'error' | 'info' } = {
-            Signature: 'info',
-            Releasing: 'success',
-            Borrowed: 'error',
-        };
+    const colors: { [index: string]: 'success' | 'error' | 'info' } = {
+        Signature: 'info',
+        Releasing: 'success',
+        Borrowed: 'error',
+    };
 
-        return <Chip label={status} color={colors[status]} size="small" />;
+    const label = ['Signature', 'Releasing'].includes(status)
+        ? 'For ' + status
+        : status;
+
+    return <Chip label={label} color={colors[status]} size="small" />;
 };
-    
+
 export default function CvDataGrid({
     cvs,
     pagination,
@@ -27,7 +31,6 @@ export default function CvDataGrid({
     const [open, setOpen] = useState(false);
     const [bu, setBu] = useState('');
     const handleClose = () => setOpen(false);
-console.log(cvs.data);
     const columns: GridColDef[] = [
         {
             field: 'cvHeader',
@@ -72,7 +75,7 @@ console.log(cvs.data);
             minWidth: 120,
             renderCell: (params) => {
                 return renderStatus(
-                    params.row?.borrowed_check ? 'Borrowed' : 'Signature',
+                    params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
                 );
             },
         },
@@ -89,13 +92,16 @@ console.log(cvs.data);
                     <Select
                         size="small"
                         value={status ?? ''}
-                        label="For Signature"
                         onChange={(e) =>
-                            handleStatusChange(params.row.id, e.target.value, params.row.cv_header.nav_header_table.nav_database.company)
+                            handleStatusChange(
+                                params.row.id,
+                                e.target.value,
+                                params.row.company.name,
+                            )
                         }
                     >
                         <MenuItem value="details">Check Details</MenuItem>
-                        {params.row.borrowed_check == null && (
+                        {params.row.borrowedCheck == null && (
                             <MenuItem value="borrow">Borrow Check</MenuItem>
                         )}
                         <MenuItem value="scan">Scan</MenuItem>
@@ -106,6 +112,7 @@ console.log(cvs.data);
     ];
 
     const handleStatusChange = (id: number, value: string, bu: string) => {
+
         if (value === 'details') {
             router.visit(details(id));
         }
@@ -116,8 +123,6 @@ console.log(cvs.data);
             setOpen(true);
         }
     };
-
-    
 
     return (
         <>
@@ -166,7 +171,7 @@ console.log(cvs.data);
             />
 
             <BorrowedCheckModal
-                whichCheck='cv'
+                whichCheck="cv"
                 checkId={checkId}
                 open={open}
                 bu={bu}

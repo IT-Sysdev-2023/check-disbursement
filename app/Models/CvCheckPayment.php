@@ -11,6 +11,7 @@ class CvCheckPayment extends Model
     {
         return [
             'check_date' => 'datetime',
+            'clearing_date' => 'datetime',
         ];
 
     }

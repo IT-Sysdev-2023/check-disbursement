@@ -2,8 +2,8 @@ import AppLayout from '@/layouts/app-layout';
 import { retrievedRecords } from '@/routes';
 import { Cv, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import EmployeeForm from './components/checkForm';
 import { Typography } from '@mui/material';
+import CheckForm from './components/checkForm';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -16,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CvDetails({ cv }: { cv: Cv }) {
+export default function CvDetails({ cv }: { cv: {data:Cv} }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -24,8 +24,8 @@ export default function CvDetails({ cv }: { cv: Cv }) {
             <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
                 Check Voucher Details
             </Typography>
-            <EmployeeForm
-                cv= {cv}
+            <CheckForm
+                cv= {cv.data}
             />
         </AppLayout>
     );

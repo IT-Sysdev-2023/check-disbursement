@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\CvProgress;
+use App\Http\Resources\CvCheckPaymentResource;
 use App\Jobs\CvServer;
 use App\Models\Company;
 use App\Models\Crf;
@@ -236,9 +237,8 @@ class CvService extends NavConnection
 
     public function details(CvCheckPayment $cv)
     {
-        $cv->check_date = Date::parse($cv->check_date)->toFormattedDateString();
         return Inertia::render('dashboard/cv/cvDetails', [
-            'cv' => $cv->load('cvHeader:id,cv_no,vendor_no,remarks')
+            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks'))
         ]);
     }
 

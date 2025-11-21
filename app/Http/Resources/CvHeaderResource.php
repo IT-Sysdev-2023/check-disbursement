@@ -18,6 +18,8 @@ class CvHeaderResource extends JsonResource
         return [
             'id' => $this->id,
             'cvNo' => $this->cv_no,
+            'vendorNo' => $this->vendor_no ?: 'N/A',
+            'remarks' => $this->remarks,
             'navHeaderTable' => new NavHeaderTableResource($this->whenLoaded('navHeaderTable'))
         ];
     }

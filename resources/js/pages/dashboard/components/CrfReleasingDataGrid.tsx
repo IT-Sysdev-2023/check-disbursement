@@ -96,7 +96,6 @@ export default function CrfReleasingDataGrid({
             sortable: false,
             renderCell: (params) => {
                 const { status } = params.row;
-                console.log(params.row);
                 return (
                     <Select
                         size="small"

@@ -5,7 +5,7 @@ import FormGroup from '@mui/material/FormGroup';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 
-export default function EmployeeForm({ cv }: {cv: Cv}) {
+export default function CheckForm({ cv }: { cv: Cv }) {
 
     return (
         <Box
@@ -15,7 +15,7 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
             sx={{ width: '100%', p: 6 }}
         >
             <Typography variant="h6" sx={{ mb: 2 }}>
-                CV Number: {cv.cv_header?.cv_no}
+                CV Number: {cv.cvHeader?.cvNo}
             </Typography>
             <Typography variant="h6" sx={{ mb: 2 }}>
                 Payee: {cv.payee}
@@ -28,7 +28,7 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                 >
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
-                            value={cv.check_number}
+                            value={cv.checkNumber}
                             name="check_number"
                             label="Check Number"
                             slotProps={{
@@ -41,14 +41,17 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
-                            type="number"
-                            value={cv.check_amount}
+                            type="text"
+                            value={cv.checkAmount}
                             name="check_amount"
                             label="Check Amount"
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
+                                    inputProps: {
+                                        style: { textAlign: 'right' },
+                                    },
                                 },
                             }}
                         />
@@ -56,11 +59,11 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.check_date}
+                            value={cv.checkDate}
                             name="check_date"
                             label="Check Date"
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
                                 },
@@ -92,10 +95,10 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.cv_header?.vendor_no != '' ? cv.cv_header?.vendor_no : 'N/A' }
+                            value={cv.cvHeader?.vendorNo}
                             label="Vendor"
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
                                 },
@@ -105,10 +108,10 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.bank_account_no}
+                            value={cv.bankAccountNo}
                             label="Bank Account No."
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
                                 },
@@ -118,10 +121,10 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.bank_name}
+                            value={cv.bankName}
                             label="Bank Name"
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
                                 },
@@ -131,14 +134,10 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={
-                                cv.check_class_location != ''
-                                    ? cv.check_class_location
-                                    : 'N/A'
-                            }
+                            value={cv.checkClassLocation}
                             label="Check Class Location"
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
                                 },
@@ -148,10 +147,10 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.clearing_date}
+                            value={cv.clearingDate}
                             label="Clearing Date"
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
                                 },
@@ -161,10 +160,10 @@ export default function EmployeeForm({ cv }: {cv: Cv}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
-                            value={cv.cv_header?.remarks}
+                            value={cv.cvHeader?.remarks}
                             label="Remarks"
                             fullWidth
-                             slotProps={{
+                            slotProps={{
                                 input: {
                                     readOnly: true,
                                 },

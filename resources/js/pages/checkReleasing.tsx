@@ -31,7 +31,6 @@ export default function CheckReleasing({
         label: '',
         value: '',
     });
-console.log(crf);
     const [check, setCheck] = useState('1');
 
     const [search, setSearch] = useState('');

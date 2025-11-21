@@ -108,10 +108,10 @@ export interface Cv {
     checkAmount: string;
     checkDate: string;
     payee: string;
-    bank_account_no: string;
-    bank_name: string;
-    check_class_location: string;
-    clearing_date: string;
+    bankAccountNo: string;
+    bankName: string;
+    checkClassLocation: string;
+    clearingDate: string;
     cvHeader?: CvHeader;
     borrowedCheck: BorrowedCheck;
     scannedCheck: ScannedCheck;
@@ -138,8 +138,8 @@ export interface ScannedCheck {
 }
 
 export interface CvHeader {
-    cv_no: number;
-    vendor_no: string;
+    cvNo: number;
+    vendorNo: string;
     remarks: string;
 }
 
