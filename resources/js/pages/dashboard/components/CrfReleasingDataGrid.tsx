@@ -1,8 +1,8 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { detailsCrf } from '@/routes';
+import { detailsCrf, updateStatus } from '@/routes';
 import { Crf, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
-import { Chip, MenuItem, Select } from '@mui/material';
+import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
 
@@ -23,6 +23,7 @@ export default function CrfReleasingDataGrid({
     crf: inertiaPagination<Crf>;
     pagination: (model: GridPaginationModel) => void;
 }) {
+    console.log(crf);
     const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
     const [bu, setBu] = useState('');
@@ -50,11 +51,10 @@ export default function CrfReleasingDataGrid({
             headerName: 'No.',
             headerAlign: 'right',
             align: 'right',
-            flex: 1,
             minWidth: 80,
         },
         {
-            field: 'paid_to',
+            field: 'paidTo',
             headerName: 'Paid To',
             headerAlign: 'right',
             align: 'right',
@@ -66,69 +66,86 @@ export default function CrfReleasingDataGrid({
             headerName: 'Amount',
             headerAlign: 'right',
             align: 'right',
-            flex: 1,
             minWidth: 100,
         },
         {
-            field: 'ck_no',
+            field: 'ckNo',
             headerName: 'CK No.',
             headerAlign: 'right',
             align: 'right',
-            flex: 1,
             minWidth: 100,
         },
-        {
-            field: 'status',
-            headerName: 'Status',
+         {
+            field: 'details',
+            headerName: 'Check Details',
             minWidth: 120,
             renderCell: (params) => {
-                return renderStatus(
-                    params.row?.borrowed_check ? 'Borrowed' : 'Signature',
+                return (
+                    <Button
+                        variant="contained"
+                        size="small"
+                        onClick={() => {
+                            router.visit(detailsCrf(params.row.id));
+                        }}
+                    >
+                        View
+                    </Button>
                 );
             },
         },
         {
             field: 'actions',
             headerName: 'Action',
-            width: 130,
+            width: 100,
             align: 'center',
+            flex: 1,
             headerAlign: 'center',
             sortable: false,
             renderCell: (params) => {
-                const { status } = params.row;
+                const { scannedCheck } = params.row;
+
                 return (
                     <Select
                         size="small"
-                        value={status ?? ''}
+                        value={scannedCheck.status ?? ''}
                         label="For Signature"
                         onChange={(e) =>
-                            handleStatusChange(
-                                params.row.id,
-                                e.target.value,
-                                params.row.company,
-                            )
+                            handleStatusChange(scannedCheck.id, e.target.value)
                         }
                     >
-                        <MenuItem value="details">Check Details</MenuItem>
-                        {params.row.borrowed_check == null && (
-                            <MenuItem value="borrow">Borrow Check</MenuItem>
-                        )}
-                        <MenuItem value="scan">Scan</MenuItem>
+                        <MenuItem value="release">
+                            {' '}
+                            <Chip label="Released Check" color="primary" />
+                        </MenuItem>
+                        <MenuItem value="forward">
+                            <Chip label="Forward Check" color="secondary" />
+                        </MenuItem>
+                        <MenuItem value="deposit">
+                            <Chip label="Deposit Check" color="info" />
+                        </MenuItem>
+                        <MenuItem value="stale">
+                            <Chip label="Stale Check" color="warning" />
+                        </MenuItem>
+                        <MenuItem value="cancel">
+                            <Chip label="Cancel Check" color="error" />
+                        </MenuItem>
                     </Select>
                 );
             },
         },
     ];
 
-    const handleStatusChange = (id: number, value: string, bu: string) => {
-        if (value === 'details') {
-            router.visit(detailsCrf(id));
-        }
-        if (value === 'borrow') {
-            setBu(bu);
-            setCheckId(id);
-            setOpen(true);
-        }
+    const handleStatusChange = (id: number, value: string) => {
+        router.put(
+            updateStatus(id),
+            {
+                value: value,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+            },
+        );
     };
 
     return (
@@ -137,6 +154,7 @@ export default function CrfReleasingDataGrid({
                 rows={crf.data}
                 columns={columnsCrf}
                 rowCount={crf.meta.total}
+                 rowHeight={70}
                 paginationMode="server"
                 paginationModel={{
                     page: crf.meta.current_page - 1,

@@ -31,6 +31,8 @@ export default function CheckReleasing({
         label: '',
         value: '',
     });
+
+    console.log(cv);
     const [check, setCheck] = useState('1');
 
     const [search, setSearch] = useState('');

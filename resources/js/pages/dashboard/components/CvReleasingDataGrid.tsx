@@ -1,5 +1,5 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { updateStatus } from '@/routes';
+import { details, updateStatus } from '@/routes';
 import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Chip, MenuItem, Select } from '@mui/material';
@@ -77,8 +77,7 @@ export default function CvReleasingDataGrid({
                         variant="contained"
                         size="small"
                         onClick={() => {
-                            // Put your action here
-                            console.log('Clicked:', params.row);
+                            router.visit(details(params.row.id));
                         }}
                     >
                         View
@@ -95,10 +94,7 @@ export default function CvReleasingDataGrid({
             flex: 1,
             minWidth: 80,
             renderCell: (params) => {
-                return (
-                    params.row.cvHeader?.navHeaderTable?.navDatabase?.company ||
-                    '—'
-                );
+                return params.row.company.name || '—';
             },
         },
 
