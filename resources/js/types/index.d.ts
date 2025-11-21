@@ -156,7 +156,7 @@ export interface Crf {
     amount: number;
     bank: string;
     ckNo: number;
-    prepared_by: string;
+    preparedBy: string;
     created_at: string;
     updated_at: string;
 }

@@ -19,14 +19,14 @@ export default function CvStatusDataGrid({
     const handleClose = () => setOpen(false);
 
     const columns: GridColDef[] = [
+        // {
+        //     field: 'cv_header',
+        //     headerName: 'CV Number',
+        //     minWidth: 150,
+        //     valueGetter: (params) => params.cv_no,
+        // },
         {
-            field: 'cv_header',
-            headerName: 'CV Number',
-            minWidth: 150,
-            valueGetter: (params) => params.cv_no,
-        },
-        {
-            field: 'check_number',
+            field: 'checkNumber',
             headerName: 'Check Number',
             headerAlign: 'right',
             align: 'right',
@@ -34,7 +34,7 @@ export default function CvStatusDataGrid({
             minWidth: 50,
         },
         {
-            field: 'check_amount',
+            field: 'checkAmount',
             headerName: 'Check Amount',
             headerAlign: 'right',
             align: 'right',
@@ -42,7 +42,7 @@ export default function CvStatusDataGrid({
             minWidth: 80,
         },
         {
-            field: 'bank_account_no',
+            field: 'bankAccountNo',
             headerName: 'Bank Account No.',
             headerAlign: 'right',
             align: 'right',
@@ -50,7 +50,7 @@ export default function CvStatusDataGrid({
             minWidth: 80,
         },
         {
-            field: 'bank_name',
+            field: 'bankName',
             headerName: 'Bank Name',
             headerAlign: 'right',
             align: 'right',
@@ -58,7 +58,7 @@ export default function CvStatusDataGrid({
             minWidth: 100,
         },
         {
-            field: 'check_date',
+            field: 'checkDate',
             headerName: 'Check Date',
             headerAlign: 'right',
             align: 'right',
@@ -87,11 +87,11 @@ export default function CvStatusDataGrid({
                 return (
                     <Chip
                         label={
-                            statusMap[params.row.scanned_check.status]?.label ||
+                            statusMap[params.row.scannedCheck.status]?.label ||
                             'Unknown'
                         }
                         color={
-                            statusMap[params.row.scanned_check.status]?.color ||
+                            statusMap[params.row.scannedCheck.status]?.color ||
                             'default'
                         }
                     />
@@ -107,17 +107,17 @@ export default function CvStatusDataGrid({
             headerAlign: 'center',
             sortable: false,
             renderCell: (params) => {
-                const { scanned_check } = params.row;
+                const { scannedCheck } = params.row;
                 return (
                     <Select
                         size="small"
-                        value={scanned_check.status ?? ''}
+                        value={scannedCheck.status ?? ''}
                         label=""
                         onChange={(e) =>
                             handleStatusChange(params.row.id, e.target.value)
                         }
                     >
-                        <MenuItem value="crfForm">
+                        <MenuItem value="details">
                             {' '}
                             Check Request Form Details
                         </MenuItem>
@@ -131,9 +131,9 @@ export default function CvStatusDataGrid({
     ];
 
     const handleStatusChange = (id: number, value: string) => {
-        // if (value === 'details') {
-        //     router.visit(details(id));
-        // }
+        if (value === 'details') {
+            router.visit(details(id));
+        }
 
         // if (value === 'borrow') {
         //     // setBu(bu);
@@ -147,12 +147,12 @@ export default function CvStatusDataGrid({
             <DataGrid
                 rows={cvs.data}
                 columns={columns}
-                rowCount={cvs.total}
+                rowCount={cvs.meta.total}
                 rowHeight={70}
                 paginationMode="server"
                 paginationModel={{
-                    page: cvs.current_page - 1,
-                    pageSize: cvs.per_page,
+                    page: cvs.meta.current_page - 1,
+                    pageSize: cvs.meta.per_page,
                 }}
                 pageSizeOptions={[10, 15, 25, 50]}
                 getRowClassName={(params) =>

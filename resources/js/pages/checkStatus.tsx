@@ -1,16 +1,15 @@
 import AppLayout from '@/layouts/app-layout';
-import { checkStatus, retrievedRecords } from '@/routes';
+import { checkStatus } from '@/routes';
 import { Auth, Crf, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
-import CrfDataGrid from './dashboard/components/CrfDataGrid';
-import CvDataGrid from './dashboard/components/CvDataGrid';
 import Search from './dashboard/components/Search';
 import SelectItem from './dashboard/components/SelectItem';
 import Copyright from './dashboard/internals/components/Copyright';
 import CvStatusDataGrid from './dashboard/components/CvStatusDataGrid';
+import CrfStatusDataGrid from './dashboard/components/CrfStatusDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,6 +31,7 @@ export default function CheckStatus({
         label: '',
         value: '',
     });
+    console.log(crf);
 
     const [check, setCheck] = useState('1');
 
@@ -50,7 +50,7 @@ export default function CheckStatus({
 
         router.get(
             checkStatus(),
-            { page: 1, bu: bu.label },
+            { bu: bu.label },
             {
                 preserveScroll: true,
                 preserveState: true,
@@ -138,7 +138,7 @@ export default function CheckStatus({
                         <CvStatusDataGrid cvs={cv} pagination={handlePagination} />
                     )}
 
-                    {check === '2' && <CrfDataGrid crf={crf} pagination={handlePagination}/>}
+                    {check === '2' && <CrfStatusDataGrid crf={crf} pagination={handlePagination}/>}
                 </Grid>
                 <Copyright sx={{ my: 4 }} />
             </Box>

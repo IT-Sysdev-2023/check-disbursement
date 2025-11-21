@@ -53,4 +53,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(CompanyPermission::class);
     }
+
+    public function borrowedChecks()
+    {
+        return $this->hasMany(BorrowedCheck::class);
+    }
+
+    public function scannedChecks()
+    {
+        return $this->hasMany(ScannedCheck::class);
+    }
 }

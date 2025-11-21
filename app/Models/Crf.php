@@ -9,10 +9,21 @@ class Crf extends Model
     protected $guarded = [];
     protected $table = 'crfs';
 
-    public function borrowedCheck(){
+    protected function casts(): array
+    {
+        return [
+            'date' => 'datetime',
+        ];
+
+    }
+
+
+    public function borrowedCheck()
+    {
         return $this->hasOne(BorrowedCheck::class, 'check_id')->where('check', 'crf');
     }
-      public function scannedCheck(){
+    public function scannedCheck()
+    {
         return $this->hasOne(ScannedCheck::class, 'check_id')->where('check', 'crf');
     }
 }

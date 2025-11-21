@@ -47,10 +47,8 @@ class CrfController extends Controller
 
     public function detailsCrf(Crf $id)
     {
-
-        $id->date = Date::parse($id->date)->toFormattedDateString();
         return Inertia::render('crf/crfDetails', [
-            'crf' => $id
+            'crf' => $id->toResource()
         ]);
     }
 }

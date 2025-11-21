@@ -223,11 +223,13 @@ class CvService extends NavConnection
         $records = $query->paginate($page)->withQueryString()->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck')
+        ->doesntHave('scannedCheck')
+        ->select('id', 'crf', 'company','no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
             ->when($search, function ($query, $search) {
                 $query->whereAny([
                     'crf',
                 ], 'LIKE', '%' . $search . '%');
-            })->paginate($page);
+            })->paginate($page)->toResourceCollection();
 
         return Inertia::render('retrievedCv', [
             'cv' => $records,

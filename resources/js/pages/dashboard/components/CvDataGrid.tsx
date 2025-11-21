@@ -1,8 +1,8 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { details } from '@/routes';
-import { Cv, inertiaPagination } from '@/types';
+import { details, scanCheck } from '@/routes';
+import { Cv, FlashReponse, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
-import { Chip, MenuItem, Select } from '@mui/material';
+import { Alert, Chip, MenuItem, Select, Snackbar } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
 
@@ -31,6 +31,9 @@ export default function CvDataGrid({
     const [open, setOpen] = useState(false);
     const [bu, setBu] = useState('');
     const handleClose = () => setOpen(false);
+    const [message, setMessage] = useState('');
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+
     const columns: GridColDef[] = [
         {
             field: 'cvHeader',
@@ -52,13 +55,13 @@ export default function CvDataGrid({
             headerAlign: 'right',
             align: 'right',
             flex: 1,
-            minWidth: 80,
         },
         {
             field: 'company',
-            headerName: 'Company',
-            headerAlign: 'right',
-            align: 'right',
+            headerName: 'Business Unit',
+            headerAlign: 'center',
+            align: 'center',
+            flex: 1,
             valueGetter: (params) => params.name,
         },
         {
@@ -66,8 +69,6 @@ export default function CvDataGrid({
             headerName: 'Check Date',
             headerAlign: 'right',
             align: 'right',
-            flex: 1,
-            minWidth: 100,
         },
         {
             field: 'status',
@@ -112,7 +113,6 @@ export default function CvDataGrid({
     ];
 
     const handleStatusChange = (id: number, value: string, bu: string) => {
-
         if (value === 'details') {
             router.visit(details(id));
         }
@@ -121,6 +121,26 @@ export default function CvDataGrid({
             setBu(bu);
             setCheckId(id);
             setOpen(true);
+        }
+
+        if (value === 'scan') {
+            router.post(
+                scanCheck(),
+                {
+                    check: 'cv',
+                    status: 'release',
+                    id: id,
+                },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onSuccess: (page) => {
+                        setOpenSnackBar(true);
+                        const m = page.props.flash as FlashReponse;
+                        setMessage(m.message);
+                    },
+                },
+            );
         }
     };
 
@@ -177,6 +197,21 @@ export default function CvDataGrid({
                 bu={bu}
                 handleClose={handleClose}
             />
+            
+            <Snackbar
+                open={openSnackBar}
+                autoHideDuration={6000}
+                onClose={handleClose}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="success"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
         </>
     );
 }

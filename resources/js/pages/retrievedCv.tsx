@@ -49,7 +49,7 @@ export default function RetrievedCv({
 
         router.get(
             retrievedRecords(),
-            { page: 1, bu: bu.label },
+            { bu: bu.label },
             {
                 preserveScroll: true,
                 preserveState: true,

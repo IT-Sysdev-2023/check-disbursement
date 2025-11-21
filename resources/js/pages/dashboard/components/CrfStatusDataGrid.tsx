@@ -1,8 +1,8 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { detailsCrf, scanCheck } from '@/routes';
-import { Crf, FlashReponse, inertiaPagination } from '@/types';
+import { detailsCrf } from '@/routes';
+import { Crf, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
-import { Alert, Chip, MenuItem, Select, Snackbar } from '@mui/material';
+import { Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
 
@@ -16,19 +16,18 @@ const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
     return <Chip label={status} color={colors[status]} size="small" />;
 };
 
-export default function CrfDataGrid({
+export default function CrfStatusDataGrid({
     crf,
     pagination,
 }: {
     crf: inertiaPagination<Crf>;
     pagination: (model: GridPaginationModel) => void;
 }) {
+    console.log(crf);
     const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
     const [bu, setBu] = useState('');
     const handleClose = () => setOpen(false);
-    const [message, setMessage] = useState('');
-    const [openSnackBar, setOpenSnackBar] = useState(false);
 
     const columnsCrf: GridColDef[] = [
         {
@@ -82,10 +81,33 @@ export default function CrfDataGrid({
         {
             field: 'status',
             headerName: 'Status',
+            flex: 1,
             minWidth: 120,
             renderCell: (params) => {
-                return renderStatus(
-                    params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
+                const statusMap: Record<
+                    string,
+                    {
+                        label: string;
+                        color: 'primary' | 'success' | 'warning' | 'error';
+                    }
+                > = {
+                    release: { label: 'For Releasing', color: 'primary' },
+                    forward: { label: 'Forwarded', color: 'warning' },
+                    deposit: { label: 'Deposit', color: 'success' },
+                    cancel: { label: 'Cancelled', color: 'error' },
+                };
+
+                return (
+                    <Chip
+                        label={
+                            statusMap[params.row.scannedCheck.status]?.label ||
+                            'Unknown'
+                        }
+                        color={
+                            statusMap[params.row.scannedCheck.status]?.color ||
+                            'default'
+                        }
+                    />
                 );
             },
         },
@@ -111,11 +133,13 @@ export default function CrfDataGrid({
                             )
                         }
                     >
-                        <MenuItem value="details">Check Details</MenuItem>
-                        {params.row.borrowedCheck == null && (
-                            <MenuItem value="borrow">Borrow Check</MenuItem>
-                        )}
-                        <MenuItem value="scan">Scan</MenuItem>
+                        <MenuItem value="crfForm">
+                            {' '}
+                            Check Request Form Details
+                        </MenuItem>
+                        <MenuItem value="scannedCheck">
+                            Scanned Check Details
+                        </MenuItem>
                     </Select>
                 );
             },
@@ -130,25 +154,6 @@ export default function CrfDataGrid({
             setBu(bu);
             setCheckId(id);
             setOpen(true);
-        }
-        if (value === 'scan') {
-            router.post(
-                scanCheck(),
-                {
-                    check: 'crf',
-                    status: 'release',
-                    id: id,
-                },
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                    onSuccess: (page) => {
-                        setOpenSnackBar(true);
-                        const m = page.props.flash as FlashReponse;
-                        setMessage(m.message);
-                    },
-                },
-            );
         }
     };
 
@@ -204,20 +209,6 @@ export default function CrfDataGrid({
                 open={open}
                 handleClose={handleClose}
             />
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={6000}
-                onClose={handleClose}
-            >
-                <Alert
-                    onClose={handleClose}
-                    severity="success"
-                    variant="filled"
-                    sx={{ width: '100%' }}
-                >
-                    {message}
-                </Alert>
-            </Snackbar>
         </>
     );
 }

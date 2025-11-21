@@ -28,15 +28,15 @@ class StatusController extends Controller
                 });
             });
 
-        // if ($bu) {
-        //     $query->whereRelation(
-        //         'cvHeader.navHeaderTable.navDatabase',
-        //         'company',
-        //         $bu
-        //     );
-        // }
+        if ($request->bu) {
+            $query->whereRelation(
+                'cvHeader.navHeaderTable.navDatabase',
+                'company',
+                $request->bu
+            );
+        }
 
-        $records = $query->paginate($request->page)->withQueryString();
+        $records = $query->paginate($request->page)->withQueryString()->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck', 'scannedCheck')
             ->has('scannedCheck')
@@ -44,7 +44,7 @@ class StatusController extends Controller
                 $query->whereAny([
                     'crf',
                 ], 'LIKE', '%' . $search . '%');
-            })->paginate($request->page);
+            })->paginate($request->page)->withQueryString()->toResourceCollection();
 
         return Inertia::render('checkStatus', [
             'cv' => $records,
@@ -111,20 +111,31 @@ class StatusController extends Controller
             'id' => 'required'
         ]);
 
-        BorrowedCheck::create([
+        $request->user()->borrowedChecks()->create([
             'check_id' => $request->id,
             'name' => $request->name,
             'reason' => $request->reason,
             'check' => $request->check,
-            'created_at' => now(),
-            'updated_at' => now()
         ]);
 
         return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
-    public function scanCheck()
+    public function scanCheck(Request $request)
     {
+        $request->validate([
+            'id' => 'required',
+            'check' => 'required| string',
+            'status' => 'required| string',
+        ]);
+
+        $request->user()->scannedChecks()->create([
+            'check_id' => $request->id,
+            'status' => $request->status,
+            'check' => $request->check,
+        ]);
+
+        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Scanned']);
 
     }
 }

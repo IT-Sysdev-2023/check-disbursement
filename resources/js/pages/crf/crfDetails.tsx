@@ -16,17 +16,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CrfDetails({ crf }: { crf: Crf }) {
-
+export default function CrfDetails({ crf }: { crf: { data: Crf } }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV Details" />
             <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
                 Check Request Form Details
             </Typography>
-            <CrfFields
-                crf= {crf}
-            />
+            <CrfFields crf={crf.data} />
         </AppLayout>
     );
 }

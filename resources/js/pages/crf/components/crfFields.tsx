@@ -56,7 +56,7 @@ export default function CrfFields({ crf }: {crf: Crf}) {
                             }}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                    {/* <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             
                             value={crf.location}
@@ -68,7 +68,7 @@ export default function CrfFields({ crf }: {crf: Crf}) {
                                 },
                             }}
                         />
-                    </Grid>
+                    </Grid> */}
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             
@@ -85,7 +85,7 @@ export default function CrfFields({ crf }: {crf: Crf}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             
-                            value={crf.paid_to}
+                            value={crf.paidTo}
                             label="Paid To"
                             fullWidth
                              slotProps={{
@@ -97,7 +97,9 @@ export default function CrfFields({ crf }: {crf: Crf}) {
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
-                            
+                            id="outlined-multiline-static"
+                            multiline
+                            rows={4}
                             value={crf.particulars}
                             label="Particulars"
                             fullWidth
@@ -137,7 +139,7 @@ export default function CrfFields({ crf }: {crf: Crf}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             
-                            value={crf.ck_no}
+                            value={crf.ckNo}
                             label="CK No"
                             fullWidth
                              slotProps={{
@@ -150,7 +152,7 @@ export default function CrfFields({ crf }: {crf: Crf}) {
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             
-                            value={crf.prepared_by}
+                            value={crf.preparedBy}
                             label="Prepared By"
                             fullWidth
                              slotProps={{

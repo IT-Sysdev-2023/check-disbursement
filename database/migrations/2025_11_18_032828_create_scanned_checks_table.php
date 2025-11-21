@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('scanned_checks', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->integer('check_id');
-            $table->boolean('is_scanned');
             $table->enum('status', ['release', 'forward', 'deposit', 'stale', 'cancel']);
              $table->enum('check', ['cv', 'crf']);
             $table->timestamps();

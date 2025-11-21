@@ -6,7 +6,6 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 
 export default function CheckForm({ cv }: { cv: Cv }) {
-
     return (
         <Box
             component="form"
@@ -92,7 +91,7 @@ export default function CheckForm({ cv }: { cv: Cv }) {
                             />
                         </LocalizationProvider>
                     </Grid> */}
-                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                    {/* <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
                             value={cv.cvHeader?.vendorNo}
@@ -104,7 +103,7 @@ export default function CheckForm({ cv }: { cv: Cv }) {
                                 },
                             }}
                         />
-                    </Grid>
+                    </Grid> */}
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
@@ -131,7 +130,7 @@ export default function CheckForm({ cv }: { cv: Cv }) {
                             }}
                         />
                     </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                    {/* <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
                             value={cv.checkClassLocation}
@@ -143,8 +142,8 @@ export default function CheckForm({ cv }: { cv: Cv }) {
                                 },
                             }}
                         />
-                    </Grid>
-                    <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
+                    </Grid> */}
+                    {/* <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
                             value={cv.clearingDate}
@@ -156,12 +155,15 @@ export default function CheckForm({ cv }: { cv: Cv }) {
                                 },
                             }}
                         />
-                    </Grid>
+                    </Grid> */}
                     <Grid size={{ xs: 12, sm: 6 }} sx={{ display: 'flex' }}>
                         <TextField
                             type="text"
                             value={cv.cvHeader?.remarks}
                             label="Remarks"
+                            id="outlined-multiline-static"
+                            multiline
+                            rows={4}
                             fullWidth
                             slotProps={{
                                 input: {

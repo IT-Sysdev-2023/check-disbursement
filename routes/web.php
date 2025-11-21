@@ -86,36 +86,24 @@ Route::get('/test', function () {
 
     $start = "2025-11-03";
     $end = "2025-11-04";
+//     $tables = DB::connection('sqlsrvCaf')
+//     ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+
+// dd($tables);
+
+
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
-        ->table('SON-OK AGRI FARM$CV Check Payment')
-        // $head = $con->table('ALTA CITTA ACCOUNTING$CV Header')
-        // ->where('CV Status', "")//CV25080289
-        // ->whereIn('CV No_', [
-        //     "CRF2511001",
-        //     "CRF2511002",
-        //     "CRF2511003",
-        //     "CRF2511004",
-        //     "CRF2511005",
-        //     "CRF2511006",
-        //     "CRF2511007",
-        //     "CRF2511008",
-        //     "CRF2511009",
-        //     "CRF2511010",
-        //     "CRF2511011",
-        //     "CRF2511012",
-        //     "CRF2511013",
-        //     "CRF2511014",
-        //     "CRF2511015",
-        //     "CRF2511016",
-        // ])//CV25080289
+        // ->table('SON-OK AGRI FARM$CV Check Payment')
+        ->table('PLANNING & CONSTRUCTION ACCTG$CV Check Payment')
+
         // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
         // ->where('Check Class Location', '==',  '!=', '')
-        ->whereNot(function ($query) {
+        // ->whereNot(function ($query) {
 
-            $query->where('Check Class Location', '');
+        //     $query->where('Check Class Location', '');
 
-        })
+        // })
         ->limit(10)
         ->get();
     // $con1 = DB::connection('sqlsrvCaf')
@@ -126,7 +114,7 @@ Route::get('/test', function () {
     // $con2 = DB::connection('sqlsrvCaf')
     // ->table('CARMEN AGRI FARM$CV Check Payment')
     // // ->where('CV No_', "CRF0000118")//CV25080289
-    // // // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
+    // // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
     // ->first();
     dd($con);
     $str = [];
