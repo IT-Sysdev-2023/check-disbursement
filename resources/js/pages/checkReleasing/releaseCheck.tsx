@@ -1,0 +1,177 @@
+import AppLayout from '@/layouts/app-layout';
+import { retrievedRecords, storeReleaseCheck } from '@/routes';
+import { type BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
+import {
+    Box,
+    Button,
+    FormControl,
+    FormHelperText,
+    TextField,
+    Typography,
+} from '@mui/material';
+import { ChangeEvent, FormEvent, useRef } from 'react';
+import SignatureCanvas from 'react-signature-canvas';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Retrieved CV/CRF',
+        href: retrievedRecords().url,
+    },
+    {
+        title: 'CV Details',
+        href: '#',
+    },
+];
+interface MyFormData {
+    receiversName: string;
+    file: File | null;
+    signature: string | null;
+}
+
+export default function ReleaseCheck() {
+    const { data, setData, post, processing, errors, transform, reset } =
+        useForm<MyFormData>({
+            receiversName: '',
+            file: null,
+            signature: null,
+        });
+
+    const sigPadRef = useRef<SignatureCanvas>(null);
+
+    const handleTextChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setData('receiversName', e.target.value);
+    };
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setData('file', e.target.files[0]);
+        }
+    };
+
+    const handleClearSignature = () => {
+        sigPadRef.current?.clear();
+        setData('signature', null);
+    };
+
+    const handleSaveSignature = () => {
+        if (sigPadRef.current && !sigPadRef.current.isEmpty()) {
+            const canvas = sigPadRef.current.getCanvas();
+            setData('signature', canvas.toDataURL('image/png'));
+        }
+    };
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        post(storeReleaseCheck().url, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                reset();
+            },
+        });
+        // Here you can send formData to API or backend
+    };
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Release Check" />
+            <Typography component="h2" variant="h6" sx={{ mb: 2, pl: 3 }}>
+                Release Check
+            </Typography>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%',
+                }}
+            >
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 2,
+                        width: 400,
+                    }}
+                >
+                    {/* Text Field */}
+                    <TextField
+                        label="Receivers Name"
+                        variant="outlined"
+                        value={data.receiversName}
+                        onChange={handleTextChange}
+                        error={!!errors.receiversName}
+                        helperText={errors.receiversName ?? ' '}
+                    />
+
+                    {/* File Upload */}
+                    <FormControl error={!!errors.file}>
+                        <Button variant="contained" component="label">
+                            Upload Profile Image
+                            <input
+                                type="file"
+                                hidden
+                                onChange={handleFileChange}
+                            />
+                        </Button>
+
+                        {/* Show selected file name */}
+                        {data.file && (
+                            <Typography sx={{ mt: 1 }}>
+                                {data.file.name}
+                            </Typography>
+                        )}
+
+                        {/* Error message like TextField helperText */}
+                        <FormHelperText>{errors.file ?? ' '}</FormHelperText>
+                    </FormControl>
+
+                    {/* Signature Pad */}
+                    <FormControl error={!!errors.signature}>
+                        <Box
+                            sx={{
+                                border: '1px solid #ccc',
+                                borderRadius: 1,
+                                height: 200,
+                                width: '100%',
+                            }}
+                        >
+                            <SignatureCanvas
+                                ref={sigPadRef}
+                                penColor="black"
+                                canvasProps={{
+                                    width: 400,
+                                    height: 200,
+                                    style: { backgroundColor: 'white' },
+                                    className: 'sigCanvas',
+                                }}
+                            />
+                        </Box>
+                         {/* Error message like TextField helperText */}
+                        <FormHelperText>{errors.signature ?? ' '}</FormHelperText>
+                        <Box sx={{ display: 'flex', gap: 1 }}>
+                            <Button
+                                variant="outlined"
+                                onClick={handleClearSignature}
+                            >
+                                Clear
+                            </Button>
+                            <Button
+                                variant="contained"
+                                onClick={handleSaveSignature}
+                            >
+                                Save Signature
+                            </Button>
+                        </Box>
+                        
+                    </FormControl>
+                    <Button type="submit" variant="contained" color="primary">
+                        Submit
+                    </Button>
+                </Box>
+            </Box>
+        </AppLayout>
+    );
+}

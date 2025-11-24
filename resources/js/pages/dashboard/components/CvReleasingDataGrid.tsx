@@ -1,9 +1,10 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { details, updateStatus } from '@/routes';
+import { details, releaseCheck, updateStatus } from '@/routes';
 import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
+import { release } from 'os';
 import { useState } from 'react';
 
 const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
@@ -141,16 +142,20 @@ export default function CvReleasingDataGrid({
     ];
 
     const handleStatusChange = (id: number, value: string) => {
-        router.put(
-            updateStatus(id),
-            {
-                value: value,
-            },
-            {
-                preserveScroll: true,
-                preserveState: true,
-            },
-        );
+
+        if (value === 'release') {
+            router.visit(releaseCheck());
+        } 
+        // router.put(
+        //     updateStatus(id),
+        //     {
+        //         value: value,
+        //     },
+        //     {
+        //         preserveScroll: true,
+        //         preserveState: true,
+        //     },
+        // );
     };
 
     return (

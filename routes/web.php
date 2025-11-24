@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
@@ -48,8 +49,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('scan-check', [StatusController::class, 'scanCheck'])->name('scanCheck');
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
-    Route::get('check-releasing', [StatusController::class, 'checkReleasing'])->name('check-releasing');
+
     Route::put('update-status/{id}', [StatusController::class, 'updateStatus'])->name('update-status');
+
+    Route::prefix('check-releasing')->controller(CheckReleasingController::class)->group(function () {
+        Route::get('index', 'checkReleasing')->name('check-releasing');
+        Route::get('release-check', 'releaseCheck')->name('release-check');
+        Route::post('store-release-check', 'storeReleaseCheck')->name('store-release-check');
+    });
 
     Route::get('report', function () {
         return Inertia::render('dashboard');
@@ -86,10 +93,10 @@ Route::get('/test', function () {
 
     $start = "2025-11-03";
     $end = "2025-11-04";
-//     $tables = DB::connection('sqlsrvCaf')
+    //     $tables = DB::connection('sqlsrvCaf')
 //     ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
 
-// dd($tables);
+    // dd($tables);
 
 
     $con = DB::connection('sqlsrvCaf')
