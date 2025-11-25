@@ -63,4 +63,8 @@ class User extends Authenticatable
     {
         return $this->hasMany(ScannedCheck::class);
     }
+
+    public function  releasedChecks(){
+        return $this->hasMany(ReleasedCheck::class);
+    }
 }

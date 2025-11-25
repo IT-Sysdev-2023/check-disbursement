@@ -8,7 +8,7 @@ import CheckForm from './components/checkForm';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: retrievedRecords().url,
+        href: '#',
     },
     {
         title: 'CV Details',

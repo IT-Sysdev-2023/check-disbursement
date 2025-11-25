@@ -108,15 +108,14 @@ export default function CvReleasingDataGrid({
             headerAlign: 'center',
             sortable: false,
             renderCell: (params) => {
-                const { scannedCheck } = params.row;
-
+                const { id } = params.row;
                 return (
                     <Select
                         size="small"
-                        value={scannedCheck.status ?? ''}
+                        value={ ''}
                         label="For Signature"
                         onChange={(e) =>
-                            handleStatusChange(scannedCheck.id, e.target.value)
+                            handleStatusChange(id, e.target.value)
                         }
                     >
                         <MenuItem value="release">
@@ -144,7 +143,7 @@ export default function CvReleasingDataGrid({
     const handleStatusChange = (id: number, value: string) => {
 
         if (value === 'release') {
-            router.visit(releaseCheck());
+            router.visit(releaseCheck(id));
         } 
         // router.put(
         //     updateStatus(id),

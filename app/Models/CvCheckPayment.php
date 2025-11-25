@@ -34,4 +34,8 @@ class CvCheckPayment extends Model
     {
         return $this->belongsTo(Company::class);
     }
+
+    public function releasedCheck(){
+        return $this->hasOne(ReleasedCheck::class, 'check_id');
+    }
 }

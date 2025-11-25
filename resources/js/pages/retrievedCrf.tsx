@@ -7,7 +7,7 @@ import CrfDataGrid from './dashboard/components/CrfDataGrid';
 import Search from './dashboard/components/Search';
 import Copyright from './dashboard/internals/components/Copyright';
 import { useState } from 'react';
-import { retrievedCrf } from '@/routes';
+import { retrievedRecords } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,7 +24,7 @@ export default function RetrievedCrf({ crf }: { crf: inertiaPagination<Crf> }) {
             setSearch(value);
     
             router.get(
-                retrievedCrf(),
+                retrievedRecords(),
                 { search: value},
                 {
                     preserveScroll: true,

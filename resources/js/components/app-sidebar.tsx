@@ -1,4 +1,4 @@
-import { retrievedCrf } from '@/actions/App/Http/Controllers/CrfController';
+
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -12,30 +12,23 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import {
-    about,
-    changePassword,
-    checkReleasing,
     checkRequestForm,
     checkStatus,
     checkVoucher,
     dashboard,
-    notifications,
     report,
     retrievedRecords,
 } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import {
-    Bell,
     BookOpen,
     Check,
     Database,
     FileSpreadsheet,
-    Key,
     LayoutGrid,
     PackageOpen,
     Tickets,
-    Users,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 

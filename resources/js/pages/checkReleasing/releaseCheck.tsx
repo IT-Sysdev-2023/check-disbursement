@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { retrievedRecords, storeReleaseCheck } from '@/routes';
+import { checkReleasing, storeReleaseCheck } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import {
@@ -16,21 +16,22 @@ import SignatureCanvas from 'react-signature-canvas';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: retrievedRecords().url,
+        href: checkReleasing().url,
     },
     {
         title: 'CV Details',
         href: '#',
     },
 ];
+
 interface MyFormData {
     receiversName: string;
     file: File | null;
     signature: string | null;
 }
 
-export default function ReleaseCheck() {
-    const { data, setData, post, processing, errors, transform, reset } =
+export default function ReleaseCheck({id}: {id: number}) {
+    const { data, setData, post, errors, transform, reset, processing } =
         useForm<MyFormData>({
             receiversName: '',
             file: null,
@@ -64,9 +65,16 @@ export default function ReleaseCheck() {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        transform((data) => ({
+            ...data,
+            id: id,
+        }));
         post(storeReleaseCheck().url, {
             preserveScroll: true,
             preserveState: true,
+            onError: (e) => {
+                console.log(e);
+            },
             onSuccess: () => {
                 reset();
             },
@@ -149,8 +157,10 @@ export default function ReleaseCheck() {
                                 }}
                             />
                         </Box>
-                         {/* Error message like TextField helperText */}
-                        <FormHelperText>{errors.signature ?? ' '}</FormHelperText>
+                        {/* Error message like TextField helperText */}
+                        <FormHelperText>
+                            {errors.signature ?? ' '}
+                        </FormHelperText>
                         <Box sx={{ display: 'flex', gap: 1 }}>
                             <Button
                                 variant="outlined"
@@ -165,9 +175,8 @@ export default function ReleaseCheck() {
                                 Save Signature
                             </Button>
                         </Box>
-                        
                     </FormControl>
-                    <Button type="submit" variant="contained" color="primary">
+                    <Button type="submit" variant="contained" color="primary" loading={processing}>
                         Submit
                     </Button>
                 </Box>

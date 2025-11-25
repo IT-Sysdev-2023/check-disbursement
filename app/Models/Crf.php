@@ -26,4 +26,7 @@ class Crf extends Model
     {
         return $this->hasOne(ScannedCheck::class, 'check_id')->where('check', 'crf');
     }
+     public function releasedCheck(){
+        return $this->hasOne(ReleasedCheck::class, 'check_id');
+    }
 }
