@@ -25,9 +25,9 @@ class CvCheckPayment extends Model
     {
         return $this->hasOne(BorrowedCheck::class, 'check_id')->where('check', 'cv');
     }
-    public function scannedCheck()
+    public function checkStatus()
     {
-        return $this->hasOne(ScannedCheck::class, 'check_id')->where('check', 'cv');
+        return $this->hasOne(CheckStatus::class, 'check_id')->where('check', 'cv');
     }
 
     public function company()
@@ -35,7 +35,4 @@ class CvCheckPayment extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function releasedCheck(){
-        return $this->hasOne(ReleasedCheck::class, 'check_id');
-    }
 }

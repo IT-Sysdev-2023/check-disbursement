@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CheckStatus;
+use App\Models\Company;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\ReleasedCheck;
@@ -14,30 +16,25 @@ class CheckReleasingController extends Controller
 {
     public function checkReleasing(Request $request)
     {
-        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'scannedCheck', 'company')
+        // dd($request->bu);
+        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus', 'company')
             ->select('id', 'cv_header_id', 'check_number', 'check_date', 'check_amount', 'payee', 'company_id')
-            ->has('scannedCheck')
-            ->doesntHave('releasedCheck')
+            ->whereRelation('checkStatus', 'status', null)
             ->when($request->search, function ($query, $search) {
                 $query->whereHas('cvHeader', function (Builder $query) use ($search) {
                     $query->whereAny([
                         'cv_no',
                     ], 'LIKE', '%' . $search . '%');
                 });
+            })
+             ->when($request->bu, function ($query, $bu) {
+                $companiesId = Company::where('name', $bu)->first('id');
+                $query->where('company_id', $companiesId->id);
             });
 
-        if ($request->bu) {
-            $query->whereRelation(
-                'cvHeader.navHeaderTable.navDatabase',
-                'company_id',
-                $request->bu
-            );
-        }
-
-        $crfs = Crf::with('borrowedCheck', 'scannedCheck')
+        $crfs = Crf::with('borrowedCheck', 'checkStatus')
             ->select('id', 'crf', 'paid_to', 'amount', 'ck_no', 'no', 'company', 'paid_to')
-            ->has('scannedCheck')
-            ->doesntHave('releasedCheck')
+            ->whereRelation('checkStatus', 'status', null)
             ->when($request->search, function ($query, $search) {
                 $query->whereAny([
                     'crf',
@@ -52,36 +49,38 @@ class CheckReleasingController extends Controller
         ]);
     }
 
-    public function releaseCheck(int $id)
+    public function releaseCheck(string $id, string $status)
     {
         return Inertia::render('checkReleasing/releaseCheck', [
-            'id' => $id
+            'id' => $id,
+            'status' => $status
         ]);
     }
 
-    public function storeReleaseCheck(Request $request)
+    public function storeReleaseCheck(CheckStatus $id, Request $request)
     {
-        $request->validate([
+        $request->validate(rules: [
             'receiversName' => 'required|string|max:255',
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'signature' => 'required|string',
-            'id' => 'required|integer'
+            'status' => 'required|string',
         ]);
 
         $signature = preg_replace('/^data:image\/\w+;base64,/', '', $request->signature);
 
         $imageData = base64_decode($signature);
-        $name = $request->id . '_' . $request->user()->id . '_' . now()->format('Y-m-d-His');
-        $folder = "releasedChecks/";
+        $name = $id->id . '_' . $request->user()->id . '_' . now()->format('Y-m-d-His');
+        $folder = $request->status . "/";
 
         Storage::disk('public')->put($folder . 'signatures/' . $name . '.png', $imageData);
         Storage::disk('public')->putFileAs($folder . 'images/', $request->file, $name . '.png');
 
-        $request->user()->releasedChecks()->create([
-            'check_id' => $request->id,
+        $id->update([
+            'status' => $request->status,
             'receivers_name' => $request->receiversName,
             'image' => $folder . 'images/' . $name,
             'signature' => $folder . 'signatures/' . $name,
+            'caused_by' => $request->user()->id,
         ]);
 
         return redirect()->route('check-releasing')->with(['status' => true, 'message' => 'Successfully Updated']);

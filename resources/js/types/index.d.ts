@@ -114,7 +114,7 @@ export interface Cv {
     clearingDate: string;
     cvHeader?: CvHeader;
     borrowedCheck: BorrowedCheck;
-    scannedCheck: ScannedCheck;
+    checkStatus: CheckStatus;
     created_at: string;
     updated_at: string;
 }
@@ -127,12 +127,15 @@ export interface BorrowedCheck {
     check: 'crf' | 'cv';
 }
 
-export interface ScannedCheck {
+export interface CheckStatus {
     id: number;
-    check: 'crf' | 'cv';
+    user_id: number;
     check_id: number;
-    is_scanned: number;
     status: 'release' | 'forward' | 'deposit' | 'cancel' | 'stale';
+    check: 'crf' | 'cv';
+    receivers_name?: string | null;
+    image: string | null;
+    signature: string | null;
     created_at: string;
     updated_at: string;
 }

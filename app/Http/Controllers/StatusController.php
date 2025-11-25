@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CvCheckPaymentCollection;
 use App\Models\BorrowedCheck;
+use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
-use App\Models\ScannedCheck;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Contracts\Database\Query\Builder;
@@ -18,8 +18,8 @@ class StatusController extends Controller
     public function checkStatus(Request $request)
     {
 
-        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'scannedCheck')
-            ->has('scannedCheck')
+        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus')
+            ->has('checkStatus')
             ->when($request->search, function ($query, $search) {
                 $query->whereHas('cvHeader', function (Builder $query) use ($search) {
                     $query->whereAny([
@@ -38,8 +38,8 @@ class StatusController extends Controller
 
         $records = $query->paginate($request->page)->withQueryString()->toResourceCollection();
 
-        $crfs = Crf::with('borrowedCheck', 'scannedCheck')
-            ->has('scannedCheck')
+        $crfs = Crf::with('borrowedCheck', 'checkStatus')
+            ->has('checkStatus')
             ->when($request->search, function ($query, $search) {
                 $query->whereAny([
                     'crf',
@@ -52,7 +52,7 @@ class StatusController extends Controller
         ]);
     }
 
-    public function updateStatus(ScannedCheck $id, Request $request)
+    public function updateStatus(CheckStatus $id, Request $request)
     {
 
         $request->validate([
@@ -93,7 +93,7 @@ class StatusController extends Controller
             'status' => 'nullable | string',
         ]);
 
-        $request->user()->scannedChecks()->create([
+        $request->user()->checkStatuses()->create([
             'check_id' => $request->id,
             'status' => $request->status,
             'check' => $request->check,

@@ -30,8 +30,8 @@ interface MyFormData {
     signature: string | null;
 }
 
-export default function ReleaseCheck({id}: {id: number}) {
-    const { data, setData, post, errors, transform, reset, processing } =
+export default function ReleaseCheck({id, status}: {id: number, status: string}) {
+    const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
             file: null,
@@ -67,9 +67,9 @@ export default function ReleaseCheck({id}: {id: number}) {
 
         transform((data) => ({
             ...data,
-            id: id,
+            status: status,
         }));
-        post(storeReleaseCheck().url, {
+        post(storeReleaseCheck(id).url, {
             preserveScroll: true,
             preserveState: true,
             onError: (e) => {

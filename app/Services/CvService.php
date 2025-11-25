@@ -203,7 +203,7 @@ class CvService extends NavConnection
 
         $cv = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
-            ->doesntHave('scannedCheck')
+            ->doesntHave('checkStatus')
             ->when($search, function ($query, $search) {
                 $query->whereHas('cvHeader', function (Builder $query) use ($search) {
                     $query->whereAny([
@@ -220,7 +220,7 @@ class CvService extends NavConnection
             ->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck')
-            ->doesntHave('scannedCheck')
+            ->doesntHave('checkStatus')
             ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
             ->when($search, function ($query, $search) {
                 $query->whereAny([

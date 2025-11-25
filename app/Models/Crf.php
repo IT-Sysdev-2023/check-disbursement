@@ -22,11 +22,8 @@ class Crf extends Model
     {
         return $this->hasOne(BorrowedCheck::class, 'check_id')->where('check', 'crf');
     }
-    public function scannedCheck()
+    public function checkStatus()
     {
-        return $this->hasOne(ScannedCheck::class, 'check_id')->where('check', 'crf');
-    }
-     public function releasedCheck(){
-        return $this->hasOne(ReleasedCheck::class, 'check_id');
+        return $this->hasOne(CheckStatus::class, 'check_id')->where('check', 'crf');
     }
 }

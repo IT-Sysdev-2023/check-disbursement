@@ -82,11 +82,11 @@ export default function CvStatusDataGrid({
                 return (
                     <Chip
                         label={
-                            statusMap[params.row.scannedCheck.status]?.label ||
+                            statusMap[params.row.checkStatus.status]?.label ||
                             'For Releasing'
                         }
                         color={
-                            statusMap[params.row.scannedCheck.status]?.color ||
+                            statusMap[params.row.checkStatus.status]?.color ||
                             'default'
                         }
                     />
@@ -102,11 +102,11 @@ export default function CvStatusDataGrid({
             headerAlign: 'center',
             sortable: false,
             renderCell: (params) => {
-                const { scannedCheck } = params.row;
+                const { checkStatus } = params.row;
                 return (
                     <Select
                         size="small"
-                        value={scannedCheck.status ?? ''}
+                        value={checkStatus.status ?? ''}
                         label=""
                         onChange={(e) =>
                             handleStatusChange(params.row.id, e.target.value)
@@ -116,7 +116,7 @@ export default function CvStatusDataGrid({
                             {' '}
                             Check Request Form Details
                         </MenuItem>
-                        <MenuItem value="scannedCheck">
+                        <MenuItem value="checkStatus">
                             Scanned Check Details
                         </MenuItem>
                     </Select>

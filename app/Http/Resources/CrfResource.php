@@ -29,7 +29,7 @@ class CrfResource extends JsonResource
             'ckNo' => $this->ck_no,
             'preparedBy' => $this->prepared_by,
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
-            'scannedCheck' => $this->whenLoaded('scannedCheck'),
+            'checkStatus' => $this->whenLoaded('checkStatus'),
         ];
     }
 }

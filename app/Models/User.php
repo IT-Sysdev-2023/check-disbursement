@@ -59,12 +59,9 @@ class User extends Authenticatable
         return $this->hasMany(BorrowedCheck::class);
     }
 
-    public function scannedChecks()
+    public function checkStatuses()
     {
-        return $this->hasMany(ScannedCheck::class);
+        return $this->hasMany(CheckStatus::class, 'caused_by');
     }
 
-    public function  releasedChecks(){
-        return $this->hasMany(ReleasedCheck::class);
-    }
 }

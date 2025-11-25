@@ -102,15 +102,15 @@ export default function CrfReleasingDataGrid({
             headerAlign: 'center',
             sortable: false,
             renderCell: (params) => {
-                const { scannedCheck } = params.row;
+                const { checkStatus } = params.row;
 
                 return (
                     <Select
                         size="small"
-                        value={scannedCheck.status ?? ''}
+                        value={checkStatus.status ?? ''}
                         label="For Signature"
                         onChange={(e) =>
-                            handleStatusChange(scannedCheck.id, e.target.value)
+                            handleStatusChange(checkStatus.id, e.target.value)
                         }
                     >
                         <MenuItem value="release">

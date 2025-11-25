@@ -85,11 +85,11 @@ export default function CrfStatusDataGrid({
                 return (
                     <Chip
                         label={
-                            statusMap[params.row.scannedCheck.status]?.label ||
+                            statusMap[params.row.checkStatus.status]?.label ||
                             'For Releasing'
                         }
                         color={
-                            statusMap[params.row.scannedCheck.status]?.color ||
+                            statusMap[params.row.checkStatus.status]?.color ||
                             'default'
                         }
                     />
