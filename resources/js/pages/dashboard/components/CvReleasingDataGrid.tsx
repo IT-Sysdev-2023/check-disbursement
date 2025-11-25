@@ -1,21 +1,11 @@
-import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { details, releaseCheck, updateStatus } from '@/routes';
+import ReasonCancellationModal from '@/components/reason-cancellation-modal';
+import { details, releaseCheck } from '@/routes';
 import { Cv, inertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
-import { release } from 'os';
 import { useState } from 'react';
 
-const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
-    const colors: { [index: string]: 'success' | 'error' | 'info' } = {
-        Signature: 'info',
-        Releasing: 'success',
-        Borrowed: 'error',
-    };
-
-    return <Chip label={status} color={colors[status]} size="small" />;
-};
 
 export default function CvReleasingDataGrid({
     cvs,
@@ -24,11 +14,8 @@ export default function CvReleasingDataGrid({
     cvs: inertiaPagination<Cv>;
     pagination: (model: GridPaginationModel) => void;
 }) {
-    const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
-    const [bu, setBu] = useState('');
-    const handleClose = () => setOpen(false);
-
+    const [checkId, setCheckId] = useState();
     const columns: GridColDef[] = [
         {
             field: 'checkNumber',
@@ -142,6 +129,11 @@ export default function CvReleasingDataGrid({
 
     const handleStatusChange = (id: number, value: string) => {
 
+        if (value === 'cancel') {
+            setCheckId(id);
+            setOpen(true);
+            return;
+        }
         // if (value === 'release') {
         router.visit(releaseCheck([id, value]));
         // } 
@@ -204,13 +196,11 @@ export default function CvReleasingDataGrid({
                 }}
             />
 
-            <BorrowedCheckModal
-                whichCheck="cv"
-                checkId={checkId}
-                open={open}
-                bu={bu}
-                handleClose={handleClose}
-            />
+            <ReasonCancellationModal
+                            checkId={checkId}
+                            open={open}
+                            handleClose={()=> setOpen(false)}
+                        />
         </>
     );
 }

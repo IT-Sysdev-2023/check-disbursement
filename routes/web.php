@@ -56,6 +56,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', 'checkReleasing')->name('check-releasing');
         Route::get('release-check/{id}/{status}', 'releaseCheck')->name('release-check');
         Route::post('store-release-check/{id}', 'storeReleaseCheck')->name('store-release-check');
+        Route::post('cancel-check/{id}', 'cancelCheck')->name('cancel-check');
     });
 
     Route::get('report', function () {
@@ -179,7 +180,11 @@ Route::get('/company', function (Request $request) {
     dd();
 })->name('company');
 
+Route::get('permission', function () {
+   $r =  User::where('id', 1)->first()->assignRole('admin');
 
+    dd($r);
+});
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

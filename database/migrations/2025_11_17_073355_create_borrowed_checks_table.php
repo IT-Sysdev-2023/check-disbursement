@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('borrowed_checks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->integer('check_id');
+            $table->unsignedBigInteger('check_id');
             $table->string('name');
             $table->string('reason');
             $table->enum('check', ['cv', 'crf']);

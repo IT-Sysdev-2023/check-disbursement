@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CancelledCheck;
 use App\Models\CheckStatus;
 use App\Models\Company;
 use App\Models\Crf;
@@ -9,7 +10,9 @@ use App\Models\CvCheckPayment;
 use App\Models\ReleasedCheck;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class CheckReleasingController extends Controller
@@ -53,7 +56,8 @@ class CheckReleasingController extends Controller
     {
         return Inertia::render('checkReleasing/releaseCheck', [
             'id' => $id,
-            'status' => $status
+            'status' => $status,
+            'label' => Str::title($status) . ' Check',
         ]);
     }
 
@@ -84,5 +88,25 @@ class CheckReleasingController extends Controller
         ]);
 
         return redirect()->route('check-releasing')->with(['status' => true, 'message' => 'Successfully Updated']);
+    }
+
+    public function cancelCheck(CheckStatus $id,  Request $request){
+        $request->validate([
+            'reason' => 'required|string|max:255',
+        ]);
+        
+        DB::transaction(function () use ($id, $request) {
+
+            $id->update([
+                'status' => 'cancel',
+            ]);
+
+            CancelledCheck::create([
+                'check_status_id' => $id->id,
+                'reason' => $request->reason,
+                'cancelled_by' => $request->user()->id,
+            ]);
+        });
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 }

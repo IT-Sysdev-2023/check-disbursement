@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('receivers_name')->nullable();
             $table->string('image')->nullable();
             $table->string('signature')->nullable();
-            $table->unsignedBigInteger('caused_by');
+            $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

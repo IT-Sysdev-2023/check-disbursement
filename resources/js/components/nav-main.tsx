@@ -5,10 +5,34 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { checkReleasing, users } from '@/routes';
+
+import {
+    about,
+    changePassword,
+    checkReleasing,
+    checkRequestForm,
+    checkStatus,
+    checkVoucher,
+    notifications,
+    report,
+    retrievedRecords,
+    users,
+} from '@/routes';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { Check, ChevronDown, ChevronRight, Users } from 'lucide-react';
+import {
+    Bell,
+    BookOpen,
+    Check,
+    ChevronDown,
+    ChevronRight,
+    Database,
+    FileSpreadsheet,
+    Key,
+    PackageOpen,
+    Tickets,
+    Users,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
@@ -22,19 +46,56 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     );
     const isAdmin = roles.includes('admin');
     const releasing = roles.includes('releasing');
+    const scanning = roles.includes('scanning');
 
-    
+    console.log(roles);
+
     const [openItem, setOpenItem] = useState<string | null>(null);
 
     // 🔹 Append "Users" only if admin
     const finalItems = useMemo(() => {
         return [
             ...items,
+            ...(isAdmin || scanning
+                ? [
+                      {
+                          title: 'Extract',
+                          href: '#',
+                          icon: Database,
+                          submenu: [
+                              {
+                                  title: 'Check Voucher',
+                                  href: checkVoucher(),
+                                  icon: Tickets,
+                              },
+                              {
+                                  title: 'Check Request Form',
+                                  href: checkRequestForm(),
+                                  icon: BookOpen,
+                              },
+                          ],
+                      },
+                      {
+                          title: 'Retrieved CV/CRF',
+                          href: retrievedRecords(),
+                          icon: PackageOpen,
+                      },
+                  ]
+                : []),
             ...(isAdmin || releasing
                 ? [
                       {
                           title: 'Check Releasing',
                           href: checkReleasing(),
+                          icon: Check,
+                      },
+                  ]
+                : []),
+            ...(isAdmin || releasing || scanning
+                ? [
+                      {
+                          title: 'Check Status',
+                          href: checkStatus(),
                           icon: Check,
                       },
                   ]
@@ -48,8 +109,34 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       } as NavItem,
                   ]
                 : []),
+            {
+                title: 'Report',
+                href: report(),
+                icon: FileSpreadsheet,
+            },
+            //         {
+            //     title: 'Retrieved CRF',
+            //     href: RetrievedCrf(),
+            //     icon: PackageOpen,
+            // },
+
+            {
+                title: 'About Us',
+                href: about(),
+                icon: Users,
+            },
+            {
+                title: 'Change Password',
+                href: changePassword(),
+                icon: Key,
+            },
+            {
+                title: 'Notifications',
+                href: notifications(),
+                icon: Bell,
+            },
         ];
-    }, [items, isAdmin, releasing]);
+    }, [items, isAdmin, releasing, scanning]);
 
     // Automatically open submenu if current page belongs to it
     useEffect(() => {

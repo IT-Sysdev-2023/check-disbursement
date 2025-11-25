@@ -30,7 +30,7 @@ interface MyFormData {
     signature: string | null;
 }
 
-export default function ReleaseCheck({id, status}: {id: number, status: string}) {
+export default function ReleaseCheck({id, status, label}: {id: number, status: string, label: string}) {
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
@@ -85,7 +85,7 @@ export default function ReleaseCheck({id, status}: {id: number, status: string})
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Release Check" />
             <Typography component="h2" variant="h6" sx={{ mb: 2, pl: 3 }}>
-                Release Check
+                {label}
             </Typography>
             <Box
                 sx={{

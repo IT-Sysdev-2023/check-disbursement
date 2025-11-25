@@ -35,4 +35,8 @@ class CvCheckPayment extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function cancelledCheck()
+    {
+        return $this->hasOne(CancelledCheck::class);
+    }
 }

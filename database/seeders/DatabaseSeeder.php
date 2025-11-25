@@ -41,6 +41,13 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('12341234'),
             ]
         );
+        User::firstOrCreate(
+            ['username' => 'releasing'],
+            [
+                'name' => 'renan',
+                'password' => Hash::make('12341234'),
+            ]
+        );
 
         // $ret = Company::select('name')->get();
 
@@ -49,6 +56,7 @@ class DatabaseSeeder extends Seeder
         // });
 
         Role::create(['name' => 'releasing']);
+        Role::create(['name' => 'scanning']);
         $admin = Role::create(['name' => 'admin']);
         // $admin->givePermissionTo(Permission::all());
         $user = User::first();
