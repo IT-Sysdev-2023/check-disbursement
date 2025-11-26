@@ -30,7 +30,15 @@ interface MyFormData {
     signature: string | null;
 }
 
-export default function ReleaseCheck({id, status, label}: {id: number, status: string, label: string}) {
+export default function ReleaseCheck({
+    id,
+    status,
+    label,
+}: {
+    id: number;
+    status: string;
+    label: string;
+}) {
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
@@ -100,49 +108,54 @@ export default function ReleaseCheck({id, status, label}: {id: number, status: s
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
+                        padding: 5,
                         gap: 2,
-                        width: 400,
+                        width: '100%',
                     }}
                 >
-                    {/* Text Field */}
-                    <TextField
-                        label="Receivers Name"
-                        variant="outlined"
-                        value={data.receiversName}
-                        onChange={handleTextChange}
-                        error={!!errors.receiversName}
-                        helperText={errors.receiversName ?? ' '}
-                    />
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {/* Text Field */}
+                        <TextField
+                            label="Receivers Name"
+                            variant="outlined"
+                            value={data.receiversName}
+                            onChange={handleTextChange}
+                            error={!!errors.receiversName}
+                            helperText={errors.receiversName ?? ' '}
+                        />
 
-                    {/* File Upload */}
-                    <FormControl error={!!errors.file}>
-                        <Button variant="contained" component="label">
-                            Upload Profile Image
-                            <input
-                                type="file"
-                                hidden
-                                onChange={handleFileChange}
-                            />
-                        </Button>
+                        {/* File Upload */}
+                        <FormControl error={!!errors.file}>
+                            <Button variant="contained" component="label">
+                                Upload Profile Image
+                                <input
+                                    type="file"
+                                    hidden
+                                    onChange={handleFileChange}
+                                />
+                            </Button>
 
-                        {/* Show selected file name */}
-                        {data.file && (
-                            <Typography sx={{ mt: 1 }}>
-                                {data.file.name}
-                            </Typography>
-                        )}
+                            {/* Show selected file name */}
+                            {data.file && (
+                                <Typography sx={{ mt: 1 }}>
+                                    {data.file.name}
+                                </Typography>
+                            )}
 
-                        {/* Error message like TextField helperText */}
-                        <FormHelperText>{errors.file ?? ' '}</FormHelperText>
-                    </FormControl>
+                            {/* Error message like TextField helperText */}
+                            <FormHelperText>
+                                {errors.file ?? ' '}
+                            </FormHelperText>
+                        </FormControl>
+                    </Box>
 
                     {/* Signature Pad */}
-                    <FormControl error={!!errors.signature}>
+                    <FormControl error={!!errors.signature} >
                         <Box
                             sx={{
                                 border: '1px solid #ccc',
                                 borderRadius: 1,
-                                height: 200,
+                                height: 300,
                                 width: '100%',
                             }}
                         >
@@ -150,9 +163,8 @@ export default function ReleaseCheck({id, status, label}: {id: number, status: s
                                 ref={sigPadRef}
                                 penColor="black"
                                 canvasProps={{
-                                    width: 400,
-                                    height: 200,
-                                    style: { backgroundColor: 'white' },
+                                    height: 300,
+                                    style: { backgroundColor: 'white',width: '100%',  display: 'block',  },
                                     className: 'sigCanvas',
                                 }}
                             />
@@ -176,7 +188,12 @@ export default function ReleaseCheck({id, status, label}: {id: number, status: s
                             </Button>
                         </Box>
                     </FormControl>
-                    <Button type="submit" variant="contained" color="primary" loading={processing}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        loading={processing}
+                    >
                         Submit
                     </Button>
                 </Box>

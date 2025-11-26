@@ -197,7 +197,12 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                         )}
                                     </div>
                                 ) : (
-                                    <Link href={href} prefetch>
+                                    <Link
+                                        href={href}
+                                        headers={{
+                                            'Cache-Control': 'no-cache',
+                                        }}
+                                    >
                                         {item.icon && <item.icon />}
                                         <span>{item.title}</span>
                                     </Link>
