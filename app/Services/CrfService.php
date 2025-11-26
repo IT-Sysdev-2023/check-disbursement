@@ -34,7 +34,7 @@ class CrfService
                 ->extractBank()
                 ->extractCkNo()
                 ->extractPreparedBy()
-                ->getRecords();
+                ->getRecords($userId);
 
             $records->push($contentRecords);
 

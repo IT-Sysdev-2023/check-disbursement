@@ -151,6 +151,7 @@ class CvService extends NavConnection
                             ->get()
                             ->map(fn($check) => [
                                 'cv_header_id' => $headerId,
+                                'causer_id' => $this->userId,
                                 'company_id' => $companyId,
                                 'check_number' => $check->{'Check Number'},
                                 'check_amount' => $check->{'Check Amount'},

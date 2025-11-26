@@ -107,7 +107,7 @@ class CrfHelper
     {
         //Extract CRF# in Particular
         preg_match('/CRF#\d+/', $this->particular, $match);
-            
+
         $this->crf = $match[0];
         return $this;
     }
@@ -139,9 +139,10 @@ class CrfHelper
         return $this;
     }
 
-    public function getRecords()
+    public function getRecords(int $userId)
     {
         return [
+            'causer_id' => $userId,
             'filename' => $this->filename,
             'crf' => $this->crf,
             'company' => $this->company,
@@ -156,6 +157,7 @@ class CrfHelper
             'particulars' => $this->particular,
             'created_at' => now(),
             'updated_at' => now()
+
         ];
     }
 

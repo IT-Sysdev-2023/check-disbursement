@@ -21,7 +21,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function RetrievedCv({
     cv,
     crf,
-    auth,
     company
 }: {
     cv: inertiaPagination<Cv>;
@@ -121,7 +120,7 @@ export default function RetrievedCv({
                     <SelectItem
                         handleChange={handleChange}
                         value={bu.value}
-                        title="BU"
+                        title="Company"
                         items={company}
                     />
                     <SelectItem
