@@ -19,7 +19,7 @@ class CrfController extends Controller
     }
     public function index(Request $request)
     {
-         $bu = PermissionService::getCompanyPermissions($request->user());
+        $bu = PermissionService::getCompanyPermissions($request->user());
         return Inertia::render('extract/checkRequestForm', [
             'bu' => $bu
         ]);
@@ -38,12 +38,7 @@ class CrfController extends Controller
 
     public function retrievedCrf(Request $request)
     {
-
-        $records = Crf::when($request->search, function ($query, $search) {
-            $query->whereAny([
-                'crf',
-            ], 'LIKE', '%' . $search . '%');
-        })->paginate();
+        $records = Crf::filter($request->only('search'))->paginate();
         return Inertia::render('retrievedCrf', [
             'crf' => $records
         ]);

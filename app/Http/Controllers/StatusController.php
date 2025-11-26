@@ -17,34 +17,20 @@ class StatusController extends Controller
 
     public function checkStatus(Request $request)
     {
-
-        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus')
+        $filters = $request->only(['bu', 'search']);
+        $records = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus')
             ->has('checkStatus')
-            ->when($request->search, function ($query, $search) {
-                $query->whereHas('cvHeader', function (Builder $query) use ($search) {
-                    $query->whereAny([
-                        'cv_no',
-                    ], 'LIKE', '%' . $search . '%');
-                });
-            });
-
-        if ($request->bu) {
-            $query->whereRelation(
-                'cvHeader.navHeaderTable.navDatabase',
-                'company',
-                $request->bu
-            );
-        }
-
-        $records = $query->paginate($request->page)->withQueryString()->toResourceCollection();
+            ->filter($filters)
+            ->paginate($request->page)
+            ->withQueryString()
+            ->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck', 'checkStatus')
             ->has('checkStatus')
-            ->when($request->search, function ($query, $search) {
-                $query->whereAny([
-                    'crf',
-                ], 'LIKE', '%' . $search . '%');
-            })->paginate($request->page)->withQueryString()->toResourceCollection();
+            ->filter($filters)
+            ->paginate($request->page)
+            ->withQueryString()
+            ->toResourceCollection();
 
         return Inertia::render('checkStatus', [
             'cv' => $records,

@@ -19,36 +19,26 @@ class CheckReleasingController extends Controller
 {
     public function checkReleasing(Request $request)
     {
-        // dd($request->bu);
-        $query = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus', 'company')
+        $filters = $request->only(['bu', 'search']);
+        $records = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus', 'company')
             ->select('id', 'cv_header_id', 'check_number', 'check_date', 'check_amount', 'payee', 'company_id')
             ->whereRelation('checkStatus', 'status', null)
-            ->when($request->search, function ($query, $search) {
-                $query->whereHas('cvHeader', function (Builder $query) use ($search) {
-                    $query->whereAny([
-                        'cv_no',
-                    ], 'LIKE', '%' . $search . '%');
-                });
-            })
-             ->when($request->bu, function ($query, $bu) {
-                $companiesId = Company::where('name', $bu)->first('id');
-                $query->where('company_id', $companiesId->id);
-            });
+            ->filter($filters)
+            ->paginate($request->page)
+            ->withQueryString()
+            ->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck', 'checkStatus')
             ->select('id', 'crf', 'paid_to', 'amount', 'ck_no', 'no', 'company', 'paid_to')
             ->whereRelation('checkStatus', 'status', null)
-            ->when($request->search, function ($query, $search) {
-                $query->whereAny([
-                    'crf',
-                ], 'LIKE', '%' . $search . '%');
-            })
+            ->filter($filters)
             ->paginate($request->page)
-            ->withQueryString();
+            ->withQueryString()
+            ->toResourceCollection();
 
         return Inertia::render('checkReleasing', [
-            'cv' => $query->paginate($request->page)->withQueryString()->toResourceCollection(),
-            'crf' => $crfs->toResourceCollection()
+            'cv' => $records,
+            'crf' => $crfs
         ]);
     }
 
@@ -90,11 +80,12 @@ class CheckReleasingController extends Controller
         return redirect()->route('check-releasing')->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
-    public function cancelCheck(CheckStatus $id,  Request $request){
+    public function cancelCheck(CheckStatus $id, Request $request)
+    {
         $request->validate([
             'reason' => 'required|string|max:255',
         ]);
-        
+
         DB::transaction(function () use ($id, $request) {
 
             $id->update([

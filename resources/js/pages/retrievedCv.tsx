@@ -18,7 +18,11 @@ import {
     Typography,
 } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
-import { DateCalendar, LocalizationProvider } from '@mui/x-date-pickers';
+import {
+    DateCalendar,
+    DatePicker,
+    LocalizationProvider,
+} from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import dayjs, { Dayjs } from 'dayjs';
@@ -57,6 +61,8 @@ export default function RetrievedCv({
         label: '',
         value: '',
     });
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
     const [check, setCheck] = useState('1');
 
@@ -105,7 +111,7 @@ export default function RetrievedCv({
     };
 
     const handlePagination = (model: GridPaginationModel) => {
-        const page = model.page + 1; // MUI DataGrid uses 0-based index
+        const page = model.page + 1;
         const per_page = model.pageSize;
 
         router.get(
@@ -154,6 +160,22 @@ export default function RetrievedCv({
                         title="Check"
                         items={checks}
                     />
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <DatePicker
+                                label="Start Date"
+                                value={startDate}
+                                onChange={(newValue) => setStartDate(newValue)}
+                                maxDate={endDate || undefined}
+                            />
+                            <DatePicker
+                                label="End Date"
+                                value={endDate}
+                                onChange={(newValue) => setEndDate(newValue)}
+                                minDate={startDate || undefined}
+                            />
+                        </Box>
+                    </LocalizationProvider>
                 </Stack>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Box sx={{ width: '100%', p: 2 }}>
