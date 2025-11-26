@@ -146,6 +146,7 @@ export default function CvDataGrid({
 
     return (
         <>
+            
             <DataGrid
                 rows={cvs.data}
                 columns={columns}
@@ -197,7 +198,7 @@ export default function CvDataGrid({
                 bu={bu}
                 handleClose={handleClose}
             />
-            
+
             <Snackbar
                 open={openSnackBar}
                 autoHideDuration={6000}

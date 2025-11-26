@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Crf extends Model
 {
@@ -15,6 +16,15 @@ class Crf extends Model
             'date' => 'datetime',
         ];
 
+    }
+
+    public function scopeFilter(Builder $builder, $filter)
+    {
+        return $builder->when($filter['search'] ?? null, function ($query, $search) {
+            $query->whereAny([
+                'crf',
+            ], 'LIKE', '%' . $search . '%');
+        });
     }
     public function borrowedCheck()
     {

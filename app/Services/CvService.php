@@ -199,40 +199,35 @@ class CvService extends NavConnection
         return $this;
     }
 
-    public function cvs(?int $page, ?string $bu, ?string $search, User $user)
+    public function cvs(?int $page, array $filters, User $user)
     {
 
         $cv = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')
-            ->when($search, function ($query, $search) {
-                $query->whereHas('cvHeader', function (Builder $query) use ($search) {
-                    $query->whereAny([
-                        'cv_no',
-                    ], 'LIKE', '%' . $search . '%');
-                });
-            })
-            ->when($bu, function ($query, $bu) {
-                $companiesId = Company::where('name', $bu)->first('id');
-                $query->where('company_id', $companiesId->id);
-            })
+            ->filter($filters)
             ->paginate($page)
             ->withQueryString()
             ->toResourceCollection();
 
         $crfs = Crf::with('borrowedCheck')
-            ->doesntHave('checkStatus')
             ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
-            ->when($search, function ($query, $search) {
-                $query->whereAny([
-                    'crf',
-                ], 'LIKE', '%' . $search . '%');
-            })
+            ->doesntHave('checkStatus')
+            ->filter($filters)
             ->paginate($page)
             ->withQueryString()
             ->toResourceCollection();
 
         $bu = PermissionService::getCompanyPermissions($user);
+
+        $distinctMonths = CvCheckPayment::select(DB::raw('YEAR(check_date) as year'), DB::raw('MONTH(check_date) as month'))
+            ->distinct()
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get();
+
+
+        // dd($distinctMonths);
 
         return Inertia::render('retrievedCv', [
             'cv' => $cv,

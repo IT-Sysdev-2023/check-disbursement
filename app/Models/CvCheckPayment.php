@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class CvCheckPayment extends Model
 {
@@ -14,6 +15,21 @@ class CvCheckPayment extends Model
             'clearing_date' => 'datetime',
         ];
 
+    }
+
+    public function scopeFilter(Builder $builder, array $filters)
+    {
+        return $builder->when($filters['search'] ?? null, function ($query, $search) {
+            $query->whereHas('cvHeader', function (Builder $query) use ($search) {
+                $query->whereAny([
+                    'cv_no',
+                ], 'LIKE', '%' . $search . '%');
+            });
+        })
+            ->when($filters['bu'] ?? null, function ($query, $bu) {
+                $companiesId = Company::where('name', $bu)->first('id');
+                $query->where('company_id', $companiesId->id);
+            });
     }
 
     public function cvHeader()

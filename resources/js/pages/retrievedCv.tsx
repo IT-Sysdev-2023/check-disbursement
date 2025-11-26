@@ -2,8 +2,19 @@ import AppLayout from '@/layouts/app-layout';
 import { retrievedRecords } from '@/routes';
 import { Auth, Crf, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
+import {
+    Box,
+    Grid,
+    SelectChangeEvent,
+    Stack,
+    styled,
+    Typography,
+} from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
+import { DateCalendar, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { PickersDay } from '@mui/x-date-pickers/PickersDay';
+import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 import CrfDataGrid from './dashboard/components/CrfDataGrid';
 import CvDataGrid from './dashboard/components/CvDataGrid';
@@ -17,15 +28,20 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '#',
     },
 ];
+const HighlightedDay = styled(PickersDay)(({ theme }) => ({
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.common.white,
+    borderRadius: '50%',
+}));
 
 export default function RetrievedCv({
     cv,
     crf,
-    company
+    company,
 }: {
     cv: inertiaPagination<Cv>;
     crf: inertiaPagination<Crf>;
-        auth: Auth;
+    auth: Auth;
     company: { label: string; value: number }[];
 }) {
     const [bu, setBu] = useState<{ label: string; value: string }>({
@@ -107,7 +123,13 @@ export default function RetrievedCv({
             },
         );
     };
-
+    const highlightedDates: Dayjs[] = [
+        dayjs('2022-04-17'),
+        dayjs('2022-04-18'),
+        dayjs('2022-04-20'),
+        dayjs('2022-04-25'),
+    ];
+      const initialMonthYear = dayjs("2022-04-01");
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -130,13 +152,37 @@ export default function RetrievedCv({
                         items={checks}
                     />
                 </Stack>
-                <Grid container spacing={2} columns={12} sx={{mt:3}}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateCalendar
+                         referenceDate={initialMonthYear}
+                        slots={{
+                            day: (props) => {
+                                const { day, ...other } = props;
+
+                                // Check if the current day is in the highlightedDates array
+                                const isHighlighted = highlightedDates.some(
+                                    (d) => day.isSame(d, 'day'),
+                                );
+
+                                return isHighlighted ? (
+                                    <HighlightedDay day={day} {...other} />
+                                ) : (
+                                    <PickersDay day={day} {...other} />
+                                );
+                            },
+                        }}
+                    />
+                </LocalizationProvider>
+                <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
                     {check === '1' && (
                         <CvDataGrid cvs={cv} pagination={handlePagination} />
                     )}
 
-                    {check === '2' && <CrfDataGrid crf={crf} pagination={handlePagination}/>}
+                    {check === '2' && (
+                        <CrfDataGrid crf={crf} pagination={handlePagination} />
+                    )}
                 </Grid>
+
                 <Copyright sx={{ my: 4 }} />
             </Box>
         </AppLayout>
