@@ -1,6 +1,6 @@
 import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import { details, releaseCheck } from '@/routes';
-import { Cv, inertiaPagination } from '@/types';
+import { Cv, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -11,7 +11,7 @@ export default function CvReleasingDataGrid({
     cvs,
     pagination,
 }: {
-    cvs: inertiaPagination<Cv>;
+    cvs: InertiaPagination<Cv>;
     pagination: (model: GridPaginationModel) => void;
 }) {
     const [open, setOpen] = useState(false);

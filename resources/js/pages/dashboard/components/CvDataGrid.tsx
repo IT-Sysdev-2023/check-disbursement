@@ -1,6 +1,6 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import { details, scanCheck } from '@/routes';
-import { Cv, FlashReponse, inertiaPagination } from '@/types';
+import { Cv, FlashReponse, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Alert, Chip, MenuItem, Select, Snackbar } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -24,7 +24,7 @@ export default function CvDataGrid({
     cvs,
     pagination,
 }: {
-    cvs: inertiaPagination<Cv>;
+    cvs: InertiaPagination<Cv>;
     pagination: (model: GridPaginationModel) => void;
 }) {
     const [checkId, setCheckId] = useState<number | undefined>();

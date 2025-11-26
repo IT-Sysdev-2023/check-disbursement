@@ -220,19 +220,22 @@ class CvService extends NavConnection
 
         $bu = PermissionService::getCompanyPermissions($user);
 
-        $distinctMonths = CvCheckPayment::select(DB::raw('YEAR(check_date) as year'), DB::raw('MONTH(check_date) as month'))
+        $distinctDates = CvCheckPayment::select('check_date')
+            ->doesntHave('checkStatus')
             ->distinct()
-            ->orderBy('year')
-            ->orderBy('month')
             ->get();
 
+        $distinctMonths = $distinctDates->groupBy(function ($date) {
+            $date = $date->check_date->year . '-' . $date->check_date->month;
+            return $date;
+        });
 
-        // dd($distinctMonths);
 
         return Inertia::render('retrievedCv', [
             'cv' => $cv,
             'crf' => $crfs,
-            'company' => $bu
+            'company' => $bu,
+            'distinctMonths' => $distinctMonths,
         ]);
     }
 

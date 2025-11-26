@@ -1,6 +1,6 @@
 
 import { details } from '@/routes';
-import { Cv, inertiaPagination } from '@/types';
+import { Cv, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -9,7 +9,7 @@ export default function CvStatusDataGrid({
     cvs,
     pagination,
 }: {
-    cvs: inertiaPagination<Cv>;
+    cvs: InertiaPagination<Cv>;
     pagination: (model: GridPaginationModel) => void;
 }) {
 

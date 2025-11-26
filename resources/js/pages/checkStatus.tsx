@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 import { checkStatus } from '@/routes';
-import { Auth, Crf, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
+import { Auth, Crf, Cv, InertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
@@ -23,8 +23,8 @@ export default function CheckStatus({
     crf,
     auth,
 }: {
-    cv: inertiaPagination<Cv>;
-    crf: inertiaPagination<Crf>;
+    cv: InertiaPagination<Cv>;
+    crf: InertiaPagination<Crf>;
     auth: Auth;
 }) {
     const [bu, setBu] = useState<{ label: string; value: string }>({

@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 // import { retrieveCrfRecords } from '@/routes';
-import { Crf, inertiaPagination, type BreadcrumbItem } from '@/types';
+import { Crf, InertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import CrfDataGrid from './dashboard/components/CrfDataGrid';
@@ -16,7 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function RetrievedCrf({ crf }: { crf: inertiaPagination<Crf> }) {
+export default function RetrievedCrf({ crf }: { crf: InertiaPagination<Crf> }) {
 
     const [search, setSearch] = useState('');
 

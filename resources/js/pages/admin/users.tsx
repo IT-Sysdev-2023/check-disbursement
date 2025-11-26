@@ -1,6 +1,6 @@
 import AppLayout from '@/layouts/app-layout';
 // import { retrieveCrfRecords } from '@/routes';
-import { inertiaPagination, User, type BreadcrumbItem } from '@/types';
+import { InertiaPagination, User, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Box, Grid, Stack, Typography } from '@mui/material';
 import Search from '../dashboard/components/Search';
@@ -14,7 +14,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Users({ users }: { users: inertiaPagination<User> }) {
+export default function Users({ users }: { users: InertiaPagination<User> }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />

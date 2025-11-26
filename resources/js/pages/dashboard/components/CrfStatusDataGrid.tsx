@@ -1,5 +1,5 @@
 import { detailsCrf } from '@/routes';
-import { Crf, inertiaPagination } from '@/types';
+import { Crf, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -10,7 +10,7 @@ export default function CrfStatusDataGrid({
     crf,
     pagination,
 }: {
-    crf: inertiaPagination<Crf>;
+    crf: InertiaPagination<Crf>;
     pagination: (model: GridPaginationModel) => void;
 }) {
 

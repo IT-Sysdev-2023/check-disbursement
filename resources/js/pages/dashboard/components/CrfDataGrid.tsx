@@ -1,6 +1,6 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import { detailsCrf, scanCheck } from '@/routes';
-import { Crf, FlashReponse, inertiaPagination } from '@/types';
+import { Crf, FlashReponse, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import { Alert, Chip, MenuItem, Select, Snackbar } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -20,7 +20,7 @@ export default function CrfDataGrid({
     crf,
     pagination,
 }: {
-    crf: inertiaPagination<Crf>;
+    crf: InertiaPagination<Crf>;
     pagination: (model: GridPaginationModel) => void;
 }) {
     const [checkId, setCheckId] = useState<number | undefined>();

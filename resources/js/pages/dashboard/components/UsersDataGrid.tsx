@@ -1,6 +1,6 @@
 import UserModal from '@/pages/admin/components/userModal';
 import { users } from '@/routes';
-import { inertiaPagination, Permission, User } from '@/types';
+import { InertiaPagination, Permission, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Stack } from '@mui/material';
 import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
@@ -9,7 +9,7 @@ import { useState } from 'react';
 export default function UsersDataGrid({
     usersList,
 }: {
-    usersList: inertiaPagination<User>;
+    usersList: InertiaPagination<User>;
 }) {
     const [openModal, setOpenModal] = useState(false);
     const [userDetails, setUserDetails] = useState<User>();
@@ -97,11 +97,11 @@ export default function UsersDataGrid({
             <DataGrid
                 rows={usersList.data}
                 columns={columns}
-                rowCount={usersList.total}
+                rowCount={usersList.meta.total}
                 paginationMode="server"
                 paginationModel={{
-                    page: usersList.current_page - 1,
-                    pageSize: usersList.per_page,
+                    page: usersList.meta.current_page - 1,
+                    pageSize: usersList.meta.per_page,
                 }}
                 pageSizeOptions={[10, 15, 25, 50]}
                 getRowClassName={(params) =>

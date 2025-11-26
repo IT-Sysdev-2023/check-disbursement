@@ -1,6 +1,13 @@
 import AppLayout from '@/layouts/app-layout';
 import { retrievedRecords } from '@/routes';
-import { Auth, Crf, Cv, inertiaPagination, type BreadcrumbItem } from '@/types';
+import {
+    Auth,
+    Crf,
+    Cv,
+    DistinctMonths,
+    InertiaPagination,
+    type BreadcrumbItem,
+} from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
     Box,
@@ -38,10 +45,12 @@ export default function RetrievedCv({
     cv,
     crf,
     company,
+    distinctMonths,
 }: {
-    cv: inertiaPagination<Cv>;
-    crf: inertiaPagination<Crf>;
+    cv: InertiaPagination<Cv>;
+    crf: InertiaPagination<Crf>;
     auth: Auth;
+    distinctMonths: DistinctMonths;
     company: { label: string; value: number }[];
 }) {
     const [bu, setBu] = useState<{ label: string; value: string }>({
@@ -123,13 +132,7 @@ export default function RetrievedCv({
             },
         );
     };
-    const highlightedDates: Dayjs[] = [
-        dayjs('2022-04-17'),
-        dayjs('2022-04-18'),
-        dayjs('2022-04-20'),
-        dayjs('2022-04-25'),
-    ];
-      const initialMonthYear = dayjs("2022-04-01");
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -153,26 +156,70 @@ export default function RetrievedCv({
                     />
                 </Stack>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DateCalendar
-                         referenceDate={initialMonthYear}
-                        slots={{
-                            day: (props) => {
-                                const { day, ...other } = props;
+                    <Box sx={{ width: '100%', p: 2 }}>
+                        <Box
+                            sx={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(3, 1fr)',
+                                gap: 2,
+                            }}
+                        >
+                            {Object.entries(distinctMonths).map(
+                                ([key, monthGroup]) => {
+                                    const [year, month] = key.split('-');
 
-                                // Check if the current day is in the highlightedDates array
-                                const isHighlighted = highlightedDates.some(
-                                    (d) => day.isSame(d, 'day'),
-                                );
-
-                                return isHighlighted ? (
-                                    <HighlightedDay day={day} {...other} />
-                                ) : (
-                                    <PickersDay day={day} {...other} />
-                                );
-                            },
-                        }}
-                    />
+                                    const highlightedDates = monthGroup.map(
+                                        (dateObj: { check_date: string }) => {
+                                            const date = dayjs(
+                                                dateObj.check_date,
+                                            );
+                                            return date;
+                                        },
+                                    );
+                                    return (
+                                        <DateCalendar
+                                            key={key}
+                                            readOnly
+                                            referenceDate={dayjs(
+                                                `${year}-${month}-01`,
+                                            )}
+                                            onMonthChange={() => {}}
+                                            onYearChange={() => {}}
+                                            slots={{
+                                                previousIconButton: () => null,
+                                                nextIconButton: () => null,
+                                                day: (props) => {
+                                                    const { day, ...other } =
+                                                        props;
+                                                    const isHighlighted =
+                                                        highlightedDates.some(
+                                                            (d: Dayjs) =>
+                                                                day.isSame(
+                                                                    d,
+                                                                    'day',
+                                                                ),
+                                                        );
+                                                    return isHighlighted ? (
+                                                        <HighlightedDay
+                                                            day={day}
+                                                            {...other}
+                                                        />
+                                                    ) : (
+                                                        <PickersDay
+                                                            day={day}
+                                                            {...other}
+                                                        />
+                                                    );
+                                                },
+                                            }}
+                                        />
+                                    );
+                                },
+                            )}
+                        </Box>
+                    </Box>
                 </LocalizationProvider>
+
                 <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
                     {check === '1' && (
                         <CvDataGrid cvs={cv} pagination={handlePagination} />

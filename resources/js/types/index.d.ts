@@ -186,11 +186,13 @@ export interface Meta {
     to: number;
     total: number;
 }
-export interface inertiaPagination<T> {
+export interface InertiaPagination<T> {
     links: Links;
     meta: Meta;
     data: T[];
 }
+
+export type DistinctMonths = Record<string, { check_date: string }[]>;
 
 export interface ProgressState {
     [message: string]: {
