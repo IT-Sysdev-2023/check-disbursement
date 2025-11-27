@@ -143,40 +143,9 @@ export default function RetrievedCv({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
             <Box id="hero" sx={{ px: 3 }}>
-                <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                    Check Vouchers/ Check Request Form
+                <Typography component="h2" variant="h6" sx={{ mt: 2 }}>
+                    Transactions
                 </Typography>
-                <Stack direction="row" sx={{ gap: 3 }}>
-                    <Search onSearch={handleSearch} value={search} />
-                    <SelectItem
-                        handleChange={handleChange}
-                        value={bu.value}
-                        title="Company"
-                        items={company}
-                    />
-                    <SelectItem
-                        handleChange={handleChangeCheck}
-                        value={check}
-                        title="Check"
-                        items={checks}
-                    />
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <DatePicker
-                                label="Start Date"
-                                value={startDate}
-                                onChange={(newValue) => setStartDate(newValue)}
-                                maxDate={endDate || undefined}
-                            />
-                            <DatePicker
-                                label="End Date"
-                                value={endDate}
-                                onChange={(newValue) => setEndDate(newValue)}
-                                minDate={startDate || undefined}
-                            />
-                        </Box>
-                    </LocalizationProvider>
-                </Stack>
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Box sx={{ width: '100%', p: 2 }}>
                         <Box
@@ -241,7 +210,57 @@ export default function RetrievedCv({
                         </Box>
                     </Box>
                 </LocalizationProvider>
-
+                <Stack
+                    direction="row"
+                    sx={{
+                        width: '100%',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginTop: 4,
+                    }}
+                >
+                    <Stack direction="row" sx={{ gap: 3 }}>
+                        <Search onSearch={handleSearch} value={search} />
+                        <SelectItem
+                            handleChange={handleChange}
+                            value={bu.value}
+                            title="Company"
+                            items={company}
+                        />
+                        <SelectItem
+                            handleChange={handleChangeCheck}
+                            value={check}
+                            title="Check"
+                            items={checks}
+                        />
+                    </Stack>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <DatePicker
+                                label="Start Date"
+                                value={startDate}
+                                onChange={(newValue) => setStartDate(newValue)}
+                                maxDate={endDate || undefined}
+                            />
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    fontSize: '1.2rem',
+                                    color: 'text.secondary',
+                                }}
+                            >
+                                ➔
+                            </Box>
+                            <DatePicker
+                                label="End Date"
+                                value={endDate}
+                                onChange={(newValue) => setEndDate(newValue)}
+                                minDate={startDate || undefined}
+                            />
+                        </Box>
+                    </LocalizationProvider>
+                </Stack>
                 <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
                     {check === '1' && (
                         <CvDataGrid cvs={cv} pagination={handlePagination} />
