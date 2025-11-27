@@ -1,23 +1,33 @@
+import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import { retrievedRecords } from '@/routes';
+import { details, retrievedRecords, scanCheck } from '@/routes';
 import {
     Auth,
     Crf,
     Cv,
     DistinctMonths,
+    FlashReponse,
     InertiaPagination,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import {
+    Alert,
     Box,
-    Grid,
+    Chip,
+    MenuItem,
+    Select,
     SelectChangeEvent,
+    Snackbar,
     Stack,
     styled,
-    Typography,
 } from '@mui/material';
-import { GridPaginationModel } from '@mui/x-data-grid';
+import {
+    GridColDef,
+    GridFilterModel,
+    GridPaginationModel,
+    GridSortModel,
+} from '@mui/x-data-grid';
 import {
     DateCalendar,
     DatePicker,
@@ -27,11 +37,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PickersDay } from '@mui/x-date-pickers/PickersDay';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
-import CrfDataGrid from './dashboard/components/CrfDataGrid';
 import CvDataGrid from './dashboard/components/CvDataGrid';
-import Search from './dashboard/components/Search';
 import SelectItem from './dashboard/components/SelectItem';
-import Copyright from './dashboard/internals/components/Copyright';
+import PageContainer from './retrievedData/components/pageContainer';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,6 +52,20 @@ const HighlightedDay = styled(PickersDay)(({ theme }) => ({
     color: theme.palette.common.white,
     borderRadius: '50%',
 }));
+
+const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
+    const colors: { [index: string]: 'success' | 'error' | 'info' } = {
+        Signature: 'info',
+        Releasing: 'success',
+        Borrowed: 'error',
+    };
+
+    const label = ['Signature', 'Releasing'].includes(status)
+        ? 'For ' + status
+        : status;
+
+    return <Chip label={label} color={colors[status]} size="small" />;
+};
 
 export default function RetrievedCv({
     cv,
@@ -66,12 +88,17 @@ export default function RetrievedCv({
 
     const [check, setCheck] = useState('1');
 
-    const [search, setSearch] = useState('');
-
     const checks = [
         { value: '1', label: 'CV' },
         { value: '2', label: 'CRF' },
     ];
+
+    const [checkId, setCheckId] = useState<number | undefined>();
+    const [open, setOpen] = useState(false);
+    const [buBorrow, setBuBorrow] = useState('');
+    const [message, setMessage] = useState('');
+    const [openSnackBar, setOpenSnackBar] = useState(false);
+    const handleClose = () => setOpen(false);
 
     const handleChangeCheck = (event: SelectChangeEvent) => {
         setCheck(event.target.value);
@@ -125,12 +152,10 @@ export default function RetrievedCv({
         );
     };
 
-    const handleSearch = (value: string) => {
-        setSearch(value);
-
+    const handleSearch = (model: GridFilterModel) => {
         router.get(
             retrievedRecords(),
-            { search: value, bu: bu.label },
+            { search: model.quickFilterValues?.[0], bu: bu.label },
             {
                 preserveScroll: true,
                 preserveState: true,
@@ -139,13 +164,146 @@ export default function RetrievedCv({
         );
     };
 
+    const handleSort = (model: GridSortModel) => {
+        if (model.length > 0) {
+            router.get(
+                retrievedRecords(),
+                {
+                    sort: {
+                        field: model[0].field,
+                        sort: model[0].sort,
+                    },
+                },
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: true,
+                },
+            );
+        }
+    };
+
+    const columns: GridColDef[] = [
+        {
+            field: 'cvNo',
+            headerName: 'CV Number',
+            minWidth: 150,
+            renderCell: (params) => {
+                return params.row.cvHeader?.cvNo;
+            },
+        },
+        {
+            field: 'checkAmount',
+            headerName: 'Check Amount',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 80,
+        },
+        {
+            field: 'payee',
+            headerName: 'Payee',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+        },
+        {
+            field: 'name',
+            headerName: 'Business Unit',
+            headerAlign: 'center',
+            align: 'center',
+            flex: 1,
+            renderCell: (params) => {
+                return params.row.company?.name;
+            },
+        },
+        {
+            field: 'checkDate',
+            headerName: 'Check Date',
+            headerAlign: 'right',
+            align: 'right',
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            minWidth: 120,
+            renderCell: (params) => {
+                return renderStatus(
+                    params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
+                );
+            },
+        },
+        {
+            field: 'actions',
+            headerName: 'Action',
+            width: 130,
+            align: 'center',
+            headerAlign: 'center',
+            sortable: false,
+            renderCell: (params) => {
+                const { status } = params.row;
+                return (
+                    <Select
+                        size="small"
+                        value={status ?? ''}
+                        onChange={(e) =>
+                            handleStatusChange(
+                                params.row.id,
+                                e.target.value,
+                                params.row.company.name,
+                            )
+                        }
+                    >
+                        <MenuItem value="details">Check Details</MenuItem>
+                        {params.row.borrowedCheck == null && (
+                            <MenuItem value="borrow">Borrow Check</MenuItem>
+                        )}
+                        <MenuItem value="scan">Scan</MenuItem>
+                    </Select>
+                );
+            },
+        },
+    ];
+
+    const handleStatusChange = (id: number, value: string, bu: string) => {
+        if (value === 'details') {
+            router.visit(details(id));
+        }
+
+        if (value === 'borrow') {
+            setBuBorrow(bu);
+            setCheckId(id);
+            setOpen(true);
+        }
+
+        if (value === 'scan') {
+            router.post(
+                scanCheck(),
+                {
+                    check: 'cv',
+                    status: null,
+                    id: id,
+                },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                    onSuccess: (page) => {
+                        setOpenSnackBar(true);
+                        const m = page.props.flash as FlashReponse;
+                        setMessage(m.message);
+                    },
+                },
+            );
+        }
+    };
+
+    const pageTitle = 'Retrieved CV/CRF';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="CV" />
-            <Box id="hero" sx={{ px: 3 }}>
-                <Typography component="h2" variant="h6" sx={{ mt: 2 }}>
-                    Transactions
-                </Typography>
+            <PageContainer
+                title={pageTitle}
+                breadcrumbs={[{ title: pageTitle }]}
+            >
                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                     <Box sx={{ width: '100%', p: 2 }}>
                         <Box
@@ -217,10 +375,10 @@ export default function RetrievedCv({
                         alignItems: 'center',
                         justifyContent: 'space-between',
                         marginTop: 4,
+                        marginBottom: 2,
                     }}
                 >
                     <Stack direction="row" sx={{ gap: 3 }}>
-                        <Search onSearch={handleSearch} value={search} />
                         <SelectItem
                             handleChange={handleChange}
                             value={bu.value}
@@ -261,18 +419,40 @@ export default function RetrievedCv({
                         </Box>
                     </LocalizationProvider>
                 </Stack>
-                <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
-                    {check === '1' && (
-                        <CvDataGrid cvs={cv} pagination={handlePagination} />
-                    )}
+                
+                <Box sx={{ flex: 1, width: '100%' }}>
+                    <CvDataGrid
+                        cvs={cv}
+                        pagination={handlePagination}
+                        handleSearchFilter={handleSearch}
+                        handleSortFilter={handleSort}
+                        columns={columns}
+                    />
+                </Box>
+            </PageContainer>
 
-                    {check === '2' && (
-                        <CrfDataGrid crf={crf} pagination={handlePagination} />
-                    )}
-                </Grid>
+            <BorrowedCheckModal
+                whichCheck="cv"
+                checkId={checkId}
+                open={open}
+                bu={buBorrow}
+                handleClose={handleClose}
+            />
 
-                <Copyright sx={{ my: 4 }} />
-            </Box>
+            <Snackbar
+                open={openSnackBar}
+                autoHideDuration={6000}
+                onClose={handleClose}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="success"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                    {message}
+                </Alert>
+            </Snackbar>
         </AppLayout>
     );
 }

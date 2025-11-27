@@ -97,11 +97,11 @@ export default function UsersDataGrid({
             <DataGrid
                 rows={usersList.data}
                 columns={columns}
-                rowCount={usersList.meta.total}
+                rowCount={usersList.total}
                 paginationMode="server"
                 paginationModel={{
-                    page: usersList.meta.current_page - 1,
-                    pageSize: usersList.meta.per_page,
+                    page: usersList.current_page - 1,
+                    pageSize: usersList.per_page,
                 }}
                 pageSizeOptions={[10, 15, 25, 50]}
                 getRowClassName={(params) =>

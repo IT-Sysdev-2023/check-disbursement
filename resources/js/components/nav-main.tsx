@@ -48,8 +48,6 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const releasing = roles.includes('releasing');
     const scanning = roles.includes('scanning');
 
-    console.log(roles);
-
     const [openItem, setOpenItem] = useState<string | null>(null);
 
     // 🔹 Append "Users" only if admin

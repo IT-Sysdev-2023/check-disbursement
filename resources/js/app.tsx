@@ -1,11 +1,16 @@
-import '../css/app.css';
-
 import { createInertiaApp } from '@inertiajs/react';
 import { configureEcho } from '@laravel/echo-react';
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { CssBaseline, createTheme } from '@mui/material';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
+import '../css/app.css';
 import { initializeTheme } from './hooks/use-appearance';
+import DialogsProvider from './pages/retrievedData/components/dialogs/dialogsProvider';
+import NotificationsProvider from './pages/retrievedData/components/notifications/notificationsProvider';
+import { dataGridCustomizations } from './themes/customizations/dataGridCustomizations';
+import { formInputCustomizations } from './themes/customizations/formInputCustomizations';
+import AppTheme from './themes/shared-theme/AppTheme';
 
 configureEcho({
     broadcaster: 'reverb',
@@ -29,24 +34,38 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        const defaultTheme = createTheme({
-            colorSchemes: { light: true, dark: true },
-            cssVariables: {
-                colorSchemeSelector: 'data-mui-color-scheme',
-            },
-            // typography: {
-            //   fontFamily: 'Segoe UI Emoji'
-            // }
-        });
+        // const defaultTheme = createTheme({
+        //     colorSchemes: { light: true, dark: true },
+        //     cssVariables: {
+        //         colorSchemeSelector: 'data-mui-color-scheme',
+        //     },
+        //     components: {
+        //         ...dataGridCustomizations,
+        //         ...formInputCustomizations,
+        //     },
+        //     typography: {
+        //       fontFamily: 'Roboto'
+        //     }
+        // });
+
+        const themeComponents = {
+            ...dataGridCustomizations,
+            ...formInputCustomizations,
+            // ...datePickersCustomizations,
+        };
 
         root.render(
-            <ThemeProvider theme={defaultTheme}>
+            // <ThemeProvider theme={defaultTheme}>
+            <AppTheme themeComponents={themeComponents}>
                 <CssBaseline />
-                <App {...props} />
-            </ThemeProvider>,
-            // <ThemeProviderWithAppearance>
-            //   <App {...props} />
-            // </ThemeProviderWithAppearance>
+                <NotificationsProvider>
+                    <DialogsProvider>
+                        <BrowserRouter>
+                            <App {...props} />
+                        </BrowserRouter>
+                    </DialogsProvider>
+                </NotificationsProvider>
+            </AppTheme>,
         );
     },
     progress: {

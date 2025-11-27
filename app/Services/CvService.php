@@ -201,7 +201,7 @@ class CvService extends NavConnection
 
     public function cvs(?int $page, array $filters, User $user)
     {
-
+        
         $cv = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')

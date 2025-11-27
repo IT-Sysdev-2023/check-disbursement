@@ -59,8 +59,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('cancel-check/{id}', 'cancelCheck')->name('cancel-check');
     });
 
-    Route::get('report', function () {
-        return Inertia::render('dashboard');
+    // Route::get('report', function () {
+    //     return Inertia::render('crud-dashboard/CrudDashboard');
+    // })->name('report');
+
+      Route::get('report', function () {
+        return Inertia::render('retrievedData/employeeList');
     })->name('report');
 
     Route::get('about', function () {

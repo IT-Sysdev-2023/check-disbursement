@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class CvCheckPayment extends Model
 {
@@ -29,6 +31,31 @@ class CvCheckPayment extends Model
             ->when($filters['bu'] ?? null, function ($query, $bu) {
                 $companiesId = Company::where('name', $bu)->first('id');
                 $query->where('company_id', $companiesId->id);
+            })
+            ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
+
+                $field = Str::snake($sort['field']);
+                $direction = $sort['sort'];
+
+                // Main table
+                if (Schema::hasColumn('cv_check_payments', $field)) {
+                    return $query->orderBy($field, $direction);
+                }
+
+                // cvHeader relationship
+                if (Schema::hasColumn('cv_headers', $field)) {
+                    return $query->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+                        ->orderBy("cv_headers.$field", $direction)
+                        ->select('cv_check_payments.*');
+                }
+
+                // company relationship
+                if (Schema::hasColumn('companies', $field)) {
+                    return $query->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
+                        ->orderBy("companies.$field", $direction)
+                        ->select('cv_check_payments.*');
+                }
+
             });
     }
 
