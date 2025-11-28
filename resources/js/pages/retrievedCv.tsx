@@ -59,13 +59,12 @@ export default function RetrievedCv({
     company,
     distinctMonths,
 }: {
-    selectedBu: string,
+    selectedBu: string;
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
 }) {
-   
     const [check, setCheck] = useState('cv');
     const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
@@ -74,21 +73,6 @@ export default function RetrievedCv({
     const [message, setMessage] = useState('');
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const handleClose = () => setOpen(false);
-
-    const handlePagination = (model: GridPaginationModel) => {
-        const page = model.page + 1;
-        const per_page = model.pageSize;
-
-        // router.get(
-        //     retrievedRecords(),
-        //     { page, per_page, bu: bu.label },
-        //     {
-        //         preserveScroll: true,
-        //         preserveState: true,
-        //         replace: true,
-        //     },
-        // );
-    };
 
     const handleSearch = (model: GridFilterModel) => {
         // router.get(
@@ -327,34 +311,41 @@ export default function RetrievedCv({
         }
     };
 
+    const handlePagination = (model: GridPaginationModel) => {
+        const page = model.page + 1;
+        const per_page = model.pageSize;
+
+        router.reload({
+            data: {
+                page: page,
+                per_page: per_page,
+            },
+            preserveScroll: true, //Dont Remove( Mugana ni.. gibitok ra ang vs code)
+            preserveState: true,
+        });
+    };
+
     const handleCheck = (event: SelectChangeEvent) => {
         setCheck(event.target.value);
         router.reload({
             preserveScroll: true,
             only: ['crf'],
-            onStart: () => {
-                setTableLoading(true);
-            },
-            onFinish: () => {
-                setTableLoading(false);
-            },
+            replace: true,
+            onStart: () => setTableLoading(true),
+            onFinish: () => setTableLoading(false),
         });
-        // console.log(crf);
     };
     const pageTitle = 'Retrieved CV/CRF';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <PageContainer
-                title={pageTitle}
-            >
+            <PageContainer title={pageTitle}>
                 <TableFilter
-                    isCrf={ check === 'crf'}
+                    isCrf={check === 'crf'}
                     handleChangeCheck={handleCheck}
                     distinctMonths={distinctMonths}
                     company={company}
                     selectedBu={selectedBu}
                     check={check}
-                    
                 />
 
                 <TableDataGrid

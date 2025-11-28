@@ -24,7 +24,7 @@ export default function TableDataGrid({
     pagination: (model: GridPaginationModel) => void;
     handleSearchFilter: (model: GridFilterModel) => void;
     handleSortFilter: (model: GridSortModel) => void;
-}) {
+    }) {
     const handleSortModelChange = useCallback(
         (model: GridSortModel) => {
             handleSortFilter(model);
