@@ -47,7 +47,7 @@ class CvController extends Controller
         $perPage = $request->per_page;
         $filters = $request->only(['bu', 'search','sort']);
 
-        // dd(json_decode( $filters['sort'], true)[0]);
+        // dd($filters);
         return $this->service->cvs($perPage, $filters, $request->user());
     }
 

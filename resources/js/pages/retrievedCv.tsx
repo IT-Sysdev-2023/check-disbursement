@@ -2,16 +2,23 @@ import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
 import { details, retrievedRecords, scanCheck } from '@/routes';
 import {
-    Auth,
     Crf,
     Cv,
     DistinctMonths,
     FlashReponse,
     InertiaPagination,
+    SelectionType,
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import { Alert, Box, Chip, MenuItem, Select, Snackbar } from '@mui/material';
+import {
+    Alert,
+    Chip,
+    MenuItem,
+    Select,
+    SelectChangeEvent,
+    Snackbar,
+} from '@mui/material';
 import {
     GridColDef,
     GridFilterModel,
@@ -19,8 +26,8 @@ import {
     GridSortModel,
 } from '@mui/x-data-grid';
 import { useState } from 'react';
-import CvDataGrid from './dashboard/components/CvDataGrid';
 
+import TableDataGrid from './dashboard/components/TableDataGrid';
 import PageContainer from './retrievedData/components/pageContainer';
 import TableFilter from './retrievedData/components/tableFilter';
 
@@ -46,24 +53,23 @@ const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
 };
 
 export default function RetrievedCv({
+    selectedBu,
     cv,
     crf,
     company,
     distinctMonths,
 }: {
+    selectedBu: string,
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
-    auth: Auth;
     distinctMonths: DistinctMonths;
-    company: { label: string; value: number }[];
+    company: SelectionType[];
 }) {
-    const [bu, setBu] = useState<{ label: string; value: string }>({
-        label: '',
-        value: '',
-    });
-
+   
+    const [check, setCheck] = useState('cv');
     const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
     const [buBorrow, setBuBorrow] = useState('');
     const [message, setMessage] = useState('');
     const [openSnackBar, setOpenSnackBar] = useState(false);
@@ -73,27 +79,27 @@ export default function RetrievedCv({
         const page = model.page + 1;
         const per_page = model.pageSize;
 
-        router.get(
-            retrievedRecords(),
-            { page, per_page, bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
+        // router.get(
+        //     retrievedRecords(),
+        //     { page, per_page, bu: bu.label },
+        //     {
+        //         preserveScroll: true,
+        //         preserveState: true,
+        //         replace: true,
+        //     },
+        // );
     };
 
     const handleSearch = (model: GridFilterModel) => {
-        router.get(
-            retrievedRecords(),
-            { search: model.quickFilterValues?.[0], bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
+        // router.get(
+        //     retrievedRecords(),
+        //     { search: model.quickFilterValues?.[0], bu: bu.label },
+        //     {
+        //         preserveScroll: true,
+        //         preserveState: true,
+        //         replace: true,
+        //     },
+        // );
     };
 
     const handleSort = (model: GridSortModel) => {
@@ -115,7 +121,7 @@ export default function RetrievedCv({
         }
     };
 
-    const columns: GridColDef[] = [
+    const cvColumns: GridColDef[] = [
         {
             field: 'cvNo',
             headerName: 'CV Number',
@@ -197,6 +203,98 @@ export default function RetrievedCv({
         },
     ];
 
+    const crfcolumns: GridColDef[] = [
+        {
+            field: 'crf',
+            headerName: 'CRF #',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 80,
+        },
+        {
+            field: 'company',
+            headerName: 'Company',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 80,
+        },
+        {
+            field: 'no',
+            headerName: 'No.',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 80,
+        },
+        {
+            field: 'paidTo',
+            headerName: 'Paid To',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 100,
+        },
+        {
+            field: 'amount',
+            headerName: 'Amount',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 100,
+        },
+        {
+            field: 'ckNo',
+            headerName: 'CK No.',
+            headerAlign: 'right',
+            align: 'right',
+            flex: 1,
+            minWidth: 100,
+        },
+        {
+            field: 'status',
+            headerName: 'Status',
+            minWidth: 120,
+            renderCell: (params) => {
+                return renderStatus(
+                    params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
+                );
+            },
+        },
+        {
+            field: 'actions',
+            headerName: 'Action',
+            width: 130,
+            align: 'center',
+            headerAlign: 'center',
+            sortable: false,
+            renderCell: (params) => {
+                const { status } = params.row;
+                return (
+                    <Select
+                        size="small"
+                        value={status ?? ''}
+                        label="For Signature"
+                        onChange={(e) =>
+                            handleStatusChange(
+                                params.row.id,
+                                e.target.value,
+                                params.row.company,
+                            )
+                        }
+                    >
+                        <MenuItem value="details">Check Details</MenuItem>
+                        {params.row.borrowedCheck == null && (
+                            <MenuItem value="borrow">Borrow Check</MenuItem>
+                        )}
+                        <MenuItem value="scan">Scan</MenuItem>
+                    </Select>
+                );
+            },
+        },
+    ];
+
     const handleStatusChange = (id: number, value: string, bu: string) => {
         if (value === 'details') {
             router.visit(details(id));
@@ -229,33 +327,44 @@ export default function RetrievedCv({
         }
     };
 
+    const handleCheck = (event: SelectChangeEvent) => {
+        setCheck(event.target.value);
+        router.reload({
+            preserveScroll: true,
+            only: ['crf'],
+            onStart: () => {
+                setTableLoading(true);
+            },
+            onFinish: () => {
+                setTableLoading(false);
+            },
+        });
+        // console.log(crf);
+    };
     const pageTitle = 'Retrieved CV/CRF';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer
                 title={pageTitle}
-                breadcrumbs={[{ title: pageTitle }]}
             >
                 <TableFilter
+                    isCrf={ check === 'crf'}
+                    handleChangeCheck={handleCheck}
                     distinctMonths={distinctMonths}
                     company={company}
-                    bu={bu}
-                    setBu={(selectedItem) =>
-                        setBu({
-                            label: selectedItem?.label,
-                            value: String(selectedItem?.value),
-                        })
-                    }
+                    selectedBu={selectedBu}
+                    check={check}
+                    
                 />
-                <Box sx={{ flex: 1, width: '100%' }}>
-                    <CvDataGrid
-                        cvs={cv}
-                        pagination={handlePagination}
-                        handleSearchFilter={handleSearch}
-                        handleSortFilter={handleSort}
-                        columns={columns}
-                    />
-                </Box>
+
+                <TableDataGrid
+                    data={check === 'cv' ? cv : crf}
+                    pagination={handlePagination}
+                    handleSearchFilter={handleSearch}
+                    handleSortFilter={handleSort}
+                    columns={check === 'cv' ? cvColumns : crfcolumns}
+                    isLoading={tableLoading}
+                />
             </PageContainer>
 
             <BorrowedCheckModal

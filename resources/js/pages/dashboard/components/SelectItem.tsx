@@ -9,6 +9,7 @@ interface SelectItemProps {
     items: { label: string; value: string | number }[];
     handleChange: (e: SelectChangeEvent) => void;
     value: string;
+    isDisabled?: boolean
 }
 
 export default function SelectItem({
@@ -16,12 +17,14 @@ export default function SelectItem({
     items,
     handleChange,
     value,
+    isDisabled = false
 }: SelectItemProps) {
     return (
         <Box sx={{ minWidth: 120 }}>
             <FormControl fullWidth>
                 <InputLabel id={`${title}-label`}>{title}</InputLabel>
                 <Select
+                    disabled={isDisabled}
                     labelId={`${title}-label`}
                     id={`${title}-select`}
                     value={value}

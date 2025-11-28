@@ -201,7 +201,7 @@ class CvService extends NavConnection
 
     public function cvs(?int $page, array $filters, User $user)
     {
-        
+
         $cv = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')
@@ -210,13 +210,6 @@ class CvService extends NavConnection
             ->withQueryString()
             ->toResourceCollection();
 
-        $crfs = Crf::with('borrowedCheck')
-            ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
-            ->doesntHave('checkStatus')
-            ->filter($filters)
-            ->paginate($page)
-            ->withQueryString()
-            ->toResourceCollection();
 
         $bu = PermissionService::getCompanyPermissions($user);
 
@@ -230,10 +223,21 @@ class CvService extends NavConnection
             return $date;
         });
 
+        $crfs = Inertia::lazy(
+            fn() =>
+            Crf::with('borrowedCheck')
+                ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
+                ->doesntHave('checkStatus')
+                ->filter($filters)
+                ->paginate($page)
+                ->withQueryString()
+                ->toResourceCollection()
+        );
 
         return Inertia::render('retrievedCv', [
             'cv' => $cv,
             'crf' => $crfs,
+            'selectedBu' => $filters['bu'] ?? '0',
             'company' => $bu,
             'distinctMonths' => $distinctMonths,
         ]);

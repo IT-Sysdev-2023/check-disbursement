@@ -66,7 +66,7 @@ export interface User {
 
 export interface SelectionType {
     label: string;
-    value: number;
+    value: number | string;
 }
 
 export interface Company {

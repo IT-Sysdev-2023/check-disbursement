@@ -29,8 +29,7 @@ class CvCheckPayment extends Model
             });
         })
             ->when($filters['bu'] ?? null, function ($query, $bu) {
-                $companiesId = Company::where('name', $bu)->first('id');
-                $query->where('company_id', $companiesId->id);
+                $query->where('company_id', $bu);
             })
             ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
 

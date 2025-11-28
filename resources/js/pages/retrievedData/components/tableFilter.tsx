@@ -1,6 +1,5 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { retrievedRecords } from '@/routes';
-import { DistinctMonths } from '@/types';
+import { DistinctMonths, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 import { Box, SelectChangeEvent, Stack, styled } from '@mui/material';
 import {
@@ -19,60 +18,38 @@ const HighlightedDay = styled(PickersDay)(({ theme }) => ({
     borderRadius: '50%',
 }));
 
+const checks = [
+    { value: 'cv', label: 'CV' },
+    { value: 'crf', label: 'CRF' },
+];
+
 export default function ({
     distinctMonths,
     company,
-    bu,
-    setBu
+    check,
+    handleChangeCheck,
+    selectedBu,
+    isCrf,
 }: {
     distinctMonths: DistinctMonths;
-    company: { label: string; value: number }[];
-        bu: { label: string; value: string };
-        setBu: (value: { label: string; value: number }) => void;
-    }) {
-    
+    company: SelectionType[];
+    selectedBu: string;
+    check: string;
+    isCrf: boolean;
+    handleChangeCheck: (value: SelectChangeEvent) => void;
+}) {
+    const [bu, setBu] = useState<string>(selectedBu);
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
-    const [check, setCheck] = useState('1');
-
-    const checks = [
-        { value: '1', label: 'CV' },
-        { value: '2', label: 'CRF' },
-    ];
-
-    const handleChangeCheck = (event: SelectChangeEvent) => {
-        setCheck(event.target.value);
-
-        router.get(
-            retrievedRecords(),
-            { bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
-
     const handleChange = (event: SelectChangeEvent) => {
-        const selectedItem: {label: string; value: number} | undefined = company.find(
-            (item) => item.value == Number(event.target.value),
-        );
-
-        if (selectedItem) {
-            setBu(selectedItem);
-        }
-
-        router.get(
-            retrievedRecords(),
-            { bu: selectedItem?.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
+        setBu(event.target.value);
+        router.reload({
+            only: ['cv'],
+            data: {
+                bu: event.target.value,
             },
-        );
+        });
     };
 
     return (
@@ -150,8 +127,9 @@ export default function ({
             >
                 <Stack direction="row" sx={{ gap: 3 }}>
                     <SelectItem
+                        isDisabled={isCrf}
                         handleChange={handleChange}
-                        value={bu.value}
+                        value={bu}
                         title="Company"
                         items={company}
                     />
