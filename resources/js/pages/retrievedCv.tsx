@@ -11,35 +11,18 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import {
-    Alert,
-    Box,
-    Chip,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-    Snackbar,
-    Stack,
-    styled,
-} from '@mui/material';
+import { Alert, Box, Chip, MenuItem, Select, Snackbar } from '@mui/material';
 import {
     GridColDef,
     GridFilterModel,
     GridPaginationModel,
     GridSortModel,
 } from '@mui/x-data-grid';
-import {
-    DateCalendar,
-    DatePicker,
-    LocalizationProvider,
-} from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { PickersDay } from '@mui/x-date-pickers/PickersDay';
-import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 import CvDataGrid from './dashboard/components/CvDataGrid';
-import SelectItem from './dashboard/components/SelectItem';
+
 import PageContainer from './retrievedData/components/pageContainer';
+import TableFilter from './retrievedData/components/tableFilter';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -47,11 +30,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '#',
     },
 ];
-const HighlightedDay = styled(PickersDay)(({ theme }) => ({
-    backgroundColor: theme.palette.primary.main,
-    color: theme.palette.common.white,
-    borderRadius: '50%',
-}));
 
 const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
     const colors: { [index: string]: 'success' | 'error' | 'info' } = {
@@ -83,15 +61,6 @@ export default function RetrievedCv({
         label: '',
         value: '',
     });
-    const [startDate, setStartDate] = useState<Dayjs | null>(null);
-    const [endDate, setEndDate] = useState<Dayjs | null>(null);
-
-    const [check, setCheck] = useState('1');
-
-    const checks = [
-        { value: '1', label: 'CV' },
-        { value: '2', label: 'CRF' },
-    ];
 
     const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
@@ -99,43 +68,6 @@ export default function RetrievedCv({
     const [message, setMessage] = useState('');
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const handleClose = () => setOpen(false);
-
-    const handleChangeCheck = (event: SelectChangeEvent) => {
-        setCheck(event.target.value);
-
-        router.get(
-            retrievedRecords(),
-            { bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
-
-    const handleChange = (event: SelectChangeEvent) => {
-        const selectedItem = company.find(
-            (item) => item.value == Number(event.target.value),
-        );
-
-        if (selectedItem) {
-            setBu({
-                label: selectedItem?.label,
-                value: String(selectedItem?.value),
-            });
-        }
-
-        router.get(
-            retrievedRecords(),
-            { bu: selectedItem?.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
 
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1;
@@ -304,122 +236,17 @@ export default function RetrievedCv({
                 title={pageTitle}
                 breadcrumbs={[{ title: pageTitle }]}
             >
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <Box sx={{ width: '100%', p: 2 }}>
-                        <Box
-                            sx={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(3, 1fr)',
-                                gap: 2,
-                            }}
-                        >
-                            {Object.entries(distinctMonths).map(
-                                ([key, monthGroup]) => {
-                                    const [year, month] = key.split('-');
-
-                                    const highlightedDates = monthGroup.map(
-                                        (dateObj: { check_date: string }) => {
-                                            const date = dayjs(
-                                                dateObj.check_date,
-                                            );
-                                            return date;
-                                        },
-                                    );
-                                    return (
-                                        <DateCalendar
-                                            key={key}
-                                            readOnly
-                                            referenceDate={dayjs(
-                                                `${year}-${month}-01`,
-                                            )}
-                                            onMonthChange={() => {}}
-                                            onYearChange={() => {}}
-                                            slots={{
-                                                previousIconButton: () => null,
-                                                nextIconButton: () => null,
-                                                day: (props) => {
-                                                    const { day, ...other } =
-                                                        props;
-                                                    const isHighlighted =
-                                                        highlightedDates.some(
-                                                            (d: Dayjs) =>
-                                                                day.isSame(
-                                                                    d,
-                                                                    'day',
-                                                                ),
-                                                        );
-                                                    return isHighlighted ? (
-                                                        <HighlightedDay
-                                                            day={day}
-                                                            {...other}
-                                                        />
-                                                    ) : (
-                                                        <PickersDay
-                                                            day={day}
-                                                            {...other}
-                                                        />
-                                                    );
-                                                },
-                                            }}
-                                        />
-                                    );
-                                },
-                            )}
-                        </Box>
-                    </Box>
-                </LocalizationProvider>
-                <Stack
-                    direction="row"
-                    sx={{
-                        width: '100%',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        marginTop: 4,
-                        marginBottom: 2,
-                    }}
-                >
-                    <Stack direction="row" sx={{ gap: 3 }}>
-                        <SelectItem
-                            handleChange={handleChange}
-                            value={bu.value}
-                            title="Company"
-                            items={company}
-                        />
-                        <SelectItem
-                            handleChange={handleChangeCheck}
-                            value={check}
-                            title="Check"
-                            items={checks}
-                        />
-                    </Stack>
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <DatePicker
-                                label="Start Date"
-                                value={startDate}
-                                onChange={(newValue) => setStartDate(newValue)}
-                                maxDate={endDate || undefined}
-                            />
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    fontSize: '1.2rem',
-                                    color: 'text.secondary',
-                                }}
-                            >
-                                ➔
-                            </Box>
-                            <DatePicker
-                                label="End Date"
-                                value={endDate}
-                                onChange={(newValue) => setEndDate(newValue)}
-                                minDate={startDate || undefined}
-                            />
-                        </Box>
-                    </LocalizationProvider>
-                </Stack>
-                
+                <TableFilter
+                    distinctMonths={distinctMonths}
+                    company={company}
+                    bu={bu}
+                    setBu={(selectedItem) =>
+                        setBu({
+                            label: selectedItem?.label,
+                            value: String(selectedItem?.value),
+                        })
+                    }
+                />
                 <Box sx={{ flex: 1, width: '100%' }}>
                     <CvDataGrid
                         cvs={cv}
