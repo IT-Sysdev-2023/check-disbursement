@@ -161,8 +161,10 @@ export const createCrfColumns = (
         minWidth: 120,
         sortable: false,
         renderCell: (params) => {
+            const { row } = params;
+            // console.log(row);
             return renderStatus(
-                params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
+                row?.borrowedCheck ? 'Borrowed' : 'Signature',
             );
         },
     },

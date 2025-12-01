@@ -220,7 +220,7 @@ class CvService extends NavConnection
                 self::crfRecords($filters, $page))
             : self::crfRecords($filters, $page); // use for when refresh( it doesnt load when refresh cause its on lazy)
 
-        return Inertia::render('retrievedCv', [
+        return Inertia::render('retrievedRecords', [
             'cv' => $cvRecords,
             'crf' => $crfs,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',

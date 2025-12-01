@@ -60,7 +60,7 @@ class StatusController extends Controller
             'check' => 'required| string',
             'id' => 'required'
         ]);
-
+        
         $request->user()->borrowedChecks()->create([
             'check_id' => $request->id,
             'name' => $request->name,
@@ -78,7 +78,6 @@ class StatusController extends Controller
             'check' => 'required| string',
             'status' => 'nullable | string',
         ]);
-
         $request->user()->checkStatuses()->create([
             'check_id' => $request->id,
             'status' => $request->status,

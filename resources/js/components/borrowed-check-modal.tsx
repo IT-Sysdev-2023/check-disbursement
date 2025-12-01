@@ -31,7 +31,6 @@ export default function BorrowedCheckModal({
     bu: string;
     handleClose: () => void;
 }) {
-    // const [open, setOpen] = useState(false);
 
     const { data, setData, post, processing, errors, transform, reset } =
         useForm({
@@ -112,7 +111,6 @@ export default function BorrowedCheckModal({
                                     error={!!errors.reason}
                                     helperText={errors.reason}
                                     multiline
-                                    rows={4}
                                     fullWidth
                                 />
                             </Grid>

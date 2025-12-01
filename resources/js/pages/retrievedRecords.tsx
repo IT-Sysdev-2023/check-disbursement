@@ -37,7 +37,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function RetrievedCv({
+export default function RetrievedRecords({
     cv,
     crf,
     defaultCheck,
@@ -185,7 +185,7 @@ export default function RetrievedCv({
             </PageContainer>
 
             <BorrowedCheckModal
-                whichCheck="cv"
+                whichCheck={check}
                 checkId={checkId}
                 open={open}
                 bu={buBorrow}
