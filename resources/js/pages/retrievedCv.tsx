@@ -1,9 +1,12 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import { details, scanCheck } from '@/routes';
+import { details, detailsCrf, scanCheck } from '@/routes';
 import {
+    ActionHandler,
+    ActionType,
     Crf,
     Cv,
+    DateFilterType,
     DistinctMonths,
     FlashReponse,
     InertiaPagination,
@@ -11,16 +14,8 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
+import { Alert, SelectChangeEvent, Snackbar } from '@mui/material';
 import {
-    Alert,
-    Chip,
-    MenuItem,
-    Select,
-    SelectChangeEvent,
-    Snackbar,
-} from '@mui/material';
-import {
-    GridColDef,
     GridFilterModel,
     GridPaginationModel,
     GridSortModel,
@@ -28,6 +23,10 @@ import {
 import { useState } from 'react';
 
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import {
+    createCrfColumns,
+    createCvColumns,
+} from './retrievedData/components/columns';
 import PageContainer from './retrievedData/components/pageContainer';
 import TableFilter from './retrievedData/components/tableFilter';
 
@@ -38,38 +37,26 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
-    const colors: { [index: string]: 'success' | 'error' | 'info' } = {
-        Signature: 'info',
-        Releasing: 'success',
-        Borrowed: 'error',
-    };
-
-    const label = ['Signature', 'Releasing'].includes(status)
-        ? 'For ' + status
-        : status;
-
-    return <Chip label={label} color={colors[status]} size="small" />;
-};
-
 export default function RetrievedCv({
-    filter,
     cv,
     crf,
+    defaultCheck,
+    filter,
     company,
     distinctMonths,
 }: {
     filter: {
         selectedBu: string;
         search: string;
-        date: { start: string | null; end: string | null };
+        date: DateFilterType;
     };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
+    defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
 }) {
-    const [check, setCheck] = useState('cv');
+    const [check, setCheck] = useState(defaultCheck);
     const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
@@ -109,200 +96,21 @@ export default function RetrievedCv({
         });
     };
 
-    const cvColumns: GridColDef[] = [
-        {
-            field: 'cvNo',
-            headerName: 'CV Number',
-            minWidth: 150,
-            renderCell: (params) => {
-                return params.row.cvHeader?.cvNo;
-            },
+    const actionHandlers: Record<string, ActionHandler> = {
+        details: (id) => {
+            if (check === 'cv') router.visit(details(id));
+            else router.visit(detailsCrf(id));
         },
-        {
-            field: 'checkAmount',
-            headerName: 'Check Amount',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 80,
-        },
-        {
-            field: 'payee',
-            headerName: 'Payee',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-        },
-        {
-            field: 'name',
-            headerName: 'Business Unit',
-            headerAlign: 'center',
-            align: 'center',
-            flex: 1,
-            renderCell: (params) => {
-                return params.row.company?.name;
-            },
-        },
-        {
-            field: 'checkDate',
-            headerName: 'Check Date',
-            headerAlign: 'right',
-            align: 'right',
-        },
-        {
-            field: 'status',
-            headerName: 'Status',
-            minWidth: 120,
-            renderCell: (params) => {
-                return renderStatus(
-                    params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
-                );
-            },
-        },
-        {
-            field: 'actions',
-            headerName: 'Action',
-            width: 130,
-            align: 'center',
-            headerAlign: 'center',
-            sortable: false,
-            renderCell: (params) => {
-                const { status } = params.row;
-                return (
-                    <Select
-                        size="small"
-                        value={status ?? ''}
-                        onChange={(e) =>
-                            handleStatusChange(
-                                params.row.id,
-                                e.target.value,
-                                params.row.company.name,
-                            )
-                        }
-                    >
-                        <MenuItem value="details">Check Details</MenuItem>
-                        {params.row.borrowedCheck == null && (
-                            <MenuItem value="borrow">Borrow Check</MenuItem>
-                        )}
-                        <MenuItem value="scan">Scan</MenuItem>
-                    </Select>
-                );
-            },
-        },
-    ];
-
-    const crfColumns: GridColDef[] = [
-        {
-            field: 'crf',
-            headerName: 'CRF #',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 80,
-        },
-        {
-            field: 'company',
-            headerName: 'Company',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 80,
-        },
-        {
-            field: 'no',
-            headerName: 'No.',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 80,
-        },
-        {
-            field: 'paidTo',
-            headerName: 'Paid To',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 100,
-        },
-        {
-            field: 'amount',
-            headerName: 'Amount',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 100,
-        },
-        {
-            field: 'ckNo',
-            headerName: 'CK No.',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
-            minWidth: 100,
-        },
-        {
-            field: 'status',
-            headerName: 'Status',
-            minWidth: 120,
-            sortable: false,
-            renderCell: (params) => {
-                return renderStatus(
-                    params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
-                );
-            },
-        },
-        {
-            field: 'actions',
-            headerName: 'Action',
-            width: 130,
-            align: 'center',
-            headerAlign: 'center',
-            sortable: false,
-            renderCell: (params) => {
-                const { status } = params.row;
-                return (
-                    <Select
-                        size="small"
-                        value={status ?? ''}
-                        label="For Signature"
-                        onChange={(e) =>
-                            handleStatusChange(
-                                params.row.id,
-                                e.target.value,
-                                params.row.company,
-                            )
-                        }
-                    >
-                        <MenuItem value="details">Check Details</MenuItem>
-                        {params.row.borrowedCheck == null && (
-                            <MenuItem value="borrow">Borrow Check</MenuItem>
-                        )}
-                        <MenuItem value="scan">Scan</MenuItem>
-                    </Select>
-                );
-            },
-        },
-    ];
-
-    const handleStatusChange = (id: number, value: string, bu: string) => {
-        if (value === 'details') {
-            router.visit(details(id));
-        }
-
-        if (value === 'borrow') {
+        borrow: (id, bu) => {
+            if (!bu) return;
             setBuBorrow(bu);
             setCheckId(id);
             setOpen(true);
-        }
-
-        if (value === 'scan') {
+        },
+        scan: (id) => {
             router.post(
                 scanCheck(),
-                {
-                    check: 'cv',
-                    status: null,
-                    id: id,
-                },
+                { check, status: null, id },
                 {
                     preserveScroll: true,
                     preserveState: true,
@@ -313,7 +121,12 @@ export default function RetrievedCv({
                     },
                 },
             );
-        }
+        },
+    };
+
+    const handleStatusChange = (id: number, value: ActionType, bu: string) => {
+        const handler = actionHandlers[value];
+        if (handler) handler(id, bu);
     };
 
     const handlePagination = (model: GridPaginationModel) => {
@@ -333,6 +146,9 @@ export default function RetrievedCv({
     const handleCheck = (event: SelectChangeEvent) => {
         setCheck(event.target.value);
         router.reload({
+            data: {
+                selectedCheck: event.target.value
+            },
             preserveScroll: true, //Dont bother with the line error( Mugana ni.. gibitok ra ang vs code)
             only: ['crf'],
             replace: true,
@@ -340,6 +156,10 @@ export default function RetrievedCv({
             onFinish: () => setTableLoading(false),
         });
     };
+
+    const cvColumns = createCvColumns(handleStatusChange);
+    const crfColumns = createCrfColumns(handleStatusChange);
+
     const pageTitle = 'Retrieved CV/CRF';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

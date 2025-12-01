@@ -69,6 +69,15 @@ export interface SelectionType {
     value: number | string;
 }
 
+export interface DateFilterType {
+    start: string | null;
+    end: string | null;
+}
+
+export type ActionHandler = (id: number, bu?: string) => void;
+
+export type ActionType = 'details' | 'borrow' | 'scan';
+
 export interface Company {
     id: number;
     code: string;

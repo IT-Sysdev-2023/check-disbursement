@@ -88,7 +88,7 @@ export default function TableDataGrid({
             onRowClick={handleRowClick}
             loading={isLoading}
             showToolbar
-            pageSizeOptions={[5, 10, 25]}
+            pageSizeOptions={[5, 10, 15, 25]}
             sx={{
                 [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
                     outline: 'transparent',

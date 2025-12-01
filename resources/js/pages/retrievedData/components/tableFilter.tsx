@@ -1,5 +1,5 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { DistinctMonths, SelectionType } from '@/types';
+import { DateFilterType, DistinctMonths, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 import { Box, SelectChangeEvent, Stack, styled } from '@mui/material';
 import {
@@ -36,7 +36,7 @@ export default function ({
     company: SelectionType[];
     filters: {
         selectedBu: string;
-        date: { start: string | null; end: string | null };
+        date: DateFilterType;
     };
     check: string;
     isCrf: boolean;
@@ -44,12 +44,12 @@ export default function ({
 }) {
     const [bu, setBu] = useState<string>(filters.selectedBu);
     const [startDate, setStartDate] = useState<Dayjs | null>(
-         filters.date.start ? dayjs(filters.date.start) : null
+        filters.date.start ? dayjs(filters.date.start) : null,
     );
     const [endDate, setEndDate] = useState<Dayjs | null>(
-         filters.date.end ? dayjs(filters.date.end) : null
+        filters.date.end ? dayjs(filters.date.end) : null,
     );
-    
+
     const handleChange = (event: SelectChangeEvent) => {
         setBu(event.target.value);
         router.reload({

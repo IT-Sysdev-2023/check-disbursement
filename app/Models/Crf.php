@@ -42,7 +42,7 @@ class Crf extends Model
                 if (Schema::hasColumn($table, $field)) {
                     return $query->orderBy($field, $direction);
                 }
-                
+
                 return $query;
             });
         ;
