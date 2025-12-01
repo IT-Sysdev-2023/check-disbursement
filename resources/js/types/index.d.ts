@@ -201,7 +201,7 @@ export interface InertiaPagination<T> {
     data: T[];
 }
 
-export type DistinctMonths = Record<string, { check_date: string }[]>;
+export type DistinctMonths = Record<string, { check_date: string, total: number }[]>;
 
 export interface ProgressState {
     [message: string]: {

@@ -1,7 +1,7 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { DateFilterType, DistinctMonths, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
-import { Box, SelectChangeEvent, Stack, styled } from '@mui/material';
+import { Badge, Box, SelectChangeEvent, Stack, styled } from '@mui/material';
 import {
     DateCalendar,
     DatePicker,
@@ -101,12 +101,6 @@ export default function ({
                             ([key, monthGroup]) => {
                                 const [year, month] = key.split('-');
 
-                                const highlightedDates = monthGroup.map(
-                                    (dateObj: { check_date: string }) => {
-                                        const date = dayjs(dateObj.check_date);
-                                        return date;
-                                    },
-                                );
                                 return (
                                     <DateCalendar
                                         key={key}
@@ -121,20 +115,48 @@ export default function ({
                                             nextIconButton: () => null,
                                             day: (props) => {
                                                 const { day, ...other } = props;
-                                                const isHighlighted =
-                                                    highlightedDates.some(
-                                                        (d: Dayjs) =>
+
+                                                const recordForDay =
+                                                    monthGroup.find(
+                                                        (dateObj: {
+                                                            check_date: string;
+                                                            total: number;
+                                                        }) =>
                                                             day.isSame(
-                                                                d,
+                                                                dayjs(
+                                                                    dateObj.check_date,
+                                                                ),
                                                                 'day',
                                                             ),
                                                     );
-                                                return isHighlighted ? (
-                                                    <HighlightedDay
-                                                        day={day}
-                                                        {...other}
-                                                    />
-                                                ) : (
+
+                                                if (recordForDay) {
+                                                    return (
+                                                        <Badge
+                                                            overlap="circular"
+                                                            badgeContent={recordForDay.total} 
+                                                            color="secondary" 
+                                                            sx={{
+                                                                [`& .MuiBadge-badge`]:
+                                                                    {
+                                                                        fontSize:
+                                                                            '0.65rem',
+                                                                        minWidth: 16,
+                                                                        height: 16,
+                                                                        transform:
+                                                                            'translate(60%, -60%)', // adjusts badge position
+                                                                    },
+                                                            }}
+                                                        >
+                                                            <HighlightedDay
+                                                                day={day}
+                                                                {...other}
+                                                            />
+                                                        </Badge>
+                                                    );
+                                                }
+
+                                                return (
                                                     <PickersDay
                                                         day={day}
                                                         {...other}

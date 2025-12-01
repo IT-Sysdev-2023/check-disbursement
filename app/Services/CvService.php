@@ -203,16 +203,15 @@ class CvService extends NavConnection
     {
         $bu = PermissionService::getCompanyPermissions($user);
 
-        $distinctDates = CvCheckPayment::select('check_date')
+        $distinctDates = CvCheckPayment::select('check_date', DB::raw('count(*) as total'))
             ->doesntHave('checkStatus')
-            ->distinct()
-            ->get();
+            ->groupBy('check_date')
+            ->get()
+            ->keyBy('check_date');
 
         $distinctMonths = $distinctDates->groupBy(function ($date) {
-            $date = $date->check_date->year . '-' . $date->check_date->month;
-            return $date;
+            return $date->check_date->format('Y-m');
         });
-
         $cvRecords = self::cvRecords($filters, $page);
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'cv'
