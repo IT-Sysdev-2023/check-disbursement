@@ -3,11 +3,12 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Cv } from '@/types';
 import { Head } from '@inertiajs/react';
 import CvDetails from './components/cvDetails';
+import { retrievedRecords } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: '#',
+        href: retrievedRecords().url,
     },
     {
         title: 'CV Details',
