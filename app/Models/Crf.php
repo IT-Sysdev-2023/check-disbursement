@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class Crf extends Model
 {
@@ -18,13 +20,32 @@ class Crf extends Model
 
     }
 
-    public function scopeFilter(Builder $builder, $filter)
+    public function scopeFilter(Builder $builder, $filters)
     {
-        return $builder->when($filter['search'] ?? null, function ($query, $search) {
+        return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->whereAny([
                 'crf',
+                'company',
+                'no',
+                'paid_to',
+                'particulars',
+                'amount',
+                'ck_no'
             ], 'LIKE', '%' . $search . '%');
-        });
+        })
+            ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
+                $field = Str::snake($sort['field']);
+                $direction = $sort['sort'];
+
+                $table = $query->getModel()->getTable();
+
+                if (Schema::hasColumn($table, $field)) {
+                    return $query->orderBy($field, $direction);
+                }
+                
+                return $query;
+            });
+        ;
     }
     public function borrowedCheck()
     {

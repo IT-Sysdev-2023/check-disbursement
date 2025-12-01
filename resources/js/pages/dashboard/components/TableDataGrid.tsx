@@ -8,38 +8,44 @@ import {
     GridPaginationModel,
     GridSortModel,
 } from '@mui/x-data-grid';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 
 export default function TableDataGrid({
     data,
     columns,
     pagination,
     isLoading,
+    filter,
     handleSearchFilter,
     handleSortFilter,
 }: {
     data: InertiaPagination<Cv | Crf>;
     columns: GridColDef[];
     isLoading: boolean;
+    filter: string;
     pagination: (model: GridPaginationModel) => void;
     handleSearchFilter: (model: GridFilterModel) => void;
     handleSortFilter: (model: GridSortModel) => void;
-    }) {
+}) {
+    const [filterModel, setFilterModel] = useState<GridFilterModel>({
+        items: [],
+        quickFilterValues: [filter],
+    });
+
     const handleSortModelChange = useCallback(
         (model: GridSortModel) => {
-            handleSortFilter(model);
+            if (model.length) {
+                handleSortFilter(model);
+            }
         },
         [handleSortFilter],
     );
 
     const handleFilterModelChange = useCallback(
         (model: GridFilterModel) => {
-            if (
-                model.items.length > 0 ||
-                (model.quickFilterValues && model.quickFilterValues.length > 0)
-            ) {
-                handleSearchFilter(model);
-            }
+            setFilterModel(model);
+
+            handleSearchFilter(model);
         },
         [handleSearchFilter],
     );
@@ -76,6 +82,7 @@ export default function TableDataGrid({
             }}
             onPaginationModelChange={pagination}
             onSortModelChange={handleSortModelChange}
+            filterModel={filterModel}
             onFilterModelChange={handleFilterModelChange}
             disableRowSelectionOnClick
             onRowClick={handleRowClick}

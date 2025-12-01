@@ -237,7 +237,10 @@ class CvService extends NavConnection
         return Inertia::render('retrievedCv', [
             'cv' => $cv,
             'crf' => $crfs,
-            'selectedBu' => $filters['bu'] ?? '0',
+            'filter' => (object) [
+                'selectedBu' => $filters['bu'] ?? '0',
+                'search' => $filters['search'] ?? '',
+            ],
             'company' => $bu,
             'distinctMonths' => $distinctMonths,
         ]);

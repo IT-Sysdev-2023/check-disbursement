@@ -1,6 +1,6 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import { details, retrievedRecords, scanCheck } from '@/routes';
+import { details, scanCheck } from '@/routes';
 import {
     Crf,
     Cv,
@@ -53,13 +53,13 @@ const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature') => {
 };
 
 export default function RetrievedCv({
-    selectedBu,
+    filter,
     cv,
     crf,
     company,
     distinctMonths,
 }: {
-    selectedBu: string;
+    filter: { selectedBu: string; search: string };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
     distinctMonths: DistinctMonths;
@@ -75,34 +75,34 @@ export default function RetrievedCv({
     const handleClose = () => setOpen(false);
 
     const handleSearch = (model: GridFilterModel) => {
-        // router.get(
-        //     retrievedRecords(),
-        //     { search: model.quickFilterValues?.[0], bu: bu.label },
-        //     {
-        //         preserveScroll: true,
-        //         preserveState: true,
-        //         replace: true,
-        //     },
-        // );
+        const query = model.quickFilterValues?.length
+            ? model.quickFilterValues?.[0]
+            : '';
+
+        router.reload({
+            data: {
+                search: query,
+            },
+            only: [check === 'cv' ? 'cv' : 'crf'],
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        });
     };
 
     const handleSort = (model: GridSortModel) => {
-        if (model.length > 0) {
-            router.get(
-                retrievedRecords(),
-                {
-                    sort: {
-                        field: model[0].field,
-                        sort: model[0].sort,
-                    },
+        router.reload({
+            data: {
+                sort: {
+                    field: model[0].field,
+                    sort: model[0].sort,
                 },
-                {
-                    preserveState: true,
-                    preserveScroll: true,
-                    replace: true,
-                },
-            );
-        }
+            },
+            only: [check === 'cv' ? 'cv' : 'crf'],
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
     };
 
     const cvColumns: GridColDef[] = [
@@ -187,7 +187,7 @@ export default function RetrievedCv({
         },
     ];
 
-    const crfcolumns: GridColDef[] = [
+    const crfColumns: GridColDef[] = [
         {
             field: 'crf',
             headerName: 'CRF #',
@@ -240,6 +240,7 @@ export default function RetrievedCv({
             field: 'status',
             headerName: 'Status',
             minWidth: 120,
+            sortable: false,
             renderCell: (params) => {
                 return renderStatus(
                     params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
@@ -328,7 +329,7 @@ export default function RetrievedCv({
     const handleCheck = (event: SelectChangeEvent) => {
         setCheck(event.target.value);
         router.reload({
-            preserveScroll: true,
+            preserveScroll: true, //Dont Remove( Mugana ni.. gibitok ra ang vs code)
             only: ['crf'],
             replace: true,
             onStart: () => setTableLoading(true),
@@ -344,16 +345,17 @@ export default function RetrievedCv({
                     handleChangeCheck={handleCheck}
                     distinctMonths={distinctMonths}
                     company={company}
-                    selectedBu={selectedBu}
+                    selectedBu={filter.selectedBu}
                     check={check}
                 />
 
                 <TableDataGrid
                     data={check === 'cv' ? cv : crf}
+                    filter={filter.search}
                     pagination={handlePagination}
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
-                    columns={check === 'cv' ? cvColumns : crfcolumns}
+                    columns={check === 'cv' ? cvColumns : crfColumns}
                     isLoading={tableLoading}
                 />
             </PageContainer>
