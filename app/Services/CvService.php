@@ -206,7 +206,7 @@ class CvService extends NavConnection
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')
             ->filter($filters)
-            ->paginate($page)
+            ->paginate($page ?? 10)
             ->withQueryString()
             ->toResourceCollection();
 
@@ -229,7 +229,7 @@ class CvService extends NavConnection
                 ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
                 ->doesntHave('checkStatus')
                 ->filter($filters)
-                ->paginate($page)
+                ->paginate($page ?? 10)
                 ->withQueryString()
                 ->toResourceCollection()
         );
@@ -240,6 +240,7 @@ class CvService extends NavConnection
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] 
             ],
             'company' => $bu,
             'distinctMonths' => $distinctMonths,

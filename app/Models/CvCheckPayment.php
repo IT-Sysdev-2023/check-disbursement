@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -21,6 +22,7 @@ class CvCheckPayment extends Model
 
     public function scopeFilter(Builder $builder, array $filters)
     {
+        // dd($filters['date'] );
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->whereHas('cvHeader', function (Builder $query) use ($search) {
                 $query->whereAny([
@@ -30,6 +32,9 @@ class CvCheckPayment extends Model
         })
             ->when($filters['bu'] ?? null, function ($query, $bu) {
                 $query->where('company_id', $bu);
+            })
+            ->when($filters['date'] ?? null, function ($query, $date) {
+                $query->whereBetween('check_date', [$date['start'], $date['end']]);
             })
             ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
 

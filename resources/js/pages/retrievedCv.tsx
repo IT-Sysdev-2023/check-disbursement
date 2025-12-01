@@ -59,7 +59,11 @@ export default function RetrievedCv({
     company,
     distinctMonths,
 }: {
-    filter: { selectedBu: string; search: string };
+    filter: {
+        selectedBu: string;
+        search: string;
+        date: { start: string | null; end: string | null };
+    };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
     distinctMonths: DistinctMonths;
@@ -329,7 +333,7 @@ export default function RetrievedCv({
     const handleCheck = (event: SelectChangeEvent) => {
         setCheck(event.target.value);
         router.reload({
-            preserveScroll: true, //Dont Remove( Mugana ni.. gibitok ra ang vs code)
+            preserveScroll: true, //Dont bother with the line error( Mugana ni.. gibitok ra ang vs code)
             only: ['crf'],
             replace: true,
             onStart: () => setTableLoading(true),
@@ -345,7 +349,7 @@ export default function RetrievedCv({
                     handleChangeCheck={handleCheck}
                     distinctMonths={distinctMonths}
                     company={company}
-                    selectedBu={filter.selectedBu}
+                    filters={filter}
                     check={check}
                 />
 

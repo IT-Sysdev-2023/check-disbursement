@@ -9,6 +9,7 @@ import {
     PickersDay,
 } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { PickerValue } from '@mui/x-date-pickers/internals';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
@@ -28,20 +29,27 @@ export default function ({
     company,
     check,
     handleChangeCheck,
-    selectedBu,
+    filters,
     isCrf,
 }: {
     distinctMonths: DistinctMonths;
     company: SelectionType[];
-    selectedBu: string;
+    filters: {
+        selectedBu: string;
+        date: { start: string | null; end: string | null };
+    };
     check: string;
     isCrf: boolean;
     handleChangeCheck: (value: SelectChangeEvent) => void;
 }) {
-    const [bu, setBu] = useState<string>(selectedBu);
-    const [startDate, setStartDate] = useState<Dayjs | null>(null);
-    const [endDate, setEndDate] = useState<Dayjs | null>(null);
-
+    const [bu, setBu] = useState<string>(filters.selectedBu);
+    const [startDate, setStartDate] = useState<Dayjs | null>(
+         filters.date.start ? dayjs(filters.date.start) : null
+    );
+    const [endDate, setEndDate] = useState<Dayjs | null>(
+         filters.date.end ? dayjs(filters.date.end) : null
+    );
+    
     const handleChange = (event: SelectChangeEvent) => {
         setBu(event.target.value);
         router.reload({
@@ -50,6 +58,32 @@ export default function ({
                 bu: event.target.value,
             },
         });
+    };
+    const handleStartDateChange = (value: PickerValue) => {
+        setStartDate(value);
+        filterDate(value, endDate);
+    };
+
+    const handleEndDateChange = (value: PickerValue) => {
+        setEndDate(value);
+        filterDate(startDate, value);
+    };
+
+    const filterDate = (startDate: Dayjs | null, endDate: Dayjs | null) => {
+        if (startDate && endDate) {
+            router.reload({
+                data: {
+                    date: {
+                        start: startDate.format('YYYY-MM-DD'),
+                        end: endDate.format('YYYY-MM-DD'),
+                    },
+                },
+                only: ['cv'],
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+            });
+        }
     };
 
     return (
@@ -145,8 +179,9 @@ export default function ({
                         <DatePicker
                             label="Start Date"
                             value={startDate}
-                            onChange={(newValue) => setStartDate(newValue)}
+                            onChange={handleStartDateChange}
                             maxDate={endDate || undefined}
+                            disabled={isCrf}
                         />
                         <Box
                             sx={{
@@ -161,8 +196,9 @@ export default function ({
                         <DatePicker
                             label="End Date"
                             value={endDate}
-                            onChange={(newValue) => setEndDate(newValue)}
+                            onChange={handleEndDateChange}
                             minDate={startDate || undefined}
+                            disabled={isCrf}
                         />
                     </Box>
                 </LocalizationProvider>
