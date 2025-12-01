@@ -238,7 +238,7 @@ class CvService extends NavConnection
 
     public function details(CvCheckPayment $cv)
     {
-        return Inertia::render('dashboard/cv/cvDetails', [
+        return Inertia::render('retrievedRecords/checkDetailsCv', [
             'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks'))
         ]);
     }

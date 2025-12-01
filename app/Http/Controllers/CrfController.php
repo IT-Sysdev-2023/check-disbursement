@@ -46,7 +46,7 @@ class CrfController extends Controller
 
     public function detailsCrf(Crf $id)
     {
-        return Inertia::render('crf/crfDetails', [
+        return Inertia::render('retrievedRecords/checkDetailsCrf', [
             'crf' => $id->toResource()
         ]);
     }

@@ -14,7 +14,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import { Alert, SelectChangeEvent, Snackbar } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material';
 import {
     GridFilterModel,
     GridPaginationModel,
@@ -22,13 +22,14 @@ import {
 } from '@mui/x-data-grid';
 import { useState } from 'react';
 
+import useNotifications from '../components/notifications/useNotifications';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import {
     createCrfColumns,
     createCvColumns,
-} from './retrievedData/components/columns';
-import PageContainer from './retrievedData/components/pageContainer';
-import TableFilter from './retrievedData/components/tableFilter';
+} from './retrievedRecords/components/columns';
+import PageContainer from '../components/pageContainer';
+import TableFilter from './retrievedRecords/components/tableFilter';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -61,8 +62,6 @@ export default function RetrievedRecords({
     const [open, setOpen] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [buBorrow, setBuBorrow] = useState('');
-    const [message, setMessage] = useState('');
-    const [openSnackBar, setOpenSnackBar] = useState(false);
     const handleClose = () => setOpen(false);
 
     const handleSearch = (model: GridFilterModel) => {
@@ -80,7 +79,7 @@ export default function RetrievedRecords({
             replace: true,
         });
     };
-
+    const notifications = useNotifications();
     const handleSort = (model: GridSortModel) => {
         router.reload({
             data: {
@@ -115,9 +114,12 @@ export default function RetrievedRecords({
                     preserveScroll: true,
                     preserveState: true,
                     onSuccess: (page) => {
-                        setOpenSnackBar(true);
                         const m = page.props.flash as FlashReponse;
-                        setMessage(m.message);
+
+                        notifications.show(m.message, {
+                            severity: 'success',
+                            autoHideDuration: 3000,
+                        });
                     },
                 },
             );
@@ -147,7 +149,7 @@ export default function RetrievedRecords({
         setCheck(event.target.value);
         router.reload({
             data: {
-                selectedCheck: event.target.value
+                selectedCheck: event.target.value,
             },
             preserveScroll: true, //Dont bother with the line error( Mugana ni.. gibitok ra ang vs code)
             only: ['crf'],
@@ -191,21 +193,6 @@ export default function RetrievedRecords({
                 bu={buBorrow}
                 handleClose={handleClose}
             />
-
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={6000}
-                onClose={handleClose}
-            >
-                <Alert
-                    onClose={handleClose}
-                    severity="success"
-                    variant="filled"
-                    sx={{ width: '100%' }}
-                >
-                    {message}
-                </Alert>
-            </Snackbar>
         </AppLayout>
     );
 }

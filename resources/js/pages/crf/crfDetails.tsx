@@ -1,5 +1,4 @@
 import AppLayout from '@/layouts/app-layout';
-import { retrievedRecords } from '@/routes';
 import { Crf, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Typography } from '@mui/material';

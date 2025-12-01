@@ -1,13 +1,13 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { configureEcho } from '@laravel/echo-react';
-import { CssBaseline, createTheme } from '@mui/material';
+import { CssBaseline } from '@mui/material';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router';
 import '../css/app.css';
+import DialogsProvider from './components/dialogs/dialogsProvider';
+import NotificationsProvider from './components/notifications/notificationsProvider';
 import { initializeTheme } from './hooks/use-appearance';
-import DialogsProvider from './pages/retrievedData/components/dialogs/dialogsProvider';
-import NotificationsProvider from './pages/retrievedData/components/notifications/notificationsProvider';
 import { dataGridCustomizations } from './themes/customizations/dataGridCustomizations';
 import { formInputCustomizations } from './themes/customizations/formInputCustomizations';
 import AppTheme from './themes/shared-theme/AppTheme';
