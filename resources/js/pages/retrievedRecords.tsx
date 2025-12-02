@@ -23,12 +23,13 @@ import {
 import { useState } from 'react';
 
 import useNotifications from '../components/notifications/useNotifications';
+import PageContainer from '../components/pageContainer';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createCrfColumns,
     createCvColumns,
 } from './retrievedRecords/components/columns';
-import PageContainer from '../components/pageContainer';
 import TableFilter from './retrievedRecords/components/tableFilter';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -166,10 +167,10 @@ export default function RetrievedRecords({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title={pageTitle}>
+                <CalendarView distinctMonths={distinctMonths} />
                 <TableFilter
                     isCrf={check === 'crf'}
                     handleChangeCheck={handleCheck}
-                    distinctMonths={distinctMonths}
                     company={company}
                     filters={filter}
                     check={check}
