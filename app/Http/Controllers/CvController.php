@@ -42,14 +42,6 @@ class CvController extends Controller
         return $this->service->retrieveData($request->user(), $date, $request->bu);
     }
 
-    public function retrievedCv(Request $request)
-    {
-        $perPage = $request->per_page;
-        $filters = $request->only(['bu', 'search','sort', 'date', 'selectedCheck']);
-        // dd($filters);
-        return $this->service->cvs($perPage, $filters, $request->user());
-    }
-
     public function details(CvCheckPayment $id)
     {
         return $this->service->details($id);

@@ -17,7 +17,7 @@ use Inertia\Inertia;
 
 class CheckReleasingController extends Controller
 {
-    public function checkReleasing(Request $request)
+    public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search']);
         $records = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus', 'company')

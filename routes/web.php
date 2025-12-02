@@ -5,6 +5,7 @@ use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\RetrieveDataController;
+use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\StatusController;
 use App\Models\Company;
 use App\Models\CompanyPermission;
@@ -26,38 +27,43 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::prefix('check-voucher')->controller(CvController::class)->group(function () {
+    //! EXTRACT CHECKS
+    Route::prefix('extract')->group(function () {
 
-        Route::get('index', 'index')->name('check-voucher');
-        Route::post('extract-cv', 'extractCv')->name('extractCv');
+        Route::prefix('check-voucher')->group(function () {
+            Route::get('index', [CvController::class, 'index'])->name('check-voucher');
+            Route::post('extract-cv', [CvController::class, 'extractCv'])->name('extractCv');
+        });
 
-        Route::get('retrieved', 'retrievedCv')->name('retrievedRecords');
-        Route::get('details/{id}', 'details')->name('details');
+        Route::prefix('crf')->group(function () {
+            Route::get('index', [CrfController::class, 'index'])->name('check-request-form');
+            Route::post('extract-crf', [CrfController::class, 'extractCrf'])->name('extractCrf');
+
+        });
 
     });
 
-    Route::prefix('crf')->controller(CrfController::class)->group(function () {
+    //! RETRIEVED CHECKS
+    Route::prefix('retrieved-checks')->group(function () {
+        Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrievedRecords');
+        Route::post('borrowed-check', [RetrievedChecksController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
+        Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
 
-        Route::get('index', 'index')->name('check-request-form');
-        Route::post('extract-crf', 'extractCrf')->name('extractCrf');
-
-        // Route::get('retrieved', 'retrievedCrf')->name('retrievedCrf');
-        Route::get('details/{id}', 'detailsCrf')->name('detailsCrf');
+        Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
+        Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('detailsCrf');
     });
 
-    Route::post('borrowed-check', [StatusController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
-    Route::post('scan-check', [StatusController::class, 'scanCheck'])->name('scanCheck');
+    //! CHECK RELEASING
+    Route::prefix('check-releasing')->group(function () {
+
+        Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
+        Route::get('release-check/{id}/{status}', [CheckReleasingController::class, 'releaseCheck'])->name('release-check');
+        Route::post('store-release-check/{id}', [CheckReleasingController::class, 'storeReleaseCheck'])->name('store-release-check');
+        Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancelCheck'])->name('cancel-check');
+    });
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
-
     Route::put('update-status/{id}', [StatusController::class, 'updateStatus'])->name('update-status');
-
-    Route::prefix('check-releasing')->controller(CheckReleasingController::class)->group(function () {
-        Route::get('index', 'checkReleasing')->name('check-releasing');
-        Route::get('release-check/{id}/{status}', 'releaseCheck')->name('release-check');
-        Route::post('store-release-check/{id}', 'storeReleaseCheck')->name('store-release-check');
-        Route::post('cancel-check/{id}', 'cancelCheck')->name('cancel-check');
-    });
 
     // Route::get('report', function () {
     //     return Inertia::render('crud-dashboard/CrudDashboard');
