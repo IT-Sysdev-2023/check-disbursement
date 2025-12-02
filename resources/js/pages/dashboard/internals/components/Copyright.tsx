@@ -16,8 +16,8 @@ export default function Copyright(props: any) {
       ]}
     >
       {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Sitemark
+      <Link color="inherit" href="https://github.com/IT-Sysdev-2023/check-disbursement">
+        Check Disbursement
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}

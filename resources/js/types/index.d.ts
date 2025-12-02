@@ -77,6 +77,12 @@ export interface DateFilterType {
 export type ActionHandler = (id: number, bu?: string) => void;
 
 export type ActionType = 'details' | 'borrow' | 'scan';
+export type ReleasingType =
+    | 'release'
+    | 'forward'
+    | 'deposit'
+    | 'stale'
+    | 'cancel';
 
 export interface Company {
     id: number;
@@ -201,7 +207,10 @@ export interface InertiaPagination<T> {
     data: T[];
 }
 
-export type DistinctMonths = Record<string, { cv_date: string, total: number }[]>;
+export type DistinctMonths = Record<
+    string,
+    { cv_date: string; total: number }[]
+>;
 
 export interface ProgressState {
     [message: string]: {

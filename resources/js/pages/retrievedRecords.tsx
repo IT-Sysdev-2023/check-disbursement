@@ -14,7 +14,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import { SelectChangeEvent } from '@mui/material';
+import { Box, SelectChangeEvent, Tab } from '@mui/material';
 import {
     GridFilterModel,
     GridPaginationModel,
@@ -22,15 +22,18 @@ import {
 } from '@mui/x-data-grid';
 import { useState } from 'react';
 
+import TabContext from '@mui/lab/TabContext';
+import TabList from '@mui/lab/TabList';
+import TabPanel from '@mui/lab/TabPanel';
 import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
+import TableFilter from '../components/tableFilter';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createCrfColumns,
     createCvColumns,
 } from './retrievedRecords/components/columns';
-import TableFilter from './retrievedRecords/components/tableFilter';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -163,28 +166,50 @@ export default function RetrievedRecords({
     const cvColumns = createCvColumns(handleStatusChange);
     const crfColumns = createCrfColumns(handleStatusChange);
 
+    const [value, setValue] = useState('1');
+
+    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+        setValue(newValue);
+    };
+
     const pageTitle = 'Retrieved CV/CRF';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title={pageTitle}>
-                <CalendarView distinctMonths={distinctMonths} />
-                <TableFilter
-                    isCrf={check === 'crf'}
-                    handleChangeCheck={handleCheck}
-                    company={company}
-                    filters={filter}
-                    check={check}
-                />
+                <Box sx={{ width: '100%', typography: 'body1' }}>
+                    <TabContext value={value}>
+                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                            <TabList onChange={handleChange} aria-label="tabs">
+                                <Tab label="Calendar View" value="1" />
+                                <Tab label="Table View" value="2" />
+                            </TabList>
+                        </Box>
+                        <TabPanel value="1">
+                            <CalendarView distinctMonths={distinctMonths} />
+                        </TabPanel>
+                        <TabPanel value="2">
+                            <TableFilter
+                                isCrf={check === 'crf'}
+                                handleChangeCheck={handleCheck}
+                                company={company}
+                                filters={filter}
+                                check={check}
+                            />
 
-                <TableDataGrid
-                    data={check === 'cv' ? cv : crf}
-                    filter={filter.search}
-                    pagination={handlePagination}
-                    handleSearchFilter={handleSearch}
-                    handleSortFilter={handleSort}
-                    columns={check === 'cv' ? cvColumns : crfColumns}
-                    isLoading={tableLoading}
-                />
+                            <TableDataGrid
+                                data={check === 'cv' ? cv : crf}
+                                filter={filter.search}
+                                pagination={handlePagination}
+                                handleSearchFilter={handleSearch}
+                                handleSortFilter={handleSort}
+                                columns={
+                                    check === 'cv' ? cvColumns : crfColumns
+                                }
+                                isLoading={tableLoading}
+                            />
+                        </TabPanel>
+                    </TabContext>
+                </Box>
             </PageContainer>
 
             <BorrowedCheckModal

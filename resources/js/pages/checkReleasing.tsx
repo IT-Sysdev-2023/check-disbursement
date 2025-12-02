@@ -1,14 +1,29 @@
+import PageContainer from '@/components/pageContainer';
+import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import AppLayout from '@/layouts/app-layout';
-import { checkReleasing } from '@/routes';
-import { Auth, Crf, Cv, InertiaPagination, type BreadcrumbItem } from '@/types';
+import { releaseCheck } from '@/routes';
+import {
+    Crf,
+    Cv,
+    DateFilterType,
+    InertiaPagination,
+    SelectionType,
+    type BreadcrumbItem,
+} from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
-import { GridPaginationModel } from '@mui/x-data-grid';
+import { SelectChangeEvent } from '@mui/material';
+import {
+    GridFilterModel,
+    GridPaginationModel,
+    GridSortModel,
+} from '@mui/x-data-grid';
 import { useState } from 'react';
-import CrfReleasingDataGrid from './dashboard/components/CrfReleasingDataGrid';
-import CvReleasingDataGrid from './dashboard/components/CvReleasingDataGrid';
-import Search from './dashboard/components/Search';
-import SelectItem from './dashboard/components/SelectItem';
+import TableFilter from '../components/tableFilter';
+import {
+    createReleasingCrfColumns,
+    createReleasingCvColumns,
+} from './checkReleasing/components/columns';
+import TableDataGrid from './dashboard/components/TableDataGrid';
 import Copyright from './dashboard/internals/components/Copyright';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,135 +36,126 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function CheckReleasing({
     cv,
     crf,
-    auth,
+    company,
+    defaultCheck,
+    filter,
 }: {
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
-    auth: Auth;
+    defaultCheck: string;
+    filter: {
+        selectedBu: string;
+        search: string;
+        date: DateFilterType;
+    };
+    company: SelectionType[];
 }) {
-    const [bu, setBu] = useState<{ label: string; value: string }>({
-        label: '',
-        value: '',
-    });
-
-    console.log(cv);
-    const [check, setCheck] = useState('1');
-
-    const [search, setSearch] = useState('');
-    const permissions =
-        auth.user?.permissions?.map((r) => ({ value: r.id, label: r.name })) ||
-        [];
-
-    const checks = [
-        { value: '1', label: 'CV' },
-        { value: '2', label: 'CRF' },
-    ];
-
-    const handleChangeCheck = (event: SelectChangeEvent) => {
-        setCheck(event.target.value);
-
-        router.get(
-            checkReleasing(),
-            { bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
-
-    const handleChange = (event: SelectChangeEvent) => {
-        const selectedItem = permissions.find(
-            (item) => item.value == Number(event.target.value),
-        );
-
-        if (selectedItem) {
-            setBu({
-                label: selectedItem?.label,
-                value: String(selectedItem?.value),
-            });
-        }
-
-        router.get(
-            checkReleasing(),
-            { bu: selectedItem?.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
-
+    const [check, setCheck] = useState(defaultCheck);
+    const [tableLoading, setTableLoading] = useState(false);
+    const [open, setOpen] = useState(false);
+    const [checkId, setCheckId] = useState<number | undefined>(undefined);
     const handlePagination = (model: GridPaginationModel) => {
-        const page = model.page + 1; // MUI DataGrid uses 0-based index
+        const page = model.page + 1;
         const per_page = model.pageSize;
 
-        router.get(
-            checkReleasing(),
-            { page, per_page, bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
+        router.reload({
+            data: {
+                page: page,
+                per_page: per_page,
             },
-        );
+            preserveScroll: true, //Dont Remove( Mugana ni.. gibitok ra ang vs code)
+            preserveState: true,
+        });
     };
 
-    const handleSearch = (value: string) => {
-        setSearch(value);
+    const handleSearch = (model: GridFilterModel) => {
+        const query = model.quickFilterValues?.length
+            ? model.quickFilterValues?.[0]
+            : '';
 
-        router.get(
-            checkReleasing(),
-            { search: value, bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
+        router.reload({
+            data: {
+                search: query,
             },
-        );
+            only: [check === 'cv' ? 'cv' : 'crf'],
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        });
     };
+
+    const handleCheck = (event: SelectChangeEvent) => {
+        setCheck(event.target.value);
+        router.reload({
+            data: {
+                selectedCheck: event.target.value,
+            },
+            preserveScroll: true, //Dont bother with the line error( Mugana ni.. gibitok ra ang vs code)
+            only: ['crf'],
+            replace: true,
+            onStart: () => setTableLoading(true),
+            onFinish: () => setTableLoading(false),
+        });
+    };
+
+    const handleSort = (model: GridSortModel) => {
+        router.reload({
+            data: {
+                sort: {
+                    field: model[0].field,
+                    sort: model[0].sort,
+                },
+            },
+            only: [check === 'cv' ? 'cv' : 'crf'],
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const handleStatusChange = (id: number, value: string) => {
+        if (value === 'cancel') {
+            setCheckId(id);
+            setOpen(true);
+            return;
+        }
+        router.visit(releaseCheck([id, value]));
+    };
+
+    const cvColumns = createReleasingCvColumns(handleStatusChange);
+    const crfColumns = createReleasingCrfColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
-            <Box id="hero" sx={{ px: 3 }}>
-                <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                    Check Releasing
-                </Typography>
-                <Stack direction="row" sx={{ gap: 3 }}>
-                    <Search onSearch={handleSearch} value={search} />
-                    <SelectItem
-                        handleChange={handleChange}
-                        value={bu.value}
-                        title="BU"
-                        items={permissions}
-                    />
-                    <SelectItem
-                        handleChange={handleChangeCheck}
-                        value={check}
-                        title="Check"
-                        items={checks}
-                    />
-                </Stack>
-                <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
-                    {check === '1' && (
-                        <CvReleasingDataGrid
-                            cvs={cv}
-                            pagination={handlePagination}
-                        />
-                    )}
+            <PageContainer title="Check Releasing">
+                <TableFilter
+                    isCrf={check === 'crf'}
+                    handleChangeCheck={handleCheck}
+                    company={company}
+                    filters={filter}
+                    check={check}
+                />
 
-                    {check === '2' && (
-                        <CrfReleasingDataGrid
-                            crf={crf}
-                            pagination={handlePagination}
-                        />
-                    )}
-                </Grid>
+                <TableDataGrid
+                    data={check === 'cv' ? cv : crf}
+                    filter={filter.search}
+                    pagination={handlePagination}
+                    handleSearchFilter={handleSearch}
+                    handleSortFilter={handleSort}
+                    columns={check === 'cv' ? cvColumns : crfColumns}
+                    isLoading={tableLoading}
+                />
                 <Copyright sx={{ my: 4 }} />
-            </Box>
+
+                <ReasonCancellationModal
+                    checkId={checkId ?? 0}
+                    open={open}
+                    handleClose={() => {
+                        setOpen(false);
+                    }}
+                />
+            </PageContainer>
         </AppLayout>
     );
 }

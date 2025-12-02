@@ -82,7 +82,6 @@ export default function ReasonCancellationModal({
                                     error={!!errors.reason}
                                     helperText={errors.reason}
                                     multiline
-                                    rows={4}
                                     fullWidth
                                 />
                             </Grid>

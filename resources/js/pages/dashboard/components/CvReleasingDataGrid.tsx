@@ -161,7 +161,7 @@ export default function CvReleasingDataGrid({
                     page: cvs.meta.current_page - 1,
                     pageSize: cvs.meta.per_page,
                 }}
-                pageSizeOptions={[10, 15, 25, 50]}
+                pageSizeOptions={[10, 15, 25, 50]} 
                 getRowClassName={(params) =>
                     params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
                 }
