@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\User;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -13,16 +14,15 @@ class ChecksService
     public function records(?int $page, array $filters, User $user)
     {
 
-        $distinctMonths = CvCheckPayment::select('check_date', DB::raw('count(*) as total'))
+        $distinctMonths = CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
+            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->doesntHave('checkStatus')
-            ->groupBy('check_date')
+            ->groupBy('cv_headers.cv_date')
             ->get()
-            ->keyBy('check_date')
             ->groupBy(
                 fn($date) =>
-                $date->check_date->format('Y-m')
+                Date::parse($date->cv_date)->format('Y-m')
             );
-
         $cvRecords = self::cvRecords($filters, $page);
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'cv'
@@ -42,7 +42,10 @@ class ChecksService
                     'end' => null
                 ]
             ],
-            'company' => PermissionService::getCompanyPermissions($user),
+            'company' => PermissionService::getCompanyPermissions($user)->prepend([
+                'label' => 'All',
+                'value' => '0'
+            ]),
             'distinctMonths' => $distinctMonths,
         ]);
     }

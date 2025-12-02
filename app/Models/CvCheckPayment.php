@@ -22,7 +22,6 @@ class CvCheckPayment extends Model
 
     public function scopeFilter(Builder $builder, array $filters)
     {
-        // dd($filters['date'] );
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->whereHas('cvHeader', function (Builder $query) use ($search) {
                 $query->whereAny([

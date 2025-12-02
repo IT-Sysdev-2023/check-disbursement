@@ -14,7 +14,7 @@ export default function CalendarView({
     distinctMonths,
 }: {
     distinctMonths: DistinctMonths;
-}) {
+    }) {
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={{ width: '100%', p: 2 }}>
@@ -27,7 +27,7 @@ export default function CalendarView({
                 >
                     {Object.entries(distinctMonths).map(([key, monthGroup]) => {
                         const [year, month] = key.split('-');
-
+                        console.log(monthGroup);
                         return (
                             <DateCalendar
                                 key={key}
@@ -43,11 +43,11 @@ export default function CalendarView({
 
                                         const recordForDay = monthGroup.find(
                                             (dateObj: {
-                                                check_date: string;
+                                                cv_date: string;
                                                 total: number;
                                             }) =>
                                                 day.isSame(
-                                                    dayjs(dateObj.check_date),
+                                                    dayjs(dateObj.cv_date),
                                                     'day',
                                                 ),
                                         );

@@ -6,6 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class CvHeader extends Model
 {
+
+      protected function casts(): array
+    {
+        return [
+            'cv_date' => 'datetime',
+        ];
+
+    }
     public function cvCheckPayment(){
         return $this->hasOne(CvCheckPayment::class);
     }

@@ -27,9 +27,6 @@ class PermissionService
             ];
         });
 
-        return $transform->prepend([
-            'label' => 'All',
-            'value' => '0'
-        ]);
+        return $transform;
     }
 }
