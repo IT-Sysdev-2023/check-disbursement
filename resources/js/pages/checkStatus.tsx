@@ -1,3 +1,4 @@
+import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
 import { checkStatus } from '@/routes';
 import { Auth, Crf, Cv, InertiaPagination, type BreadcrumbItem } from '@/types';
@@ -5,11 +6,13 @@ import { Head, router } from '@inertiajs/react';
 import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
 import { GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
+import CrfStatusDataGrid from './dashboard/components/CrfStatusDataGrid';
+import CvStatusDataGrid from './dashboard/components/CvStatusDataGrid';
 import Search from './dashboard/components/Search';
 import SelectItem from './dashboard/components/SelectItem';
 import Copyright from './dashboard/internals/components/Copyright';
-import CvStatusDataGrid from './dashboard/components/CvStatusDataGrid';
-import CrfStatusDataGrid from './dashboard/components/CrfStatusDataGrid';
+import TableFilter from '@/components/tableFilter';
+import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -59,29 +62,6 @@ export default function CheckStatus({
         );
     };
 
-    const handleChange = (event: SelectChangeEvent) => {
-        const selectedItem = permissions.find(
-            (item) => item.value == Number(event.target.value),
-        );
-
-        if (selectedItem) {
-            setBu({
-                label: selectedItem?.label,
-                value: String(selectedItem?.value),
-            });
-        }
-
-        router.get(
-            checkStatus(),
-            { bu: selectedItem?.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
-    };
-
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1; // MUI DataGrid uses 0-based index
         const per_page = model.pageSize;
@@ -114,9 +94,29 @@ export default function CheckStatus({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
+            <PageContainer title="Check Status">
+                <TableFilter
+                    isCrf={check === 'crf'}
+                    handleChangeCheck={handleCheck}
+                    company={company}
+                    filters={filter}
+                    check={check}
+                />
+
+                <TableDataGrid
+                    data={check === 'cv' ? cv : crf}
+                    filter={filter.search}
+                    pagination={handlePagination}
+                    handleSearchFilter={handleSearch}
+                    handleSortFilter={handleSort}
+                    columns={check === 'cv' ? cvColumns : crfColumns}
+                    isLoading={tableLoading}
+                />
+            </PageContainer>
+
             <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                   Check Status
+                    Check Status
                 </Typography>
                 <Stack direction="row" sx={{ gap: 3 }}>
                     <Search onSearch={handleSearch} value={search} />
@@ -133,12 +133,20 @@ export default function CheckStatus({
                         items={checks}
                     />
                 </Stack>
-                <Grid container spacing={2} columns={12} sx={{mt:3}}>
+                <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
                     {check === '1' && (
-                        <CvStatusDataGrid cvs={cv} pagination={handlePagination} />
+                        <CvStatusDataGrid
+                            cvs={cv}
+                            pagination={handlePagination}
+                        />
                     )}
 
-                    {check === '2' && <CrfStatusDataGrid crf={crf} pagination={handlePagination}/>}
+                    {check === '2' && (
+                        <CrfStatusDataGrid
+                            crf={crf}
+                            pagination={handlePagination}
+                        />
+                    )}
                 </Grid>
                 <Copyright sx={{ my: 4 }} />
             </Box>

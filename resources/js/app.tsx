@@ -3,7 +3,6 @@ import { configureEcho } from '@laravel/echo-react';
 import { CssBaseline } from '@mui/material';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter } from 'react-router';
 import '../css/app.css';
 import DialogsProvider from './components/dialogs/dialogsProvider';
 import NotificationsProvider from './components/notifications/notificationsProvider';
@@ -60,9 +59,7 @@ createInertiaApp({
                 <CssBaseline />
                 <NotificationsProvider>
                     <DialogsProvider>
-                        <BrowserRouter>
                             <App {...props} />
-                        </BrowserRouter>
                     </DialogsProvider>
                 </NotificationsProvider>
             </AppTheme>,

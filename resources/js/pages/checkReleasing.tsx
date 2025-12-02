@@ -146,7 +146,7 @@ export default function CheckReleasing({
                     columns={check === 'cv' ? cvColumns : crfColumns}
                     isLoading={tableLoading}
                 />
-                <Copyright sx={{ my: 4 }} />
+                {/* <Copyright sx={{ my: 4 }} /> */}
 
                 <ReasonCancellationModal
                     checkId={checkId ?? 0}
