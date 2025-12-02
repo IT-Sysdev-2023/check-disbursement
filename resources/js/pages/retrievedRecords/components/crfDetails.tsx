@@ -1,6 +1,4 @@
-import { retrievedRecords } from '@/routes';
 import { Crf } from '@/types';
-import { router } from '@inertiajs/react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
     Box,
@@ -104,12 +102,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                 <Button
                     variant="contained"
                     startIcon={<ArrowBackIcon />}
-                    onClick={() =>
-                        router.visit(retrievedRecords(), {
-                            preserveScroll: true,
-                            preserveState: true,
-                        })
-                    }
+                    onClick={() => window.history.back()}
                 >
                     Back
                 </Button>

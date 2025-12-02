@@ -1,6 +1,5 @@
-import { retrievedRecords } from '@/routes';
+
 import { Cv } from '@/types';
-import { router } from '@inertiajs/react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 // import DeleteIcon from '@mui/icons-material/Delete';
 // import EditIcon from '@mui/icons-material/Edit';
@@ -91,7 +90,7 @@ export default function CvDetails({ details }: { details: Cv }) {
                 <Button
                     variant="contained"
                     startIcon={<ArrowBackIcon />}
-                    onClick={() => router.visit(retrievedRecords(), {preserveScroll: true, preserveState: true})}
+                    onClick={() => window.history.back()}
                 >
                     Back
                 </Button>

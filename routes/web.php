@@ -19,7 +19,7 @@ use Spatie\Permission\Models\Role;
 
 Route::get('/', function () {
     return Inertia::render('auth/login');
-})->name('home');
+})->name('home')->middleware('guest');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
@@ -63,7 +63,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //     return Inertia::render('crud-dashboard/CrudDashboard');
     // })->name('report');
 
-      Route::get('report', function () {
+    Route::get('report', function () {
         return Inertia::render('retrievedData/employeeList');
     })->name('report');
 
@@ -185,7 +185,7 @@ Route::get('/company', function (Request $request) {
 })->name('company');
 
 Route::get('permission', function () {
-   $r =  User::where('id', 1)->first()->assignRole('admin');
+    $r = User::where('id', 1)->first()->assignRole('admin');
 
     dd($r);
 });
