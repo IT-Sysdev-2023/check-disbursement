@@ -1,7 +1,7 @@
 import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
-import { checkStatus } from '@/routes';
+import { details, detailsCrf } from '@/routes';
 import {
     Crf,
     Cv,
@@ -11,19 +11,18 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
+import { SelectChangeEvent } from '@mui/material';
 import {
     GridFilterModel,
     GridPaginationModel,
     GridSortModel,
 } from '@mui/x-data-grid';
 import { useState } from 'react';
-import CrfStatusDataGrid from './dashboard/components/CrfStatusDataGrid';
-import CvStatusDataGrid from './dashboard/components/CvStatusDataGrid';
-import Search from './dashboard/components/Search';
-import SelectItem from './dashboard/components/SelectItem';
+import {
+    createStatusCrfColumns,
+    createStatusCvColumns,
+} from './checkStatus/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import Copyright from './dashboard/internals/components/Copyright';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -49,7 +48,7 @@ export default function CheckStatus({
     };
     defaultCheck: string;
 }) {
-    const [check, setCheck] = useState('1');
+    const [check, setCheck] = useState(defaultCheck);
     const [tableLoading, setTableLoading] = useState(false);
 
     const handlePagination = (model: GridPaginationModel) => {
@@ -61,8 +60,6 @@ export default function CheckStatus({
                 page: page,
                 per_page: per_page,
             },
-            preserveScroll: true, //Dont Remove( Mugana ni.. gibitok ra ang vs code)
-            preserveState: true,
         });
     };
 
@@ -76,8 +73,6 @@ export default function CheckStatus({
                 search: query,
             },
             only: [check === 'cv' ? 'cv' : 'crf'],
-            preserveScroll: true,
-            preserveState: true,
             replace: true,
         });
     };
@@ -88,7 +83,6 @@ export default function CheckStatus({
             data: {
                 selectedCheck: event.target.value,
             },
-            preserveScroll: true, //Dont bother with the line error( Mugana ni.. gibitok ra ang vs code)
             only: ['crf'],
             replace: true,
             onStart: () => setTableLoading(true),
@@ -105,14 +99,18 @@ export default function CheckStatus({
                 },
             },
             only: [check === 'cv' ? 'cv' : 'crf'],
-            preserveState: true,
-            preserveScroll: true,
             replace: true,
         });
     };
+    const handleStatusChange = (id: number, value: string) => {
+        if (value === 'details') {
+            if (check === 'cv') router.visit(details(id));
+            else router.visit(detailsCrf(id));
+        }
+    };
 
-    const cvColumns = createReleasingCvColumns(handleStatusChange);
-    const crfColumns = createReleasingCrfColumns(handleStatusChange);
+    const cvColumns = createStatusCvColumns(handleStatusChange);
+    const crfColumns = createStatusCrfColumns(handleStatusChange);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -135,43 +133,6 @@ export default function CheckStatus({
                     isLoading={tableLoading}
                 />
             </PageContainer>
-
-            {/* <Box id="hero" sx={{ px: 3 }}>
-                <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-                    Check Status
-                </Typography>
-                <Stack direction="row" sx={{ gap: 3 }}>
-                    <Search onSearch={handleSearch} value={search} />
-                     <SelectItem
-                        handleChange={handleChange}
-                        value={bu.value}
-                        title="BU"
-                        items={permissions}
-                    /> *
-                    <SelectItem
-                        handleChange={handleChangeCheck}
-                        value={check}
-                        title="Check"
-                        items={checks}
-                    />
-                </Stack>
-                <Grid container spacing={2} columns={12} sx={{ mt: 3 }}>
-                    {check === '1' && (
-                        <CvStatusDataGrid
-                            cvs={cv}
-                            pagination={handlePagination}
-                        />
-                    )}
-
-                    {check === '2' && (
-                        <CrfStatusDataGrid
-                            crf={crf}
-                            pagination={handlePagination}
-                        />
-                    )}
-                </Grid>
-                <Copyright sx={{ my: 4 }} />
-            </Box> */}
         </AppLayout>
     );
 }

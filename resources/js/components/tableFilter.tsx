@@ -71,8 +71,6 @@ export default function ({
                     },
                 },
                 only: ['cv'],
-                preserveState: true,
-                preserveScroll: true,
                 replace: true,
             });
         }

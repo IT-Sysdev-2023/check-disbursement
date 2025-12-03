@@ -78,8 +78,6 @@ export default function RetrievedRecords({
                 search: query,
             },
             only: [check === 'cv' ? 'cv' : 'crf'],
-            preserveScroll: true,
-            preserveState: true,
             replace: true,
         });
     };
@@ -93,8 +91,6 @@ export default function RetrievedRecords({
                 },
             },
             only: [check === 'cv' ? 'cv' : 'crf'],
-            preserveState: true,
-            preserveScroll: true,
             replace: true,
         });
     };
@@ -144,8 +140,6 @@ export default function RetrievedRecords({
                 page: page,
                 per_page: per_page,
             },
-            preserveScroll: true, //Dont Remove( Mugana ni.. gibitok ra ang vs code)
-            preserveState: true,
         });
     };
 
@@ -155,7 +149,6 @@ export default function RetrievedRecords({
             data: {
                 selectedCheck: event.target.value,
             },
-            preserveScroll: true, //Dont bother with the line error( Mugana ni.. gibitok ra ang vs code)
             only: ['crf'],
             replace: true,
             onStart: () => setTableLoading(true),
