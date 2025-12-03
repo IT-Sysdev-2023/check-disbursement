@@ -1,18 +1,29 @@
 import PageContainer from '@/components/pageContainer';
+import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { checkStatus } from '@/routes';
-import { Auth, Crf, Cv, InertiaPagination, type BreadcrumbItem } from '@/types';
+import {
+    Crf,
+    Cv,
+    DateFilterType,
+    InertiaPagination,
+    SelectionType,
+    type BreadcrumbItem,
+} from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Box, Grid, SelectChangeEvent, Stack, Typography } from '@mui/material';
-import { GridPaginationModel } from '@mui/x-data-grid';
+import {
+    GridFilterModel,
+    GridPaginationModel,
+    GridSortModel,
+} from '@mui/x-data-grid';
 import { useState } from 'react';
 import CrfStatusDataGrid from './dashboard/components/CrfStatusDataGrid';
 import CvStatusDataGrid from './dashboard/components/CvStatusDataGrid';
 import Search from './dashboard/components/Search';
 import SelectItem from './dashboard/components/SelectItem';
-import Copyright from './dashboard/internals/components/Copyright';
-import TableFilter from '@/components/tableFilter';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import Copyright from './dashboard/internals/components/Copyright';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -24,73 +35,84 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function CheckStatus({
     cv,
     crf,
-    auth,
+    company,
+    filter,
+    defaultCheck,
 }: {
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
-    auth: Auth;
-}) {
-    const [bu, setBu] = useState<{ label: string; value: string }>({
-        label: '',
-        value: '',
-    });
-    console.log(crf);
-
-    const [check, setCheck] = useState('1');
-
-    const [search, setSearch] = useState('');
-    const permissions =
-        auth.user?.permissions?.map((r) => ({ value: r.id, label: r.name })) ||
-        [];
-
-    const checks = [
-        { value: '1', label: 'CV' },
-        { value: '2', label: 'CRF' },
-    ];
-
-    const handleChangeCheck = (event: SelectChangeEvent) => {
-        setCheck(event.target.value);
-
-        router.get(
-            checkStatus(),
-            { bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
-            },
-        );
+    company: SelectionType[];
+    filter: {
+        selectedBu: string;
+        search: string;
+        date: DateFilterType;
     };
+    defaultCheck: string;
+}) {
+    const [check, setCheck] = useState('1');
+    const [tableLoading, setTableLoading] = useState(false);
 
     const handlePagination = (model: GridPaginationModel) => {
-        const page = model.page + 1; // MUI DataGrid uses 0-based index
+        const page = model.page + 1;
         const per_page = model.pageSize;
 
-        router.get(
-            checkStatus(),
-            { page, per_page, bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
+        router.reload({
+            data: {
+                page: page,
+                per_page: per_page,
             },
-        );
+            preserveScroll: true, //Dont Remove( Mugana ni.. gibitok ra ang vs code)
+            preserveState: true,
+        });
     };
 
-    const handleSearch = (value: string) => {
-        setSearch(value);
+    const handleSearch = (model: GridFilterModel) => {
+        const query = model.quickFilterValues?.length
+            ? model.quickFilterValues?.[0]
+            : '';
 
-        router.get(
-            checkStatus(),
-            { search: value, bu: bu.label },
-            {
-                preserveScroll: true,
-                preserveState: true,
-                replace: true,
+        router.reload({
+            data: {
+                search: query,
             },
-        );
+            only: [check === 'cv' ? 'cv' : 'crf'],
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        });
     };
 
+    const handleCheck = (event: SelectChangeEvent) => {
+        setCheck(event.target.value);
+        router.reload({
+            data: {
+                selectedCheck: event.target.value,
+            },
+            preserveScroll: true, //Dont bother with the line error( Mugana ni.. gibitok ra ang vs code)
+            only: ['crf'],
+            replace: true,
+            onStart: () => setTableLoading(true),
+            onFinish: () => setTableLoading(false),
+        });
+    };
+
+    const handleSort = (model: GridSortModel) => {
+        router.reload({
+            data: {
+                sort: {
+                    field: model[0].field,
+                    sort: model[0].sort,
+                },
+            },
+            only: [check === 'cv' ? 'cv' : 'crf'],
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    };
+
+    const cvColumns = createReleasingCvColumns(handleStatusChange);
+    const crfColumns = createReleasingCrfColumns(handleStatusChange);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -114,18 +136,18 @@ export default function CheckStatus({
                 />
             </PageContainer>
 
-            <Box id="hero" sx={{ px: 3 }}>
+            {/* <Box id="hero" sx={{ px: 3 }}>
                 <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
                     Check Status
                 </Typography>
                 <Stack direction="row" sx={{ gap: 3 }}>
                     <Search onSearch={handleSearch} value={search} />
-                    {/* <SelectItem
+                     <SelectItem
                         handleChange={handleChange}
                         value={bu.value}
                         title="BU"
                         items={permissions}
-                    /> */}
+                    /> *
                     <SelectItem
                         handleChange={handleChangeCheck}
                         value={check}
@@ -149,7 +171,7 @@ export default function CheckStatus({
                     )}
                 </Grid>
                 <Copyright sx={{ my: 4 }} />
-            </Box>
+            </Box> */}
         </AppLayout>
     );
 }
