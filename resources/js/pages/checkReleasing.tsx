@@ -111,7 +111,18 @@ export default function CheckReleasing({
             setOpen(true);
             return;
         }
-        router.visit(releaseCheck([id, value]));
+
+        router.push({
+            url: releaseCheck([id, value]).url,
+            component: 'checkReleasing/releaseCheck',
+            props: (curr) => ({
+                ...curr,
+                id: id,
+                status: value,
+                label:
+                    value.charAt(0).toUpperCase() + value.slice(1) + ' Check',
+            }),
+        });
     };
 
     const cvColumns = createReleasingCvColumns(handleStatusChange);
