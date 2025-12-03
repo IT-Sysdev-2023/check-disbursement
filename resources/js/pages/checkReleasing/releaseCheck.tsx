@@ -10,6 +10,7 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
+import { CloudUploadIcon } from 'lucide-react';
 import { ChangeEvent, FormEvent, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 
@@ -113,7 +114,13 @@ export default function ReleaseCheck({
                         width: '100%',
                     }}
                 >
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                        }}
+                    >
                         {/* Text Field */}
                         <TextField
                             label="Receivers Name"
@@ -126,7 +133,12 @@ export default function ReleaseCheck({
 
                         {/* File Upload */}
                         <FormControl error={!!errors.file}>
-                            <Button variant="contained" component="label">
+                            <Button
+                                variant="contained"
+                                component="label"
+                                color="secondary"
+                                startIcon={<CloudUploadIcon />}
+                            >
                                 Upload Profile Image
                                 <input
                                     type="file"
@@ -150,7 +162,7 @@ export default function ReleaseCheck({
                     </Box>
 
                     {/* Signature Pad */}
-                    <FormControl error={!!errors.signature} >
+                    <FormControl error={!!errors.signature}>
                         <Box
                             sx={{
                                 border: '1px solid #ccc',
@@ -164,7 +176,11 @@ export default function ReleaseCheck({
                                 penColor="black"
                                 canvasProps={{
                                     height: 300,
-                                    style: { backgroundColor: 'white',width: '100%',  display: 'block',  },
+                                    style: {
+                                        backgroundColor: 'white',
+                                        width: '100%',
+                                        display: 'block',
+                                    },
                                     className: 'sigCanvas',
                                 }}
                             />
@@ -191,7 +207,7 @@ export default function ReleaseCheck({
                     <Button
                         type="submit"
                         variant="contained"
-                        color="primary"
+                        color="secondary"
                         loading={processing}
                     >
                         Submit

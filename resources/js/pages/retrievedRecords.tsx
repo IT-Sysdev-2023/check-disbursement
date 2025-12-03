@@ -173,7 +173,7 @@ export default function RetrievedRecords({
                     <TabContext value={value}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <TabList onChange={handleChange} aria-label="tabs">
-                                <Tab label="Calendar View" value="1" />
+                                <Tab label="CV Calendar View" value="1" />
                                 <Tab label="Table View" value="2" />
                             </TabList>
                         </Box>
