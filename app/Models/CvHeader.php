@@ -11,6 +11,7 @@ class CvHeader extends Model
     {
         return [
             'cv_date' => 'datetime',
+            'created_at' => 'datetime',
         ];
 
     }

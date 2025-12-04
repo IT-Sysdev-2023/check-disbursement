@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RetrieveDataController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\StatusController;
@@ -23,9 +24,7 @@ Route::get('/', function () {
 })->name('home')->middleware('guest');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     //! EXTRACT CHECKS
     Route::prefix('extract')->group(function () {

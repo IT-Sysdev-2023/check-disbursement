@@ -3,6 +3,7 @@ import {
     DataGrid,
     gridClasses,
     GridColDef,
+    GridDensity,
     GridEventListener,
     GridFilterModel,
     GridPaginationModel,
@@ -18,18 +19,20 @@ export default function TableDataGrid({
     filter,
     handleSearchFilter,
     handleSortFilter,
+    density,
 }: {
     data: InertiaPagination<Cv | Crf>;
     columns: GridColDef[];
     isLoading: boolean;
-    filter: string;
+    filter?: string;
+    density?: GridDensity;
     pagination: (model: GridPaginationModel) => void;
     handleSearchFilter: (model: GridFilterModel) => void;
     handleSortFilter: (model: GridSortModel) => void;
 }) {
     const [filterModel, setFilterModel] = useState<GridFilterModel>({
         items: [],
-        quickFilterValues: [filter],
+        quickFilterValues: [filter ?? []],
     });
 
     const handleSortModelChange = useCallback(
@@ -76,6 +79,7 @@ export default function TableDataGrid({
             sortingMode="server"
             filterMode="server"
             paginationMode="server"
+            density={density}
             paginationModel={{
                 page: data.meta.current_page - 1,
                 pageSize: data.meta.per_page,
