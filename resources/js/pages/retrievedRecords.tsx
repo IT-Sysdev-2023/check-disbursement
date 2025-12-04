@@ -1,6 +1,6 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf, scanCheck } from '@/routes';
+import { details, detailsCrf, scanCheck, unassignCheck } from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -126,6 +126,9 @@ export default function RetrievedRecords({
                     },
                 },
             );
+        },
+        assign: (id) => {
+            router.get(unassignCheck(id));
         },
     };
 

@@ -31,7 +31,6 @@ export default function BorrowedCheckModal({
     bu: string;
     handleClose: () => void;
 }) {
-
     const { data, setData, post, processing, errors, transform, reset } =
         useForm({
             name: '',

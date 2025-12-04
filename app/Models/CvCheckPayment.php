@@ -76,6 +76,11 @@ class CvCheckPayment extends Model
         return $this->hasOne(CheckStatus::class, 'check_id')->where('check', 'cv');
     }
 
+    public function assignedCheckNumber()
+    {
+        return $this->hasOne(AssignedCheckNumber::class);
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class);

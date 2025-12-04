@@ -2,12 +2,14 @@ import { ActionType } from '@/types';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
-const renderStatus = (status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign') => {
+const renderStatus = (
+    status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign',
+) => {
     const colors: { [index: string]: 'success' | 'error' | 'info' } = {
         Signature: 'info',
         Releasing: 'success',
         Borrowed: 'error',
-        Assign: 'error'
+        Assign: 'error',
     };
 
     const label = ['Signature', 'Releasing', 'Assign'].includes(status)
@@ -266,20 +268,16 @@ export const createNoCheckNumberColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: (params) => {
-            const { status } = params.row;
+            const { status, id, company } = params.row;
             return (
                 <Select
                     size="small"
                     value={status ?? ''}
                     onChange={(e) =>
-                        handleStatusChange(
-                            params.row.id,
-                            e.target.value,
-                            params.row.company.name,
-                        )
+                        handleStatusChange(id, e.target.value, company.name)
                     }
                 >
-                    <MenuItem value="scan">Assign</MenuItem>
+                    <MenuItem value="assign">Assign</MenuItem>
                     <MenuItem value="details">Check Details</MenuItem>
                 </Select>
             );

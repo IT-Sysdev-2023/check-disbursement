@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\CvCheckPaymentResource;
+use App\Models\CvCheckPayment;
 use App\Services\ChecksService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Inertia\Inertia;
 
 class RetrievedChecksController extends Controller
 {
@@ -30,7 +33,7 @@ class RetrievedChecksController extends Controller
             'check' => 'required| string',
             'id' => 'required'
         ]);
-        
+
         $request->user()->borrowedChecks()->create([
             'check_id' => $request->id,
             'name' => $request->name,
@@ -41,7 +44,7 @@ class RetrievedChecksController extends Controller
         return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
-     public function scanCheck(Request $request)
+    public function scanCheck(Request $request)
     {
         $request->validate([
             'id' => 'required',
@@ -55,6 +58,30 @@ class RetrievedChecksController extends Controller
         ]);
 
         return Redirect::back()->with(['status' => true, 'message' => 'Successfully Scanned']);
+    }
+    public function unassignCheck(CvCheckPayment $id)
+    {
+        //  $request->validate([
+        //     'id' => 'required',
+        //     'checkNumber' => 'required| string',
+        // ]);
+        return Inertia::render('retrievedRecords/unassignCheck', [
+            'cv' => new CvCheckPaymentResource($id->load('cvHeader:id,cv_no,vendor_no,remarks'))
+        ]);
+    }
 
+    public function storeUnassignCheck(Request $request)
+    {
+        $request->validate([
+            'id' => 'required',
+            'checkNumber' => ['required', 'integer', 'regex:/^[1-9]\d*$/'],
+        ]);
+
+        $request->user()->assignedCheckNumber()->create([
+            'cv_check_payment_id' => $request->id,
+            'check_number' => $request->checkNumber
+        ]);
+
+        return Redirect::route('retrievedRecords')->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 }

@@ -63,5 +63,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(CheckStatus::class, 'caused_by');
     }
+    public function assignedCheckNumber()
+    {
+        return $this->hasMany(AssignedCheckNumber::class, 'caused_by');
+    }
 
 }

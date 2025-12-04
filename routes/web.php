@@ -47,7 +47,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrievedRecords');
         Route::post('borrowed-check', [RetrievedChecksController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
         Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
-
+        Route::get('unassign-check/{id}', [RetrievedChecksController::class, 'unassignCheck'])->name('unassignCheck');
+        Route::post('store-unassign-check-number', [RetrievedChecksController::class, 'storeUnassignCheck'])->name('storeUnassignCheck');
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
         Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('detailsCrf');
     });

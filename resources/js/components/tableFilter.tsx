@@ -67,7 +67,7 @@ export default function ({
                         end: endDate.format('YYYY-MM-DD'),
                     },
                 },
-                only: ['cv'],
+                only: ['cv', 'cvEmptyCheckNo'],
                 replace: true,
             });
         }

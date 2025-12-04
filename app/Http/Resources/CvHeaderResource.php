@@ -18,7 +18,7 @@ class CvHeaderResource extends JsonResource
         return [
             'id' => $this->id,
             'cvNo' => $this->cv_no,
-            'cvDate' => $this->cv_date->toFormattedDateString(),
+            'cvDate' =>$this->cv_date ? $this->cv_date->toFormattedDateString() : 'N/A',
             'vendorNo' => $this->vendor_no ?: 'N/A',
             'remarks' => $this->remarks,
             'navHeaderTable' => new NavHeaderTableResource($this->whenLoaded('navHeaderTable'))

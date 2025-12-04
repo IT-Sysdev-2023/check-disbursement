@@ -72,6 +72,7 @@ class ChecksService
         return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')
+            ->doesntHave('assignedCheckNumber')
             ->when($hasNoAmount, function ($query) {
                 $query->where('check_number', 0);
             }, function ($query) {
