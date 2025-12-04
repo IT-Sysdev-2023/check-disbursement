@@ -2,16 +2,11 @@ import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { DateFilterType, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 import { Box, SelectChangeEvent, Stack } from '@mui/material';
-import {
-    DatePicker,
-    LocalizationProvider,
-} from '@mui/x-date-pickers';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PickerValue } from '@mui/x-date-pickers/internals';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
-
-
 
 const checks = [
     { value: 'cv', label: 'CV' },
@@ -22,6 +17,7 @@ export default function ({
     company,
     check,
     handleChangeCheck,
+    isCheckDisabled = false,
     filters,
     isCrf,
 }: {
@@ -30,6 +26,7 @@ export default function ({
         selectedBu: string;
         date: DateFilterType;
     };
+    isCheckDisabled?: boolean;
     check: string;
     isCrf: boolean;
     handleChangeCheck: (value: SelectChangeEvent) => void;
@@ -97,6 +94,7 @@ export default function ({
                 />
                 <SelectItem
                     handleChange={handleChangeCheck}
+                    isDisabled={isCheckDisabled}
                     value={check}
                     title="Check"
                     items={checks}

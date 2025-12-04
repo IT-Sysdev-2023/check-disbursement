@@ -27,7 +27,6 @@ export default function CalendarView({
                 >
                     {Object.entries(distinctMonths).map(([key, monthGroup]) => {
                         const [year, month] = key.split('-');
-                        console.log(monthGroup);
                         return (
                             <DateCalendar
                                 key={key}

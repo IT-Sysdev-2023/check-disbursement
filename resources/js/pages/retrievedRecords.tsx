@@ -33,6 +33,7 @@ import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createCrfColumns,
     createCvColumns,
+    createNoCheckNumberColumns,
 } from './retrievedRecords/components/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -49,6 +50,7 @@ export default function RetrievedRecords({
     filter,
     company,
     distinctMonths,
+    cvEmptyCheckNo,
 }: {
     filter: {
         selectedBu: string;
@@ -57,6 +59,7 @@ export default function RetrievedRecords({
     };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
+    cvEmptyCheckNo: InertiaPagination<Cv>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
@@ -131,11 +134,12 @@ export default function RetrievedRecords({
         if (handler) handler(id, bu);
     };
 
-    const handlePagination = (model: GridPaginationModel) => {
+    const handlePagination = (model: GridPaginationModel, param: string[]) => {
         const page = model.page + 1;
         const per_page = model.pageSize;
 
         router.reload({
+            only: param,
             data: {
                 page: page,
                 per_page: per_page,
@@ -158,10 +162,20 @@ export default function RetrievedRecords({
 
     const cvColumns = createCvColumns(handleStatusChange);
     const crfColumns = createCrfColumns(handleStatusChange);
+    const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
 
-    const [value, setValue] = useState('1');
+    const [value, setValue] = useState('calendar');
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+        //if Table View
+        if (newValue !== 'calendar') {
+            router.reload({
+                only: [newValue],
+                data: {
+                    page: 1,
+                },
+            });
+        }
         setValue(newValue);
     };
 
@@ -173,14 +187,21 @@ export default function RetrievedRecords({
                     <TabContext value={value}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                             <TabList onChange={handleChange} aria-label="tabs">
-                                <Tab label="CV Calendar View" value="1" />
-                                <Tab label="Table View" value="2" />
+                                <Tab
+                                    label="CV Calendar View"
+                                    value="calendar"
+                                />
+                                <Tab label="Table View" value="cv" />
+                                <Tab
+                                    label="Unassigned Check Number"
+                                    value="cvEmptyCheckNo"
+                                />
                             </TabList>
                         </Box>
-                        <TabPanel value="1">
+                        <TabPanel value="calendar">
                             <CalendarView distinctMonths={distinctMonths} />
                         </TabPanel>
-                        <TabPanel value="2">
+                        <TabPanel value="cv">
                             <TableFilter
                                 isCrf={check === 'crf'}
                                 handleChangeCheck={handleCheck}
@@ -192,12 +213,36 @@ export default function RetrievedRecords({
                             <TableDataGrid
                                 data={check === 'cv' ? cv : crf}
                                 filter={filter.search}
-                                pagination={handlePagination}
+                                pagination={(model) =>
+                                    handlePagination(model, ['cv', 'crf'])
+                                }
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
                                 columns={
                                     check === 'cv' ? cvColumns : crfColumns
                                 }
+                                isLoading={tableLoading}
+                            />
+                        </TabPanel>
+                        <TabPanel value="cvEmptyCheckNo">
+                            <TableFilter
+                                isCrf={false}
+                                isCheckDisabled={true}
+                                handleChangeCheck={handleCheck}
+                                company={company}
+                                filters={filter}
+                                check={check}
+                            />
+
+                            <TableDataGrid
+                                data={cvEmptyCheckNo}
+                                filter={filter.search}
+                                pagination={(model) =>
+                                    handlePagination(model, ['cvEmptyCheckNo'])
+                                }
+                                handleSearchFilter={handleSearch}
+                                handleSortFilter={handleSort}
+                                columns={cvNoCheckNoColumns}
                                 isLoading={tableLoading}
                             />
                         </TabPanel>

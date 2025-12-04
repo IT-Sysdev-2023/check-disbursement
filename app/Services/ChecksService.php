@@ -23,16 +23,22 @@ class ChecksService
                 fn($date) =>
                 Date::parse($date->cv_date)->format('Y-m')
             );
-        $cvRecords = self::cvRecords($filters, $page);
 
-        $crfs = ($filters['selectedCheck'] ?? null) === 'cv'
-            ? Inertia::lazy(fn() =>
-                self::crfRecords($filters, $page))
-            : self::crfRecords($filters, $page); // use when refresh( it doesnt load when refresh cause its on lazy)
+        $cvRecords = Inertia::lazy(fn() => self::cvRecords($filters, $page));
+
+        $cvNoCheckNo = Inertia::lazy(fn() => self::cvRecords($filters, $page, true));
+
+        $crfs =
+            // ($filters['selectedCheck'] ?? null) === 'cv'
+            //     ? 
+            Inertia::lazy(fn() =>
+                self::crfRecords($filters, $page));
+        // : self::crfRecords($filters, $page); // use when refresh( it doesnt load when refresh cause its on lazy)
 
         return Inertia::render('retrievedRecords', [
             'cv' => $cvRecords,
             'crf' => $crfs,
+            'cvEmptyCheckNo' => $cvNoCheckNo,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
@@ -56,18 +62,23 @@ class ChecksService
             ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
             ->doesntHave('checkStatus')
             ->filter($filters)
-            ->paginate($page ?? 10)
+            ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
     }
 
-    private static function cvRecords(array $filters, ?int $page)
+    private static function cvRecords(array $filters, ?int $page, ?bool $hasNoAmount = false)
     {
         return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')
+            ->when($hasNoAmount, function ($query) {
+                $query->where('check_number', 0);
+            }, function ($query) {
+                $query->whereNot('check_number', 0);
+            })
             ->filter($filters)
-            ->paginate($page ?? 10)
+            ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
     }
