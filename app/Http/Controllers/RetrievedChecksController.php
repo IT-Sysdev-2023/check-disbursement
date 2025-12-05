@@ -20,9 +20,9 @@ class RetrievedChecksController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->per_page;
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
 
-        return $this->service->records($perPage, $filters, $request->user());
+        return $this->service->records($perPage, $filters, $request);
     }
 
     public function storeBorrowedCheck(Request $request)
@@ -61,10 +61,6 @@ class RetrievedChecksController extends Controller
     }
     public function unassignCheck(CvCheckPayment $id)
     {
-        //  $request->validate([
-        //     'id' => 'required',
-        //     'checkNumber' => 'required| string',
-        // ]);
         return Inertia::render('retrievedRecords/unassignCheck', [
             'cv' => new CvCheckPaymentResource($id->load('cvHeader:id,cv_no,vendor_no,remarks'))
         ]);
@@ -82,6 +78,6 @@ class RetrievedChecksController extends Controller
             'check_number' => $request->checkNumber
         ]);
 
-        return Redirect::route('retrievedRecords')->with(['status' => true, 'message' => 'Successfully Updated']);
+        return Redirect::route('retrievedRecords')->with(['status' => true, 'message' => 'Successfully Assigned']);
     }
 }

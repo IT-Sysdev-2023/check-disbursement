@@ -5,35 +5,24 @@ namespace App\Services;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ChecksService
 {
-    public function records(?int $page, array $filters, User $user)
+    public function records(?int $page, array $filters, Request $request)
     {
+        //LAZY LOADING APPROACHING MOTHER F*CKERSSSSSSSS hAHAHAHHA
+        $cvRecords = $filters['tab'] === 'cv' ? self::cvRecords($filters)
+            : Inertia::lazy(fn() => self::cvRecords($filters));
 
-        $distinctMonths = CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
-            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-            ->doesntHave('checkStatus')
-            ->groupBy('cv_headers.cv_date')
-            ->get()
-            ->groupBy(
-                fn($date) =>
-                Date::parse($date->cv_date)->format('Y-m')
-            );
+        $cvNoCheckNo = $filters['tab'] === 'cvEmptyCheckNo' ? self::cvRecords($filters, true)
+            : Inertia::lazy(fn() => self::cvRecords($filters, true));
 
-        $cvRecords = Inertia::lazy(fn() => self::cvRecords($filters, $page));
-
-        $cvNoCheckNo = Inertia::lazy(fn() => self::cvRecords($filters, $page, true));
-
-        $crfs =
-            // ($filters['selectedCheck'] ?? null) === 'cv'
-            //     ? 
-            Inertia::lazy(fn() =>
-                self::crfRecords($filters, $page));
-        // : self::crfRecords($filters, $page); // use when refresh( it doesnt load when refresh cause its on lazy)
+        $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
+            : Inertia::lazy(fn() => self::crfRecords($filters));
 
         return Inertia::render('retrievedRecords', [
             'cv' => $cvRecords,
@@ -46,17 +35,18 @@ class ChecksService
                 'date' => $filters['date'] ?? (object) [
                     'start' => null,
                     'end' => null
-                ]
+                ],
+                'tab' => $filters['tab'] ?? 'calendar'
             ],
-            'company' => PermissionService::getCompanyPermissions($user)->prepend([
+            'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
                 'value' => '0'
             ]),
-            'distinctMonths' => $distinctMonths,
+            'distinctMonths' => self::distinctMonths()
         ]);
     }
 
-    private static function crfRecords(array $filters, ?int $page)
+    private static function crfRecords(array $filters)
     {
         return Crf::with('borrowedCheck')
             ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
@@ -67,7 +57,7 @@ class ChecksService
             ->toResourceCollection();
     }
 
-    private static function cvRecords(array $filters, ?int $page, ?bool $hasNoAmount = false)
+    private static function cvRecords(array $filters, ?bool $hasNoAmount = false)
     {
         return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
@@ -76,11 +66,25 @@ class ChecksService
             ->when($hasNoAmount, function ($query) {
                 $query->where('check_number', 0);
             }, function ($query) {
-                $query->whereNot('check_number', 0);
+                $query->whereNot('check_number', 0)
+                    ->orHas('assignedCheckNumber');
             })
             ->filter($filters)
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
+    }
+
+    private static function distinctMonths()
+    {
+        return CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
+            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+            ->doesntHave('checkStatus')
+            ->groupBy('cv_headers.cv_date')
+            ->get()
+            ->groupBy(
+                fn($date) =>
+                Date::parse($date->cv_date)->format('Y-m')
+            );
     }
 }

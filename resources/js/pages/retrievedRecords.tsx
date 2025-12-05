@@ -13,14 +13,14 @@ import {
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { Box, SelectChangeEvent, Tab } from '@mui/material';
 import {
     GridFilterModel,
     GridPaginationModel,
     GridSortModel,
 } from '@mui/x-data-grid';
-import { useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -56,6 +56,7 @@ export default function RetrievedRecords({
         selectedBu: string;
         search: string;
         date: DateFilterType;
+        tab: string;
     };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
@@ -69,8 +70,23 @@ export default function RetrievedRecords({
     const [open, setOpen] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [buBorrow, setBuBorrow] = useState('');
-    const handleClose = () => setOpen(false);
+    const notifications = useNotifications();
+    const [value, setValue] = useState(filter.tab);
+    
+    const { flash } = usePage().props as {
+        flash?: { status?: boolean; message?: string };
+    };
+    useEffect(() => {
+        if (flash?.status && flash?.message) {
+            notifications.show(flash.message, {
+                severity: 'success',
+                autoHideDuration: 3000,
+            });
+            setCheck('cvEmptyCheckNo');
+        }
+    }, [flash, notifications]);
 
+    const handleClose = () => setOpen(false);
     const handleSearch = (model: GridFilterModel) => {
         const query = model.quickFilterValues?.length
             ? model.quickFilterValues?.[0]
@@ -84,7 +100,7 @@ export default function RetrievedRecords({
             replace: true,
         });
     };
-    const notifications = useNotifications();
+
     const handleSort = (model: GridSortModel) => {
         router.reload({
             data: {
@@ -167,15 +183,14 @@ export default function RetrievedRecords({
     const crfColumns = createCrfColumns(handleStatusChange);
     const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
 
-    const [value, setValue] = useState('calendar');
-
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    const handleChange = (event: SyntheticEvent, newValue: string) => {
         //if Table View
         if (newValue !== 'calendar') {
             router.reload({
                 only: [newValue],
                 data: {
                     page: 1,
+                    tab: newValue,
                 },
             });
         }
