@@ -15,10 +15,10 @@ class ChecksService
     public function records(?int $page, array $filters, Request $request)
     {
         //LAZY LOADING APPROACHING MOTHER F*CKERSSSSSSSS hAHAHAHHA
-        $cvRecords = $filters['tab'] === 'cv' ? self::cvRecords($filters)
+        $cvRecords = ($filters['tab'] ?? null) === 'cv'  ? self::cvRecords($filters)
             : Inertia::lazy(fn() => self::cvRecords($filters));
 
-        $cvNoCheckNo = $filters['tab'] === 'cvEmptyCheckNo' ? self::cvRecords($filters, true)
+        $cvNoCheckNo = ($filters['tab'] ?? null) === 'cvEmptyCheckNo' ? self::cvRecords($filters, true)
             : Inertia::lazy(fn() => self::cvRecords($filters, true));
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
