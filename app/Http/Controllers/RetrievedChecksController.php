@@ -78,6 +78,6 @@ class RetrievedChecksController extends Controller
             'check_number' => $request->checkNumber
         ]);
 
-        return Redirect::route('retrievedRecords')->with(['status' => true, 'message' => 'Successfully Assigned']);
+        return Redirect::route('retrievedRecords', ['tab' => 'cv'])->with(['status' => true, 'message' => 'Successfully Assigned']);
     }
 }

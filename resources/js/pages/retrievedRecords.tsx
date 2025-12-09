@@ -33,7 +33,6 @@ import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createCrfColumns,
     createCvColumns,
-    createNoCheckNumberColumns,
 } from './retrievedRecords/components/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -50,7 +49,7 @@ export default function RetrievedRecords({
     filter,
     company,
     distinctMonths,
-    cvEmptyCheckNo,
+    // cvEmptyCheckNo,
 }: {
     filter: {
         selectedBu: string;
@@ -60,7 +59,7 @@ export default function RetrievedRecords({
     };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
-    cvEmptyCheckNo: InertiaPagination<Cv>;
+    // cvEmptyCheckNo: InertiaPagination<Cv>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
@@ -72,7 +71,7 @@ export default function RetrievedRecords({
     const [buBorrow, setBuBorrow] = useState('');
     const notifications = useNotifications();
     const [value, setValue] = useState(filter.tab);
-    
+
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
@@ -82,7 +81,7 @@ export default function RetrievedRecords({
                 severity: 'success',
                 autoHideDuration: 3000,
             });
-            setCheck('cvEmptyCheckNo');
+            setCheck('cv');
         }
     }, [flash, notifications]);
 
@@ -181,13 +180,12 @@ export default function RetrievedRecords({
 
     const cvColumns = createCvColumns(handleStatusChange);
     const crfColumns = createCrfColumns(handleStatusChange);
-    const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
+    // const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
 
     const handleChange = (event: SyntheticEvent, newValue: string) => {
-        //if Table View
+
         if (newValue !== 'calendar') {
             router.reload({
-                only: [newValue],
                 data: {
                     page: 1,
                     tab: newValue,
@@ -210,10 +208,6 @@ export default function RetrievedRecords({
                                     value="calendar"
                                 />
                                 <Tab label="Table View" value="cv" />
-                                <Tab
-                                    label="Unassigned Check Number"
-                                    value="cvEmptyCheckNo"
-                                />
                             </TabList>
                         </Box>
                         <TabPanel value="calendar">
@@ -228,41 +222,20 @@ export default function RetrievedRecords({
                                 check={check}
                             />
 
-                            <TableDataGrid
-                                data={check === 'cv' ? cv : crf}
-                                filter={filter.search}
-                                pagination={(model) =>
-                                    handlePagination(model, ['cv', 'crf'])
-                                }
-                                handleSearchFilter={handleSearch}
-                                handleSortFilter={handleSort}
-                                columns={
-                                    check === 'cv' ? cvColumns : crfColumns
-                                }
-                                isLoading={tableLoading}
-                            />
-                        </TabPanel>
-                        <TabPanel value="cvEmptyCheckNo">
-                            <TableFilter
-                                isCrf={false}
-                                isCheckDisabled={true}
-                                handleChangeCheck={handleCheck}
-                                company={company}
-                                filters={filter}
-                                check={check}
-                            />
-
-                            <TableDataGrid
-                                data={cvEmptyCheckNo}
-                                filter={filter.search}
-                                pagination={(model) =>
-                                    handlePagination(model, ['cvEmptyCheckNo'])
-                                }
-                                handleSearchFilter={handleSearch}
-                                handleSortFilter={handleSort}
-                                columns={cvNoCheckNoColumns}
-                                isLoading={tableLoading}
-                            />
+                            
+                                <TableDataGrid
+                                    data={check === 'cv' ? cv : crf}
+                                    filter={filter.search}
+                                    pagination={(model) =>
+                                        handlePagination(model, ['cv', 'crf'])
+                                    }
+                                    handleSearchFilter={handleSearch}
+                                    handleSortFilter={handleSort}
+                                    columns={
+                                        check === 'cv' ? cvColumns : crfColumns
+                                    }
+                                    isLoading={tableLoading}
+                                />
                         </TabPanel>
                     </TabContext>
                 </Box>

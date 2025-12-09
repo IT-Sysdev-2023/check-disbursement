@@ -70,6 +70,10 @@ export const createCvColumns = (
         headerName: 'Status',
         minWidth: 120,
         renderCell: (params) => {
+            if (!params.row.checkNumber) {
+                return renderStatus('Assign');
+            }
+
             return renderStatus(
                 params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
             );
@@ -83,7 +87,23 @@ export const createCvColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: (params) => {
-            const { status } = params.row;
+            const { status, id, company } = params.row;
+
+            if (!params.row.checkNumber) {
+                return (
+                    <Select
+                        size="small"
+                        value={status ?? ''}
+                        onChange={(e) =>
+                            handleStatusChange(id, e.target.value, company.name)
+                        }
+                    >
+                        <MenuItem value="assign">Assign</MenuItem>
+                        <MenuItem value="details">Check Details</MenuItem>
+                    </Select>
+                );
+            }
+
             return (
                 <Select
                     size="small"
@@ -206,81 +226,3 @@ export const createCrfColumns = (
     },
 ];
 
-export const createNoCheckNumberColumns = (
-    handleStatusChange: (
-        id: number,
-        value: ActionType,
-        companyName: string,
-    ) => void,
-): GridColDef[] => [
-    {
-        field: 'cvNo',
-        headerName: 'CV Number',
-        minWidth: 150,
-        renderCell: (params) => {
-            return params.row.cvHeader?.cvNo;
-        },
-    },
-    {
-        field: 'checkAmount',
-        headerName: 'Check Amount',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'payee',
-        headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-    },
-    {
-        field: 'name',
-        headerName: 'Business Unit',
-        headerAlign: 'center',
-        align: 'center',
-        flex: 1,
-        renderCell: (params) => {
-            return params.row.company?.name;
-        },
-    },
-    {
-        field: 'checkDate',
-        headerName: 'Check Date',
-        headerAlign: 'right',
-        align: 'right',
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        minWidth: 120,
-        renderCell: () => {
-            return renderStatus('Assign');
-        },
-    },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 130,
-        align: 'center',
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            const { status, id, company } = params.row;
-            return (
-                <Select
-                    size="small"
-                    value={status ?? ''}
-                    onChange={(e) =>
-                        handleStatusChange(id, e.target.value, company.name)
-                    }
-                >
-                    <MenuItem value="assign">Assign</MenuItem>
-                    <MenuItem value="details">Check Details</MenuItem>
-                </Select>
-            );
-        },
-    },
-];

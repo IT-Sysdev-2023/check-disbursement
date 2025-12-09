@@ -15,11 +15,15 @@ class ChecksService
     public function records(?int $page, array $filters, Request $request)
     {
         //LAZY LOADING APPROACHING MOTHER F*CKERSSSSSSSS hAHAHAHHA
-        $cvRecords = ($filters['tab'] ?? null) === 'cv'  ? self::cvRecords($filters)
-            : Inertia::lazy(fn() => self::cvRecords($filters));
 
-        $cvNoCheckNo = ($filters['tab'] ?? null) === 'cvEmptyCheckNo' ? self::cvRecords($filters, true)
-            : Inertia::lazy(fn() => self::cvRecords($filters, true));
+        if (self::checkIfHasNoCheckNumber()) {
+            $cvRecords = ($filters['tab'] ?? null) === 'cv' ? self::cvRecords($filters, true)
+                : Inertia::lazy(fn() => self::cvRecords($filters, true));
+        } else {
+            $cvRecords = ($filters['tab'] ?? null) === 'cv' ? self::cvRecords($filters)
+                : Inertia::lazy(fn() => self::cvRecords($filters));
+        }
+
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
             : Inertia::lazy(fn() => self::crfRecords($filters));
@@ -27,7 +31,6 @@ class ChecksService
         return Inertia::render('retrievedRecords', [
             'cv' => $cvRecords,
             'crf' => $crfs,
-            'cvEmptyCheckNo' => $cvNoCheckNo,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
@@ -55,6 +58,11 @@ class ChecksService
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
+    }
+
+    public static function checkIfHasNoCheckNumber()
+    {
+        return CvCheckPayment::where('check_number', 0)->exists();
     }
 
     private static function cvRecords(array $filters, ?bool $hasNoAmount = false)
