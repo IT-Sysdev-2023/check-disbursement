@@ -70,7 +70,7 @@ export const createCvColumns = (
         headerName: 'Status',
         minWidth: 120,
         renderCell: (params) => {
-            if (!params.row.checkNumber) {
+            if (!params.row.assignedCheckNumbers) {
                 return renderStatus('Assign');
             }
 
@@ -89,7 +89,7 @@ export const createCvColumns = (
         renderCell: (params) => {
             const { status, id, company } = params.row;
 
-            if (!params.row.checkNumber) {
+            if (!params.row.assignedCheckNumbers) {
                 return (
                     <Select
                         size="small"

@@ -62,12 +62,15 @@ class ChecksService
 
     public static function checkIfHasNoCheckNumber()
     {
-        return CvCheckPayment::where('check_number', 0)->exists();
+        return CvCheckPayment::where('check_number', 0)
+            ->doesntHave('checkStatus')
+            ->doesntHave('assignedCheckNumber')
+            ->exists();
     }
 
     private static function cvRecords(array $filters, ?bool $hasNoAmount = false)
     {
-        return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company')
+        return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company','assignedCheckNumber')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')
             ->doesntHave('assignedCheckNumber')

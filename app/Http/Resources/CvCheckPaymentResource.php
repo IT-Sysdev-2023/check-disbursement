@@ -25,9 +25,9 @@ class CvCheckPaymentResource extends JsonResource
             'checkNumber' => $this->check_number,
 
             'checkDate' => $this->check_date->toFormattedDateString(),
-            
+
             'checkAmount' => NumberHelper::currency($this->check_amount),
-            
+
             'payee' => $this->payee,
             'bankName' => $this->bank_name,
             'bankAccountNo' => $this->bank_account_no,
@@ -38,7 +38,7 @@ class CvCheckPaymentResource extends JsonResource
             'cvHeader' => new CvHeaderResource($this->whenLoaded('cvHeader')),
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
             'checkStatus' => $this->whenLoaded('checkStatus'),
-
+            'assignedCheckNumbers' => $this->whenLoaded('assignedCheckNumber'),
         ];
     }
 }
