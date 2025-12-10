@@ -57,21 +57,6 @@ export default function BorrowedCheckModal({
                 console.log(e);
             },
         });
-
-        // router.post(
-        //     borrowCheck(),
-        //     {
-        //         type: selectionModel.type,
-        //         ids: Array.from(selectionModel.ids), // convert Set to array
-        //     },
-        //     {
-        //         preserveScroll: true,
-        //         preserveState: true,
-        //         onError: (e) => {
-        //             console.log(e);
-        //         },
-        //     },
-        // );
     };
 
     return (

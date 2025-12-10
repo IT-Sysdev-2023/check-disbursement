@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CvCheckPaymentResource;
+use App\Models\BorrowedCheck;
+use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\ChecksService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
@@ -52,17 +56,61 @@ class RetrievedChecksController extends Controller
             'ids.*' => ['integer'],
             "name" => ["required", "string"],
             "reason" => ["required", "string"],
-            'check' => ["required", "string"],
+            'check' => ["required", "in:cv,crf"],
         ]);
 
-        foreach ($request->ids as $id) {
-            $request->user()->borrowedChecks()->create([
-                'check_id' => $id,
-                'name' => $request->name,
-                'reason' => $request->reason,
-                'check' => $request->check,
-            ]);
+        if ($request->type === 'exclude') {
+            if ($request->check === 'cv') {
+                CvCheckPayment::doesntHave('borrowedCheck')
+                    ->doesntHave('checkStatus')
+                    ->where(function ($q) {
+                        $q->where('check_number', '!=', 0)
+                            ->orHas('assignedCheckNumber');
+                    })
+                    ->whereNotIn('id', $request->ids)
+                    ->chunk(100, function (Collection $items) use ($request) {
+                        $data = $items->map(fn($check) => [
+                            'check_id' => $check->id,
+                            'name' => $request->name,
+                            'reason' => $request->reason,
+                            'check' => $request->check,
+                            'user_id' => $request->user()->id,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ])->toArray();
+
+                        BorrowedCheck::insert($data);
+                    });
+            } else {
+                Crf::doesntHave('checkStatus')
+                    ->doesntHave('borrowedCheck')
+                    ->whereNotIn('id', $request->ids)
+                    ->chunk(100, function (Collection $items) use ($request) {
+                        $data = $items->map(fn($check) => [
+                            'check_id' => $check->id,
+                            'name' => $request->name,
+                            'reason' => $request->reason,
+                            'check' => $request->check,
+                            'user_id' => $request->user()->id,
+                            'created_at' => now(),
+                            'updated_at' => now()
+                        ])->toArray();
+
+                        BorrowedCheck::insert($data);
+                    });
+            }
+        } else {
+            foreach ($request->ids as $id) {
+                $request->user()->borrowedChecks()->create([
+                    'check_id' => $id,
+                    'name' => $request->name,
+                    'reason' => $request->reason,
+                    'check' => $request->check,
+                ]);
+            }
         }
+
+
         return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 

@@ -58,6 +58,7 @@ class ChecksService
         return Crf::with('borrowedCheck')
             ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
             ->doesntHave('checkStatus')
+            ->doesntHave('borrowedCheck')
             ->filter($filters)
             ->paginate(10)
             ->withQueryString()

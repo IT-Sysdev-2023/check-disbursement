@@ -216,10 +216,10 @@ export const createCrfColumns = (
                     }
                 >
                     <MenuItem value="details">Check Details</MenuItem>
-                    {params.row.borrowedCheck == null && (
+                    {/* {params.row.borrowedCheck == null && (
                         <MenuItem value="borrow">Borrow Check</MenuItem>
                     )}
-                    <MenuItem value="scan">Scan</MenuItem>
+                    <MenuItem value="scan">Scan</MenuItem> */}
                 </Select>
             );
         },

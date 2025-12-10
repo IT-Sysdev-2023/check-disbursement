@@ -26,7 +26,7 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import { HandCoins } from 'lucide-react';
+import { Cloud, HandCoins } from 'lucide-react';
 import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
@@ -52,7 +52,6 @@ export default function RetrievedRecords({
     company,
     distinctMonths,
     borrowed,
-    // cvEmptyCheckNo,
 }: {
     filter: {
         selectedBu: string;
@@ -63,7 +62,6 @@ export default function RetrievedRecords({
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
     borrowed: InertiaPagination<Cv>;
-    // cvEmptyCheckNo: InertiaPagination<Cv>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
@@ -81,6 +79,7 @@ export default function RetrievedRecords({
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
+
     useEffect(() => {
         if (flash?.status && flash?.message) {
             notifications.show(flash.message, {
@@ -215,6 +214,13 @@ export default function RetrievedRecords({
     const crfColumns = createCrfColumns(handleStatusChange);
     // const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
 
+    const handleClose = () => {
+        setOpen(false);
+        setSelectionModel({
+            type: 'include',
+            ids: new Set(),
+        });
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">
@@ -292,7 +298,6 @@ export default function RetrievedRecords({
                             <TableDataGrid
                                 data={check === 'cv' ? borrowed : crf}
                                 filter={filter.search}
-                                hasSelection={true}
                                 selectionModel={selectionModel}
                                 handleSelectionChange={(model) =>
                                     setSelectionModel(
@@ -317,12 +322,11 @@ export default function RetrievedRecords({
                                 mt={3}
                             >
                                 <Button
-                                    disabled={!hasSelection}
                                     variant="outlined"
-                                    startIcon={<HandCoins />}
+                                    startIcon={<Cloud />}
                                     onClick={() => setOpen(true)}
                                 >
-                                    Borrow
+                                    Sync Check Scanned
                                 </Button>
                             </Box>
                         </TabPanel>
@@ -334,7 +338,7 @@ export default function RetrievedRecords({
                 whichCheck={check}
                 checkId={selectionModel}
                 open={open}
-                handleClose={() => setOpen(false)}
+                handleClose={handleClose}
             />
         </AppLayout>
     );
