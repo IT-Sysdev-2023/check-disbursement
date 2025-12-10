@@ -24,6 +24,9 @@ class ChecksService
                 : Inertia::lazy(fn() => self::cvRecords($filters));
         }
 
+        $borrowedRecords = ($filters['tab'] ?? null) === 'borrowed' ? self::borrowedRecords($filters)
+            : Inertia::lazy(fn() => self::borrowedRecords($filters));
+
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
             : Inertia::lazy(fn() => self::crfRecords($filters));
@@ -32,6 +35,7 @@ class ChecksService
             'cv' => $cvRecords,
             'crf' => $crfs,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
+            'borrowed' => $borrowedRecords,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -68,17 +72,34 @@ class ChecksService
             ->exists();
     }
 
-    private static function cvRecords(array $filters, ?bool $hasNoAmount = false)
+    public function borrowedRecords(array $filters)
     {
-        return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company','assignedCheckNumber')
+        return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company', 'assignedCheckNumber')
             ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
             ->doesntHave('checkStatus')
-            ->doesntHave('assignedCheckNumber')
+            // ->doesntHave('assignedCheckNumber')
+            ->has('borrowedCheck')
+            ->filter($filters)
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
+    }
+
+    private static function cvRecords(array $filters, ?bool $hasNoAmount = false)
+    {
+
+        return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company', 'assignedCheckNumber')
+            ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
+            ->doesntHave('borrowedCheck')
+            ->doesntHave('checkStatus')
+            // ->doesntHave('assignedCheckNumber')
             ->when($hasNoAmount, function ($query) {
                 $query->where('check_number', 0);
             }, function ($query) {
-                $query->whereNot('check_number', 0)
-                    ->orHas('assignedCheckNumber');
+                $query->where(function ($q) {
+                    $q->where('check_number', '!=', 0)
+                        ->orHas('assignedCheckNumber');
+                });
             })
             ->filter($filters)
             ->paginate(10)

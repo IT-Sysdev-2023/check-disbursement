@@ -207,6 +207,11 @@ export interface InertiaPagination<T> {
     data: T[];
 }
 
+export type SelectionModelType = {
+    type: 'include';
+    ids: Set<GridRowId>;
+};
+
 export type DistinctMonths = Record<
     string,
     { cv_date: string; total: number }[]

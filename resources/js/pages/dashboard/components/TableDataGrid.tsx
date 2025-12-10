@@ -7,6 +7,7 @@ import {
     GridEventListener,
     GridFilterModel,
     GridPaginationModel,
+    GridRowSelectionModel,
     GridSortModel,
 } from '@mui/x-data-grid';
 import { useCallback, useState } from 'react';
@@ -20,12 +21,20 @@ export default function TableDataGrid({
     handleSearchFilter,
     handleSortFilter,
     density,
+    hasSelection = false,
+    handleSelectionChange,
+    selectionModel,
+    handleRowClickSelection,
 }: {
     data: InertiaPagination<Cv | Crf>;
     columns: GridColDef[];
     isLoading: boolean;
+    hasSelection?: boolean;
     filter?: string;
+    selectionModel?: GridRowSelectionModel;
     density?: GridDensity;
+    handleRowClickSelection?: (id: number) => void;
+    handleSelectionChange?: (model: GridRowSelectionModel) => void;
     pagination: (model: GridPaginationModel) => void;
     handleSearchFilter: (model: GridFilterModel) => void;
     handleSortFilter: (model: GridSortModel) => void;
@@ -55,11 +64,13 @@ export default function TableDataGrid({
 
     const handleRowClick = useCallback<GridEventListener<'rowClick'>>(
         ({ row }) => {
-            console.log(row);
+            // console.log(row);
+            handleRowClickSelection?.(row.id);
             // router.visit(details(row.id));
         },
-        [],
+        [handleRowClickSelection],
     );
+
     if (!data) {
         return (
             <DataGrid
@@ -79,6 +90,10 @@ export default function TableDataGrid({
             sortingMode="server"
             filterMode="server"
             paginationMode="server"
+            checkboxSelection={hasSelection}
+            rowSelectionModel={selectionModel}
+            onRowClick={handleRowClick}
+            onRowSelectionModelChange={handleSelectionChange}
             density={density}
             paginationModel={{
                 page: data.meta.current_page - 1,
@@ -89,7 +104,6 @@ export default function TableDataGrid({
             filterModel={filterModel}
             onFilterModelChange={handleFilterModelChange}
             disableRowSelectionOnClick
-            onRowClick={handleRowClick}
             loading={isLoading}
             showToolbar
             pageSizeOptions={[5, 10, 15, 25]}

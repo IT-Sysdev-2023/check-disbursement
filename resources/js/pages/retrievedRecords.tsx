@@ -10,11 +10,12 @@ import {
     DistinctMonths,
     FlashReponse,
     InertiaPagination,
+    SelectionModelType,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Box, SelectChangeEvent, Tab } from '@mui/material';
+import { Box, Button, SelectChangeEvent, Tab } from '@mui/material';
 import {
     GridFilterModel,
     GridPaginationModel,
@@ -25,6 +26,7 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import { HandCoins } from 'lucide-react';
 import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
@@ -49,6 +51,7 @@ export default function RetrievedRecords({
     filter,
     company,
     distinctMonths,
+    borrowed,
     // cvEmptyCheckNo,
 }: {
     filter: {
@@ -59,18 +62,21 @@ export default function RetrievedRecords({
     };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
+    borrowed: InertiaPagination<Cv>;
     // cvEmptyCheckNo: InertiaPagination<Cv>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
 }) {
     const [check, setCheck] = useState(defaultCheck);
-    const [checkId, setCheckId] = useState<number | undefined>();
     const [open, setOpen] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
-    const [buBorrow, setBuBorrow] = useState('');
     const notifications = useNotifications();
     const [value, setValue] = useState(filter.tab);
+    const [selectionModel, setSelectionModel] = useState<SelectionModelType>({
+        type: 'include',
+        ids: new Set(),
+    });
 
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
@@ -85,7 +91,6 @@ export default function RetrievedRecords({
         }
     }, [flash, notifications]);
 
-    const handleClose = () => setOpen(false);
     const handleSearch = (model: GridFilterModel) => {
         const query = model.quickFilterValues?.length
             ? model.quickFilterValues?.[0]
@@ -119,10 +124,10 @@ export default function RetrievedRecords({
             else router.visit(detailsCrf(id));
         },
         borrow: (id, bu) => {
-            if (!bu) return;
-            setBuBorrow(bu);
-            setCheckId(id);
-            setOpen(true);
+            // if (!bu) return;
+            // setBuBorrow(bu);
+            // setCheckId(id);
+            // setOpen(true);
         },
         scan: (id) => {
             router.post(
@@ -178,12 +183,7 @@ export default function RetrievedRecords({
         });
     };
 
-    const cvColumns = createCvColumns(handleStatusChange);
-    const crfColumns = createCrfColumns(handleStatusChange);
-    // const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
-
     const handleChange = (event: SyntheticEvent, newValue: string) => {
-
         if (newValue !== 'calendar') {
             router.reload({
                 data: {
@@ -195,10 +195,29 @@ export default function RetrievedRecords({
         setValue(newValue);
     };
 
-    const pageTitle = 'Retrieved CV/CRF';
+    const handleRowSelection = (id: number) => {
+        setSelectionModel((prev) => {
+            const newIds = new Set(prev.ids);
+
+            if (newIds.has(id)) {
+                newIds.delete(id); // remove if already selected
+            } else {
+                newIds.add(id); // add if not selected
+            }
+
+            return { ...prev, ids: newIds };
+        });
+    };
+
+    const hasSelection =
+        selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
+    const cvColumns = createCvColumns(handleStatusChange);
+    const crfColumns = createCrfColumns(handleStatusChange);
+    // const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <PageContainer title={pageTitle}>
+            <PageContainer title="Retrieved CV/CRF">
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <TabContext value={value}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -208,6 +227,8 @@ export default function RetrievedRecords({
                                     value="calendar"
                                 />
                                 <Tab label="Table View" value="cv" />
+                                <Tab label="Borrowed Checks" value="borrowed" />
+                                <Tab label="Manage Checks" value="manage" />
                             </TabList>
                         </Box>
                         <TabPanel value="calendar">
@@ -222,20 +243,88 @@ export default function RetrievedRecords({
                                 check={check}
                             />
 
-                            
-                                <TableDataGrid
-                                    data={check === 'cv' ? cv : crf}
-                                    filter={filter.search}
-                                    pagination={(model) =>
-                                        handlePagination(model, ['cv', 'crf'])
-                                    }
-                                    handleSearchFilter={handleSearch}
-                                    handleSortFilter={handleSort}
-                                    columns={
-                                        check === 'cv' ? cvColumns : crfColumns
-                                    }
-                                    isLoading={tableLoading}
-                                />
+                            <TableDataGrid
+                                data={check === 'cv' ? cv : crf}
+                                filter={filter.search}
+                                hasSelection={true}
+                                selectionModel={selectionModel}
+                                handleSelectionChange={(model) =>
+                                    setSelectionModel(
+                                        model as SelectionModelType,
+                                    )
+                                }
+                                handleRowClickSelection={handleRowSelection}
+                                pagination={(model) =>
+                                    handlePagination(model, ['cv', 'crf'])
+                                }
+                                handleSearchFilter={handleSearch}
+                                handleSortFilter={handleSort}
+                                columns={
+                                    check === 'cv' ? cvColumns : crfColumns
+                                }
+                                isLoading={tableLoading}
+                            />
+
+                            <Box
+                                display="flex"
+                                justifyContent="flex-end"
+                                mt={3}
+                            >
+                                <Button
+                                    disabled={!hasSelection}
+                                    variant="outlined"
+                                    startIcon={<HandCoins />}
+                                    onClick={() => setOpen(true)}
+                                >
+                                    Borrow
+                                </Button>
+                            </Box>
+                        </TabPanel>
+                        <TabPanel value="borrowed">
+                            <TableFilter
+                                isCrf={check === 'crf'}
+                                handleChangeCheck={handleCheck}
+                                company={company}
+                                filters={filter}
+                                check={check}
+                            />
+
+                            <TableDataGrid
+                                data={check === 'cv' ? borrowed : crf}
+                                filter={filter.search}
+                                hasSelection={true}
+                                selectionModel={selectionModel}
+                                handleSelectionChange={(model) =>
+                                    setSelectionModel(
+                                        model as SelectionModelType,
+                                    )
+                                }
+                                handleRowClickSelection={handleRowSelection}
+                                pagination={(model) =>
+                                    handlePagination(model, ['cv', 'crf'])
+                                }
+                                handleSearchFilter={handleSearch}
+                                handleSortFilter={handleSort}
+                                columns={
+                                    check === 'cv' ? cvColumns : crfColumns
+                                }
+                                isLoading={tableLoading}
+                            />
+
+                            <Box
+                                display="flex"
+                                justifyContent="flex-end"
+                                mt={3}
+                            >
+                                <Button
+                                    disabled={!hasSelection}
+                                    variant="outlined"
+                                    startIcon={<HandCoins />}
+                                    onClick={() => setOpen(true)}
+                                >
+                                    Borrow
+                                </Button>
+                            </Box>
                         </TabPanel>
                     </TabContext>
                 </Box>
@@ -243,10 +332,9 @@ export default function RetrievedRecords({
 
             <BorrowedCheckModal
                 whichCheck={check}
-                checkId={checkId}
+                checkId={selectionModel}
                 open={open}
-                bu={buBorrow}
-                handleClose={handleClose}
+                handleClose={() => setOpen(false)}
             />
         </AppLayout>
     );

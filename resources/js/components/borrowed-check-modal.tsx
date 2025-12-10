@@ -1,10 +1,10 @@
-import { borrowedCheck } from '@/routes';
+import { borrowCheck } from '@/routes';
+import { SelectionModelType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Grid, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import Typography from '@mui/material/Typography';
 
 const style = {
     position: 'absolute',
@@ -22,13 +22,13 @@ export default function BorrowedCheckModal({
     checkId,
     whichCheck,
     open,
-    bu,
+    // bu,
     handleClose,
 }: {
-    checkId: number | undefined;
+    checkId: SelectionModelType;
     open: boolean;
     whichCheck: string;
-    bu: string;
+    // bu: string;
     handleClose: () => void;
 }) {
     const { data, setData, post, processing, errors, transform, reset } =
@@ -41,18 +41,37 @@ export default function BorrowedCheckModal({
 
         transform((data) => ({
             ...data,
-            id: checkId,
+            type: checkId.type,
+            ids: Array.from(checkId.ids), // convert Set to array
             check: whichCheck,
         }));
 
-        post(borrowedCheck().url, {
+        post(borrowCheck().url, {
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {
                 reset();
                 handleClose();
             },
+            onError: (e) => {
+                console.log(e);
+            },
         });
+
+        // router.post(
+        //     borrowCheck(),
+        //     {
+        //         type: selectionModel.type,
+        //         ids: Array.from(selectionModel.ids), // convert Set to array
+        //     },
+        //     {
+        //         preserveScroll: true,
+        //         preserveState: true,
+        //         onError: (e) => {
+        //             console.log(e);
+        //         },
+        //     },
+        // );
     };
 
     return (
@@ -71,13 +90,13 @@ export default function BorrowedCheckModal({
                     >
                         
                     </Typography> */}
-                    <Typography
+                    {/* <Typography
                         id="modal-modal-title"
                         variant="h6"
                         component="h2"
                     >
                         Business Unit: {bu}
-                    </Typography>
+                    </Typography> */}
 
                     <form onSubmit={handleSubmit}>
                         <Grid

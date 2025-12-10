@@ -44,6 +44,28 @@ class RetrievedChecksController extends Controller
         return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
+    public function storeBorrowCheck(Request $request)
+    {
+        $request->validate([
+            "type" => ["required", 'in:include,exclude'],
+            "ids" => ['required_if:type,include', 'array'],
+            'ids.*' => ['integer'],
+            "name" => ["required", "string"],
+            "reason" => ["required", "string"],
+            'check' => ["required", "string"],
+        ]);
+
+        foreach ($request->ids as $id) {
+            $request->user()->borrowedChecks()->create([
+                'check_id' => $id,
+                'name' => $request->name,
+                'reason' => $request->reason,
+                'check' => $request->check,
+            ]);
+        }
+        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
+    }
+
     public function scanCheck(Request $request)
     {
         $request->validate([
