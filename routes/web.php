@@ -7,6 +7,7 @@ use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RetrieveDataController;
 use App\Http\Controllers\RetrievedChecksController;
+use App\Http\Controllers\ScannedRecordsController;
 use App\Http\Controllers\StatusController;
 use App\Models\Company;
 use App\Models\CompanyPermission;
@@ -97,67 +98,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     });
 
-    Route::get('scan', function () {
-        $files = Storage::disk('scanned')->files();
-
-        foreach ($files as $file) {
-            $contents = Storage::disk('scanned')->get($file);
-            $lines = preg_split("/\r\n|\n|\r/", $contents);
-
-            $headerTitle = null;
-
-            foreach ($lines as $line) {
-                $bu = trim($line);
-                if ($bu !== '') {
-                    $headerTitle = $bu;
-                    break;
-                }
-            }
-
-            foreach ($lines as $line) {
-
-                // Skip empty lines and headers
-                if (!preg_match('/^\s*\d+\s+\d{2}\/\d{2}\/\d{4}/', $line)) {
-                    continue;
-                }
-
-                // Parse using regex (flexible for spacing)
-                $pattern = '/^\s*(\d+)\s+(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(\d+)\s+([A-Z- ]+)\s+([\d,]+\.\d{2})/';
-
-                if (preg_match($pattern, $line, $m)) {
-
-                    dd([
-                        'seq' => $m[1],
-                        'date' => $m[2],
-                        'account_no' => $m[3],
-                        'posted_date' => $m[4],
-                        'check_no' => $m[5],
-                        'branch_code' => $m[6],
-                        'branch_name' => trim($m[7]),
-                        'amount' => str_replace(',', '', $m[8]),
-                    ], $headerTitle, $contents);
-
-                    dd($contents);
-                    // YourModel::create([
-                    //     'seq' => $m[1],
-                    //     'date' => $m[2],
-                    //     'account_no' => $m[3],
-                    //     'posted_date' => $m[4],
-                    //     'check_no' => $m[5],
-                    //     'branch_code' => $m[6],
-                    //     'branch_name' => trim($m[7]),
-                    //     'amount' => str_replace(',', '', $m[8]),
-                    // ]);
-                }
-
-            }
-            // dd($contents);
-            dd($lines);
-        }
-
-
-        dd($files);
-    })->name('scan');
+    Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
 
 });
 Route::get('/test', function () {

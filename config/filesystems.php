@@ -62,7 +62,7 @@ return [
 
         'scanned' => [
             'driver' => 'local',
-            'root' => '\\\\172.16.42.91\jessan testing folder', //\\172.16.42.143\GiftCheckTextfile
+            'root' => '\\\\172.16.42.91\jessan', //\\172.16.42.143\GiftCheckTextfile
         ],
 
     ],

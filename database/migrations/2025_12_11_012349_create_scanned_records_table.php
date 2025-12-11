@@ -15,12 +15,13 @@ return new class extends Migration {
             $table->string('bu');
             $table->string('seq');
             $table->dateTime('date');
-            $table->unsignedBigInteger('account_no');
+            $table->string('account_no');
             $table->dateTime('posted_date');
-            $table->unsignedBigInteger('check_no');
+            $table->string('check_no');
             $table->unsignedBigInteger('branch_code');
             $table->string('branch_name');
-            $table->unsignedBigInteger('amount');
+            $table->decimal('amount', 20);
+            $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
             $table->unique(['check_no', 'account_no', 'amount']);

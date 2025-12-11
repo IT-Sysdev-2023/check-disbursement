@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('particulars');
             $table->decimal('amount',20);
             $table->string('bank');
-            $table->unsignedBigInteger('ck_no');
+            $table->string('ck_no');
             $table->string('prepared_by');
             $table->timestamps();
 
