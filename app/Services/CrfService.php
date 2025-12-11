@@ -18,7 +18,7 @@ class CrfService
         $total = $files->count();
         $start = 1;
 
-        $files->each(function ($item) use (&$records, &$start, $total, $userId) {
+        $files->each(function ( $item) use (&$records, &$start, $total, $userId) {
             $contents = $item->get();
             $fileName = $item->getClientOriginalName();
 

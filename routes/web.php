@@ -48,7 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('borrowed-check', [RetrievedChecksController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
 
         Route::post('store-borrow-check', [RetrievedChecksController::class, 'storeBorrowCheck'])->name('borrowCheck');
-        
+
         Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
         Route::get('unassign-check/{id}', [RetrievedChecksController::class, 'unassignCheck'])->name('unassignCheck');
         Route::post('store-unassign-check-number', [RetrievedChecksController::class, 'storeUnassignCheck'])->name('storeUnassignCheck');
@@ -96,6 +96,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
     });
+
+    Route::get('scan', function () {
+        $files = Storage::disk('scanned')->files();
+
+        foreach ($files as $file) {
+            $contents = Storage::disk('scanned')->get($file);
+
+            dd($contents);
+        }
+
+
+        dd($files);
+    })->name('scan');
 
 });
 Route::get('/test', function () {
