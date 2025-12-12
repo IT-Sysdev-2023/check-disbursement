@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\BorrowerName;
 use App\Models\Company;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -25,6 +26,7 @@ class DatabaseSeeder extends Seeder
             NavCpSeeder::class,
             NavHeaderSeeder::class,
             NavLineSeeder::class,
+            BorrowerNameSeeder::class
         ]);
 
         User::firstOrCreate(
@@ -48,6 +50,8 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('12341234'),
             ]
         );
+
+    
 
         // $ret = Company::select('name')->get();
 

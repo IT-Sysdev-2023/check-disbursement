@@ -1,10 +1,13 @@
-import { borrowCheck } from '@/routes';
-import { SelectionModelType } from '@/types';
+import SelectItem from '@/pages/dashboard/components/SelectItem';
+import { borrowCheck, borrowerNames } from '@/routes';
+import { SelectionModelType, SelectionType } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { Grid, TextField } from '@mui/material';
+import { Grid, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 const style = {
     position: 'absolute',
@@ -31,11 +34,26 @@ export default function BorrowedCheckModal({
     // bu: string;
     handleClose: () => void;
 }) {
+    const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
+        [],
+    );
+
+    // const [borrower, setBorrower] = useState('');
+
     const { data, setData, post, processing, errors, transform, reset } =
         useForm({
             name: '',
             reason: '',
         });
+
+    useEffect(() => {
+        const fetchBorrower = async () => {
+            const { data } = await axios.get(borrowerNames().url);
+            setBorrowerSelection(data);
+        };
+
+        fetchBorrower();
+    }, []);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -59,6 +77,9 @@ export default function BorrowedCheckModal({
         });
     };
 
+    const handleChange = (event: SelectChangeEvent) => {
+        setData('name', event.target.value);
+    };
     return (
         <>
             <Modal
@@ -68,13 +89,13 @@ export default function BorrowedCheckModal({
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    {/* <Typography
+                    <Typography
                         id="modal-modal-title"
                         variant="h6"
                         component="h2"
                     >
-                        
-                    </Typography> */}
+                        Borrower Info
+                    </Typography>
                     {/* <Typography
                         id="modal-modal-title"
                         variant="h6"
@@ -90,7 +111,7 @@ export default function BorrowedCheckModal({
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
                             <Grid size={{ xs: 12, sm: 12 }}>
-                                <TextField
+                                {/* <TextField
                                     type="text"
                                     value={data.name ?? ''}
                                     onChange={(e) =>
@@ -101,6 +122,12 @@ export default function BorrowedCheckModal({
                                     error={!!errors.name}
                                     helperText={errors.name ?? ' '}
                                     fullWidth
+                                /> */}
+                                <SelectItem
+                                    handleChange={handleChange}
+                                    value={data.name}
+                                    title="Borrower Name"
+                                    items={borrowerSelection}
                                 />
                             </Grid>
 

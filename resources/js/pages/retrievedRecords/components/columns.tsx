@@ -73,7 +73,7 @@ export const createCvColumns = (
             if (!params.row.assignedCheckNumbers) {
                 return renderStatus('Assign');
             }
-
+            
             return renderStatus(
                 params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
             );
@@ -98,7 +98,7 @@ export const createCvColumns = (
                             handleStatusChange(id, e.target.value, company.name)
                         }
                     >
-                        <MenuItem value="assign">Assign</MenuItem>
+                        {/* <MenuItem value="assign">Assign</MenuItem> */}
                         <MenuItem value="details">Check Details</MenuItem>
                     </Select>
                 );

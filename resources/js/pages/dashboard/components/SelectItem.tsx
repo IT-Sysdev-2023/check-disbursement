@@ -1,3 +1,4 @@
+import { SelectionType } from '@/types';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
@@ -6,10 +7,10 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 interface SelectItemProps {
     title: string;
-    items: { label: string; value: string | number }[];
+    items: SelectionType[];
     handleChange: (e: SelectChangeEvent) => void;
     value: string;
-    isDisabled?: boolean
+    isDisabled?: boolean;
 }
 
 export default function SelectItem({
@@ -17,7 +18,7 @@ export default function SelectItem({
     items,
     handleChange,
     value,
-    isDisabled = false
+    isDisabled = false,
 }: SelectItemProps) {
     return (
         <Box sx={{ minWidth: 120 }}>

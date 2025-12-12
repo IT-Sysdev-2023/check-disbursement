@@ -48,6 +48,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrievedRecords');
         Route::post('borrowed-check', [RetrievedChecksController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
 
+        Route::get('get-borrower-names', [RetrievedChecksController::class, 'borrowerNames'])->name('borrowerNames');
         Route::post('store-borrow-check', [RetrievedChecksController::class, 'storeBorrowCheck'])->name('borrowCheck');
 
         Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');

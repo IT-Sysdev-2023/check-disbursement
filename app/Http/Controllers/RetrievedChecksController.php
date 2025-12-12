@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\CvCheckPaymentResource;
 use App\Models\BorrowedCheck;
+use App\Models\BorrowerName;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\ChecksService;
@@ -54,11 +55,11 @@ class RetrievedChecksController extends Controller
             "type" => ["required", 'in:include,exclude'],
             "ids" => ['required_if:type,include', 'array'],
             'ids.*' => ['integer'],
-            "name" => ["required", "string"],
+            "name" => ["required", "int"],
             "reason" => ["required", "string"],
             'check' => ["required", "in:cv,crf"],
         ]);
-
+        
         if ($request->type === 'exclude') {
             if ($request->check === 'cv') {
                 CvCheckPayment::doesntHave('borrowedCheck')
@@ -71,7 +72,7 @@ class RetrievedChecksController extends Controller
                     ->chunk(100, function (Collection $items) use ($request) {
                         $data = $items->map(fn($check) => [
                             'check_id' => $check->id,
-                            'name' => $request->name,
+                            'borrower_name_id' => $request->name,
                             'reason' => $request->reason,
                             'check' => $request->check,
                             'user_id' => $request->user()->id,
@@ -88,7 +89,7 @@ class RetrievedChecksController extends Controller
                     ->chunk(100, function (Collection $items) use ($request) {
                         $data = $items->map(fn($check) => [
                             'check_id' => $check->id,
-                            'name' => $request->name,
+                            'borrower_name_id' => $request->name,
                             'reason' => $request->reason,
                             'check' => $request->check,
                             'user_id' => $request->user()->id,
@@ -103,7 +104,7 @@ class RetrievedChecksController extends Controller
             foreach ($request->ids as $id) {
                 $request->user()->borrowedChecks()->create([
                     'check_id' => $id,
-                    'name' => $request->name,
+                    'borrower_name_id' => $request->name,
                     'reason' => $request->reason,
                     'check' => $request->check,
                 ]);
@@ -149,5 +150,19 @@ class RetrievedChecksController extends Controller
         ]);
 
         return Redirect::route('retrievedRecords', ['tab' => 'cv'])->with(['status' => true, 'message' => 'Successfully Assigned']);
+    }
+
+    public function borrowerNames(Request $request)
+    {
+        $names = BorrowerName::select('id', 'name')->get();
+
+        $transform = $names->map(function ($name) {
+            return [
+                'label' => $name->name,
+                'value' => $name->id,
+            ];
+        });
+
+        return response()->json($transform);
     }
 }
