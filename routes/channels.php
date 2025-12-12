@@ -10,3 +10,11 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('cv-progress.{id}', function (User $user, int $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('crf-progress.{id}', function (User $user, int $id) {
+    return (int) $user->id === (int) $id;
+});
+
+Broadcast::channel('scan-progress.{id}', function (User $user, int $id) {
+    return (int) $user->id === (int) $id;
+});

@@ -1,9 +1,10 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf, scanCheck, unassignCheck } from '@/routes';
+import { details, detailsCrf, scan, scanCheck, unassignCheck } from '@/routes';
 import {
     ActionHandler,
     ActionType,
+    Auth,
     Crf,
     Cv,
     DateFilterType,
@@ -36,6 +37,7 @@ import {
     createCrfColumns,
     createCvColumns,
 } from './retrievedRecords/components/columns';
+import ProgressModal from './retrievedRecords/components/progressModal';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -52,6 +54,7 @@ export default function RetrievedRecords({
     company,
     distinctMonths,
     borrowed,
+    auth,
 }: {
     filter: {
         selectedBu: string;
@@ -65,9 +68,11 @@ export default function RetrievedRecords({
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
+    auth: Auth;
 }) {
     const [check, setCheck] = useState(defaultCheck);
     const [open, setOpen] = useState(false);
+    const [openProgress, setOpenProgress] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const notifications = useNotifications();
     const [value, setValue] = useState(filter.tab);
@@ -122,12 +127,12 @@ export default function RetrievedRecords({
             if (check === 'cv') router.visit(details(id));
             else router.visit(detailsCrf(id));
         },
-        borrow: (id, bu) => {
-            // if (!bu) return;
-            // setBuBorrow(bu);
-            // setCheckId(id);
-            // setOpen(true);
-        },
+        // borrow: (id, bu) => {
+        // if (!bu) return;
+        // setBuBorrow(bu);
+        // setCheckId(id);
+        // setOpen(true);
+        // },
         scan: (id) => {
             router.post(
                 scanCheck(),
@@ -220,6 +225,11 @@ export default function RetrievedRecords({
             type: 'include',
             ids: new Set(),
         });
+    };
+
+    const handleSyncScanned = () => {
+        setOpenProgress(true);
+        router.get(scan(), {}, { preserveState: true, preserveScroll: true });
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -324,7 +334,7 @@ export default function RetrievedRecords({
                                 <Button
                                     variant="outlined"
                                     startIcon={<Cloud />}
-                                    onClick={() => setOpen(true)}
+                                    onClick={handleSyncScanned}
                                 >
                                     Sync Check Scanned
                                 </Button>
@@ -339,6 +349,12 @@ export default function RetrievedRecords({
                 checkId={selectionModel}
                 open={open}
                 handleClose={handleClose}
+            />
+
+            <ProgressModal
+                userId={auth.user.id}
+                open={openProgress}
+                handleClose={() => setOpenProgress(false)}
             />
         </AppLayout>
     );

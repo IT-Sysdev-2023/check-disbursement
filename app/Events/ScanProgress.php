@@ -11,16 +11,16 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CrfProgress implements ShouldBroadcast
+class ScanProgress implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     protected $percentage;
     /**
      * Create a new event instance.
      */
-    public function __construct(protected string $message, protected int $currentRow, protected int $totalRows, protected int $userId)
+    public function __construct(protected string $message, protected int $currentRow, protected int $totalRows, protected int $userId, protected int $totalFiles, protected int $index)
     {
-        $this->percentage = NumberHelper::percentage($currentRow, $totalRows);
+        $this->percentage = NumberHelper::percentage($currentRow + 1, $totalRows);
     }
 
     /**
@@ -31,7 +31,7 @@ class CrfProgress implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('cv-progress.' . $this->userId),
+            new PrivateChannel('scan-progress.' . $this->userId),
         ];
     }
 
@@ -42,6 +42,8 @@ class CrfProgress implements ShouldBroadcast
             'percentage' => $this->percentage,
             'currentRow' => $this->currentRow,
             'totalRows' => $this->totalRows,
+            'totalFiles' => $this->totalFiles,
+            'currentIndex' => $this->index + 1
         ];
     }
 }

@@ -229,6 +229,8 @@ export interface EventType {
     percentage: number;
     total: number;
     message: string;
+    currentIndex: number;
+    totalFiles: number;
 }
 
 export interface FlashReponse {
