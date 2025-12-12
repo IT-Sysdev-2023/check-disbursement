@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('scanned_sync', function (Blueprint $table) {
+        Schema::create('scanned_syncs', function (Blueprint $table) {
             $table->id();
             $table->string('filename');
             $table->string('filepath')->nullable();
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('scanned_sync');
+        Schema::dropIfExists('scanned_syncs');
     }
 };

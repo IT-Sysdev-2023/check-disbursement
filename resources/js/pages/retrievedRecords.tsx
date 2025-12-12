@@ -228,8 +228,26 @@ export default function RetrievedRecords({
     };
 
     const handleSyncScanned = () => {
-        setOpenProgress(true);
-        router.get(scan(), {}, { preserveState: true, preserveScroll: true });
+        router.get(
+            scan(),
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onStart: () => {
+                    setOpenProgress(true);
+                },
+                onSuccess: ({ props }) => {
+                    const m = props.flash as FlashReponse;
+
+                    setOpenProgress(false);
+                    notifications.show(m.message, {
+                        severity: 'error',
+                        autoHideDuration: 3000,
+                    });
+                },
+            },
+        );
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
