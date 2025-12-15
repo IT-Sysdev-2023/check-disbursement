@@ -8,10 +8,13 @@ use App\Models\BorrowerName;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\ChecksService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class RetrievedChecksController extends Controller
@@ -114,8 +117,8 @@ class RetrievedChecksController extends Controller
             }
         }
 
-
-        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
+        return $this->download($borrowerNo, $request->check);
+        // return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
     public function scanCheck(Request $request)
@@ -167,5 +170,53 @@ class RetrievedChecksController extends Controller
         });
 
         return response()->json($transform);
+    }
+    public function download(int $borrowerNo, string $check)
+    {
+        $borrower = BorrowedCheck::with('borrowerName:id,name')
+            ->with($check === 'cv' ? 'cvCheckPayment.company' : 'crf')
+            ->where('borrower_no', $borrowerNo)
+            ->get();
+
+        $companyNames = $borrower
+            ->pluck($check === 'cv' ? 'cvCheckPayment.company.name' : 'crf.company')
+            ->filter()
+            ->unique()
+            ->implode(', ');
+
+
+        $data = [
+            'dateBorrowed' => $borrower->first()->created_at->isoFormat('MMMM D, YYYY h:mm A'),
+
+            'items' => [
+                [
+                    'borrowerNo' => Str::padLeft($borrowerNo, 5, '0'),
+                    'noOfChecks' => $borrower->count(),
+                    'borrowedBy' => $borrower->first()->borrowerName?->name,
+                    'company' => $companyNames,
+                    'purpose' => 'For Signature',
+                ]
+            ]
+        ];
+
+        $pdf = Pdf::loadView('borrowedPdf', ['data' => $data])->setPaper('A5');
+
+        // Get raw PDF output
+        $output = $pdf->output();
+
+        // Define a filename
+        $filename = 'pdfs/borrowed/' . $borrowerNo . '_' . now()->format('Ymd_His') . '.pdf';
+
+        // Store in storage/app/public (or any disk you prefer)
+        Storage::disk('public')->put($filename, $output);
+
+
+        // Encode in Base64
+        $base64 = base64_encode($output);
+
+        // Optional: add header for embedding
+        $stream = "data:application/pdf;base64," . $base64;
+
+        return redirect()->back()->with('stream', $stream);
     }
 }

@@ -1,6 +1,6 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { borrowCheck, borrowerNames } from '@/routes';
-import { SelectionModelType, SelectionType } from '@/types';
+import { FlashReponse, SelectionModelType, SelectionType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Grid, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -46,6 +46,8 @@ export default function BorrowedCheckModal({
             reason: '',
         });
 
+    const [stream, setStream] = useState('');
+    const [openModalPdf, setOpenModalPdf] = useState(false);
     useEffect(() => {
         const fetchBorrower = async () => {
             const { data } = await axios.get(borrowerNames().url);
@@ -67,9 +69,14 @@ export default function BorrowedCheckModal({
         post(borrowCheck().url, {
             preserveScroll: true,
             preserveState: true,
-            onSuccess: () => {
+            onSuccess: (page) => {
+                const m = page.props.flash as FlashReponse;
+
                 reset();
                 handleClose();
+
+                setStream(m.stream);
+                setOpenModalPdf(true);
             },
             onError: (e) => {
                 console.log(e);
@@ -159,6 +166,24 @@ export default function BorrowedCheckModal({
                     </form>
                 </Box>
             </Modal>
+
+            <Modal
+                open={openModalPdf}
+                onClose={() => setOpenModalPdf(false)}
+            >
+                <Box sx={{ ...style, width: '70%' }}>
+                    {stream && (
+                        <iframe
+                            src={stream}
+                            style={{ width: '100%', height: '500px' }}
+                            frameBorder={0}
+                        />
+                    )}
+                </Box>
+            </Modal>
+            {/* <a-modal v-model:open="openModalReprint" style="width: 70%;">
+        <iframe :src="stream" frameborder="0" style="width: 100%; height: 500px;"></iframe>
+    </a-modal> */}
         </>
     );
 }

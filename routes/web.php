@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('get-borrower-names', [RetrievedChecksController::class, 'borrowerNames'])->name('borrowerNames');
         Route::post('store-borrow-check', [RetrievedChecksController::class, 'storeBorrowCheck'])->name('borrowCheck');
+Route::get('download', [RetrievedChecksController::class, 'download'])->name('borrowerPdf');
 
         Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
         Route::get('unassign-check/{id}', [RetrievedChecksController::class, 'unassignCheck'])->name('unassignCheck');
