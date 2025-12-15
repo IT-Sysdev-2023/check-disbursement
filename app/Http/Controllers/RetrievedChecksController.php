@@ -59,7 +59,7 @@ class RetrievedChecksController extends Controller
             "reason" => ["required", "string"],
             'check' => ["required", "in:cv,crf"],
         ]);
-        
+        $borrowerNo = (BorrowedCheck::max('borrower_no') ?? 0) + 1;
         if ($request->type === 'exclude') {
             if ($request->check === 'cv') {
                 CvCheckPayment::doesntHave('borrowedCheck')
@@ -69,9 +69,10 @@ class RetrievedChecksController extends Controller
                             ->orHas('assignedCheckNumber');
                     })
                     ->whereNotIn('id', $request->ids)
-                    ->chunk(100, function (Collection $items) use ($request) {
+                    ->chunk(100, function (Collection $items) use ($request, $borrowerNo) {
                         $data = $items->map(fn($check) => [
                             'check_id' => $check->id,
+                            'borrower_no' => $borrowerNo,
                             'borrower_name_id' => $request->name,
                             'reason' => $request->reason,
                             'check' => $request->check,
@@ -86,9 +87,10 @@ class RetrievedChecksController extends Controller
                 Crf::doesntHave('checkStatus')
                     ->doesntHave('borrowedCheck')
                     ->whereNotIn('id', $request->ids)
-                    ->chunk(100, function (Collection $items) use ($request) {
+                    ->chunk(100, function (Collection $items) use ($request, $borrowerNo) {
                         $data = $items->map(fn($check) => [
                             'check_id' => $check->id,
+                            'borrower_no' => $borrowerNo,
                             'borrower_name_id' => $request->name,
                             'reason' => $request->reason,
                             'check' => $request->check,
@@ -104,6 +106,7 @@ class RetrievedChecksController extends Controller
             foreach ($request->ids as $id) {
                 $request->user()->borrowedChecks()->create([
                     'check_id' => $id,
+                    'borrower_no' => $borrowerNo,
                     'borrower_name_id' => $request->name,
                     'reason' => $request->reason,
                     'check' => $request->check,

@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('borrower_name_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->unsignedBigInteger('borrower_no');
             $table->unsignedBigInteger('check_id');
             $table->string('reason');
             $table->enum('check', ['cv', 'crf']);
