@@ -85,6 +85,7 @@ class ChecksService
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
             ->join('borrower_names', 'borrower_names.id', '=', 'borrowed_checks.borrower_name_id')
+            ->where('approver_id', null)
             // ->with('borrowerName')
             // ->with($check === 'cv' ? 'cvCheckPayment.company' : 'crf')
             ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'check')

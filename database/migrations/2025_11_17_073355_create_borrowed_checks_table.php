@@ -13,10 +13,12 @@ return new class extends Migration {
         Schema::create('borrowed_checks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('approver_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('borrower_name_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unsignedBigInteger('borrower_no');
             $table->unsignedBigInteger('check_id');
             $table->string('reason');
+            $table->timestamp('approved_at')->nullable();
             $table->enum('check', ['cv', 'crf']);
             $table->timestamps();
         });

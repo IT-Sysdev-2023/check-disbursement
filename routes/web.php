@@ -52,6 +52,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('store-borrow-check', [RetrievedChecksController::class, 'storeBorrowCheck'])->name('borrowCheck');
         Route::get('download', [RetrievedChecksController::class, 'download'])->name('borrowerPdf');
         Route::get('borrowed-checks', [RetrievedChecksController::class, 'borrowedChecks'])->name('borrowedChecks');
+        Route::get('approver', [RetrievedChecksController::class, 'approver'])->name('approverNames');
+        Route::put('approve-check', [RetrievedChecksController::class, 'approveCheck'])->name('approveCheck');
 
         Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
         Route::get('unassign-check/{id}', [RetrievedChecksController::class, 'unassignCheck'])->name('unassignCheck');

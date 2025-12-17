@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\NumberHelper;
 use App\Http\Resources\CvCheckPaymentResource;
+use App\Models\Approver;
 use App\Models\BorrowedCheck;
 use App\Models\BorrowerName;
 use App\Models\Crf;
@@ -238,5 +239,31 @@ class RetrievedChecksController extends Controller
                 ->get();
         }
         return response()->json($records);
+    }
+
+    public function approver(Request $request)
+    {
+        $names = Approver::select('id', 'name')->get();
+
+        $transform = $names->map(function ($name) {
+            return [
+                'label' => $name->name,
+                'value' => $name->id,
+            ];
+        });
+
+        return response()->json($transform);
+    }
+
+    public function approveCheck(Request $request)
+    {
+        $request->validate([
+            'borrowedNo' => ['required', 'integer'],
+            'approver' => ['required', 'integer'],
+        ]);
+        BorrowedCheck::where('borrower_no', $request->borrowedNo)
+            ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Approved']);
     }
 }
