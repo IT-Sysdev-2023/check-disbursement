@@ -134,6 +134,23 @@ export interface Cv {
     updated_at: string;
 }
 
+export interface BorrowerName {
+    borrowerNo: number;
+    reason: string;
+    lastBorrowedAt: string;
+    totalChecks: number;
+    borrowerName: string;
+    check: string,
+    borrowerNoClean: number;
+    // 'check_id as checkId',
+    
+    // 'borrower_no',
+    //         'borrower_name_id',
+    //         'reason',
+    //         'borrower_names.name as borrower_name',
+    //         DB::raw('COUNT(*) as total_checks'),
+    //         DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
+}
 export interface BorrowedCheck {
     id: number;
     check_id: number;

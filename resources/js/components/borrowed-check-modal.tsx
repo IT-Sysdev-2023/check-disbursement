@@ -48,6 +48,7 @@ export default function BorrowedCheckModal({
 
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
+    
     useEffect(() => {
         const fetchBorrower = async () => {
             const { data } = await axios.get(borrowerNames().url);

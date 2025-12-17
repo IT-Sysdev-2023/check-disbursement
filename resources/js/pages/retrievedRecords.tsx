@@ -5,6 +5,7 @@ import {
     ActionHandler,
     ActionType,
     Auth,
+    BorrowerName,
     Crf,
     Cv,
     DateFilterType,
@@ -38,6 +39,7 @@ import {
     createCvColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
+import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -64,7 +66,7 @@ export default function RetrievedRecords({
     };
     cv: InertiaPagination<Cv>;
     crf: InertiaPagination<Crf>;
-    borrowed: InertiaPagination<Cv>;
+    borrowed: InertiaPagination<BorrowerName>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
@@ -84,7 +86,6 @@ export default function RetrievedRecords({
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
-
     useEffect(() => {
         if (flash?.status && flash?.message) {
             notifications.show(flash.message, {
@@ -260,7 +261,7 @@ export default function RetrievedRecords({
                                     label="CV Calendar View"
                                     value="calendar"
                                 />
-                                <Tab label="Table View" value="cv" />
+                                <Tab label="Table View" value="tableView" />
                                 <Tab label="Borrowed Checks" value="borrowed" />
                                 <Tab label="Manage Checks" value="manage" />
                             </TabList>
@@ -268,7 +269,7 @@ export default function RetrievedRecords({
                         <TabPanel value="calendar">
                             <CalendarView distinctMonths={distinctMonths} />
                         </TabPanel>
-                        <TabPanel value="cv">
+                        <TabPanel value="tableView">
                             <TableFilter
                                 isCrf={check === 'crf'}
                                 handleChangeCheck={handleCheck}
@@ -315,7 +316,8 @@ export default function RetrievedRecords({
                             </Box>
                         </TabPanel>
                         <TabPanel value="borrowed">
-                            <TableFilter
+                            <BorrowedTableGrid data={ borrowed} />
+                            {/* <TableFilter
                                 isCrf={check === 'crf'}
                                 handleChangeCheck={handleCheck}
                                 company={company}
@@ -356,7 +358,7 @@ export default function RetrievedRecords({
                                 >
                                     Sync Check Scanned
                                 </Button>
-                            </Box>
+                            </Box> */}
                         </TabPanel>
                     </TabContext>
                 </Box>

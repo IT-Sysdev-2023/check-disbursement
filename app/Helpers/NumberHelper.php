@@ -3,10 +3,11 @@
 namespace App\Helpers;
 
 use Illuminate\Support\Number;
+use Illuminate\Support\Str;
 
 class NumberHelper
 {
-    public static function format(mixed $number, int $scale =2): string
+    public static function format(mixed $number, int $scale = 2): string
     {
         return number_format($number, $scale);
     }
@@ -19,10 +20,15 @@ class NumberHelper
         return (float) self::format($percent, 0);
     }
 
-     public static function currency(float $amount, $locale = 'en_PH', string $currency = 'PHP')
+    public static function currency(float $amount, $locale = 'en_PH', string $currency = 'PHP')
     {
         // $numberFormatter = new NumberFormatter($locale, NumberFormatter::CURRENCY);
         // return $numberFormatter->formatCurrency($amount, $currency);
         return Number::currency($amount, in: $currency, locale: $locale);
+    }
+
+    public static function padLeft($number, int $length = 5, string $pad = '0')
+    {
+        return Str::padLeft($number, $length, $pad);
     }
 }

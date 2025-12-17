@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NumberHelper;
 use App\Http\Resources\CvCheckPaymentResource;
 use App\Models\BorrowedCheck;
 use App\Models\BorrowerName;
@@ -12,6 +13,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -184,13 +186,11 @@ class RetrievedChecksController extends Controller
             ->unique()
             ->implode(', ');
 
-
         $data = [
             'dateBorrowed' => $borrower->first()->created_at->isoFormat('MMMM D, YYYY h:mm A'),
-
             'items' => [
                 [
-                    'borrowerNo' => Str::padLeft($borrowerNo, 5, '0'),
+                    'borrowerNo' => NumberHelper::padLeft($borrowerNo),
                     'noOfChecks' => $borrower->count(),
                     'borrowedBy' => $borrower->first()->borrowerName?->name,
                     'company' => $companyNames,
@@ -210,7 +210,6 @@ class RetrievedChecksController extends Controller
         // Store in storage/app/public (or any disk you prefer)
         Storage::disk('public')->put($filename, $output);
 
-
         // Encode in Base64
         $base64 = base64_encode($output);
 
@@ -218,5 +217,26 @@ class RetrievedChecksController extends Controller
         $stream = "data:application/pdf;base64," . $base64;
 
         return redirect()->back()->with('stream', $stream);
+    }
+
+    public function borrowedChecks(Request $request)
+    {
+        $ids = BorrowedCheck::where('borrower_no', $request->borrowerNo)->pluck('check_id');
+        if ($request->check === 'cv') {
+            $records = CvCheckPayment::with('cvHeader', 'company')
+                ->select('check_date', 'check_amount', 'cv_check_payments.id', 'cv_header_id', 'companies.name as company_name', 'payee')
+                ->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
+                ->whereIn('cv_check_payments.id', $ids)
+                ->get()
+                ->each(function ($item) {
+                    $item->date = $item->check_date->toFormattedDateString();
+                    $item->check_amount = NumberHelper::currency($item->check_amount);
+                });
+        } else {
+            $records = Crf::select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
+                ->whereIn('id', $ids)
+                ->get();
+        }
+        return response()->json($records);
     }
 }

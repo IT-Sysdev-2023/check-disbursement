@@ -8,7 +8,7 @@ class BorrowedCheck extends Model
 {
     protected $guarded = [];
 
-     protected function casts(): array
+    protected function casts(): array
     {
         return [
             'created_at' => 'datetime',
@@ -16,22 +16,25 @@ class BorrowedCheck extends Model
 
     }
 
-
-    public function borrowerName(){
+    public function borrowerName()
+    {
         return $this->belongsTo(BorrowerName::class);
     }
 
 
-    public function crf(){
+    public function crf()
+    {
         return $this->belongsTo(Crf::class, 'check_id');
     }
 
-    public function cvCheckPayment(){
+    public function cvCheckPayment()
+    {
         return $this->belongsTo(CvCheckPayment::class, 'check_id');
     }
 
-    public function checkRelation(string $type){
-        return match($type){
+    public function checkRelation(string $type)
+    {
+        return match ($type) {
             'cv' => $this->cvCheckPayment(),
             'crf' => $this->crf(),
             default => null,
