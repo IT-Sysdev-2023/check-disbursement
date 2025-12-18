@@ -3,7 +3,7 @@ import { BorrowerName, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Button, Grid, Modal } from '@mui/material';
+import { Button, Grid, Modal, TablePagination } from '@mui/material';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -17,7 +17,7 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { ArrowBigRightDash } from 'lucide-react';
-import * as React from 'react';
+import { MouseEvent, useEffect, useState } from 'react';
 import SelectItem from './SelectItem';
 
 const style = {
@@ -34,20 +34,18 @@ const style = {
 
 function Row(props: { row: BorrowerName }) {
     const { row } = props;
-    const [open, setOpen] = React.useState(false);
-    const [borrowerData, setBorrowerData] = React.useState<
-        Record<string, any[]>
-    >({});
+    const [open, setOpen] = useState(false);
+    const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
 
-    const [approver, setApprover] = React.useState<
+    const [approver, setApprover] = useState<
         { label: string; value: string }[]
     >([]);
 
-    const [openModal, setOpenModal] = React.useState(false);
-    const [selectedApprover, setSelectedApprover] = React.useState('');
-    const [borrowedId, setBorrowedId] = React.useState<number | null>(null);
+    const [openModal, setOpenModal] = useState(false);
+    const [selectedApprover, setSelectedApprover] = useState('');
+    const [borrowedId, setBorrowedId] = useState<number | null>(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (open) {
             const fetchBorrower = async () => {
                 const { data } = await axios.get(borrowedChecks().url, {
@@ -60,7 +58,6 @@ function Row(props: { row: BorrowerName }) {
                     ...prev,
                     [row.borrowerNoClean]: data,
                 }));
-                // setBorrowerSelection(data);
             };
 
             fetchBorrower();
@@ -77,22 +74,26 @@ function Row(props: { row: BorrowerName }) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!borrowedId) return;
-        router.put(approveCheck(), {
-            approver: selectedApprover,
-            borrowedNo: borrowedId,
-        }, {
-            onError: (e) => {
-                console.log(e);
+        router.put(
+            approveCheck(),
+            {
+                approver: selectedApprover,
+                borrowedNo: borrowedId,
             },
-            onSuccess: (e) => {
-                console.log(e);
-                setOpenModal(false);
-            }
-        });
+            {
+                onError: (e) => {
+                    console.log(e);
+                },
+                onSuccess: (e) => {
+                    console.log(e);
+                    setOpenModal(false);
+                },
+            },
+        );
     };
 
     return (
-        <React.Fragment>
+        <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
                 <TableCell>
                     <IconButton
@@ -224,7 +225,7 @@ function Row(props: { row: BorrowerName }) {
                     </form>
                 </Box>
             </Modal>
-        </React.Fragment>
+        </>
     );
 }
 
@@ -233,26 +234,63 @@ export default function BorrowedTableGrid({
 }: {
     data: InertiaPagination<BorrowerName>;
 }) {
+    const [rowsPerPage, setRowsPerPage] = useState(data?.meta.per_page || 10);
+
+    const handleChangePage = (
+        _: MouseEvent<HTMLButtonElement> | null,
+        newPage: number,
+    ) => {
+        console.log(_);
+        const page = newPage + 1;
+        const per_page = data.meta.per_page;
+
+        router.reload({
+            data: {
+                tab: 'borrowed',
+                page: page,
+                per_page: per_page,
+            },
+        });
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        // setRowsPerPage(parseInt(event.target.value, 10));
+        // setPage(0);
+    };
     return (
-        <TableContainer component={Paper}>
-            <Table aria-label="collapsible table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell />
-                        <TableCell>Borrower Number</TableCell>
-                        <TableCell align="right">Borrowed Date</TableCell>
-                        <TableCell align="right">Borrower Name</TableCell>
-                        <TableCell align="right">Reason</TableCell>
-                        <TableCell align="right">Purpose</TableCell>
-                        <TableCell align="right">Borrower Details</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {data?.data.map((row) => (
-                        <Row key={row.borrowerNo} row={row} />
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <>
+            <TableContainer component={Paper}>
+                <Table aria-label="collapsible table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell />
+                            <TableCell>Borrower Number</TableCell>
+                            <TableCell align="right">Borrowed Date</TableCell>
+                            <TableCell align="right">Borrower Name</TableCell>
+                            <TableCell align="right">Reason</TableCell>
+                            <TableCell align="right">Purpose</TableCell>
+                            <TableCell align="right">
+                                Borrower Details
+                            </TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {data?.data.map((row) => (
+                            <Row key={row.borrowerNo} row={row} />
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            <TablePagination
+                component="div"
+                count={data?.meta.total ?? 0}
+                page={data?.meta.current_page - 1}
+                onPageChange={handleChangePage}
+                rowsPerPage={rowsPerPage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                rowsPerPageOptions={[5, 10, 25, 50]}
+            />
+        </>
     );
 }

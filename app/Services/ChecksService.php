@@ -25,7 +25,7 @@ class ChecksService
                 : null;
         }
 
-        $borrowedRecords = ($filters['tab'] ?? null) === 'borrowed' ? self::borrowedRecords($filters, $filters['selectedCheck'] ?? 'cv')
+        $borrowedRecords = ($filters['tab'] ?? null) === 'borrowed' ? self::borrowedRecords()
             : null;
 
 
@@ -74,7 +74,7 @@ class ChecksService
             ->exists();
     }
 
-    public function borrowedRecords(array $filters, string $check)
+    public function borrowedRecords()
     {
         $borrowed = BorrowedCheck::select(
             'borrower_no',
@@ -91,7 +91,7 @@ class ChecksService
             ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'check')
             ->orderByDesc('borrower_no')
             // ->get()
-            ->paginate(10)
+            ->paginate(5)
             ->withQueryString()
             ->toResourceCollection()
         ;
