@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Approver;
 use App\Models\BorrowerName;
+use App\Models\TagLocation;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -25,6 +26,14 @@ class BorrowerNameSeeder extends Seeder
             ['name' => 'Incorporator A', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Incorporator B', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Incorporator C', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+
+        TagLocation::insert([
+            ['location' => 'Cebu', 'created_at' => now(), 'updated_at' => now()],
+            ['location' => 'Manila', 'created_at' => now(), 'updated_at' => now()],
+            ['location' => 'Internal', 'created_at' => now(), 'updated_at' => now()],
+            ['location' => 'Deposit', 'created_at' => now(), 'updated_at' => now()],
+            ['location' => 'Tagbilaran Pick-up', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }

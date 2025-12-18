@@ -1,6 +1,6 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf, scan, scanCheck, unassignCheck } from '@/routes';
+import { details, detailsCrf, scanCheck, unassignCheck } from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -28,7 +28,7 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import { Cloud, HandCoins } from 'lucide-react';
+import { HandCoins } from 'lucide-react';
 import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
@@ -228,28 +228,28 @@ export default function RetrievedRecords({
         });
     };
 
-    const handleSyncScanned = () => {
-        router.get(
-            scan(),
-            {},
-            {
-                preserveState: true,
-                preserveScroll: true,
-                onStart: () => {
-                    setOpenProgress(true);
-                },
-                onSuccess: ({ props }) => {
-                    const m = props.flash as FlashReponse;
+    // const handleSyncScanned = () => {
+    //     router.get(
+    //         scan(),
+    //         {},
+    //         {
+    //             preserveState: true,
+    //             preserveScroll: true,
+    //             onStart: () => {
+    //                 setOpenProgress(true);
+    //             },
+    //             onSuccess: ({ props }) => {
+    //                 const m = props.flash as FlashReponse;
 
-                    setOpenProgress(false);
-                    notifications.show(m.message, {
-                        severity: 'error',
-                        autoHideDuration: 3000,
-                    });
-                },
-            },
-        );
-    };
+    //                 setOpenProgress(false);
+    //                 notifications.show(m.message, {
+    //                     severity: 'error',
+    //                     autoHideDuration: 3000,
+    //                 });
+    //             },
+    //         },
+    //     );
+    // };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">

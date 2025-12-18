@@ -98,8 +98,8 @@ export const createCvColumns = (
                             handleStatusChange(id, e.target.value, company.name)
                         }
                     >
-                        {/* <MenuItem value="assign">Assign</MenuItem> */}
                         <MenuItem value="details">Check Details</MenuItem>
+                        <MenuItem value="assign">Tag Location</MenuItem>
                     </Select>
                 );
             }
