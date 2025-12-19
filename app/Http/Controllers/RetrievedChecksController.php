@@ -234,7 +234,7 @@ class RetrievedChecksController extends Controller
         // Optional: add header for embedding
         $stream = "data:application/pdf;base64," . $base64;
 
-        return redirect()->back()->with('stream', $stream);
+        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
     }
 
     public function borrowedChecks(Request $request)
