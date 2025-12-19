@@ -27,7 +27,7 @@ class CvCheckPaymentResource extends JsonResource
             'checkDate' => $this->check_date->toFormattedDateString(),
 
             'checkAmount' => NumberHelper::currency($this->check_amount),
-
+            'taggedAt' => $this->tagged_at,
             'payee' => $this->payee,
             'bankName' => $this->bank_name,
             'bankAccountNo' => $this->bank_account_no,

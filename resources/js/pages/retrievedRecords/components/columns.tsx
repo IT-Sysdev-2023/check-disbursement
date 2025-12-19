@@ -3,13 +3,14 @@ import { Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
 const renderStatus = (
-    status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign',
+    status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign' | 'Tagged',
 ) => {
-    const colors: { [index: string]: 'success' | 'error' | 'info' } = {
+    const colors: { [index: string]: 'success' | 'error' | 'info' | 'warning' } = {
         Signature: 'info',
         Releasing: 'success',
         Borrowed: 'error',
         Assign: 'error',
+        Tagged: 'success'
     };
 
     const label = ['Signature', 'Releasing', 'Assign'].includes(status)
@@ -73,7 +74,11 @@ export const createCvColumns = (
             if (!params.row.assignedCheckNumbers) {
                 return renderStatus('Assign');
             }
-            
+
+            if (params.row.taggedAt) {
+                return renderStatus('Tagged');
+            }
+
             return renderStatus(
                 params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
             );
@@ -99,7 +104,7 @@ export const createCvColumns = (
                         }
                     >
                         <MenuItem value="details">Check Details</MenuItem>
-                        <MenuItem value="assign">Tag Location</MenuItem>
+                        <MenuItem value="assign">Assign</MenuItem>
                     </Select>
                 );
             }
@@ -117,6 +122,9 @@ export const createCvColumns = (
                     }
                 >
                     <MenuItem value="details">Check Details</MenuItem>
+                    {!params.row.taggedAt && (
+                        <MenuItem value="tag">Tag Location</MenuItem>
+                    )}
                     {/* {params.row.borrowedCheck == null && (
                         <MenuItem value="borrow">Borrow Check</MenuItem>
                     )} */}
@@ -225,4 +233,3 @@ export const createCrfColumns = (
         },
     },
 ];
-

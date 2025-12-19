@@ -7,6 +7,7 @@ use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
@@ -32,11 +33,12 @@ class ChecksService
         $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
             : null;
 
+
         return Inertia::render('retrievedRecords', [
             'cv' => $cvRecords,
             'crf' => $crfs,
-            'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
             'borrowed' => $borrowedRecords,
+            'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -50,8 +52,16 @@ class ChecksService
                 'label' => 'All',
                 'value' => '0'
             ]),
+            'hasEmptyCheckNumber' => self::checkIfHasNoCheckNumber(),
             'distinctMonths' => self::distinctMonths()
         ]);
+    }
+
+    public function hasEmptyLocation(Collection $records){
+        if ($records)
+            return $records->every(function ($record) {
+                return $record->tag_location_id === null;
+        });
     }
 
     private static function crfRecords(array $filters)
@@ -71,6 +81,7 @@ class ChecksService
         return CvCheckPayment::where('check_number', 0)
             ->doesntHave('checkStatus')
             ->doesntHave('assignedCheckNumber')
+            ->doesntHave('borrowedCheck')
             ->exists();
     }
 
@@ -111,12 +122,12 @@ class ChecksService
     {
 
         return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company', 'assignedCheckNumber')
-            ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
+            ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee', 'tagged_at')
             ->doesntHave('borrowedCheck')
             ->doesntHave('checkStatus')
-            // ->doesntHave('assignedCheckNumber')
             ->when($hasNoAmount, function ($query) {
-                $query->where('check_number', 0);
+                $query->where('check_number', 0)
+                    ->doesntHave('assignedCheckNumber');
             }, function ($query) {
                 $query->where(function ($q) {
                     $q->where('check_number', '!=', 0)

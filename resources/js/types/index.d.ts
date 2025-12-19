@@ -227,6 +227,8 @@ export interface InertiaPagination<T> {
 export type SelectionModelType = {
     type: 'include';
     ids: Set<GridRowId>;
+      meta: Record<GridRowId, { taggedAt: string | null }>;
+    // taggedAt: string | null
 };
 
 export type DistinctMonths = Record<

@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Helpers\NumberHelper;
 use App\Http\Resources\CvCheckPaymentResource;
 use App\Models\Approver;
+use App\Models\AssignedCheckNumber;
 use App\Models\BorrowedCheck;
 use App\Models\BorrowerName;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
+use App\Models\TagLocation;
 use App\Services\ChecksService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -65,6 +67,12 @@ class RetrievedChecksController extends Controller
             "reason" => ["required", "string"],
             'check' => ["required", "in:cv,crf"],
         ]);
+
+        if (!self::checkIds($request->check, $request->ids)) {
+             return redirect()->back()->with(['status' => false, 'message' => 'Some selected checks have no location assigned. Please assign location before borrowing.']);
+           
+        }
+
         $borrowerNo = (BorrowedCheck::max('borrower_no') ?? 0) + 1;
         if ($request->type === 'exclude') {
             if ($request->check === 'cv') {
@@ -121,7 +129,15 @@ class RetrievedChecksController extends Controller
         }
 
         return $this->download($borrowerNo, $request->check);
-        // return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
+    }
+
+    private function checkIds($check, $ids)
+    {
+        $model = $check === 'cv' ? CvCheckPayment::class : Crf::class;
+
+        return $model::whereIn('id', $ids)
+            ->whereNull('tag_location_id')
+            ->count() === 0;
     }
 
     public function scanCheck(Request $request)
@@ -153,12 +169,13 @@ class RetrievedChecksController extends Controller
             'checkNumber' => ['required', 'integer', 'regex:/^[1-9]\d*$/'],
         ]);
 
-        $request->user()->assignedCheckNumber()->create([
+        AssignedCheckNumber::updateOrCreate([
             'cv_check_payment_id' => $request->id,
-            'check_number' => $request->checkNumber
+            'check_number' => $request->checkNumber,
+            'caused_by' => $request->user()->id
         ]);
 
-        return Redirect::route('retrievedRecords', ['tab' => 'cv'])->with(['status' => true, 'message' => 'Successfully Assigned']);
+        return Redirect::route('retrievedRecords', ['tab' => 'tableView'])->with(['status' => true, 'message' => 'Successfully Assigned']);
     }
 
     public function borrowerNames(Request $request)
@@ -265,5 +282,35 @@ class RetrievedChecksController extends Controller
             ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
 
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Approved']);
+    }
+
+    public function getLocation()
+    {
+        $names = TagLocation::select('id', 'location')->get();
+
+        $transform = $names->map(function ($name) {
+            return [
+                'label' => $name->location,
+                'value' => $name->id,
+            ];
+        });
+
+        return response()->json($transform);
+    }
+
+    public function setLocation(Request $request)
+    {
+        $request->validate([
+            'checkId' => ['required', 'integer'],
+            'locationId' => ['required', 'integer'],
+            'check' => ['required', 'string'],
+        ]);
+
+        if ($request->check === 'cv') {
+            CvCheckPayment::where('id', $request->checkId)
+                ->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
+        }
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
     }
 }

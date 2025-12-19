@@ -1,6 +1,13 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf, scanCheck, unassignCheck } from '@/routes';
+import {
+    details,
+    detailsCrf,
+    getLocation,
+    scanCheck,
+    unassignCheck,
+    updateLocation,
+} from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -23,15 +30,18 @@ import {
     GridPaginationModel,
     GridSortModel,
 } from '@mui/x-data-grid';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
 
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
+import axios from 'axios';
 import { HandCoins } from 'lucide-react';
 import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
+import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
+import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import CalendarView from './retrievedRecords/components/calendarView';
 import {
@@ -39,7 +49,6 @@ import {
     createCvColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
-import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -56,6 +65,7 @@ export default function RetrievedRecords({
     company,
     distinctMonths,
     borrowed,
+    hasEmptyCheckNumber,
     auth,
 }: {
     filter: {
@@ -70,26 +80,36 @@ export default function RetrievedRecords({
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
+    hasEmptyCheckNumber: boolean;
     auth: Auth;
 }) {
     const [check, setCheck] = useState(defaultCheck);
     const [open, setOpen] = useState(false);
     const [openProgress, setOpenProgress] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
+    const [openTagModal, setOpenTagModal] = useState(false);
     const notifications = useNotifications();
     const [value, setValue] = useState(filter.tab);
+    const [selectedLocation, setSelectedLocation] = useState('');
+    const [location, setLocation] = useState<
+        { label: string; value: string }[]
+    >([]);
+
+    const [checkId, setCheckId] = useState<number | undefined>();
+
     const [selectionModel, setSelectionModel] = useState<SelectionModelType>({
         type: 'include',
         ids: new Set(),
+        meta: {},
     });
 
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
     useEffect(() => {
-        if (flash?.status && flash?.message) {
+        if (flash?.message) {
             notifications.show(flash.message, {
-                severity: 'success',
+                severity: flash?.status ? 'success' : 'error',
                 autoHideDuration: 3000,
             });
             setCheck('cv');
@@ -155,6 +175,12 @@ export default function RetrievedRecords({
         assign: (id) => {
             router.get(unassignCheck(id));
         },
+        tag: async (id) => {
+            setCheckId(id);
+            setOpenTagModal(true);
+            const { data } = await axios.get(getLocation().url);
+            setLocation(data);
+        },
     };
 
     const handleStatusChange = (id: number, value: ActionType, bu: string) => {
@@ -200,20 +226,25 @@ export default function RetrievedRecords({
         setValue(newValue);
     };
 
-    const handleRowSelection = (id: number) => {
+    const handleRowSelection = (id: number, taggedAt: string | null) => {
         setSelectionModel((prev) => {
-            const newIds = new Set(prev.ids);
+            const ids = new Set(prev.ids);
+            const meta = { ...prev.meta };
 
-            if (newIds.has(id)) {
-                newIds.delete(id); // remove if already selected
+            if (ids.has(id)) {
+                ids.delete(id);
+                delete meta[id];
             } else {
-                newIds.add(id); // add if not selected
+                ids.add(id);
+                meta[id] = { taggedAt };
             }
 
-            return { ...prev, ids: newIds };
+            return { ...prev, ids, meta };
         });
     };
-
+    const hasMissingTaggedAt = Array.from(selectionModel.ids).some(
+        (id) => selectionModel.meta[id]?.taggedAt == null,
+    );
     const hasSelection =
         selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
     const cvColumns = createCvColumns(handleStatusChange);
@@ -225,6 +256,7 @@ export default function RetrievedRecords({
         setSelectionModel({
             type: 'include',
             ids: new Set(),
+            meta: {},
         });
     };
 
@@ -250,6 +282,32 @@ export default function RetrievedRecords({
     //         },
     //     );
     // };
+
+    const handleTagSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        if (!checkId) return;
+        router.put(
+            updateLocation(),
+            {
+                checkId: checkId,
+                locationId: selectedLocation,
+                check: check,
+            },
+            {
+                onError: (e) => {
+                    console.log(e);
+                },
+                onSuccess: () => {
+                    setOpenTagModal(false);
+                },
+            },
+        );
+    };
+
+    const openBorrowModal = () => {
+        setOpen(true);
+        console.log(selectionModel);
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">
@@ -281,7 +339,7 @@ export default function RetrievedRecords({
                             <TableDataGrid
                                 data={check === 'cv' ? cv : crf}
                                 filter={filter.search}
-                                hasSelection={true}
+                                hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
                                 selectionModel={selectionModel}
                                 handleSelectionChange={(model) =>
                                     setSelectionModel(
@@ -306,17 +364,21 @@ export default function RetrievedRecords({
                                 mt={3}
                             >
                                 <Button
-                                    disabled={!hasSelection}
+                                    disabled={
+                                        hasEmptyCheckNumber ||
+                                        hasMissingTaggedAt ||
+                                        selectionModel.ids.size === 0
+                                    } // !hasSelection &&
                                     variant="outlined"
                                     startIcon={<HandCoins />}
-                                    onClick={() => setOpen(true)}
+                                    onClick={openBorrowModal}
                                 >
                                     Borrow
                                 </Button>
                             </Box>
                         </TabPanel>
                         <TabPanel value="borrowed">
-                            <BorrowedTableGrid data={ borrowed} />
+                            <BorrowedTableGrid data={borrowed} />
                             {/* <TableFilter
                                 isCrf={check === 'crf'}
                                 handleChangeCheck={handleCheck}
@@ -369,6 +431,18 @@ export default function RetrievedRecords({
                 checkId={selectionModel}
                 open={open}
                 handleClose={handleClose}
+            />
+
+            <OnlySelectionModal
+                title="Tag Location"
+                open={openTagModal}
+                onClose={() => setOpenTagModal(false)}
+                handleSubmit={handleTagSubmit}
+                handleSelectedItem={(event) =>
+                    setSelectedLocation(event.target.value)
+                }
+                selectedItem={selectedLocation}
+                item={location}
             />
 
             <ProgressModal

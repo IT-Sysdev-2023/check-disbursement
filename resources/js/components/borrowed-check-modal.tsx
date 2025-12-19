@@ -48,7 +48,7 @@ export default function BorrowedCheckModal({
 
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
-    
+
     useEffect(() => {
         const fetchBorrower = async () => {
             const { data } = await axios.get(borrowerNames().url);
@@ -76,8 +76,10 @@ export default function BorrowedCheckModal({
                 reset();
                 handleClose();
 
-                setStream(m.stream);
-                setOpenModalPdf(true);
+                if (m.status) {
+                    setStream(m.stream);
+                    setOpenModalPdf(true);
+                }
             },
             onError: (e) => {
                 console.log(e);
@@ -168,10 +170,7 @@ export default function BorrowedCheckModal({
                 </Box>
             </Modal>
 
-            <Modal
-                open={openModalPdf}
-                onClose={() => setOpenModalPdf(false)}
-            >
+            <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
                 <Box sx={{ ...style, width: '70%' }}>
                     {stream && (
                         <iframe

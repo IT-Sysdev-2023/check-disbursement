@@ -3,7 +3,7 @@ import { BorrowerName, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Button, Grid, Modal, TablePagination } from '@mui/material';
+import { TablePagination } from '@mui/material';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -18,19 +18,7 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { ArrowBigRightDash } from 'lucide-react';
 import { MouseEvent, useEffect, useState } from 'react';
-import SelectItem from './SelectItem';
-
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
+import OnlySelectionModal from './onlySelectionModal';
 
 function Row(props: { row: BorrowerName }) {
     const { row } = props;
@@ -180,51 +168,17 @@ function Row(props: { row: BorrowerName }) {
                     </Collapse>
                 </TableCell>
             </TableRow>
-            <Modal
+
+            <OnlySelectionModal
+                title="Approver Name"
                 open={openModal}
                 onClose={() => setOpenModal(false)}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <Typography
-                        id="modal-modal-title"
-                        variant="h6"
-                        component="h2"
-                    >
-                        Approver Name
-                    </Typography>
-
-                    <form onSubmit={handleSubmit}>
-                        <Grid
-                            container
-                            spacing={2}
-                            sx={{ mb: 2, width: '100%', mt: 3 }}
-                        >
-                            <Grid size={{ xs: 12, sm: 12 }}>
-                                <SelectItem
-                                    handleChange={(event) =>
-                                        setSelectedApprover(event.target.value)
-                                    }
-                                    value={selectedApprover}
-                                    title="Select Approver"
-                                    items={approver}
-                                />
-                            </Grid>
-                        </Grid>
-                        <Box sx={{ textAlign: 'right', mt: 2 }}>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                size="large"
-                                //  disabled={processing}
-                            >
-                                Save
-                            </Button>
-                        </Box>
-                    </form>
-                </Box>
-            </Modal>
+                handleSubmit={handleSubmit}
+                handleSelectedItem={(event) =>
+                    setSelectedApprover(event.target.value)}
+                selectedItem={selectedApprover}
+                item={approver}
+            />
         </>
     );
 }
