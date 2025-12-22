@@ -6,6 +6,7 @@ use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -33,11 +34,15 @@ class ChecksService
         $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
             : null;
 
+        $manageChecks = ($filters['tab'] ?? null) === 'manageChecks' ? self::manageChecks() : null;
+        // dd(self::manageChecks());
+
 
         return Inertia::render('retrievedRecords', [
             'cv' => $cvRecords,
             'crf' => $crfs,
             'borrowed' => $borrowedRecords,
+            'manageChecks' => $manageChecks,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
@@ -57,11 +62,55 @@ class ChecksService
         ]);
     }
 
-    public function hasEmptyLocation(Collection $records){
+    public function hasEmptyLocation(Collection $records)
+    {
         if ($records)
             return $records->every(function ($record) {
                 return $record->tag_location_id === null;
-        });
+            });
+    }
+
+    public function manageChecks()
+    {
+        $checks = CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
+            $query->with('approver:id,name')->whereNotNull('approver_id');
+        })
+            ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
+            ->leftJoin('scanned_records', function ($join) {
+                $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
+                    ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
+            })
+
+            ->select(
+                'cv_check_payments.id',
+                'cv_check_payments.check_number',
+                'cv_check_payments.payee',
+                'cv_check_payments.cv_header_id',
+                'cv_check_payments.company_id',
+
+                'scanned_records.id as scanned_id',
+            )
+            ->with('company:id,name', 'cvHeader:id,cv_date,cv_no')
+            ->paginate(5)
+            ->withQueryString()
+            ->toResourceCollection();
+        // $checks = BorrowedCheck::select(
+        //     'borrower_no',
+        //     'reason',
+        //     'check',
+        //     'borrower_names.name as borrower_name',
+        //     DB::raw('COUNT(*) as total_checks'),
+        //     DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
+        // )
+        //     ->join('borrower_names', 'borrower_names.id', '=', 'borrowed_checks.borrower_name_id')
+        //     ->whereNot('approver_id', null)
+        //     ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'check')
+        //     ->orderByDesc('borrower_no')
+        //     ->paginate(5)
+        //     ->withQueryString()
+        //     ->toResourceCollection()
+        // ;
+        return $checks;
     }
 
     private static function crfRecords(array $filters)

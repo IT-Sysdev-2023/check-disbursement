@@ -142,14 +142,27 @@ export interface BorrowerName {
     borrowerName: string;
     check: string,
     borrowerNoClean: number;
-    // 'check_id as checkId',
-    
-    // 'borrower_no',
-    //         'borrower_name_id',
-    //         'reason',
-    //         'borrower_names.name as borrower_name',
-    //         DB::raw('COUNT(*) as total_checks'),
-    //         DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
+}
+
+export interface ManageChecks {
+    id: number;
+    check_number: string;
+    payee: string;
+    cv_header_id: number;
+    company_id: number;
+    assignedCheckNumber: AssignedCheckNumber,
+    company: Company;
+    cvHeader: CvHeader;
+
+}
+
+export interface AssignedCheckNumber {
+    id: number;
+    check_number: string;
+    cv_check_payment_id: number;
+    caused_by: number;
+    created_at: string;
+    updated_at: string;
 }
 export interface BorrowedCheck {
     id: number;

@@ -4,6 +4,7 @@ import {
     details,
     detailsCrf,
     getLocation,
+    scan,
     scanCheck,
     unassignCheck,
     updateLocation,
@@ -19,6 +20,7 @@ import {
     DistinctMonths,
     FlashReponse,
     InertiaPagination,
+    ManageChecks,
     SelectionModelType,
     SelectionType,
     type BreadcrumbItem,
@@ -47,6 +49,7 @@ import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createCrfColumns,
     createCvColumns,
+    createManageChecksColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
 
@@ -66,6 +69,7 @@ export default function RetrievedRecords({
     distinctMonths,
     borrowed,
     hasEmptyCheckNumber,
+    manageChecks,
     auth,
 }: {
     filter: {
@@ -80,6 +84,7 @@ export default function RetrievedRecords({
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
+    manageChecks: InertiaPagination<ManageChecks>;
     hasEmptyCheckNumber: boolean;
     auth: Auth;
 }) {
@@ -245,11 +250,12 @@ export default function RetrievedRecords({
     const hasMissingTaggedAt = Array.from(selectionModel.ids).some(
         (id) => selectionModel.meta[id]?.taggedAt == null,
     );
-    const hasSelection =
-        selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
+
+    // const hasSelection =
+    //     selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
     const cvColumns = createCvColumns(handleStatusChange);
     const crfColumns = createCrfColumns(handleStatusChange);
-    // const cvNoCheckNoColumns = createNoCheckNumberColumns(handleStatusChange);
+    const manageChecksColumns = createManageChecksColumns();
 
     const handleClose = () => {
         setOpen(false);
@@ -260,28 +266,28 @@ export default function RetrievedRecords({
         });
     };
 
-    // const handleSyncScanned = () => {
-    //     router.get(
-    //         scan(),
-    //         {},
-    //         {
-    //             preserveState: true,
-    //             preserveScroll: true,
-    //             onStart: () => {
-    //                 setOpenProgress(true);
-    //             },
-    //             onSuccess: ({ props }) => {
-    //                 const m = props.flash as FlashReponse;
+    const handleSyncScanned = () => {
+        router.get(
+            scan(),
+            {},
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onStart: () => {
+                    setOpenProgress(true);
+                },
+                onSuccess: ({ props }) => {
+                    const m = props.flash as FlashReponse;
 
-    //                 setOpenProgress(false);
-    //                 notifications.show(m.message, {
-    //                     severity: 'error',
-    //                     autoHideDuration: 3000,
-    //                 });
-    //             },
-    //         },
-    //     );
-    // };
+                    setOpenProgress(false);
+                    notifications.show(m.message, {
+                        severity: 'error',
+                        autoHideDuration: 3000,
+                    });
+                },
+            },
+        );
+    };
 
     const handleTagSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -321,7 +327,10 @@ export default function RetrievedRecords({
                                 />
                                 <Tab label="Table View" value="tableView" />
                                 <Tab label="Borrowed Checks" value="borrowed" />
-                                <Tab label="Manage Checks" value="manage" />
+                                <Tab
+                                    label="Manage Checks"
+                                    value="manageChecks"
+                                />
                             </TabList>
                         </Box>
                         <TabPanel value="calendar">
@@ -421,6 +430,36 @@ export default function RetrievedRecords({
                                     Sync Check Scanned
                                 </Button>
                             </Box> */}
+                        </TabPanel>
+
+                        <TabPanel value="manageChecks">
+                            <TableDataGrid
+                                data={manageChecks}
+                                filter={filter.search}
+                                hasSelection={false} //remove selection if there is no check number
+                                pagination={(model) =>
+                                    handlePagination(model, ['cv', 'crf'])
+                                }
+                                handleSearchFilter={handleSearch}
+                                handleSortFilter={handleSort}
+                                columns={manageChecksColumns
+                                }
+                                isLoading={tableLoading}
+                            />
+
+                             <Box
+                                display="flex"
+                                justifyContent="flex-end"
+                                mt={3}
+                            >
+                                <Button
+                                    variant="outlined"
+                                    startIcon={<HandCoins />}
+                                    onClick={handleSyncScanned}
+                                >
+                                    Sync Check Scanned
+                                </Button>
+                            </Box>
                         </TabPanel>
                     </TabContext>
                 </Box>

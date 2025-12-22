@@ -1,16 +1,19 @@
 import { ActionType } from '@/types';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
+import { parseArgs } from 'util';
 
 const renderStatus = (
     status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign' | 'Tagged',
 ) => {
-    const colors: { [index: string]: 'success' | 'error' | 'info' | 'warning' } = {
+    const colors: {
+        [index: string]: 'success' | 'error' | 'info' | 'warning';
+    } = {
         Signature: 'info',
         Releasing: 'success',
         Borrowed: 'error',
         Assign: 'error',
-        Tagged: 'success'
+        Tagged: 'success',
     };
 
     const label = ['Signature', 'Releasing', 'Assign'].includes(status)
@@ -230,6 +233,75 @@ export const createCrfColumns = (
                     <MenuItem value="scan">Scan</MenuItem> */}
                 </Select>
             );
+        },
+    },
+];
+
+export const createManageChecksColumns = (
+): GridColDef[] => [
+    {
+        field: 'cvNo',
+        headerName: 'CV Number',
+        minWidth: 150,
+        renderCell: (params) => {
+            return params.row.cvHeader?.cvNo;
+        },
+    },
+    {
+        field: 'cvDate',
+        headerName: 'Cv Date',
+        headerAlign: 'right',
+        align: 'right',
+        minWidth: 80,
+        renderCell: (params) => {
+            return params.row.cvHeader?.cvDate;
+        },
+    },
+    {
+        field: 'payee',
+        headerName: 'Payee',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+    },
+    {
+        field: 'name',
+        headerName: 'Business Unit',
+        headerAlign: 'center',
+        align: 'center',
+        flex: 1,
+        renderCell: (params) => {
+            return params.row.company?.name;
+        },
+    },
+    {
+        field: 'status',
+        headerName: 'Approve Status',
+        renderCell: () => {
+            return <Chip label='Approved' color='success' size="small" />
+        },
+    },
+
+    {
+        field: 'approvedBy',
+        headerName: 'Approved By',
+        headerAlign: 'right',
+        align: 'right',
+           flex: 1,
+        renderCell: (params) => {
+            return params.row.borrowedCheck?.approver?.name;
+        },
+    },
+    {
+        field: 'actions',
+        headerName: 'Sync Status',
+        width: 130,
+        align: 'center',
+        headerAlign: 'center',
+        sortable: false,
+        renderCell: (params) => {
+            console.log(params.row);
+            return params.row.scannedId ? <Chip label='Scanned' color='success' size="small" /> : <Chip label='Not Scanned' color='error' size="small" />;
         },
     },
 ];

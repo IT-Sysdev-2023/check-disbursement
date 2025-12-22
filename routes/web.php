@@ -101,8 +101,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('permissions', [AdminController::class, 'permissions'])->name('permissions');
         Route::post('assign-permissions', [AdminController::class, 'assignPermissions'])->name('assignPermissions');
-
-
     });
 
     Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
