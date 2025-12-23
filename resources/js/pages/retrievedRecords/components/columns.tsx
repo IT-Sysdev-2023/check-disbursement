@@ -1,7 +1,6 @@
 import { ActionType } from '@/types';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { parseArgs } from 'util';
 
 const renderStatus = (
     status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign' | 'Tagged',
@@ -277,6 +276,7 @@ export const createManageChecksColumns = (
     {
         field: 'status',
         headerName: 'Approve Status',
+        flex: 1,
         renderCell: () => {
             return <Chip label='Approved' color='success' size="small" />
         },

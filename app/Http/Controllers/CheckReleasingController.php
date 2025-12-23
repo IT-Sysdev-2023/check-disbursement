@@ -21,13 +21,39 @@ class CheckReleasingController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-        $records = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus', 'company')
+        $records = CvCheckPayment::with('cvHeader', 'checkStatus', 'company')
+            ->withWhereHas('borrowedCheck', function ($query) {
+                $query->whereNotNull('approver_id');
+            })
             ->select('id', 'cv_header_id', 'check_number', 'check_date', 'check_amount', 'payee', 'company_id')
             ->whereRelation('checkStatus', 'status', null)
             ->filter($filters)
             ->paginate($request->page)
             ->withQueryString()
             ->toResourceCollection();
+
+        // $checks = CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
+        //     $query->with('approver:id,name')->whereNotNull('approver_id');
+        // })
+        //     ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
+        //     ->leftJoin('scanned_records', function ($join) {
+        //         $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
+        //             ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
+        //     })
+
+        //     ->select(
+        //         'cv_check_payments.id',
+        //         'cv_check_payments.check_number',
+        //         'cv_check_payments.payee',
+        //         'cv_check_payments.cv_header_id',
+        //         'cv_check_payments.company_id',
+
+        //         'scanned_records.id as scanned_id',
+        //     )
+        //     ->with('company:id,name', 'cvHeader:id,cv_date,cv_no')
+        //     ->paginate(5)
+        //     ->withQueryString()
+        //     ->toResourceCollection();
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'cv'
             ? Inertia::lazy(fn() =>
