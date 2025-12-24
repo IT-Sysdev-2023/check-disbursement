@@ -35,7 +35,7 @@ class CvCheckPaymentResource extends JsonResource
             'clearingDate' => $this->clearing_date ? $this->clearing_date->toFormattedDateString() : 'N/A',
 
             'scannedId' => $this->scanned_id,
-            'taggedLocation' => $this->when($this->tag_location_id, self::statusLocation($this->tagLocation->location)),
+            'taggedLocation' => $this->when($this->tag_location_id, self::statusLocation($this->tagLocation?->location)),
 
             'company' => $this->whenLoaded('company'),
             'cvHeader' => new CvHeaderResource($this->whenLoaded('cvHeader')),

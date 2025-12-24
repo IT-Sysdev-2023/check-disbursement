@@ -29,8 +29,6 @@ export default function ReasonCancellationModal({
     check: string;
     handleClose: () => void;
 }) {
-    // const [open, setOpen] = useState(false);
-
     const { setData, post, processing, errors, reset } = useForm({
         reason: '',
         check: check,
