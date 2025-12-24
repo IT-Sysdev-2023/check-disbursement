@@ -68,8 +68,4 @@ class User extends Authenticatable
         return $this->hasMany(AssignedCheckNumber::class, 'caused_by');
     }
 
-    public function checkApprovals(){
-        return $this->hasMany(CheckApproval::class, 'check_id');
-    }
-
 }

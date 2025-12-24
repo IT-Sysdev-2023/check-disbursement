@@ -5,14 +5,18 @@ import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
 export const createReleasingCvColumns = (
-    handleStatusChange: (id: number, value: ReleasingType) => void,
+    handleStatusChange: (
+        checkId: number,
+        value: string,
+        check:string
+    ) => void,
 ): GridColDef[] => [
     {
         field: 'checkNumber',
         headerName: 'Check Number',
         headerAlign: 'right',
         align: 'right',
-        flex: 0.5,
+        flex: 1,
         minWidth: 50,
     },
     {
@@ -63,6 +67,17 @@ export const createReleasingCvColumns = (
             );
         },
     },
+    {
+        field: 'location',
+        headerName: 'Location',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: (params) => {
+            return params.row.taggedLocation?.location;
+        },
+    },
 
     {
         field: 'businessUnit',
@@ -85,28 +100,27 @@ export const createReleasingCvColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: (params) => {
-            const { checkStatus } = params.row;
+            const { id, taggedLocation } = params.row;
+            console.log(params.row);
             return (
                 <Select
                     size="small"
-                    value={checkStatus.status ?? ''}
+                    value={null}
                     label="For Signature"
-                    onChange={(e) =>
-                        handleStatusChange(checkStatus.id, e.target.value)
-                    }
+                    onChange={(e) => {
+                        if (!e.target.value) return;
+                        handleStatusChange(
+                            id,
+                            e.target.value,
+                            'cv'
+                        );
+                    }}
                 >
-                    <MenuItem value="release">
-                        <Chip label="Released Check" color="primary" />
-                    </MenuItem>
-                    <MenuItem value="forward">
-                        <Chip label="Forward Check" color="secondary" />
-                    </MenuItem>
-                    <MenuItem value="deposit">
-                        <Chip label="Deposit Check" color="info" />
-                    </MenuItem>
-                    <MenuItem value="stale">
-                        <Chip label="Stale Check" color="warning" />
-                    </MenuItem>
+                    
+                        <MenuItem value={taggedLocation}>
+                            <Chip label={ taggedLocation +" Check"} color="secondary" />
+                        </MenuItem>
+
                     <MenuItem value="cancel">
                         <Chip label="Cancel Check" color="error" />
                     </MenuItem>
@@ -117,7 +131,7 @@ export const createReleasingCvColumns = (
 ];
 
 export const createReleasingCrfColumns = (
-    handleStatusChange: (id: number, value: ReleasingType) => void,
+    handleStatusChange: (id: number, value: ReleasingType, check: string) => void,
 ): GridColDef[] => [
     {
         field: 'crf',
@@ -199,7 +213,7 @@ export const createReleasingCrfColumns = (
                     value={checkStatus.status ?? ''}
                     label="For Signature"
                     onChange={(e) =>
-                        handleStatusChange(checkStatus.id, e.target.value)
+                        handleStatusChange(checkStatus.id, e.target.value, 'crf')
                     }
                 >
                     <MenuItem value="release">

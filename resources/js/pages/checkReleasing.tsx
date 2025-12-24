@@ -105,22 +105,23 @@ export default function CheckReleasing({
         });
     };
 
-    const handleStatusChange = (id: number, value: string) => {
+    const handleStatusChange = (checkId: number, value: string, check: string) => {
         if (value === 'cancel') {
-            setCheckId(id);
+            setCheckId(checkId);
             setOpen(true);
             return;
         }
 
         router.push({
-            url: releaseCheck([id, value]).url,
+            url: releaseCheck([checkId, value, check]).url,
             component: 'checkReleasing/releaseCheck',
             props: (curr) => ({
                 ...curr,
-                id: id,
+                checkId: checkId,
                 status: value,
+                check: check,
                 label:
-                    value.charAt(0).toUpperCase() + value.slice(1) + ' Check',
+                    value +' Check',
             }),
         });
     };
@@ -153,6 +154,7 @@ export default function CheckReleasing({
 
                 <ReasonCancellationModal
                     checkId={checkId ?? 0}
+                    check={check}
                     open={open}
                     handleClose={() => {
                         setOpen(false);

@@ -5,7 +5,6 @@ import {
     detailsCrf,
     getLocation,
     scan,
-    scanCheck,
     unassignCheck,
     updateLocation,
 } from '@/routes';
@@ -159,24 +158,24 @@ export default function RetrievedRecords({
         // setCheckId(id);
         // setOpen(true);
         // },
-        scan: (id) => {
-            router.post(
-                scanCheck(),
-                { check, status: null, id },
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                    onSuccess: (page) => {
-                        const m = page.props.flash as FlashReponse;
+        // scan: (id) => {
+        //     router.post(
+        //         scanCheck(),
+        //         { check, status: null, id },
+        //         {
+        //             preserveScroll: true,
+        //             preserveState: true,
+        //             onSuccess: (page) => {
+        //                 const m = page.props.flash as FlashReponse;
 
-                        notifications.show(m.message, {
-                            severity: 'success',
-                            autoHideDuration: 3000,
-                        });
-                    },
-                },
-            );
-        },
+        //                 notifications.show(m.message, {
+        //                     severity: 'success',
+        //                     autoHideDuration: 3000,
+        //                 });
+        //             },
+        //         },
+        //     );
+        // },
         assign: (id) => {
             router.get(unassignCheck(id));
         },
@@ -219,7 +218,7 @@ export default function RetrievedRecords({
         });
     };
 
-    const handleChange = (event: SyntheticEvent, newValue: string) => {
+    const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
             router.reload({
                 data: {
@@ -312,7 +311,6 @@ export default function RetrievedRecords({
 
     const openBorrowModal = () => {
         setOpen(true);
-        console.log(selectionModel);
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -320,7 +318,7 @@ export default function RetrievedRecords({
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <TabContext value={value}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <TabList onChange={handleChange} aria-label="tabs">
+                            <TabList onChange={handleChangeTab} aria-label="tabs">
                                 <Tab
                                     label="CV Calendar View"
                                     value="calendar"
@@ -350,10 +348,11 @@ export default function RetrievedRecords({
                                 filter={filter.search}
                                 hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
                                 selectionModel={selectionModel}
-                                handleSelectionChange={(model) =>
+                                handleSelectionChange={(model) =>  {
                                     setSelectionModel(
                                         model as SelectionModelType,
                                     )
+                                }
                                 }
                                 handleRowClickSelection={handleRowSelection}
                                 pagination={(model) =>
@@ -387,49 +386,15 @@ export default function RetrievedRecords({
                             </Box>
                         </TabPanel>
                         <TabPanel value="borrowed">
-                            <BorrowedTableGrid data={borrowed} />
-                            {/* <TableFilter
+                             <TableFilter
                                 isCrf={check === 'crf'}
                                 handleChangeCheck={handleCheck}
                                 company={company}
                                 filters={filter}
                                 check={check}
                             />
-
-                            <TableDataGrid
-                                data={check === 'cv' ? borrowed : crf}
-                                filter={filter.search}
-                                selectionModel={selectionModel}
-                                handleSelectionChange={(model) =>
-                                    setSelectionModel(
-                                        model as SelectionModelType,
-                                    )
-                                }
-                                handleRowClickSelection={handleRowSelection}
-                                pagination={(model) =>
-                                    handlePagination(model, ['cv', 'crf'])
-                                }
-                                handleSearchFilter={handleSearch}
-                                handleSortFilter={handleSort}
-                                columns={
-                                    check === 'cv' ? cvColumns : crfColumns
-                                }
-                                isLoading={tableLoading}
-                            />
-
-                            <Box
-                                display="flex"
-                                justifyContent="flex-end"
-                                mt={3}
-                            >
-                                <Button
-                                    variant="outlined"
-                                    startIcon={<Cloud />}
-                                    onClick={handleSyncScanned}
-                                >
-                                    Sync Check Scanned
-                                </Button>
-                            </Box> */}
+                            <BorrowedTableGrid data={borrowed} />
+                            
                         </TabPanel>
 
                         <TabPanel value="manageChecks">

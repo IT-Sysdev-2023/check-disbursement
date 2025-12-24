@@ -21,18 +21,20 @@ const style = {
 export default function ReasonCancellationModal({
     checkId,
     open,
+    check,
     handleClose,
 }: {
     checkId: number;
     open: boolean;
+    check: string;
     handleClose: () => void;
 }) {
     // const [open, setOpen] = useState(false);
 
-    const { setData, post, processing, errors, reset } =
-        useForm({
-            reason: '',
-        });
+    const { setData, post, processing, errors, reset } = useForm({
+        reason: '',
+        check: check,
+    });
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -55,7 +57,7 @@ export default function ReasonCancellationModal({
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                     <Typography
+                    <Typography
                         id="modal-modal-title"
                         variant="h6"
                         component="h2"
@@ -63,15 +65,12 @@ export default function ReasonCancellationModal({
                         Reason for Cancellation
                     </Typography>
 
-
                     <form onSubmit={handleSubmit}>
                         <Grid
                             container
                             spacing={2}
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
-                          
-
                             <Grid size={{ xs: 12, sm: 12 }}>
                                 <TextField
                                     id="outlined-multiline-static"

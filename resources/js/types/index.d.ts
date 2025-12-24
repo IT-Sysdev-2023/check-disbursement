@@ -78,11 +78,11 @@ export type ActionHandler = (id: number, bu?: string) => void;
 
 export type ActionType = 'details' | 'borrow' | 'scan';
 export type ReleasingType =
-    | 'release'
-    | 'forward'
-    | 'deposit'
-    | 'stale'
-    | 'cancel';
+    | 'Cebu'
+    | 'Manila'
+    | 'Internal'
+    | 'Deposit'
+    | 'Tagbilaran Pick-up';
 
 export interface Company {
     id: number;

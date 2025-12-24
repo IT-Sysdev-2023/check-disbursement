@@ -140,21 +140,21 @@ class RetrievedChecksController extends Controller
             ->count() === 0;
     }
 
-    public function scanCheck(Request $request)
-    {
-        $request->validate([
-            'id' => 'required',
-            'check' => 'required| string',
-            'status' => 'nullable | string',
-        ]);
-        $request->user()->checkStatuses()->create([
-            'check_id' => $request->id,
-            'status' => $request->status,
-            'check' => $request->check,
-        ]);
+    // public function scanCheck(Request $request)
+    // {
+    //     $request->validate([
+    //         'id' => 'required',
+    //         'check' => 'required| string',
+    //         'status' => 'nullable | string',
+    //     ]);
+    //     $request->user()->checkStatuses()->create([
+    //         'check_id' => $request->id,
+    //         'status' => $request->status,
+    //         'check' => $request->check,
+    //     ]);
 
-        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Scanned']);
-    }
+    //     return Redirect::back()->with(['status' => true, 'message' => 'Successfully Scanned']);
+    // }
     public function unassignCheck(CvCheckPayment $id)
     {
         return Inertia::render('retrievedRecords/unassignCheck', [

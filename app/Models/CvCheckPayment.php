@@ -75,6 +75,7 @@ class CvCheckPayment extends Model
     {
         return $this->hasOne(CheckStatus::class, 'check_id')->where('check', 'cv');
     }
+    
 
     public function assignedCheckNumber()
     {
@@ -88,6 +89,10 @@ class CvCheckPayment extends Model
 
     public function cancelledCheck()
     {
-        return $this->hasOne(CancelledCheck::class);
+        return $this->hasOne(CancelledCheck::class, 'check_id')->where('check', 'cv');
+    }
+
+    public function tagLocation(){
+        return $this->belongsTo(TagLocation::class);
     }
 }

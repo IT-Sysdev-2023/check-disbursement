@@ -54,10 +54,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('borrowed-checks', [RetrievedChecksController::class, 'borrowedChecks'])->name('borrowedChecks');
         Route::get('approver', [RetrievedChecksController::class, 'approver'])->name('approverNames');
         Route::put('approve-check', [RetrievedChecksController::class, 'approveCheck'])->name('approveCheck');
-        Route::get('get-location', [RetrievedChecksController::class,'getLocation'])->name('getLocation');
+        Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('getLocation');
         Route::put('update-location', [RetrievedChecksController::class, 'setLocation'])->name('updateLocation');
 
-        Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
+        // Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
+        Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
         Route::get('unassign-check/{id}', [RetrievedChecksController::class, 'unassignCheck'])->name('unassignCheck');
         Route::post('store-unassign-check-number', [RetrievedChecksController::class, 'storeUnassignCheck'])->name('storeUnassignCheck');
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
@@ -68,8 +69,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('check-releasing')->group(function () {
 
         Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
-        Route::get('release-check/{id}/{status}', [CheckReleasingController::class, 'releaseCheck'])->name('release-check');
-        Route::post('store-release-check/{id}', [CheckReleasingController::class, 'storeReleaseCheck'])->name('store-release-check');
+        Route::get('release-check/{checkId}/{status}/{check}', [CheckReleasingController::class, 'releaseCheck'])->name('release-check');
+        Route::post('store-release-check', [CheckReleasingController::class, 'storeReleaseCheck'])->name('store-release-check');
         Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancelCheck'])->name('cancel-check');
     });
 
@@ -103,7 +104,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('assign-permissions', [AdminController::class, 'assignPermissions'])->name('assignPermissions');
     });
 
-    Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
+
 
 });
 Route::get('/test', function () {

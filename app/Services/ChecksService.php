@@ -19,24 +19,17 @@ class ChecksService
     {
         //LAZY LOADING APPROACHING MOTHER F*CKERSSSSSSSS hAHAHAHHA
 
-        if (self::checkIfHasNoCheckNumber()) {
-            $cvRecords = ($filters['tab'] ?? null) === 'tableView' ? self::cvRecords($filters, true)
-                : null;
-        } else {
-            $cvRecords = ($filters['tab'] ?? null) === 'tableView' ? self::cvRecords($filters)
-                : null;
-        }
+        $cvRecords = ($filters['tab'] ?? null) === 'tableView' ? self::cvRecords($filters, self::checkIfHasNoCheckNumber())
+            : null;
 
         $borrowedRecords = ($filters['tab'] ?? null) === 'borrowed' ? self::borrowedRecords()
             : null;
-
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
             : null;
 
         $manageChecks = ($filters['tab'] ?? null) === 'manageChecks' ? self::manageChecks() : null;
         // dd(self::manageChecks());
-
 
         return Inertia::render('retrievedRecords', [
             'cv' => $cvRecords,

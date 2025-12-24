@@ -32,7 +32,7 @@ export default function TableDataGrid({
     hasSelection?: boolean;
     filter?: string;
     selectionModel?: GridRowSelectionModel;
-    density?: GridDensity;
+        density?: GridDensity;
     handleRowClickSelection?: (id: number, taggedAt: string | null) => void;
     handleSelectionChange?: (model: GridRowSelectionModel) => void;
     pagination: (model: GridPaginationModel) => void;

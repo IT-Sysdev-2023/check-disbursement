@@ -21,39 +21,30 @@ class CheckReleasingController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-        $records = CvCheckPayment::with('cvHeader', 'checkStatus', 'company')
+        $records = CvCheckPayment::with('cvHeader', 'company')
             ->withWhereHas('borrowedCheck', function ($query) {
                 $query->whereNotNull('approver_id');
             })
-            ->select('id', 'cv_header_id', 'check_number', 'check_date', 'check_amount', 'payee', 'company_id')
-            ->whereRelation('checkStatus', 'status', null)
+            ->doesntHave('checkStatus')
+            ->select(
+                'cv_check_payments.id',
+                'cv_check_payments.cv_header_id',
+                'cv_check_payments.check_number',
+                'cv_check_payments.check_date',
+                'cv_check_payments.check_amount',
+                'cv_check_payments.payee',
+                'cv_check_payments.company_id',
+                'cv_check_payments.tag_location_id'
+            )
+            ->join('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
+            ->join('scanned_records', function ($join) {
+                $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
+                    ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
+            })
             ->filter($filters)
             ->paginate($request->page)
             ->withQueryString()
             ->toResourceCollection();
-
-        // $checks = CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
-        //     $query->with('approver:id,name')->whereNotNull('approver_id');
-        // })
-        //     ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
-        //     ->leftJoin('scanned_records', function ($join) {
-        //         $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
-        //             ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
-        //     })
-
-        //     ->select(
-        //         'cv_check_payments.id',
-        //         'cv_check_payments.check_number',
-        //         'cv_check_payments.payee',
-        //         'cv_check_payments.cv_header_id',
-        //         'cv_check_payments.company_id',
-
-        //         'scanned_records.id as scanned_id',
-        //     )
-        //     ->with('company:id,name', 'cvHeader:id,cv_date,cv_no')
-        //     ->paginate(5)
-        //     ->withQueryString()
-        //     ->toResourceCollection();
 
         $crfs = ($filters['selectedCheck'] ?? null) === 'cv'
             ? Inertia::lazy(fn() =>
@@ -90,35 +81,40 @@ class CheckReleasingController extends Controller
             ->toResourceCollection();
     }
 
-    public function releaseCheck(string $id, string $status)
+    public function releaseCheck(string $checkId, string $status, string $check)
     {
         return Inertia::render('checkReleasing/releaseCheck', [
-            'id' => $id,
+            'checkId' => $checkId,
             'status' => $status,
-            'label' => Str::title($status) . ' Check',
+            'check' => $check,
+            'label' => Str::title($status) . ' Check'
         ]);
     }
 
-    public function storeReleaseCheck(CheckStatus $id, Request $request)
+    public function storeReleaseCheck(Request $request)
     {
         $request->validate(rules: [
             'receiversName' => 'required|string|max:255',
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'signature' => 'required|string',
             'status' => 'required|string',
+            'id' => 'required|string',
+            'check' => 'required|string'
         ]);
 
         $signature = preg_replace('/^data:image\/\w+;base64,/', '', $request->signature);
 
         $imageData = base64_decode($signature);
-        $name = $id->id . '_' . $request->user()->id . '_' . now()->format('Y-m-d-His');
+        $name = $request->id . '_' . $request->user()->id . '_' . now()->format('Y-m-d-His');
         $folder = $request->status . "/";
 
         Storage::disk('public')->put($folder . 'signatures/' . $name . '.png', $imageData);
         Storage::disk('public')->putFileAs($folder . 'images/', $request->file, $name . '.png');
 
-        $id->update([
-            'status' => $request->status,
+        CheckStatus::create([
+            'check_id' => $request->id,
+            'status' => Str::lower($request->status),
+            'check' => $request->check,
             'receivers_name' => $request->receiversName,
             'image' => $folder . 'images/' . $name,
             'signature' => $folder . 'signatures/' . $name,
@@ -128,22 +124,21 @@ class CheckReleasingController extends Controller
         return redirect()->route('check-releasing')->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
-    public function cancelCheck(CheckStatus $id, Request $request)
+    public function cancelCheck(int $id, Request $request)
     {
         $request->validate([
             'reason' => 'required|string|max:255',
+            'check' => 'required|string'
         ]);
 
         DB::transaction(function () use ($id, $request) {
 
-            $id->update([
+            CheckStatus::create([
+                'check_id' => $id,
+                'check' => $request->check,
                 'status' => 'cancel',
-            ]);
-
-            CancelledCheck::create([
-                'check_status_id' => $id->id,
-                'reason' => $request->reason,
-                'cancelled_by' => $request->user()->id,
+                'cancelled_reason' => $request->reason,
+                'caused_by' => $request->user()->id,
             ]);
         });
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
