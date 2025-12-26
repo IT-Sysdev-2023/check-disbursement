@@ -49,6 +49,8 @@ import {
     createCrfColumns,
     createCvColumns,
     createManageChecksColumns,
+    createManageCrfColumns,
+    createManageCvColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
 
@@ -209,7 +211,7 @@ export default function RetrievedRecords({
             data: {
                 selectedCheck: event.target.value,
             },
-            only: ['cheques'],
+            only: [currentTab],
             replace: true,
             onStart: () => setTableLoading(true),
             onFinish: () => setTableLoading(false),
@@ -223,6 +225,7 @@ export default function RetrievedRecords({
                     page: 1,
                     tab: newValue,
                 },
+                only: [newValue],
             });
         }
         setCurrentTab(newValue);
@@ -252,7 +255,8 @@ export default function RetrievedRecords({
     //     selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
     const cvColumns = createCvColumns(handleStatusChange);
     const crfColumns = createCrfColumns(handleStatusChange);
-    const manageChecksColumns = createManageChecksColumns();
+    const manageCvColumns = createManageCvColumns();
+     const manageCrfColumns = createManageCrfColumns();
 
     const handleClose = () => {
         setOpen(false);
@@ -308,7 +312,7 @@ export default function RetrievedRecords({
             },
         );
     };
-
+console.log(manageChecks);
     const openBorrowModal = () => {
         setOpen(true);
     };
@@ -358,7 +362,7 @@ export default function RetrievedRecords({
                                 }}
                                 handleRowClickSelection={handleRowSelection}
                                 pagination={(model) =>
-                                    handlePagination(model, ['cv', 'crf'])
+                                    handlePagination(model, ['cheques'])
                                 }
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
@@ -388,6 +392,11 @@ export default function RetrievedRecords({
                             </Box>
                         </TabPanel>
                         <TabPanel value="borrowed">
+                            {/* DATE PICKER ONLY FOR FILTERING*/}
+                            <BorrowedTableGrid data={borrowed} />
+                        </TabPanel>
+
+                        <TabPanel value="manageChecks">
                             <TableFilter
                                 currentTab={currentTab}
                                 handleChangeCheck={handleCheck}
@@ -395,20 +404,16 @@ export default function RetrievedRecords({
                                 filters={filter}
                                 check={check}
                             />
-                            <BorrowedTableGrid data={borrowed} />
-                        </TabPanel>
-
-                        <TabPanel value="manageChecks">
                             <TableDataGrid
                                 data={manageChecks}
                                 filter={filter.search}
                                 hasSelection={false} //remove selection if there is no check number
                                 pagination={(model) =>
-                                    handlePagination(model, ['cv', 'crf'])
+                                    handlePagination(model, ['manageChecks'])
                                 }
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
-                                columns={manageChecksColumns}
+                                columns={check == 'cv' ? manageCvColumns : manageCrfColumns}
                                 isLoading={tableLoading}
                             />
 

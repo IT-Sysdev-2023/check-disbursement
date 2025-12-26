@@ -127,43 +127,91 @@ function Row(props: { row: BorrowerName }) {
                             >
                                 Checks
                             </Typography>
-                            <Table size="small" aria-label="purchases">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Check Date</TableCell>
-                                        <TableCell>Check Amount</TableCell>
-                                        <TableCell align="right">
-                                            Company
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            Payee
-                                        </TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {borrowerData[row.borrowerNoClean]?.map(
-                                        (historyRow) => (
-                                            <TableRow key={historyRow.id}>
-                                                <TableCell
-                                                    component="th"
-                                                    scope="row"
-                                                >
-                                                    {historyRow.date}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {historyRow.check_amount}
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    {historyRow.company_name}
-                                                </TableCell>
-                                                <TableCell align="right">
-                                                    {historyRow.payee}
-                                                </TableCell>
-                                            </TableRow>
-                                        ),
-                                    )}
-                                </TableBody>
-                            </Table>
+                            {row.check == 'cv' && (
+                                <Table size="small" aria-label="cv">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Check Date</TableCell>
+                                            <TableCell>Check Amount</TableCell>
+                                            <TableCell align="right">
+                                                Company
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                Payee
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {borrowerData[row.borrowerNoClean]?.map(
+                                            (historyRow) => (
+                                                <TableRow key={historyRow.id}>
+                                                    <TableCell
+                                                        component="th"
+                                                        scope="row"
+                                                    >
+                                                        {historyRow.date}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {
+                                                            historyRow.check_amount
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        {
+                                                            historyRow.company_name
+                                                        }
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        {historyRow.payee}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ),
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            )}
+                            {row.check == 'crf' && (
+                                <Table size="small" aria-label="cv">
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell>Amount</TableCell>
+                                            <TableCell>Check No</TableCell>
+                                            <TableCell align="right">
+                                                Company
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                CRF No
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                Paid To
+                                            </TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {borrowerData[row.borrowerNoClean]?.map(
+                                            (historyRow) => (
+                                                <TableRow key={historyRow.id}>
+                                                    <TableCell>
+                                                        {historyRow.ck_no}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        {historyRow.formatted_amount}
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        {historyRow.company}
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        {historyRow.crf}
+                                                    </TableCell>
+                                                    <TableCell align="right">
+                                                        {historyRow.paid_to}
+                                                    </TableCell>
+                                                </TableRow>
+                                            ),
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            )}
                         </Box>
                     </Collapse>
                 </TableCell>
@@ -175,7 +223,8 @@ function Row(props: { row: BorrowerName }) {
                 onClose={() => setOpenModal(false)}
                 handleSubmit={handleSubmit}
                 handleSelectedItem={(event) =>
-                    setSelectedApprover(event.target.value)}
+                    setSelectedApprover(event.target.value)
+                }
                 selectedItem={selectedApprover}
                 item={approver}
             />

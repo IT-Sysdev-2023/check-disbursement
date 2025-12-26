@@ -200,10 +200,10 @@ export const createCrfColumns = (
         renderCell: (params) => {
             const { row } = params;
 
-             if (params.row.taggedAt) {
+            if (params.row.taggedAt) {
                 return renderStatus('Tagged');
-             }
-            
+            }
+
             return renderStatus(row?.borrowedCheck ? 'Borrowed' : 'Signature');
         },
     },
@@ -243,8 +243,7 @@ export const createCrfColumns = (
     },
 ];
 
-export const createManageChecksColumns = (
-): GridColDef[] => [
+export const createManageCvColumns = (): GridColDef[] => [
     {
         field: 'cvNo',
         headerName: 'CV Number',
@@ -285,7 +284,7 @@ export const createManageChecksColumns = (
         headerName: 'Approve Status',
         flex: 1,
         renderCell: () => {
-            return <Chip label='Approved' color='success' size="small" />
+            return <Chip label="Approved" color="success" size="small" />;
         },
     },
 
@@ -294,21 +293,98 @@ export const createManageChecksColumns = (
         headerName: 'Approved By',
         headerAlign: 'right',
         align: 'right',
-           flex: 1,
+        flex: 1,
         renderCell: (params) => {
             return params.row.borrowedCheck?.approver?.name;
         },
     },
     {
-        field: 'actions',
+        field: 'syncStatus',
         headerName: 'Sync Status',
         width: 130,
         align: 'center',
         headerAlign: 'center',
         sortable: false,
         renderCell: (params) => {
-            console.log(params.row);
-            return params.row.scannedId ? <Chip label='Scanned' color='success' size="small" /> : <Chip label='Not Scanned' color='error' size="small" />;
+            return params.row.scannedId ? (
+                <Chip label="Scanned" color="success" size="small" />
+            ) : (
+                <Chip label="Not Scanned" color="error" size="small" />
+            );
+        },
+    },
+];
+
+export const createManageCrfColumns = (): GridColDef[] => [
+    {
+        field: 'crf',
+        headerName: 'CRF #',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+    },
+    {
+        field: 'company',
+        headerName: 'Company',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+    },
+    {
+        field: 'no',
+        headerName: 'No.',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+    },
+    {
+        field: 'paidTo',
+        headerName: 'Paid To',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'amount',
+        headerName: 'Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'status',
+        headerName: 'Approve Status',
+        flex: 1,
+        renderCell: () => {
+            return <Chip label="Approved" color="success" size="small" />;
+        },
+    },
+    {
+        field: 'ckNo',
+        headerName: 'CK No.',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'syncStatus',
+        headerName: 'Sync Status',
+        width: 130,
+        align: 'center',
+        headerAlign: 'center',
+        sortable: false,
+        renderCell: (params) => {
+            return params.row.scannedId ? (
+                <Chip label="Scanned" color="success" size="small" />
+            ) : (
+                <Chip label="Not Scanned" color="error" size="small" />
+            );
         },
     },
 ];

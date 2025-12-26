@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Helpers\NumberHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Crf extends Model
 {
@@ -19,7 +21,12 @@ class Crf extends Model
         ];
 
     }
-
+    protected function formattedAmount(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => NumberHelper::currency($this->amount),
+        );
+    }
     public function scopeFilter(Builder $builder, $filters)
     {
         return $builder->when($filters['search'] ?? null, function ($query, $search) {

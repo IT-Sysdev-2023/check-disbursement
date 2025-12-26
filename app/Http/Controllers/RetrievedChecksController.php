@@ -253,7 +253,8 @@ class RetrievedChecksController extends Controller
         } else {
             $records = Crf::select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
                 ->whereIn('id', $ids)
-                ->get();
+                ->get()
+                ->append('formatted_amount');
         }
         return response()->json($records);
     }

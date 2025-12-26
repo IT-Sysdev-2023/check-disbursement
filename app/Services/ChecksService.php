@@ -22,12 +22,12 @@ class ChecksService
         $tab = $filters['tab'] ?? 'calendar';
         $isCvHasNoCheckNumber = self::checkIfHasNoCheckNumber();
 
-        
+
         $chequeRecords = self::chequeRecords($filters, $defaultCheck, $isCvHasNoCheckNumber);
-        $borrowedRecords = self::borrowedRecords($tab);
+        $borrowedRecords = self::borrowedRecords($tab, $defaultCheck);
 
-        $manageChecks = $tab === 'manageChecks' ? self::manageChecks() : null;
-
+        $manageChecks = self::manageChecks($filters, $tab, $defaultCheck);
+        // dd($manageChecks);
         return Inertia::render('retrievedRecords', [
 
             'cheques' => $chequeRecords,
@@ -53,7 +53,7 @@ class ChecksService
         ]);
     }
 
-    private function chequeRecords($filters, string $defaultCheck, bool $hasNoCheckNumber)
+    private static function chequeRecords($filters, string $defaultCheck, bool $hasNoCheckNumber)
     {
         $isActiveTab = ($filters['tab'] ?? null) === 'cheques';
 
@@ -61,6 +61,18 @@ class ChecksService
             ? fn() => self::cvRecords($filters, $hasNoCheckNumber)
             : fn() => self::crfRecords($filters);
 
+        return $isActiveTab
+            ? $loader()
+            : Inertia::lazy($loader);
+    }
+
+    private static function manageChecks($filters, string $tab, string $defaultCheck)
+    {
+        $isActiveTab = $tab === 'manageChecks';
+
+        $loader = $defaultCheck === 'cv'
+            ? fn() => self::cvManageChecks($filters)
+            : fn() => self::crfManageCheck($filters);
         return $isActiveTab
             ? $loader()
             : Inertia::lazy($loader);
@@ -74,9 +86,9 @@ class ChecksService
             });
     }
 
-    public function manageChecks()
+    private static function cvManageChecks($filters)
     {
-        $checks = CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
+        return CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
             $query->with('approver:id,name')->whereNotNull('approver_id');
         })
             ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
@@ -84,37 +96,34 @@ class ChecksService
                 $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
                     ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
             })
-
             ->select(
                 'cv_check_payments.id',
                 'cv_check_payments.check_number',
                 'cv_check_payments.payee',
                 'cv_check_payments.cv_header_id',
                 'cv_check_payments.company_id',
-
                 'scanned_records.id as scanned_id',
             )
+            ->filter($filters)
             ->with('company:id,name', 'cvHeader:id,cv_date,cv_no')
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
-        // $checks = BorrowedCheck::select(
-        //     'borrower_no',
-        //     'reason',
-        //     'check',
-        //     'borrower_names.name as borrower_name',
-        //     DB::raw('COUNT(*) as total_checks'),
-        //     DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
-        // )
-        //     ->join('borrower_names', 'borrower_names.id', '=', 'borrowed_checks.borrower_name_id')
-        //     ->whereNot('approver_id', null)
-        //     ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'check')
-        //     ->orderByDesc('borrower_no')
-        //     ->paginate(5)
-        //     ->withQueryString()
-        //     ->toResourceCollection()
-        // ;
-        return $checks;
+    }
+
+    private static function crfManageCheck($filters)
+    {
+        return Crf::withWhereHas('borrowedCheck', function ($query) {
+            $query->with('approver:id,name')->whereNotNull('approver_id');
+        })
+            ->leftJoin('scanned_records', function ($join) {
+                $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
+                    ->on('scanned_records.amount', '=', 'crfs.amount');
+            })
+            ->filter($filters)
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
     }
 
     private static function crfRecords(array $filters)
@@ -138,7 +147,7 @@ class ChecksService
             ->exists();
     }
 
-    public function borrowedRecords(string $tab)
+    public function borrowedRecords(string $tab, string $selectedCheck)
     {
         $loader = fn() => BorrowedCheck::select(
             'borrower_no',
