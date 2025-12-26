@@ -18,25 +18,23 @@ class ChecksService
     public function records(?int $page, array $filters, Request $request)
     {
         //LAZY LOADING APPROACHING MOTHER F*CKERSSSSSSSS hAHAHAHHA
+        $defaultCheck = $filters['selectedCheck'] ?? 'cv';
+        $tab = $filters['tab'] ?? 'calendar';
+        $isCvHasNoCheckNumber = self::checkIfHasNoCheckNumber();
 
-        $cvRecords = ($filters['tab'] ?? null) === 'tableView' ? self::cvRecords($filters, self::checkIfHasNoCheckNumber())
-            : null;
+        
+        $chequeRecords = self::chequeRecords($filters, $defaultCheck, $isCvHasNoCheckNumber);
+        $borrowedRecords = self::borrowedRecords($tab);
 
-        $borrowedRecords = ($filters['tab'] ?? null) === 'borrowed' ? self::borrowedRecords()
-            : null;
-
-        $crfs = ($filters['selectedCheck'] ?? null) === 'crf' ? self::crfRecords($filters)
-            : null;
-
-        $manageChecks = ($filters['tab'] ?? null) === 'manageChecks' ? self::manageChecks() : null;
-        // dd(self::manageChecks());
+        $manageChecks = $tab === 'manageChecks' ? self::manageChecks() : null;
 
         return Inertia::render('retrievedRecords', [
-            'cv' => $cvRecords,
-            'crf' => $crfs,
+
+            'cheques' => $chequeRecords,
+
             'borrowed' => $borrowedRecords,
             'manageChecks' => $manageChecks,
-            'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
+            'defaultCheck' => $defaultCheck,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -44,15 +42,28 @@ class ChecksService
                     'start' => null,
                     'end' => null
                 ],
-                'tab' => $filters['tab'] ?? 'calendar'
+                'tab' => $tab
             ],
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
                 'value' => '0'
             ]),
-            'hasEmptyCheckNumber' => self::checkIfHasNoCheckNumber(),
+            'hasEmptyCheckNumber' => $isCvHasNoCheckNumber,
             'distinctMonths' => self::distinctMonths()
         ]);
+    }
+
+    private function chequeRecords($filters, string $defaultCheck, bool $hasNoCheckNumber)
+    {
+        $isActiveTab = ($filters['tab'] ?? null) === 'cheques';
+
+        $loader = $defaultCheck === 'cv'
+            ? fn() => self::cvRecords($filters, $hasNoCheckNumber)
+            : fn() => self::crfRecords($filters);
+
+        return $isActiveTab
+            ? $loader()
+            : Inertia::lazy($loader);
     }
 
     public function hasEmptyLocation(Collection $records)
@@ -109,7 +120,7 @@ class ChecksService
     private static function crfRecords(array $filters)
     {
         return Crf::with('borrowedCheck')
-            ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
+            ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by', 'tagged_at')
             ->doesntHave('checkStatus')
             ->doesntHave('borrowedCheck')
             ->filter($filters)
@@ -127,9 +138,9 @@ class ChecksService
             ->exists();
     }
 
-    public function borrowedRecords()
+    public function borrowedRecords(string $tab)
     {
-        $borrowed = BorrowedCheck::select(
+        $loader = fn() => BorrowedCheck::select(
             'borrower_no',
             'reason',
             'check',
@@ -138,26 +149,15 @@ class ChecksService
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
             ->join('borrower_names', 'borrower_names.id', '=', 'borrowed_checks.borrower_name_id')
-            ->where('approver_id', null)
-            // ->with('borrowerName')
-            // ->with($check === 'cv' ? 'cvCheckPayment.company' : 'crf')
+            ->whereNull('approver_id')
             ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'check')
             ->orderByDesc('borrower_no')
-            // ->get()
             ->paginate(5)
             ->withQueryString()
-            ->toResourceCollection()
-        ;
-        return $borrowed;
-        // return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company', 'assignedCheckNumber')
-        //     ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee')
-        //     ->doesntHave('checkStatus')
-        //     // ->doesntHave('assignedCheckNumber')
-        //     ->has('borrowedCheck')
-        //     ->filter($filters)
-        //     ->paginate(10)
-        //     ->withQueryString()
-        //     ->toResourceCollection();
+            ->toResourceCollection();
+
+        return $tab === 'borrowed' ? $loader()
+            : Inertia::lazy($loader);
     }
 
     private static function cvRecords(array $filters, ?bool $hasNoAmount = false)

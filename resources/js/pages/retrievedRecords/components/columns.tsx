@@ -199,7 +199,11 @@ export const createCrfColumns = (
         sortable: false,
         renderCell: (params) => {
             const { row } = params;
-            // console.log(row);
+
+             if (params.row.taggedAt) {
+                return renderStatus('Tagged');
+             }
+            
             return renderStatus(row?.borrowedCheck ? 'Borrowed' : 'Signature');
         },
     },
@@ -226,6 +230,9 @@ export const createCrfColumns = (
                     }
                 >
                     <MenuItem value="details">Check Details</MenuItem>
+                    {!params.row.taggedAt && (
+                        <MenuItem value="tag">Tag Location</MenuItem>
+                    )}
                     {/* {params.row.borrowedCheck == null && (
                         <MenuItem value="borrow">Borrow Check</MenuItem>
                     )}

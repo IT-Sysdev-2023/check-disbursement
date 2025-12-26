@@ -28,6 +28,7 @@ class CrfResource extends JsonResource
             'amount' => NumberHelper::currency($this->amount),
             'ckNo' => $this->ck_no,
             'preparedBy' => $this->prepared_by,
+            'taggedAt' => $this->tagged_at,
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
             'checkStatus' => $this->whenLoaded('checkStatus'),
         ];

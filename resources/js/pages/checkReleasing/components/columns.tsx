@@ -101,7 +101,6 @@ export const createReleasingCvColumns = (
         sortable: false,
         renderCell: (params) => {
             const { id, taggedLocation } = params.row;
-            console.log(params.row);
             return (
                 <Select
                     size="small"

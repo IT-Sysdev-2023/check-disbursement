@@ -116,7 +116,7 @@ export default function CheckStatus({
             <Head title="CV" />
             <PageContainer title="Check Status">
                 <TableFilter
-                    isCrf={check === 'crf'}
+                    // current
                     handleChangeCheck={handleCheck}
                     company={company}
                     filters={filter}

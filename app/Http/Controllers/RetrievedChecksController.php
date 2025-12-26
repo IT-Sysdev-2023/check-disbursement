@@ -69,8 +69,8 @@ class RetrievedChecksController extends Controller
         ]);
 
         if (!self::checkIds($request->check, $request->ids)) {
-             return redirect()->back()->with(['status' => false, 'message' => 'Some selected checks have no location assigned. Please assign location before borrowing.']);
-           
+            return redirect()->back()->with(['status' => false, 'message' => 'Some selected checks have no location assigned. Please assign location before borrowing.']);
+
         }
 
         $borrowerNo = (BorrowedCheck::max('borrower_no') ?? 0) + 1;
@@ -308,6 +308,9 @@ class RetrievedChecksController extends Controller
 
         if ($request->check === 'cv') {
             CvCheckPayment::where('id', $request->checkId)
+                ->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
+        } else {
+            Crf::where('id', $request->checkId)
                 ->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
         }
 

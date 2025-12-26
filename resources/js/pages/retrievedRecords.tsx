@@ -60,8 +60,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function RetrievedRecords({
-    cv,
-    crf,
+    cheques,
     defaultCheck,
     filter,
     company,
@@ -77,8 +76,7 @@ export default function RetrievedRecords({
         date: DateFilterType;
         tab: string;
     };
-    cv: InertiaPagination<Cv>;
-    crf: InertiaPagination<Crf>;
+    cheques: InertiaPagination<Cv | Crf>;
     borrowed: InertiaPagination<BorrowerName>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
@@ -93,7 +91,7 @@ export default function RetrievedRecords({
     const [tableLoading, setTableLoading] = useState(false);
     const [openTagModal, setOpenTagModal] = useState(false);
     const notifications = useNotifications();
-    const [value, setValue] = useState(filter.tab);
+    const [currentTab, setCurrentTab] = useState(filter.tab);
     const [selectedLocation, setSelectedLocation] = useState('');
     const [location, setLocation] = useState<
         { label: string; value: string }[]
@@ -211,7 +209,7 @@ export default function RetrievedRecords({
             data: {
                 selectedCheck: event.target.value,
             },
-            only: ['crf'],
+            only: ['cheques'],
             replace: true,
             onStart: () => setTableLoading(true),
             onFinish: () => setTableLoading(false),
@@ -227,7 +225,7 @@ export default function RetrievedRecords({
                 },
             });
         }
-        setValue(newValue);
+        setCurrentTab(newValue);
     };
 
     const handleRowSelection = (id: number, taggedAt: string | null) => {
@@ -299,6 +297,8 @@ export default function RetrievedRecords({
                 check: check,
             },
             {
+                only: [currentTab],
+                preserveScroll: true,
                 onError: (e) => {
                     console.log(e);
                 },
@@ -316,14 +316,17 @@ export default function RetrievedRecords({
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">
                 <Box sx={{ width: '100%', typography: 'body1' }}>
-                    <TabContext value={value}>
+                    <TabContext value={currentTab}>
                         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <TabList onChange={handleChangeTab} aria-label="tabs">
+                            <TabList
+                                onChange={handleChangeTab}
+                                aria-label="tabs"
+                            >
                                 <Tab
                                     label="CV Calendar View"
                                     value="calendar"
                                 />
-                                <Tab label="Table View" value="tableView" />
+                                <Tab label="Table View" value="cheques" />
                                 <Tab label="Borrowed Checks" value="borrowed" />
                                 <Tab
                                     label="Manage Checks"
@@ -334,9 +337,9 @@ export default function RetrievedRecords({
                         <TabPanel value="calendar">
                             <CalendarView distinctMonths={distinctMonths} />
                         </TabPanel>
-                        <TabPanel value="tableView">
+                        <TabPanel value="cheques">
                             <TableFilter
-                                isCrf={check === 'crf'}
+                                currentTab={currentTab}
                                 handleChangeCheck={handleCheck}
                                 company={company}
                                 filters={filter}
@@ -344,16 +347,15 @@ export default function RetrievedRecords({
                             />
 
                             <TableDataGrid
-                                data={check === 'cv' ? cv : crf}
+                                data={cheques}
                                 filter={filter.search}
                                 hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
                                 selectionModel={selectionModel}
-                                handleSelectionChange={(model) =>  {
+                                handleSelectionChange={(model) => {
                                     setSelectionModel(
                                         model as SelectionModelType,
-                                    )
-                                }
-                                }
+                                    );
+                                }}
                                 handleRowClickSelection={handleRowSelection}
                                 pagination={(model) =>
                                     handlePagination(model, ['cv', 'crf'])
@@ -386,15 +388,14 @@ export default function RetrievedRecords({
                             </Box>
                         </TabPanel>
                         <TabPanel value="borrowed">
-                             <TableFilter
-                                isCrf={check === 'crf'}
+                            <TableFilter
+                                currentTab={currentTab}
                                 handleChangeCheck={handleCheck}
                                 company={company}
                                 filters={filter}
                                 check={check}
                             />
                             <BorrowedTableGrid data={borrowed} />
-                            
                         </TabPanel>
 
                         <TabPanel value="manageChecks">
@@ -407,12 +408,11 @@ export default function RetrievedRecords({
                                 }
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
-                                columns={manageChecksColumns
-                                }
+                                columns={manageChecksColumns}
                                 isLoading={tableLoading}
                             />
 
-                             <Box
+                            <Box
                                 display="flex"
                                 justifyContent="flex-end"
                                 mt={3}
