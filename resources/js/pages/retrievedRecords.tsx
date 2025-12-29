@@ -48,7 +48,6 @@ import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createCrfColumns,
     createCvColumns,
-    createManageChecksColumns,
     createManageCrfColumns,
     createManageCvColumns,
 } from './retrievedRecords/components/columns';
@@ -312,7 +311,6 @@ export default function RetrievedRecords({
             },
         );
     };
-console.log(manageChecks);
     const openBorrowModal = () => {
         setOpen(true);
     };

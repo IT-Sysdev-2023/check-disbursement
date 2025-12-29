@@ -204,30 +204,29 @@ export const createReleasingCrfColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: (params) => {
-            const { checkStatus } = params.row;
+
+            const { id, taggedLocation } = params.row;
 
             return (
                 <Select
                     size="small"
-                    value={checkStatus.status ?? ''}
+                    value={null}
                     label="For Signature"
-                    onChange={(e) =>
-                        handleStatusChange(checkStatus.id, e.target.value, 'crf')
-                    }
+                    onChange={(e) => {
+                        if (!e.target.value) return;
+                        // handleStatusChange(
+                        //     id,
+                        //     e.target.value,
+                        //     'cv'
+                        // );
+                        return null;
+                    }}
                 >
-                    <MenuItem value="release">
-                        {' '}
-                        <Chip label="Released Check" color="primary" />
-                    </MenuItem>
-                    <MenuItem value="forward">
-                        <Chip label="Forward Check" color="secondary" />
-                    </MenuItem>
-                    <MenuItem value="deposit">
-                        <Chip label="Deposit Check" color="info" />
-                    </MenuItem>
-                    <MenuItem value="stale">
-                        <Chip label="Stale Check" color="warning" />
-                    </MenuItem>
+                    
+                        <MenuItem value={taggedLocation}>
+                            <Chip label={ taggedLocation +" Check"} color="secondary" />
+                        </MenuItem>
+
                     <MenuItem value="cancel">
                         <Chip label="Cancel Check" color="error" />
                     </MenuItem>

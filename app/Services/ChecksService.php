@@ -22,12 +22,10 @@ class ChecksService
         $tab = $filters['tab'] ?? 'calendar';
         $isCvHasNoCheckNumber = self::checkIfHasNoCheckNumber();
 
-
         $chequeRecords = self::chequeRecords($filters, $defaultCheck, $isCvHasNoCheckNumber);
         $borrowedRecords = self::borrowedRecords($tab, $defaultCheck);
-
         $manageChecks = self::manageChecks($filters, $tab, $defaultCheck);
-        // dd($manageChecks);
+
         return Inertia::render('retrievedRecords', [
 
             'cheques' => $chequeRecords,
@@ -69,7 +67,6 @@ class ChecksService
     private static function manageChecks($filters, string $tab, string $defaultCheck)
     {
         $isActiveTab = $tab === 'manageChecks';
-
         $loader = $defaultCheck === 'cv'
             ? fn() => self::cvManageChecks($filters)
             : fn() => self::crfManageCheck($filters);
@@ -116,6 +113,7 @@ class ChecksService
         return Crf::withWhereHas('borrowedCheck', function ($query) {
             $query->with('approver:id,name')->whereNotNull('approver_id');
         })
+            ->select('crfs.id', 'crfs.amount', 'crfs.ck_no', 'crf', 'company', 'no', 'paid_to',  'scanned_records.id as scanned_id',)
             ->leftJoin('scanned_records', function ($join) {
                 $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
                     ->on('scanned_records.amount', '=', 'crfs.amount');

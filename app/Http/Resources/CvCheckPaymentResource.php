@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\NumberHelper;
+use App\Helpers\StringHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
@@ -35,7 +36,7 @@ class CvCheckPaymentResource extends JsonResource
             'clearingDate' => $this->clearing_date ? $this->clearing_date->toFormattedDateString() : 'N/A',
 
             'scannedId' => $this->scanned_id,
-            'taggedLocation' => $this->when($this->tag_location_id, self::statusLocation($this->tagLocation?->location)),
+            'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
 
             'company' => $this->whenLoaded('company'),
             'cvHeader' => new CvHeaderResource($this->whenLoaded('cvHeader')),
@@ -43,19 +44,5 @@ class CvCheckPaymentResource extends JsonResource
             'checkStatus' => $this->whenLoaded('checkStatus'),
             'assignedCheckNumbers' => $this->whenLoaded('assignedCheckNumber'),
         ];
-    }
-
-    private static function statusLocation($status)
-    {
-        
-          $locations = [
-            'Cebu' => 'Forward',
-            'Manila' => 'Forward',
-            'Internal' => 'Internal',
-            'Deposit' => 'Deposit',
-            'Tagbilaran Pick-up' => 'Released',
-        ];
-        
-        return $locations[$status] ?? null;
     }
 }

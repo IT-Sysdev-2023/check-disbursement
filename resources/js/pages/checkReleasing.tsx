@@ -33,14 +33,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CheckReleasing({
-    cv,
-    crf,
+    cheques,
     company,
     defaultCheck,
     filter,
 }: {
-    cv: InertiaPagination<Cv>;
-    crf: InertiaPagination<Crf>;
+    cheques: InertiaPagination<Cv | Crf>;
     defaultCheck: string;
     filter: {
         selectedBu: string;
@@ -48,7 +46,8 @@ export default function CheckReleasing({
         date: DateFilterType;
     };
     company: SelectionType[];
-}) {
+    }) {
+    console.log(cheques);
     const [check, setCheck] = useState(defaultCheck);
     const [tableLoading, setTableLoading] = useState(false);
     const [open, setOpen] = useState(false);
@@ -85,7 +84,7 @@ export default function CheckReleasing({
             data: {
                 selectedCheck: event.target.value,
             },
-            only: ['crf'],
+            only: ['cheques'],
             replace: true,
             onStart: () => setTableLoading(true),
             onFinish: () => setTableLoading(false),
@@ -105,7 +104,11 @@ export default function CheckReleasing({
         });
     };
 
-    const handleStatusChange = (checkId: number, value: string, check: string) => {
+    const handleStatusChange = (
+        checkId: number,
+        value: string,
+        check: string,
+    ) => {
         if (value === 'cancel') {
             setCheckId(checkId);
             setOpen(true);
@@ -120,8 +123,7 @@ export default function CheckReleasing({
                 checkId: checkId,
                 status: value,
                 check: check,
-                label:
-                    value +' Check',
+                label: value + ' Check',
             }),
         });
     };
@@ -134,7 +136,7 @@ export default function CheckReleasing({
             <Head title="CV" />
             <PageContainer title="Check Releasing">
                 <TableFilter
-                    isCrf={check === 'crf'}
+                    currentTab="cheques"
                     handleChangeCheck={handleCheck}
                     company={company}
                     filters={filter}
@@ -142,7 +144,7 @@ export default function CheckReleasing({
                 />
 
                 <TableDataGrid
-                    data={check === 'cv' ? cv : crf}
+                    data={cheques}
                     filter={filter.search}
                     pagination={handlePagination}
                     handleSearchFilter={handleSearch}

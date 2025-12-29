@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\NumberHelper;
+use App\Helpers\StringHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -31,6 +32,9 @@ class CrfResource extends JsonResource
             'taggedAt' => $this->tagged_at,
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
             'checkStatus' => $this->whenLoaded('checkStatus'),
+
+            'scannedId' => $this->scanned_id,
+             'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
         ];
     }
 }
