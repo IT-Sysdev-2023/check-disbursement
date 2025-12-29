@@ -96,7 +96,7 @@ class CheckReleasingController extends Controller
 
     private static function crfRecords(?array $filters)
     {
-        return Crf::select('crfs.id', 'crf', 'paid_to', 'crfs.amount', 'ck_no', 'no', 'company', 'paid_to')
+        return Crf::select('crfs.id', 'crf', 'paid_to', 'crfs.amount', 'ck_no', 'no', 'company', 'paid_to','tag_location_id')
             ->withWhereHas('borrowedCheck', function ($query) {
                 $query->whereNotNull('approver_id');
             })

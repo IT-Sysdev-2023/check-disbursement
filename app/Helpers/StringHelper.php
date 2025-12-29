@@ -10,7 +10,7 @@ class StringHelper{
             'Manila' => 'Forward',
             'Internal' => 'Internal',
             'Deposit' => 'Deposit',
-            'Tagbilaran Pick-up' => 'Released',
+            'Tagbilaran Pick-up' => 'Release',
         ];
         
         return $locations[$status] ?? null;

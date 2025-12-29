@@ -66,4 +66,7 @@ class Crf extends Model
     {
         return $this->hasOne(CancelledCheck::class);
     }
+     public function tagLocation(){
+        return $this->belongsTo(TagLocation::class);
+    }
 }

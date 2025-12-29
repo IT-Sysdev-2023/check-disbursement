@@ -130,7 +130,7 @@ export const createReleasingCvColumns = (
 ];
 
 export const createReleasingCrfColumns = (
-    handleStatusChange: (id: number, value: ReleasingType, check: string) => void,
+    handleStatusChange: (id: number, value: string, check: string) => void,
 ): GridColDef[] => [
     {
         field: 'crf',
@@ -214,11 +214,11 @@ export const createReleasingCrfColumns = (
                     label="For Signature"
                     onChange={(e) => {
                         if (!e.target.value) return;
-                        // handleStatusChange(
-                        //     id,
-                        //     e.target.value,
-                        //     'cv'
-                        // );
+                        handleStatusChange(
+                            id,
+                            e.target.value,
+                            'crf'
+                        );
                         return null;
                     }}
                 >
