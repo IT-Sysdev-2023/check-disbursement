@@ -10,14 +10,14 @@ import {
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, router } from '@inertiajs/react';
-import { SelectChangeEvent } from '@mui/material';
+import { Head, router, usePage } from '@inertiajs/react';
+import { Box, Modal, SelectChangeEvent } from '@mui/material';
 import {
     GridFilterModel,
     GridPaginationModel,
     GridSortModel,
 } from '@mui/x-data-grid';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
 import {
     createReleasingCrfColumns,
@@ -31,6 +31,18 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '#',
     },
 ];
+
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 400,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
 
 export default function CheckReleasing({
     cheques,
@@ -46,12 +58,14 @@ export default function CheckReleasing({
         date: DateFilterType;
     };
     company: SelectionType[];
-    }) {
+}) {
     console.log(cheques);
     const [check, setCheck] = useState(defaultCheck);
     const [tableLoading, setTableLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [checkId, setCheckId] = useState<number | undefined>(undefined);
+    const [stream, setStream] = useState('');
+    const [openModalPdf, setOpenModalPdf] = useState(false);
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1;
         const per_page = model.pageSize;
@@ -63,6 +77,17 @@ export default function CheckReleasing({
             },
         });
     };
+
+    const { flash } = usePage().props as {
+        flash?: { status?: boolean; message?: string; stream?: string };
+    };
+
+    useEffect(() => {
+        if (flash?.status && flash?.stream) {
+            setStream(flash.stream);
+            setOpenModalPdf(true);
+        }
+    }, [flash]);
 
     const handleSearch = (model: GridFilterModel) => {
         const query = model.quickFilterValues?.length
@@ -163,6 +188,17 @@ export default function CheckReleasing({
                     }}
                 />
             </PageContainer>
+             <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
+                <Box sx={{ ...style, width: '70%' }}>
+                    {stream && (
+                        <iframe
+                            src={stream}
+                            style={{ width: '100%', height: '500px' }}
+                            frameBorder={0}
+                        />
+                    )}
+                </Box>
+            </Modal>
         </AppLayout>
     );
 }

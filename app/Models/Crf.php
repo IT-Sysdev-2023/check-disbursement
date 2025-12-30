@@ -54,19 +54,17 @@ class Crf extends Model
             });
         ;
     }
-    public function borrowedCheck()
-    {
-        return $this->hasOne(BorrowedCheck::class, 'check_id')->where('check', 'crf');
-    }
-    public function checkStatus()
-    {
-        return $this->hasOne(CheckStatus::class, 'check_id')->where('check', 'crf');
-    }
-    public function cancelledCheck()
-    {
-        return $this->hasOne(CancelledCheck::class);
-    }
+    
      public function tagLocation(){
         return $this->belongsTo(TagLocation::class);
+    }
+
+     public function borrowedCheck()
+    {
+        return $this->morphOne(BorrowedCheck::class, 'checkable');
+    }
+      public function checkStatus()
+    {
+        return $this->morphOne(CheckStatus::class, 'checkable');
     }
 }

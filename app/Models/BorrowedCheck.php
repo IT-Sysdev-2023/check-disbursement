@@ -28,12 +28,12 @@ class BorrowedCheck extends Model
 
     public function crf()
     {
-        return $this->belongsTo(Crf::class, 'check_id');
+        return $this->belongsTo(Crf::class, 'checkable_id');
     }
 
     public function cvCheckPayment()
     {
-        return $this->belongsTo(CvCheckPayment::class, 'check_id');
+        return $this->belongsTo(CvCheckPayment::class, 'checkable_id');
     }
 
     public function checkRelation(string $type)
@@ -43,5 +43,10 @@ class BorrowedCheck extends Model
             'crf' => $this->crf(),
             default => null,
         };
+    }
+
+    public function checkable()
+    {
+        return $this->morphTo();
     }
 }

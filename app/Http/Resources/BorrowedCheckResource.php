@@ -22,7 +22,7 @@ class BorrowedCheckResource extends JsonResource
             'borrowerNo' => NumberHelper::padLeft($this->borrower_no),
             'borrowerName' => $this->borrower_name,
             'reason' => $this->reason,
-            'check' => $this->check,
+            'check' => $this->checkable_type,
             'totalChecks' => $this->total_checks,
             'lastBorrowedAt' => Date::parse($this->last_borrowed_at)->format('M d, Y H:i A'),
         ];

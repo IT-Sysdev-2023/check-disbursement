@@ -67,16 +67,6 @@ class CvCheckPayment extends Model
         return $this->belongsTo(CvHeader::class);
     }
 
-    public function borrowedCheck()
-    {
-        return $this->hasOne(BorrowedCheck::class, 'check_id')->where('check', 'cv');
-    }
-    public function checkStatus()
-    {
-        return $this->hasOne(CheckStatus::class, 'check_id')->where('check', 'cv');
-    }
-    
-
     public function assignedCheckNumber()
     {
         return $this->hasOne(AssignedCheckNumber::class);
@@ -87,12 +77,17 @@ class CvCheckPayment extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function cancelledCheck()
-    {
-        return $this->hasOne(CancelledCheck::class, 'check_id')->where('check', 'cv');
-    }
 
     public function tagLocation(){
         return $this->belongsTo(TagLocation::class);
+    }
+
+     public function checkStatus()
+    {
+        return $this->morphOne(CheckStatus::class, 'checkable');
+    }
+     public function borrowedCheck()
+    {
+        return $this->morphOne(BorrowedCheck::class, 'checkable');
     }
 }

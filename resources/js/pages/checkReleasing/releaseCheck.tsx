@@ -26,6 +26,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface MyFormData {
+    causedBy: string;
     receiversName: string;
     file: File | null;
     signature: string | null;
@@ -35,19 +36,21 @@ export default function ReleaseCheck({
     status,
     label,
     check,
-    checkId
+    checkId,
 }: {
     status: string;
-        label: string;
+    label: string;
     check: string;
     checkId: number;
-    }) {
+}) {
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
+            causedBy: '',
             file: null,
             signature: null,
         });
+
 
     const sigPadRef = useRef<SignatureCanvas>(null);
 
@@ -93,7 +96,6 @@ export default function ReleaseCheck({
                 reset();
             },
         });
-        // Here you can send formData to API or backend
     };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -127,6 +129,7 @@ export default function ReleaseCheck({
                         }}
                     >
                         {/* Text Field */}
+
                         <TextField
                             label="Receivers Name"
                             variant="outlined"
@@ -134,6 +137,14 @@ export default function ReleaseCheck({
                             onChange={handleTextChange}
                             error={!!errors.receiversName}
                             helperText={errors.receiversName ?? ' '}
+                        />
+                        <TextField
+                            label={label + ' By'}
+                            variant="outlined"
+                            value={data.causedBy}
+                            onChange={handleTextChange}
+                            error={!!errors.causedBy}
+                            helperText={errors.causedBy ?? ' '}
                         />
 
                         {/* File Upload */}
@@ -219,6 +230,8 @@ export default function ReleaseCheck({
                     </Button>
                 </Box>
             </Box>
+
+           
         </AppLayout>
     );
 }

@@ -29,7 +29,6 @@ class ChecksService
         return Inertia::render('retrievedRecords', [
 
             'cheques' => $chequeRecords,
-
             'borrowed' => $borrowedRecords,
             'manageChecks' => $manageChecks,
             'defaultCheck' => $defaultCheck,
@@ -150,19 +149,18 @@ class ChecksService
         $loader = fn() => BorrowedCheck::select(
             'borrower_no',
             'reason',
-            'check',
+            'checkable_type',
             'borrower_names.name as borrower_name',
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
             ->join('borrower_names', 'borrower_names.id', '=', 'borrowed_checks.borrower_name_id')
             ->whereNull('approver_id')
-            ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'check')
+            ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'checkable_type')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()
             ->toResourceCollection();
-
         return $tab === 'borrowed' ? $loader()
             : Inertia::lazy($loader);
     }

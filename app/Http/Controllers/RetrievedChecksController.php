@@ -38,24 +38,24 @@ class RetrievedChecksController extends Controller
         return $this->service->records($perPage, $filters, $request);
     }
 
-    public function storeBorrowedCheck(Request $request)
-    {
-        $request->validate([
-            "name" => "required| string",
-            "reason" => "required| string",
-            'check' => 'required| string',
-            'id' => 'required'
-        ]);
+    // public function storeBorrowedCheck(Request $request)
+    // {
+    //     $request->validate([
+    //         "name" => "required| string",
+    //         "reason" => "required| string",
+    //         'check' => 'required| string',
+    //         'id' => 'required'
+    //     ]);
 
-        $request->user()->borrowedChecks()->create([
-            'check_id' => $request->id,
-            'name' => $request->name,
-            'reason' => $request->reason,
-            'check' => $request->check,
-        ]);
+    //     $request->user()->borrowedChecks()->create([
+    //         'check_id' => $request->id,
+    //         'name' => $request->name,
+    //         'reason' => $request->reason,
+    //         'check' => $request->check,
+    //     ]);
 
-        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
-    }
+    //     return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
+    // }
 
     public function storeBorrowCheck(Request $request)
     {
@@ -84,12 +84,13 @@ class RetrievedChecksController extends Controller
                     })
                     ->whereNotIn('id', $request->ids)
                     ->chunk(100, function (Collection $items) use ($request, $borrowerNo) {
+
                         $data = $items->map(fn($check) => [
-                            'check_id' => $check->id,
+                            'checkable_id' => $check->id,
+                            'checkable_type' => $request->check,
                             'borrower_no' => $borrowerNo,
                             'borrower_name_id' => $request->name,
                             'reason' => $request->reason,
-                            'check' => $request->check,
                             'user_id' => $request->user()->id,
                             'created_at' => now(),
                             'updated_at' => now()
@@ -102,12 +103,13 @@ class RetrievedChecksController extends Controller
                     ->doesntHave('borrowedCheck')
                     ->whereNotIn('id', $request->ids)
                     ->chunk(100, function (Collection $items) use ($request, $borrowerNo) {
+
                         $data = $items->map(fn($check) => [
-                            'check_id' => $check->id,
+                            'checkable_id' => $check->id,
+                            'checkable_type' => $request->check,
                             'borrower_no' => $borrowerNo,
                             'borrower_name_id' => $request->name,
                             'reason' => $request->reason,
-                            'check' => $request->check,
                             'user_id' => $request->user()->id,
                             'created_at' => now(),
                             'updated_at' => now()
@@ -119,11 +121,11 @@ class RetrievedChecksController extends Controller
         } else {
             foreach ($request->ids as $id) {
                 $request->user()->borrowedChecks()->create([
-                    'check_id' => $id,
+                    'checkable_id' => $id,
+                    'checkable_type' => $request->check,
                     'borrower_no' => $borrowerNo,
                     'borrower_name_id' => $request->name,
                     'reason' => $request->reason,
-                    'check' => $request->check,
                 ]);
             }
         }
@@ -239,7 +241,8 @@ class RetrievedChecksController extends Controller
 
     public function borrowedChecks(Request $request)
     {
-        $ids = BorrowedCheck::where('borrower_no', $request->borrowerNo)->pluck('check_id');
+        $ids = BorrowedCheck::where('borrower_no', $request->borrowerNo)->pluck('checkable_id');
+        
         if ($request->check === 'cv') {
             $records = CvCheckPayment::with('cvHeader', 'company')
                 ->select('check_date', 'check_amount', 'cv_check_payments.id', 'cv_header_id', 'companies.name as company_name', 'payee')
@@ -307,13 +310,9 @@ class RetrievedChecksController extends Controller
             'check' => ['required', 'string'],
         ]);
 
-        if ($request->check === 'cv') {
-            CvCheckPayment::where('id', $request->checkId)
-                ->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
-        } else {
-            Crf::where('id', $request->checkId)
-                ->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
-        }
+        $model = $request->check === 'cv' ? CvCheckPayment::class : Crf::class;
+
+        $model::where('id', $request->checkId)->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
 
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
     }

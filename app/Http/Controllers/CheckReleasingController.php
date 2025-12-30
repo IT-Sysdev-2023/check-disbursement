@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CancelledCheck;
+use App\Helpers\ModelHelper;
+use App\Helpers\NumberHelper;
+use App\Helpers\StringHelper;
 use App\Models\CheckStatus;
 use App\Models\Company;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\ReleasedCheck;
 use App\Services\PermissionService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -96,7 +99,7 @@ class CheckReleasingController extends Controller
 
     private static function crfRecords(?array $filters)
     {
-        return Crf::select('crfs.id', 'crf', 'paid_to', 'crfs.amount', 'ck_no', 'no', 'company', 'paid_to','tag_location_id')
+        return Crf::select('crfs.id', 'crf', 'paid_to', 'crfs.amount', 'ck_no', 'no', 'company', 'paid_to', 'tag_location_id')
             ->withWhereHas('borrowedCheck', function ($query) {
                 $query->whereNotNull('approver_id');
             })
@@ -123,7 +126,7 @@ class CheckReleasingController extends Controller
 
     public function storeReleaseCheck(Request $request)
     {
-        $request->validate(rules: [
+        $request->validate([
             'receiversName' => 'required|string|max:255',
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'signature' => 'required|string',
@@ -141,17 +144,60 @@ class CheckReleasingController extends Controller
         Storage::disk('public')->put($folder . 'signatures/' . $name . '.png', $imageData);
         Storage::disk('public')->putFileAs($folder . 'images/', $request->file, $name . '.png');
 
-        CheckStatus::create([
-            'check_id' => $request->id,
+        $checkStatus = ModelHelper::parent($request->check, $request->id)->checkStatus()->create([
             'status' => Str::lower($request->status),
-            'check' => $request->check,
             'receivers_name' => $request->receiversName,
             'image' => $folder . 'images/' . $name,
             'signature' => $folder . 'signatures/' . $name,
             'caused_by' => $request->user()->id,
         ]);
 
-        return redirect()->route('check-releasing')->with(['status' => true, 'message' => 'Successfully Updated']);
+        $checkCompany = $request->check == 'cv' ?
+            $checkStatus->load('checkable.company')->checkable->company?->company :
+            $checkStatus->load('checkable')->checkable->company;
+
+        $label = StringHelper::statusPastTense($request->status);
+        $data = [
+            'transactionNo' => NumberHelper::padLeft($checkStatus->id),
+
+            'items' => [
+                [
+                    'dateLabel' => 'Date ' . $label . ':',
+                    'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
+
+                    'causedLabel' => $label . ' By:',
+                    'causedBy' => $request->receiversName,
+
+                    'receivedLabel' => 'Received By:',
+                    'receivedBy' => $request->receiversName,
+
+
+                    'company' => $checkCompany,
+                    'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
+                ]
+            ]
+        ];
+
+        $pdf = Pdf::loadView('releasingPdf', ['data' => $data])->setPaper('A5');
+
+        // Get raw PDF output
+        $output = $pdf->output();
+
+        // Define a filename
+        $filename = 'pdfs/releasing/' . $checkStatus->id . '_' . now()->format('Ymd_His') . '.pdf';
+
+        // Store in storage/app/public (or any disk you prefer)
+        Storage::disk('public')->put($filename, $output);
+
+        // Encode in Base64
+        $base64 = base64_encode($output);
+
+        // Optional: add header for embedding
+        $stream = "data:application/pdf;base64," . $base64;
+
+        // return redirect()->back()->with(['status' => true, 'stream' => $stream]);
+        return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
+        // return redirect()->route('check-releasing')->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
     public function cancelCheck(int $id, Request $request)
