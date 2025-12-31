@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Http\Resources\CvCheckPaymentResource;
 use App\Models\Approver;
@@ -193,7 +194,7 @@ class RetrievedChecksController extends Controller
 
         return response()->json($transform);
     }
-    public function download(int $borrowerNo, string $check)
+    public function download(int $borrowerNo, string $check, FileHandler $fileHandler)
     {
         $borrower = BorrowedCheck::with('borrowerName:id,name')
             ->with($check === 'cv' ? 'cvCheckPayment.company' : 'crf')

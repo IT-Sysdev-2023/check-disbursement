@@ -132,7 +132,7 @@ class CheckReleasingController extends Controller
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'signature' => 'required|string',
             'status' => 'required|string',
-            'id' => 'required|string',
+            'id' => 'required|unique:check_statuses,checkable_id',
             'check' => 'required|string'
         ]);
 
@@ -198,8 +198,8 @@ class CheckReleasingController extends Controller
         DB::transaction(function () use ($id, $request) {
 
             CheckStatus::create([
-                'check_id' => $id,
-                'check' => $request->check,
+                'checkable_id' => $id,
+                'checkable_type' => $request->check,
                 'status' => 'cancel',
                 'cancelled_reason' => $request->reason,
                 'caused_by' => $request->user()->id,
