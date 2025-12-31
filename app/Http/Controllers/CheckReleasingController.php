@@ -139,7 +139,7 @@ class CheckReleasingController extends Controller
         $signaturePath = $fileHandler
             ->inFolder($request->status . "/signatures")
             ->createFileName($request->id, $request->user()->id, '.png')
-            ->storeSignature($request->signature);
+            ->saveSignature($request->signature);
 
         $imagePath = $fileHandler
             ->inFolder($request->status . "/images")
@@ -174,29 +174,16 @@ class CheckReleasingController extends Controller
                     'receivedLabel' => 'Received By:',
                     'receivedBy' => $request->receiversName,
 
-
                     'company' => $checkCompany,
                     'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
                 ]
             ]
         ];
 
-        $pdf = Pdf::loadView('releasingPdf', ['data' => $data])->setPaper('A5');
-
-        // Get raw PDF output
-        $output = $pdf->output();
-
-        // Define a filename
-        $filename = 'pdfs/releasing/' . $checkStatus->id . '_' . now()->format('Ymd_His') . '.pdf';
-
-        // Store in storage/app/public (or any disk you prefer)
-        Storage::disk('public')->put($filename, $output);
-
-        // Encode in Base64
-        $base64 = base64_encode($output);
-
-        // Optional: add header for embedding
-        $stream = "data:application/pdf;base64," . $base64;
+        $stream = $fileHandler
+            ->inFolder('pdfs/releasing/' . $label . '/')
+            ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
+            ->handlePdf($data, 'releasingPdf');
 
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
     }

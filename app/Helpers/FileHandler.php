@@ -6,6 +6,7 @@ use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 class FileHandler
 {
     protected string $folderName = '';
@@ -30,8 +31,21 @@ class FileHandler
         return $this;
     }
 
+    public function handlePdf(array $data, string $bladeTemplate){
+        $pdf = Pdf::loadView($bladeTemplate, ['data' => $data])->setPaper('A5');
+
+        // Get raw PDF output
+        $output = $pdf->output();
+       $this->disk->put($this->folder() . $this->fileName, $output);
+
+        // Encode in Base64
+        $base64 = base64_encode($output);
+
+        return "data:application/pdf;base64," . $base64;
+    }
+
     
-    public function storeSignature($signature)
+    public function saveSignature($signature)
     {
         $filteredSignature = preg_replace('/^data:image\/\w+;base64,/', '', $signature);
 
