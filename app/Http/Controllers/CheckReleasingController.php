@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileHandler;
 use App\Helpers\ModelHelper;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
@@ -124,7 +125,7 @@ class CheckReleasingController extends Controller
         ]);
     }
 
-    public function storeReleaseCheck(Request $request)
+    public function storeReleaseCheck(Request $request, FileHandler $fileHandler)
     {
         $request->validate([
             'receiversName' => 'required|string|max:255',
@@ -135,20 +136,21 @@ class CheckReleasingController extends Controller
             'check' => 'required|string'
         ]);
 
-        $signature = preg_replace('/^data:image\/\w+;base64,/', '', $request->signature);
+        $signaturePath = $fileHandler
+            ->inFolder($request->status . "/signatures")
+            ->createFileName($request->id, $request->user()->id, '.png')
+            ->storeSignature($request->signature);
 
-        $imageData = base64_decode($signature);
-        $name = $request->id . '_' . $request->user()->id . '_' . now()->format('Y-m-d-His');
-        $folder = $request->status . "/";
-
-        Storage::disk('public')->put($folder . 'signatures/' . $name . '.png', $imageData);
-        Storage::disk('public')->putFileAs($folder . 'images/', $request->file, $name . '.png');
+        $imagePath = $fileHandler
+            ->inFolder($request->status . "/images")
+            ->createFileName($request->id, $request->user()->id, '.png')
+            ->saveFile($request->file);
 
         $checkStatus = ModelHelper::parent($request->check, $request->id)->checkStatus()->create([
             'status' => Str::lower($request->status),
             'receivers_name' => $request->receiversName,
-            'image' => $folder . 'images/' . $name,
-            'signature' => $folder . 'signatures/' . $name,
+            'image' => $imagePath,
+            'signature' => $signaturePath,
             'caused_by' => $request->user()->id,
         ]);
 
@@ -157,6 +159,7 @@ class CheckReleasingController extends Controller
             $checkStatus->load('checkable')->checkable->company;
 
         $label = StringHelper::statusPastTense($request->status);
+
         $data = [
             'transactionNo' => NumberHelper::padLeft($checkStatus->id),
 
@@ -195,9 +198,7 @@ class CheckReleasingController extends Controller
         // Optional: add header for embedding
         $stream = "data:application/pdf;base64," . $base64;
 
-        // return redirect()->back()->with(['status' => true, 'stream' => $stream]);
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
-        // return redirect()->route('check-releasing')->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
     public function cancelCheck(int $id, Request $request)
