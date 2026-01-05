@@ -6,40 +6,51 @@ use App\Events\CvProgress;
 use App\Http\Resources\CvCheckPaymentResource;
 use App\Jobs\CvServer;
 use App\Models\Company;
-use App\Models\Crf;
-use App\Models\Cv;
 use App\Models\CvCheckPayment;
-use App\Models\NavCheckPaymentTable;
 use App\Models\NavHeaderTable;
-use App\Models\NavLineTable;
 use App\Models\NavServer;
 use App\Models\User;
 use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Database\Connection;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
-use function Pest\Laravel\getConnection;
 class CvService extends NavConnection
 {
     /**
      * Create a new class instance.
      */
 
-
     protected int $userId;
 
     public function __construct()
     {
     }
-    public function retrieveData(User $user, object $date, array $bu)
+    public function index(User $user)
     {
+
+        $bu = PermissionService::getCompanyPermissions($user);
+        return Inertia::render('extract/checkVoucher', [
+            'bu' => $bu
+        ]);
+    }
+    public function retrieveData(Request $request)
+    {
+
+        $request->validate([
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'bu' => ['required', 'array', 'min:1']
+        ]);
+        $date = (object) [
+            'start' => $request->start_date,
+            'end' => $request->end_date
+        ];
+
+        $user = $request->user();
         // Get all the Navition Servers
-        $companiesId = Company::whereIn('name', $bu)->pluck('id', 'name')->values();
+        $companiesId = Company::whereIn('name', $request->bu)->pluck('id', 'name')->values();
 
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) use ($companiesId) {
@@ -199,7 +210,7 @@ class CvService extends NavConnection
         return $this;
     }
 
-    
+
 
     public function details(CvCheckPayment $cv)
     {
@@ -209,5 +220,5 @@ class CvService extends NavConnection
     }
 
 
-    
+
 }

@@ -1,45 +1,25 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Events\CvProgress;
-use App\Models\BorrowedCheck;
-use App\Models\Company;
-use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Services\CvService;
-use App\Services\PermissionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
-use Inertia\Inertia;
 
 class CvController extends Controller
 {
     public function __construct(protected CvService $service)
     {
-
     }
 
     public function index(Request $request)
     {
 
-        $bu = PermissionService::getCompanyPermissions($request->user());
-        return Inertia::render('extract/checkVoucher', [
-            'bu' => $bu
-        ]);
+        return $this->service->index($request->user());
     }
 
     public function extractCv(Request $request)
     {
-        $request->validate([
-            'start_date' => ['required', 'date'],
-            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
-            'bu' => ['required', 'array', 'min:1']
-        ]);
-        $date = (object) [
-            'start' => $request->start_date,
-            'end' => $request->end_date
-        ];
-        return $this->service->retrieveData($request->user(), $date, $request->bu);
+        return $this->service->retrieveData($request);
     }
 
     public function details(CvCheckPayment $id)

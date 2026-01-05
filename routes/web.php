@@ -49,7 +49,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //! RETRIEVED CHECKS
     Route::prefix('retrieved-checks')->group(function () {
         Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrievedRecords');
-        // Route::post('borrowed-check', [RetrievedChecksController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
 
         Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrowerNames'])->name('borrowerNames');
         Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrowCheck');
@@ -60,7 +59,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('getLocation');
         Route::put('update-location', [RetrievedChecksController::class, 'setLocation'])->name('updateLocation');
 
-        // Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
         Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
         Route::get('unassign-check/{id}', [AssignedCheckNumberController::class, 'show'])->name('unassignCheck');
         Route::post('store-unassign-check-number', [AssignedCheckNumberController::class, 'store'])->name('storeUnassignCheck');
