@@ -69,9 +69,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('check-releasing')->group(function () {
 
         Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
-        Route::get('release-check/{checkId}/{status}/{check}', [CheckReleasingController::class, 'releaseCheck'])->name('release-check');
-        Route::post('store-release-check', [CheckReleasingController::class, 'storeReleaseCheck'])->name('store-release-check');
-        Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancelCheck'])->name('cancel-check');
+        Route::get('release-check/{checkId}/{status}/{check}', [CheckReleasingController::class, 'show'])->name('release-check');
+        Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
+        Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancel'])->name('cancel-check');
     });
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
