@@ -6,8 +6,8 @@ use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\CrfService;
 use App\Services\PermissionService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class CrfController extends Controller
@@ -19,35 +19,21 @@ class CrfController extends Controller
     }
     public function index(Request $request)
     {
-        $bu = PermissionService::getCompanyPermissions($request->user());
-        return Inertia::render('extract/checkRequestForm', [
-            'bu' => $bu
-        ]);
+        return $this->service->index($request);
     }
 
     public function extractCrf(Request $request)
     {
-
-        $request->validate([
-            'files' => 'required',
-            'files.*' => 'file|max:5120|unique:crfs,filename',
-            'bu' => ['required', 'array', 'min:1']
-        ]);
-        return $this->service->extract($request->file('files'), $request->user()->id, $request->bu);
+        return $this->service->extract($request);
     }
 
-    public function retrievedCrf(Request $request)
-    {
-        $records = Crf::filter($request->only('search'))->paginate();
-        return Inertia::render('retrievedCrf', [
-            'crf' => $records
-        ]);
-    }
+    // public function retrievedCrf(Request $request)
+    // {
+    //     return $this->service->retrievedCrf($request);
+    // }
 
     public function detailsCrf(Crf $id)
     {
-        return Inertia::render('retrievedRecords/checkDetailsCrf', [
-            'crf' => $id->toResource()
-        ]);
+        return $this->service->detailsCrf($id);
     }
 }

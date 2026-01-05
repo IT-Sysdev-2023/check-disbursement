@@ -2,19 +2,12 @@
 
 namespace App\Services;
 
-use App\Helpers\FileHandler;
-use App\Helpers\NumberHelper;
-use App\Http\Requests\BorrowedCheckRequest;
-use App\Http\Resources\CvCheckPaymentResource;
 use App\Models\Approver;
-use App\Models\AssignedCheckNumber;
 use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
-use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
