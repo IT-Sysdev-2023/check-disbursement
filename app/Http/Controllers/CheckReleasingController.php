@@ -23,9 +23,9 @@ class CheckReleasingController extends Controller
         return $this->service->getReleaseCheck($checkId, $status, $check);
     }
 
-    public function store(ReleasingCheckRequest $request, FileHandler $fileHandler)
+    public function store(ReleasingCheckRequest $request)
     {
-        return $this->service->storeReleaseCheck($request, $fileHandler);
+        return $this->service->storeReleaseCheck($request);
     }
 
     public function cancel(int $id, Request $request)

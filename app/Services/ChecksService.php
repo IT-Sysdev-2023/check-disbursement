@@ -2,11 +2,17 @@
 
 namespace App\Services;
 
+use App\Helpers\FileHandler;
+use App\Helpers\NumberHelper;
+use App\Http\Requests\BorrowedCheckRequest;
+use App\Http\Resources\CvCheckPaymentResource;
+use App\Models\Approver;
+use App\Models\AssignedCheckNumber;
 use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
-use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\TagLocation;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -15,8 +21,11 @@ use Inertia\Inertia;
 
 class ChecksService
 {
-    public function records(?int $page, array $filters, Request $request)
+
+    public function records(Request $request)
     {
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
+
         //LAZY LOADING APPROACHING MOTHER F*CKERSSSSSSSS hAHAHAHHA
         $defaultCheck = $filters['selectedCheck'] ?? 'cv';
         $tab = $filters['tab'] ?? 'calendar';
@@ -50,6 +59,61 @@ class ChecksService
         ]);
     }
 
+    public function approver(Request $request)
+    {
+        $names = Approver::select('id', 'name')->get();
+
+        $transform = $names->map(function ($name) {
+            return [
+                'label' => $name->name,
+                'value' => $name->id,
+            ];
+        });
+
+        return response()->json($transform);
+    }
+
+    public function approveCheck(Request $request)
+    {
+        $request->validate([
+            'borrowedNo' => ['required', 'integer'],
+            'approver' => ['required', 'integer'],
+        ]);
+        BorrowedCheck::where('borrower_no', $request->borrowedNo)
+            ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Approved']);
+    }
+
+    public function getLocation()
+    {
+        $names = TagLocation::select('id', 'location')->get();
+
+        $transform = $names->map(function ($name) {
+            return [
+                'label' => $name->location,
+                'value' => $name->id,
+            ];
+        });
+
+        return response()->json($transform);
+    }
+
+    public function setLocation(Request $request)
+    {
+        $request->validate([
+            'checkId' => ['required', 'integer'],
+            'locationId' => ['required', 'integer'],
+            'check' => ['required', 'string'],
+        ]);
+
+        $model = $request->check === 'cv' ? CvCheckPayment::class : Crf::class;
+
+        $model::where('id', $request->checkId)->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
+    }
+
     private static function chequeRecords($filters, string $defaultCheck, bool $hasNoCheckNumber)
     {
         $isActiveTab = ($filters['tab'] ?? null) === 'cheques';
@@ -62,7 +126,6 @@ class ChecksService
             ? $loader()
             : Inertia::lazy($loader);
     }
-
     private static function manageChecks($filters, string $tab, string $defaultCheck)
     {
         $isActiveTab = $tab === 'manageChecks';
@@ -72,14 +135,6 @@ class ChecksService
         return $isActiveTab
             ? $loader()
             : Inertia::lazy($loader);
-    }
-
-    public function hasEmptyLocation(Collection $records)
-    {
-        if ($records)
-            return $records->every(function ($record) {
-                return $record->tag_location_id === null;
-            });
     }
 
     private static function cvManageChecks($filters)
@@ -112,7 +167,7 @@ class ChecksService
         return Crf::withWhereHas('borrowedCheck', function ($query) {
             $query->with('approver:id,name')->whereNotNull('approver_id');
         })
-            ->select('crfs.id', 'crfs.amount', 'crfs.ck_no', 'crf', 'company', 'no', 'paid_to',  'scanned_records.id as scanned_id',)
+            ->select('crfs.id', 'crfs.amount', 'crfs.ck_no', 'crf', 'company', 'no', 'paid_to', 'scanned_records.id as scanned_id', )
             ->leftJoin('scanned_records', function ($join) {
                 $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
                     ->on('scanned_records.amount', '=', 'crfs.amount');

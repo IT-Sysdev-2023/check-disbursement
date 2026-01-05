@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AssignedCheckNumberController;
+use App\Http\Controllers\BorrowedCheckController;
 use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
@@ -9,6 +11,7 @@ use App\Http\Controllers\RetrieveDataController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
 use App\Http\Controllers\StatusController;
+use App\Models\BorrowedCheck;
 use App\Models\Company;
 use App\Models\CompanyPermission;
 use App\Models\Crf;
@@ -48,10 +51,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrievedRecords');
         // Route::post('borrowed-check', [RetrievedChecksController::class, 'storeBorrowedCheck'])->name('borrowedCheck');
 
-        Route::get('get-borrower-names', [RetrievedChecksController::class, 'borrowerNames'])->name('borrowerNames');
-        Route::post('store-borrow-check', [RetrievedChecksController::class, 'storeBorrowCheck'])->name('borrowCheck');
-        Route::get('download', [RetrievedChecksController::class, 'download'])->name('borrowerPdf');
-        Route::get('borrowed-checks', [RetrievedChecksController::class, 'borrowedChecks'])->name('borrowedChecks');
+        Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrowerNames'])->name('borrowerNames');
+        Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrowCheck');
+        Route::get('borrowed-checks', [BorrowedCheckController::class, 'index'])->name('borrowedChecks');
+        
         Route::get('approver', [RetrievedChecksController::class, 'approver'])->name('approverNames');
         Route::put('approve-check', [RetrievedChecksController::class, 'approveCheck'])->name('approveCheck');
         Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('getLocation');
@@ -59,8 +62,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Route::post('scan-check', [RetrievedChecksController::class, 'scanCheck'])->name('scanCheck');
         Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
-        Route::get('unassign-check/{id}', [RetrievedChecksController::class, 'unassignCheck'])->name('unassignCheck');
-        Route::post('store-unassign-check-number', [RetrievedChecksController::class, 'storeUnassignCheck'])->name('storeUnassignCheck');
+        Route::get('unassign-check/{id}', [AssignedCheckNumberController::class, 'show'])->name('unassignCheck');
+        Route::post('store-unassign-check-number', [AssignedCheckNumberController::class, 'store'])->name('storeUnassignCheck');
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
         Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('detailsCrf');
     });

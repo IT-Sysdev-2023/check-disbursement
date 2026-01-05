@@ -17,6 +17,8 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 class CheckReleasingService
 {
+     public function __construct(protected FileHandler $fileHandler){
+    }
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
@@ -52,26 +54,29 @@ class CheckReleasingService
         ]);
     }
 
-    public function storeReleaseCheck(ReleasingCheckRequest $request, FileHandler $fileHandler)
+    public function storeReleaseCheck(ReleasingCheckRequest $request)
     {
         $request->validated();
-        $handleFiles = self::handleFiles($request, $fileHandler);
 
-        $checkStatus = ModelHelper::parent($request->check, $request->id)
+        $validatedInputs = $request->safe()->only(['status', 'id', 'signature', 'file']);
+        $handleFiles = $this->handleFiles($validatedInputs);
+
+        $validated = $request->safe()->except(['signature', 'file']);
+        $checkStatus = ModelHelper::parent($validated['check'], $validated['id'])
             ->checkStatus()
             ->create([
-                'status' => Str::lower($request->status),
-                'receivers_name' => $request->receiversName,
+                'status' => Str::lower($validated['status']),
+                'receivers_name' => $validated['receiversName'],
                 'image' => $handleFiles->imagePath,
                 'signature' => $handleFiles->signaturePath,
                 'caused_by' => $request->user()->id,
             ]);
 
-        $checkCompany = $request->check == 'cv' ?
+        $checkCompany = $validated['check'] == 'cv' ?
             $checkStatus->load('checkable.company')->checkable->company?->company :
             $checkStatus->load('checkable')->checkable->company;
 
-        $label = StringHelper::statusPastTense($request->status);
+        $label = StringHelper::statusPastTense($validated['status']);
 
         $data = [
             'transactionNo' => NumberHelper::padLeft($checkStatus->id),
@@ -81,10 +86,10 @@ class CheckReleasingService
                     'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
                     'causedLabel' => $label . ' By:',
-                    'causedBy' => $request->receiversName,
+                    'causedBy' => $validated['receiversName'],
 
                     'receivedLabel' => 'Received By:',
-                    'receivedBy' => $request->receiversName,
+                    'receivedBy' => $validated['receiversName'],
 
                     'company' => $checkCompany,
                     'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
@@ -92,7 +97,7 @@ class CheckReleasingService
             ]
         ];
 
-        $stream = $fileHandler
+        $stream = $this->fileHandler
             ->inFolder('pdfs/releasing/' . $label . '/')
             ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
             ->handlePdf($data, 'releasingPdf');
@@ -188,17 +193,19 @@ class CheckReleasingService
             ->toResourceCollection();
     }
 
-    private static function handleFiles(Request $request, FileHandler $fileHandler)
+    private function handleFiles(array $validated)
     {
-        $signaturePath = $fileHandler
-            ->inFolder($request->status . "/signatures")
-            ->createFileName($request->id, $request->user()->id, '.png')
-            ->saveSignature($request->signature);
+        $userId = auth()->user()->id;
 
-        $imagePath = $fileHandler
-            ->inFolder($request->status . "/images")
-            ->createFileName($request->id, $request->user()->id, '.png')
-            ->saveFile($request->file);
+        $signaturePath = $this->fileHandler
+            ->inFolder($validated['status'] . "/signatures")
+            ->createFileName($validated['id'], $userId, '.png')
+            ->saveSignature($validated['signature']);
+
+        $imagePath = $this->fileHandler
+            ->inFolder($validated['status'] . "/images")
+            ->createFileName($validated['id'], $userId, '.png')
+            ->saveFile($validated['file']);
 
         return (object) [
             'signaturePath' => $signaturePath,
