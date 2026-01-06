@@ -1,7 +1,7 @@
 import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf } from '@/routes';
+import { detailsCrf, signatureDetails } from '@/routes';
 import {
     Crf,
     Cv,
@@ -102,11 +102,9 @@ export default function CheckStatus({
             replace: true,
         });
     };
-    const handleStatusChange = (id: number, value: string) => {
-        if (value === 'details') {
-            if (check === 'cv') router.visit(details(id));
-            else router.visit(detailsCrf(id));
-        }
+    const handleStatusChange = (id: number) => {
+        if (check === 'cv') router.visit(signatureDetails(id));
+        else router.visit(detailsCrf(id));
     };
 
     const cvColumns = createStatusCvColumns(handleStatusChange);

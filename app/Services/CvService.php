@@ -210,15 +210,17 @@ class CvService extends NavConnection
         return $this;
     }
 
-
-
     public function details(CvCheckPayment $cv)
     {
         return Inertia::render('retrievedRecords/checkDetailsCv', [
-            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks'))
+            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks','checkStatus'))
         ]);
     }
 
-
-
+    public function signatureDetails(CvCheckPayment $cv)
+    {
+        return Inertia::render('retrievedRecords/checkDetailsCvSignature', [
+            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks','checkStatus'))
+        ]);
+    }
 }

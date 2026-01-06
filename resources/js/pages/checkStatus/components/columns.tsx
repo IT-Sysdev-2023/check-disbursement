@@ -1,8 +1,9 @@
-import { Chip, MenuItem, Select } from '@mui/material';
+import { Chip, IconButton } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
+import { ArrowBigRightDash } from 'lucide-react';
 
 export const createStatusCvColumns = (
-    handleStatusChange: (id: number, value: 'details' | 'checkStatus') => void,
+    handleStatusChange: (id: number) => void,
 ): GridColDef[] => [
     {
         field: 'checkNumber',
@@ -87,29 +88,22 @@ export const createStatusCvColumns = (
         sortable: false,
         renderCell: (params) => {
             return (
-                <Select
+                <IconButton
                     size="small"
-                    value={''}
-                    label=""
-                    onChange={(e) =>
-                        handleStatusChange(params.row.id, e.target.value)
+                    color="primary"
+                    onClick={() =>
+                        handleStatusChange(params.row.id)
                     }
                 >
-                    <MenuItem value="details">
-                        {' '}
-                        Check Request Form Details
-                    </MenuItem>
-                    <MenuItem value="scannedCheck">
-                        Scanned Check Details
-                    </MenuItem>
-                </Select>
+                    <ArrowBigRightDash />
+                </IconButton>
             );
         },
     },
 ];
 
 export const createStatusCrfColumns = (
-    handleStatusChange: (id: number, value: 'details' | 'scannedCheck') => void,
+    handleStatusChange: (id: number) => void,
 ): GridColDef[] => [
     {
         field: 'crf',
@@ -201,22 +195,31 @@ export const createStatusCrfColumns = (
         sortable: false,
         renderCell: (params) => {
             return (
-                <Select
+                <IconButton
                     size="small"
-                    value={''}
-                    label="For Signature"
-                    onChange={(e) =>
-                        handleStatusChange(params.row.id, e.target.value)
+                    color="primary"
+                    onClick={() =>
+                        handleStatusChange(params.row.id)
                     }
                 >
-                    <MenuItem value="details">
-                        {' '}
-                        Check Request Form Details
-                    </MenuItem>
-                    <MenuItem value="scannedCheck">
-                        Scanned Check Details
-                    </MenuItem>
-                </Select>
+                    <ArrowBigRightDash />
+                </IconButton>
+                // <Select
+                //     size="small"
+                //     value={''}
+                //     label="For Signature"
+                //     onChange={(e) =>
+                //         handleStatusChange(params.row.id, e.target.value)
+                //     }
+                // >
+                //     <MenuItem value="details">
+                //         {' '}
+                //         Check Request Form Details
+                //     </MenuItem>
+                //     {/* <MenuItem value="scannedCheck">
+                //         Scanned Check Details
+                //     </MenuItem> */}
+                // </Select>
             );
         },
     },

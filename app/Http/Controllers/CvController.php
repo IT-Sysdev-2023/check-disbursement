@@ -27,4 +27,10 @@ class CvController extends Controller
         return $this->service->details($id);
     }
 
+     public function signatureDetails(CvCheckPayment $id)
+    {
+        return $this->service->signatureDetails($id);
+    }
+
+
 }
