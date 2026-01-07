@@ -7,6 +7,7 @@ use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RetrieveDataController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
@@ -74,18 +75,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('release-check/{checkId}/{status}/{check}', [CheckReleasingController::class, 'show'])->name('release-check');
         Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
         Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancel'])->name('cancel-check');
+
+        Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
     });
 
-    Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
-    Route::put('update-status/{id}', [StatusController::class, 'updateStatus'])->name('update-status');
-
-    // Route::get('report', function () {
-    //     return Inertia::render('crud-dashboard/CrudDashboard');
-    // })->name('report');
-
-    Route::get('report', function () {
-        return Inertia::render('retrievedData/employeeList');
-    })->name('report');
+    Route::get('report', [ReportController::class, 'index'])->name('report');
 
     Route::get('about', function () {
         return Inertia::render('dashboard');

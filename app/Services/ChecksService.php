@@ -80,14 +80,7 @@ class ChecksService
 
     public function getLocation()
     {
-        $names = TagLocation::select('id', 'location')->get();
-
-        $transform = $names->map(function ($name) {
-            return [
-                'label' => $name->location,
-                'value' => $name->id,
-            ];
-        });
+        $transform = TagLocation::locationSelection();
 
         return response()->json($transform);
     }

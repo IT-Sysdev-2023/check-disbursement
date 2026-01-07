@@ -51,18 +51,4 @@ class StatusController extends Controller
             ]),
         ]);
     }
-
-    public function updateStatus(CheckStatus $id, Request $request)
-    {
-
-        $request->validate([
-            'value' => 'required | string'
-        ]);
-
-        $id->update([
-            'status' => $request->value
-        ]);
-
-        return Redirect::back()->with(['status' => true, 'message' => 'Successfully Updated']);
-    }
 }

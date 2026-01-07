@@ -111,14 +111,7 @@ class BorrowedCheckService
 
     public function borrowerNames()
     {
-        $names = BorrowerName::select('id', 'name')->get();
-
-        $transform = $names->map(function ($name) {
-            return [
-                'label' => $name->name,
-                'value' => $name->id,
-            ];
-        });
+        $transform = BorrowerName::borrowerSelection();
 
         return response()->json($transform);
     }
