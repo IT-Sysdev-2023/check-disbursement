@@ -29,4 +29,16 @@ class ReportController extends Controller
 
     }
 
+    public function generate(Request $request)
+    {
+        $request->validate([
+            'selectedChecks' => 'required | array | min:1',
+            'selectedChecks.*' => 'string',
+            'columns' => 'required | array | min:1',
+            'columns.*' => 'string',
+        ]);
+
+        dd($request->all());
+    }
+
 }

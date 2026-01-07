@@ -80,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('report', [ReportController::class, 'index'])->name('report');
+    Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
 
     Route::get('about', function () {
         return Inertia::render('dashboard');

@@ -6,6 +6,7 @@ import {
     Checkbox,
     FormControl,
     FormControlLabel,
+    FormHelperText,
     Grid,
     InputLabel,
     MenuItem,
@@ -15,15 +16,28 @@ import {
 } from '@mui/material';
 
 import AppLayout from '@/layouts/app-layout';
+import { generateReport } from '@/routes';
 import { BreadcrumbItem, SelectionType } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, ReactNode, useEffect } from 'react';
 import SelectItem from '../dashboard/components/SelectItem';
 
-const SectionCard = ({ title, color, icon, children, height = 520 }) => (
+const SectionCard = ({
+    title,
+    color,
+    icon,
+    children,
+    height = 520,
+}: {
+    title: string;
+    color: string;
+    icon?: ReactNode;
+    children: ReactNode;
+    height?: number;
+}) => (
     <Card sx={{ borderRadius: 2, height }}>
         <Box
             sx={{
@@ -72,19 +86,26 @@ export default function EmployeeReportFilters({
     borrower: SelectionType[];
     location: SelectionType[];
 }) {
-    const [selectedChecks, setSelectedChecks] = useState<string[]>([]);
     const { data, setData, post, processing, errors, transform, reset } =
         useForm({
             borrower: '',
             status: '',
             location: '',
+            selectedChecks: [] as string[],
+            columns: [] as string[],
         });
     const handleChange =
-        (key: string) => (event: ChangeEvent<HTMLInputElement>) => {
+        (field: keyof typeof data) =>
+        (key: string) =>
+        (event: ChangeEvent<HTMLInputElement>) => {
+            const current = data[field] as string[];
             if (event.target.checked) {
-                setSelectedChecks((prev) => [...prev, key]);
+                setData(field, [...current, key]);
             } else {
-                setSelectedChecks((prev) => prev.filter((v) => v !== key));
+                setData(
+                    field,
+                    current.filter((v) => v !== key),
+                );
             }
         };
 
@@ -100,22 +121,31 @@ export default function EmployeeReportFilters({
     useEffect(() => {
         router.reload({
             data: {
-                check: selectedChecks,
+                check: data.selectedChecks,
             },
         });
-    }, [selectedChecks]);
+    }, [data.selectedChecks]);
 
-    const handleBorrowerChange = (event: SelectChangeEvent) => {
-        console.log(event);
-        setData('borrower', event.target.value);
+    const handleSelectionChange = (
+        event: SelectChangeEvent,
+        filter: 'borrower' | 'location' | 'status',
+    ) => {
+        setData(filter, event.target.value);
     };
 
-    const handleLocationChange = (event: SelectChangeEvent) => {
-        setData('location', event.target.value);
-    };
+    const onGenerate = () => {
+        post(generateReport().url, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: (page) => {
+                const m = page.props.flash as FlashReponse;
 
-      const handleStatusChange = (event: SelectChangeEvent) => {
-        setData('status', event.target.value);
+                reset();
+            },
+            onError: (e) => {
+                console.log(e);
+            },
+        });
     };
 
     return (
@@ -131,20 +161,33 @@ export default function EmployeeReportFilters({
                             color="#1e88e5"
                             icon={<ViewListIcon fontSize="small" />}
                         >
-                            {Object.entries(CHECK_OPTIONS).map(
-                                ([key, label]) => (
-                                    <FormControlLabel
-                                        key={key}
-                                        control={
-                                            <Checkbox
-                                                size="small"
-                                                onChange={handleChange(key)}
-                                            />
-                                        }
-                                        label={label}
-                                    />
-                                ),
-                            )}
+                            <FormControl
+                                error={Boolean(errors.selectedChecks)}
+                                component="fieldset"
+                            >
+                                {Object.entries(CHECK_OPTIONS).map(
+                                    ([key, label]) => (
+                                        <FormControlLabel
+                                            key={key}
+                                            control={
+                                                <Checkbox
+                                                    size="small"
+                                                    onChange={handleChange(
+                                                        'selectedChecks',
+                                                    )(key)}
+                                                />
+                                            }
+                                            label={label}
+                                        />
+                                    ),
+                                )}
+
+                                {errors.selectedChecks && (
+                                    <FormHelperText>
+                                        {errors.selectedChecks}
+                                    </FormHelperText>
+                                )}
+                            </FormControl>
                         </SectionCard>
                     </Grid>
 
@@ -155,19 +198,36 @@ export default function EmployeeReportFilters({
                             color="#009688"
                             icon={<FilterListIcon fontSize="small" />}
                         >
-                            {columns.map((label) => (
-                                <FormControlLabel
-                                    key={label}
-                                    control={<Checkbox size="small" />}
-                                    label={label}
-                                    sx={{
-                                        '& .MuiFormControlLabel-label': {
-                                            color: getLabelColor(label),
-                                            fontWeight: 500,
-                                        },
-                                    }}
-                                />
-                            ))}
+                            <FormControl
+                                error={Boolean(errors.columns)}
+                                component="fieldset"
+                            >
+                                {columns.map((label) => (
+                                    <FormControlLabel
+                                        key={label}
+                                        control={
+                                            <Checkbox
+                                                size="small"
+                                                onChange={handleChange(
+                                                    'columns',
+                                                )(label)}
+                                            />
+                                        }
+                                        label={label}
+                                        sx={{
+                                            '& .MuiFormControlLabel-label': {
+                                                color: getLabelColor(label),
+                                                fontWeight: 500,
+                                            },
+                                        }}
+                                    />
+                                ))}
+                            </FormControl>
+                            {errors.columns && (
+                                <FormHelperText>
+                                    {errors.columns}
+                                </FormHelperText>
+                            )}
                         </SectionCard>
                     </Grid>
 
@@ -187,7 +247,9 @@ export default function EmployeeReportFilters({
                                 <Select
                                     label="Current Status"
                                     value={data.status}
-                                    onChange={handleStatusChange}
+                                    onChange={(e) =>
+                                        handleSelectionChange(e, 'status')
+                                    }
                                 >
                                     {statuses.map((status) => (
                                         <MenuItem
@@ -205,7 +267,9 @@ export default function EmployeeReportFilters({
 
                             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
                                 <SelectItem
-                                    handleChange={handleBorrowerChange}
+                                    handleChange={(e) =>
+                                        handleSelectionChange(e, 'borrower')
+                                    }
                                     value={data.borrower}
                                     title="Borrower Name"
                                     items={borrower}
@@ -214,7 +278,9 @@ export default function EmployeeReportFilters({
 
                             <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <SelectItem
-                                    handleChange={handleLocationChange}
+                                    handleChange={(e) =>
+                                        handleSelectionChange(e, 'location')
+                                    }
                                     value={data.location}
                                     title="Tag location"
                                     items={location}
@@ -228,6 +294,7 @@ export default function EmployeeReportFilters({
                                     bgcolor: '#009688',
                                     '&:hover': { bgcolor: '#00796b' },
                                 }}
+                                onClick={onGenerate}
                             >
                                 Generate Report
                             </Button>
