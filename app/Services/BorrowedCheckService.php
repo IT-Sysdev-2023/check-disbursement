@@ -65,7 +65,7 @@ class BorrowedCheckService
                             'checkable_id' => $check->id,
                             'checkable_type' => $validated['check'],
                             'borrower_no' => $borrowerNo,
-                            'borrower_name_id' => $validated['name'],
+                            'borrower_id' => $validated['name'],
                             'reason' => $validated['reason'],
                             'user_id' => auth()->user()->id,
                             'created_at' => now(),
@@ -84,7 +84,7 @@ class BorrowedCheckService
                             'checkable_id' => $check->id,
                             'checkable_type' => $validated['check'],
                             'borrower_no' => $borrowerNo,
-                            'borrower_name_id' => $validated['name'],
+                            'borrower_id' => $validated['name'],
                             'reason' => $validated['reason'],
                             'user_id' => auth()->user()->id,
                             'created_at' => now(),
@@ -100,7 +100,7 @@ class BorrowedCheckService
                     'checkable_id' => $id,
                     'checkable_type' => $validated['check'],
                     'borrower_no' => $borrowerNo,
-                    'borrower_name_id' => $validated['name'],
+                    'borrower_id' => $validated['name'],
                     'reason' => $validated['reason'],
                 ]);
             }

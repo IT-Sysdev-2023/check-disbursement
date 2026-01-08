@@ -195,13 +195,14 @@ class ChecksService
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
-            ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_name_id')
+            ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
             ->whereNull('approver_id')
-            ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrowers.name', 'checkable_type')
+            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrowers.name', 'checkable_type')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()
             ->toResourceCollection();
+
         return $tab === 'borrowed' ? $loader()
             : Inertia::lazy($loader);
     }

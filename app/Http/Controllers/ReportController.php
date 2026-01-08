@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ColumnResolver;
 use App\Models\Borrower;
+use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
 use Illuminate\Http\Request;
@@ -62,15 +63,24 @@ class ReportController extends Controller
                 ->join('companies', 'cv_check_payments.company_id', '=', 'companies.id')
                 ->join('check_statuses', 'cv_check_payments.id', '=', 'check_statuses.checkable_id')
                 ->join('borrowed_checks', 'cv_check_payments.id', '=', 'borrowed_checks.checkable_id')
-                ->join('borrowers', 'borrowed_checks.borrower_id','=','borrowers.id')
-                ->join('approvers', 'borrowed_checks.approver_id','=','approvers.id')
+                ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
+                ->join('approvers', 'borrowed_checks.approver_id', '=', 'approvers.id')
                 ->where(['borrowed_checks.checkable_type' => 'cv', 'check_statuses.checkable_type' => 'cv'])
-                ->get()
-            ;
+                ->get();
 
             dd($data);
         } else {
-            dd(1);
+            $transform = array_map(
+                fn($value) => Str::snake($value),
+                $result['crf']
+            );
+
+            $data = Crf::select($transform)
+                ->join('tag_locations', 'crfs.tag_location_id', '=', 'tag_locations.id')
+                ->join('check_statuses', 'crfs.id', '=', 'check_statuses.checkable_id')
+                ->join('borrowed_checks', 'crfs.id', '=', 'borrowed_checks.checkable_id');
+
+            dd($data);
         }
         dd($request->all(), $result);
     }
