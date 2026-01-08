@@ -20,9 +20,9 @@ class BorrowedCheckController extends Controller
         return $this->service->store($request);
     }
 
-    public function borrowerNames()
+    public function borrower()
     {
-        return $this->service->borrowerNames();
+        return $this->service->borrower();
     }
 
 }

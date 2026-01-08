@@ -6,7 +6,7 @@ use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Http\Requests\BorrowedCheckRequest;
 use App\Models\BorrowedCheck;
-use App\Models\BorrowerName;
+use App\Models\Borrower;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use Illuminate\Support\Collection;
@@ -109,16 +109,16 @@ class BorrowedCheckService
         return $this->download($borrowerNo, $request->check);
     }
 
-    public function borrowerNames()
+    public function borrower()
     {
-        $transform = BorrowerName::borrowerSelection();
+        $transform = Borrower::borrowerSelection();
 
         return response()->json($transform);
     }
 
     private function download(int $borrowerNo, string $check)
     {
-        $borrower = BorrowedCheck::with('borrowerName:id,name')
+        $borrower = BorrowedCheck::with('borrower:id,name')
             ->with($check === 'cv' ? 'cvCheckPayment.company' : 'crf')
             ->where('borrower_no', $borrowerNo)
             ->get();
@@ -135,7 +135,7 @@ class BorrowedCheckService
                 [
                     'borrowerNo' => NumberHelper::padLeft($borrowerNo),
                     'noOfChecks' => $borrower->count(),
-                    'borrowedBy' => $borrower->first()->borrowerName?->name,
+                    'borrowedBy' => $borrower->first()->borrower?->name,
                     'company' => $companyNames,
                     'purpose' => 'For Signature',
                 ]

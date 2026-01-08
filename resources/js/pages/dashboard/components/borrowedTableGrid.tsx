@@ -1,5 +1,5 @@
 import { approveCheck, approverNames, borrowedChecks } from '@/routes';
-import { BorrowerName, InertiaPagination } from '@/types';
+import { Borrower, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -20,7 +20,7 @@ import { ArrowBigRightDash } from 'lucide-react';
 import { MouseEvent, useEffect, useState } from 'react';
 import OnlySelectionModal from './onlySelectionModal';
 
-function Row(props: { row: BorrowerName }) {
+function Row(props: { row: Borrower }) {
     const { row } = props;
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
@@ -100,7 +100,7 @@ function Row(props: { row: BorrowerName }) {
                     {row.borrowerNo}
                 </TableCell>
                 <TableCell align="right">{row.lastBorrowedAt}</TableCell>
-                <TableCell align="right">{row.borrowerName}</TableCell>
+                <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
                 <TableCell align="right">{'For Signature'}</TableCell>
                 <TableCell align="center">
@@ -235,7 +235,7 @@ function Row(props: { row: BorrowerName }) {
 export default function BorrowedTableGrid({
     data,
 }: {
-    data: InertiaPagination<BorrowerName>;
+    data: InertiaPagination<Borrower>;
 }) {
     const [rowsPerPage, setRowsPerPage] = useState(data?.meta.per_page || 10);
 

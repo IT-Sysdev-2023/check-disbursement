@@ -7,12 +7,12 @@ use Illuminate\Support\Facades\DB;
 class ColumnResolver
 {
     public const DEFAULT_COLUMNS = [
-        'tag location',
+        'location',
         'company',
-        'borrower',
+        'borrowers.name',
         'borrower no',
-        'approver',
-        'status',
+        'approvers.name',
+        'check_statuses.status',
         'receivers name',
     ];
 

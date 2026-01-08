@@ -134,12 +134,12 @@ export interface Cv {
     updated_at: string;
 }
 
-export interface BorrowerName {
+export interface Borrower {
     borrowerNo: number;
     reason: string;
     lastBorrowedAt: string;
     totalChecks: number;
-    borrowerName: string;
+    borrower: string;
     check: string,
     borrowerNoClean: number;
 }

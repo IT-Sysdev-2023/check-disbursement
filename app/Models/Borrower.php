@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BorrowerName extends Model
+class Borrower extends Model
 {
     public static function borrowerSelection()
     {

@@ -12,7 +12,7 @@ import {
     ActionHandler,
     ActionType,
     Auth,
-    BorrowerName,
+    Borrower,
     Crf,
     Cv,
     DateFilterType,
@@ -78,7 +78,7 @@ export default function RetrievedRecords({
         tab: string;
     };
     cheques: InertiaPagination<Cv | Crf>;
-    borrowed: InertiaPagination<BorrowerName>;
+    borrowed: InertiaPagination<Borrower>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];

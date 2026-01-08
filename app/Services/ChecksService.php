@@ -191,13 +191,13 @@ class ChecksService
             'borrower_no',
             'reason',
             'checkable_type',
-            'borrower_names.name as borrower_name',
+            'borrowers.name as borrower_name',
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
-            ->join('borrower_names', 'borrower_names.id', '=', 'borrowed_checks.borrower_name_id')
+            ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_name_id')
             ->whereNull('approver_id')
-            ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrower_names.name', 'checkable_type')
+            ->groupBy('borrower_no', 'borrower_name_id', 'reason', 'borrowers.name', 'checkable_type')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()

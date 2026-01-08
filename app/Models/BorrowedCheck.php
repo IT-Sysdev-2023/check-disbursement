@@ -16,9 +16,9 @@ class BorrowedCheck extends Model
 
     }
 
-    public function borrowerName()
+    public function borrower()
     {
-        return $this->belongsTo(BorrowerName::class);
+        return $this->belongsTo(Borrower::class);
     }
 
     public function approver()

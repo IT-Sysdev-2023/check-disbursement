@@ -3,9 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\Approver;
-use App\Models\BorrowerName;
+use App\Models\Borrower;
 use App\Models\TagLocation;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class BorrowerNameSeeder extends Seeder
@@ -15,7 +14,7 @@ class BorrowerNameSeeder extends Seeder
      */
     public function run(): void
     {
-        BorrowerName::insert([
+        Borrower::insert([
             ['name' => 'Adrian Montefalco', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Zyrone Alcaraz', 'created_at' => now(), 'updated_at' => now()],
             ['name' => 'Elijah Vergara', 'created_at' => now(), 'updated_at' => now()],

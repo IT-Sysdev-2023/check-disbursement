@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('approver_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('borrower_name_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('borrower_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unsignedBigInteger('borrower_no');
             $table->string('reason');
             $table->timestamp('approved_at')->nullable();
