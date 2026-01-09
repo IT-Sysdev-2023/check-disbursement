@@ -132,6 +132,9 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 50,
+        renderCell: (params) => {
+            return params.row.checkable.checkNumber;
+        },
     },
     {
         field: 'checkDate',
@@ -140,6 +143,9 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
+         renderCell: (params) => {
+            return params.row.checkable.checkDate;
+        },
     },
     {
         field: 'type',
@@ -149,7 +155,7 @@ export const createForwardedCvColumns = (
         flex: 1,
         minWidth: 100,
         renderCell: (params) => {
-            return params.row.checkStatus.checkable_type;
+            return params.row.checkableType;
         },
     },
     {
@@ -159,6 +165,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
+        
     },
     {
         field: 'checkAmount',
@@ -167,6 +174,9 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
+         renderCell: (params) => {
+            return params.row.checkable.checkAmount;
+        },
     },
     {
         field: 'location',
@@ -176,7 +186,8 @@ export const createForwardedCvColumns = (
         flex: 1,
         minWidth: 80,
         renderCell: (params) => {
-            return params.row.tagLocation?.location;
+            console.log(params.row);
+            return params.row.checkable.tagLocation?.location;
         },
     },
 
@@ -188,7 +199,7 @@ export const createForwardedCvColumns = (
         flex: 1,
         minWidth: 80,
         renderCell: (params) => {
-            return params.row.checkStatus.status || '—';
+            return params.row.status || '—';
         },
     },
 
@@ -201,17 +212,14 @@ export const createForwardedCvColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: (params) => {
-            const { checkStatus } = params.row;
+            const { id } = params.row;
             return (
                 <Select
                     size="small"
                     value={null}
                     onChange={(e) => {
                         if (!e.target.value) return;
-                        handleStatusChange(
-                            checkStatus.id,
-                            e.target.value,
-                        );
+                        handleStatusChange(id, e.target.value);
                     }}
                 >
                     <MenuItem value="received">

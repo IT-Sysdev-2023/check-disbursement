@@ -11,13 +11,20 @@ use Inertia\Inertia;
 
 class ForwardedCheckController extends Controller
 {
-    
+
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
         $defaultCheck = $filters['selectedCheck'] ?? 'cv';
 
-        $chequeRecords = self::chequeRecords($filters, $defaultCheck);
+        $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
+            ->with(['checkable' => ['cvHeader', 'borrowedCheck', 'checkStatus', 'company', 'tagLocation']])
+            ->whereHas('checkable.checkStatus', function ($query) {
+                $query->where(['status' => 'forward', 'received_by' => null]);
+            })
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
 
         $receiver = [
             [
@@ -25,7 +32,7 @@ class ForwardedCheckController extends Controller
                 'label' => 'Accounting Dibursement CEBU'
             ],
         ];
-        
+
         return Inertia::render('forwardCheckReleasing', [
             'cheques' => $chequeRecords,
             'defaultCheck' => $defaultCheck,
@@ -45,41 +52,10 @@ class ForwardedCheckController extends Controller
         ]);
     }
 
-    public function update(CheckStatus $id, Request $request){
+    public function update(CheckStatus $id, Request $request)
+    {
         $id->update(['received_by' => $request->user()->id]);
         return redirect()->back()->with(['status' => true, 'message' => 'Save Successfully!']);
     }
 
-    private static function chequeRecords($filters, $defaultCheck)
-    {
-        $loader = $defaultCheck === 'cv'
-            ? fn() => self::cvRecords($filters)
-            : fn() => self::crfRecords($filters);
-
-        return $loader();
-    }
-
-    private static function cvRecords(?array $filters)
-    {
-        return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus', 'company', 'tagLocation')
-            ->whereHas('checkStatus', function ($query) {
-                $query->where(['status' => 'forward', 'received_by' => null]);
-            })
-            ->filter($filters)
-            ->paginate()
-            ->withQueryString()
-            ->toResourceCollection();
-    }
-
-    private static function crfRecords(?array $filters)
-    {
-        return Crf::with('borrowedCheck', 'checkStatus')
-            ->whereHas('checkStatus', function ($query) {
-                $query->where(['status' => 'forward', 'received_by' => null]);
-            })
-            ->filter($filters)
-            ->paginate()
-            ->withQueryString()
-            ->toResourceCollection();
-    }
 }
