@@ -32,4 +32,5 @@ class CheckReleasingController extends Controller
     {
        return $this->service->cancelCheck($id, $request);
     }
+
 }

@@ -7,6 +7,7 @@ use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ForwardedCheckController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RetrieveDataController;
 use App\Http\Controllers\RetrievedChecksController;
@@ -51,7 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('retrieved-checks')->group(function () {
         Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrievedRecords');
 
-        Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrowerNames'])->name('borrowerNames');
+        Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrowerNames');
         Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrowCheck');
         Route::get('borrowed-checks', [BorrowedCheckController::class, 'index'])->name('borrowedChecks');
 
@@ -77,6 +78,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancel'])->name('cancel-check');
 
         Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+    });
+
+    //Cebu & Manila
+    Route::prefix('forwarded-check')->group(function () {
+        Route::get('index', [ForwardedCheckController::class, 'index'])->name('forwarded-check-releasing');
+        Route::put('update-receiver-{id}', [ForwardedCheckController::class,'update'])->name('receiver-forwarded');
     });
 
     Route::get('report', [ReportController::class, 'index'])->name('report');

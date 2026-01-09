@@ -13,6 +13,7 @@ import {
     checkRequestForm,
     checkStatus,
     checkVoucher,
+    forwardedCheckReleasing,
     notifications,
     report,
     retrievedRecords,
@@ -47,6 +48,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const isAdmin = roles.includes('admin');
     const releasing = roles.includes('releasing');
     const scanning = roles.includes('scanning');
+    const forwarded = roles.includes('forwarded');
 
     const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -85,6 +87,15 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Check Releasing',
                           href: checkReleasing(),
+                          icon: Check,
+                      },
+                  ]
+                : []),
+             ...(isAdmin || forwarded
+                ? [
+                      {
+                          title: 'Forwarded Check',
+                          href: forwardedCheckReleasing(),
                           icon: Check,
                       },
                   ]

@@ -59,7 +59,7 @@ export default function ({
                             <SelectItem
                                 handleChange={handleSelectedItem}
                                 value={selectedItem}
-                                title="Select Approver"
+                                title="Select"
                                 items={item}
                             />
                         </Grid>

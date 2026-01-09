@@ -3,19 +3,20 @@ import { Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
 const renderStatus = (
-    status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign' | 'Tagged',
+    status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign' | 'Tagged' | 'Tagging',
 ) => {
     const colors: {
         [index: string]: 'success' | 'error' | 'info' | 'warning';
     } = {
-        Signature: 'info',
+        Signature: 'success',
         Releasing: 'success',
         Borrowed: 'error',
         Assign: 'error',
         Tagged: 'success',
+        Tagging: 'info'
     };
 
-    const label = ['Signature', 'Releasing', 'Assign'].includes(status)
+    const label = ['Signature', 'Releasing', 'Assign', 'Tagging'].includes(status)
         ? 'For ' + status
         : status;
 
@@ -78,11 +79,11 @@ export const createCvColumns = (
             }
 
             if (params.row.taggedAt) {
-                return renderStatus('Tagged');
+                return renderStatus('Signature');
             }
 
             return renderStatus(
-                params.row?.borrowedCheck ? 'Borrowed' : 'Signature',
+                params.row?.borrowedCheck ? 'Borrowed' : 'Tagging',
             );
         },
     },
@@ -201,10 +202,10 @@ export const createCrfColumns = (
             const { row } = params;
 
             if (params.row.taggedAt) {
-                return renderStatus('Tagged');
+                return renderStatus('Signature');
             }
 
-            return renderStatus(row?.borrowedCheck ? 'Borrowed' : 'Signature');
+            return renderStatus(row?.borrowedCheck ? 'Borrowed' : 'Tagging');
         },
     },
     {

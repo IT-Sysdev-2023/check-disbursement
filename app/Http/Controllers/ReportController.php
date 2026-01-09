@@ -65,6 +65,7 @@ class ReportController extends Controller
                 ->join('borrowed_checks', 'cv_check_payments.id', '=', 'borrowed_checks.checkable_id')
                 ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
                 ->join('approvers', 'borrowed_checks.approver_id', '=', 'approvers.id')
+                // ->join check number here...
                 ->where(['borrowed_checks.checkable_type' => 'cv', 'check_statuses.checkable_type' => 'cv'])
                 ->get();
 

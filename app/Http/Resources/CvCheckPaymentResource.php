@@ -43,6 +43,7 @@ class CvCheckPaymentResource extends JsonResource
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
             'checkStatus' => new CheckStatusResource($this->whenLoaded('checkStatus')),
             'assignedCheckNumbers' => $this->whenLoaded('assignedCheckNumber'),
+            'tagLocation' => $this->whenLoaded('tagLocation'),
         ];
     }
 }
