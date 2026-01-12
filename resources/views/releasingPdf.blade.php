@@ -24,10 +24,12 @@
             <th style="text-align: left;">{{ $item['causedLabel'] }}</th>
             <td>{{ $item['causedBy'] }}</td>
         </tr>
+       @isset($item['receivedBy'])
         <tr>
             <th style="text-align: left;">{{ $item['receivedLabel'] }}</th>
             <td>{{ $item['receivedBy'] }}</td>
         </tr>
+        @endisset
         <tr>
             <th style="text-align: left;">Company:</th>
             <td>{{ $item['company'] }}</td>

@@ -34,7 +34,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ForwardCheckReleasing({
+export default function ForwardedCheck({
     cheques,
     company,
     defaultCheck,
@@ -147,6 +147,7 @@ export default function ForwardCheckReleasing({
             <Head title="CV" />
             <PageContainer title="Receiving">
                 <TableFilter
+                    isCheckDisabled
                     currentTab="cheques"
                     handleChangeCheck={handleCheck}
                     company={company}

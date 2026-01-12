@@ -232,6 +232,118 @@ export const createForwardedCvColumns = (
             );
         },
     },
+    ];
+
+    export const createForwardedReleasingCvColumns = (
+    handleStatusChange: (id: number, value: string) => void,
+): GridColDef[] => [
+    {
+        field: 'checkNumber',
+        headerName: 'Check Number',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 50,
+        renderCell: (params) => {
+            return params.row.checkable.checkNumber;
+        },
+    },
+    {
+        field: 'checkDate',
+        headerName: 'Check Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+         renderCell: (params) => {
+            return params.row.checkable.checkDate;
+        },
+    },
+    {
+        field: 'type',
+        headerName: 'Type Of Check',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+        renderCell: (params) => {
+            return params.row.checkableType;
+        },
+    },
+    {
+        field: 'accountName',
+        headerName: 'Account Name',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+        
+    },
+    {
+        field: 'checkAmount',
+        headerName: 'Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+         renderCell: (params) => {
+            return params.row.checkable.checkAmount;
+        },
+    },
+    {
+        field: 'location',
+        headerName: 'Location',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: (params) => {
+            console.log(params.row);
+            return params.row.checkable.tagLocation?.location;
+        },
+    },
+
+    {
+        field: 'status',
+        headerName: 'Status',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: (params) => {
+            return params.row.status || '—';
+        },
+    },
+
+    {
+        field: 'actions',
+        headerName: 'Action',
+        width: 100,
+        align: 'center',
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        renderCell: (params) => {
+            const { id } = params.row;
+            return (
+                <Select
+                    size="small"
+                    value={null}
+                    onChange={(e) => {
+                        if (!e.target.value) return;
+                        handleStatusChange(id, e.target.value);
+                    }}
+                >
+                    <MenuItem value="release">
+                        <Chip label="Release Check" color="primary" />
+                    </MenuItem>
+                    <MenuItem value="cancel">
+                        <Chip label="Cancel Check" color="info" />
+                    </MenuItem>
+                </Select>
+            );
+        },
+    },
 ];
 
 export const createReleasingCrfColumns = (

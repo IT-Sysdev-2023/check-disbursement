@@ -83,7 +83,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Cebu & Manila
     Route::prefix('forwarded-check')->group(function () {
         Route::get('index', [ForwardedCheckController::class, 'index'])->name('forwarded-check-releasing');
+        Route::get('release-check/{id}/{status}', [ForwardedCheckController::class, 'showForwarded'])->name('release-check-forwarded');
+        Route::post('store-release-check/{id}', [ForwardedCheckController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
         Route::put('update-receiver-{id}', [ForwardedCheckController::class,'update'])->name('receiver-forwarded');
+
+        Route::get('releasing', [ForwardedCheckController::class,'fowardedReleasing'])->name('forwarded-releasing');
+         Route::post('cancel/{id}', [ForwardedCheckController::class,'cancelForwarded'])->name('cancel-forwarded');
     });
 
     Route::get('report', [ReportController::class, 'index'])->name('report');

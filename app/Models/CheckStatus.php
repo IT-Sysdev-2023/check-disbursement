@@ -20,4 +20,8 @@ class CheckStatus extends Model
      {
           return $this->morphTo();
      }
+
+     public function checkForwardedStatus(){
+        return $this->hasOne(CheckForwardedStatus::class);
+     }
 }

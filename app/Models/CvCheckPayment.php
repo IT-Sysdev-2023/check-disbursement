@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 class CvCheckPayment extends Model
 {
 
@@ -18,6 +20,19 @@ class CvCheckPayment extends Model
             'clearing_date' => 'datetime',
         ];
 
+    }
+
+    protected function getLocation(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->tagLocation?->location,
+        );
+    }
+    protected function getCompany(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->company?->company,
+        );
     }
 
     public function scopeFilter(Builder $builder, array $filters)
@@ -78,15 +93,16 @@ class CvCheckPayment extends Model
     }
 
 
-    public function tagLocation(){
+    public function tagLocation()
+    {
         return $this->belongsTo(TagLocation::class);
     }
 
-     public function checkStatus()
+    public function checkStatus()
     {
         return $this->morphOne(CheckStatus::class, 'checkable');
     }
-     public function borrowedCheck()
+    public function borrowedCheck()
     {
         return $this->morphOne(BorrowedCheck::class, 'checkable');
     }

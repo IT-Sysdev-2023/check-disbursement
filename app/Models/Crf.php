@@ -21,6 +21,19 @@ class Crf extends Model
         ];
 
     }
+
+    protected function getLocation(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->tagLocation?->location,
+        );
+    }
+    protected function getCompany(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->company,
+        );
+    }
     protected function formattedAmount(): Attribute
     {
         return Attribute::make(
@@ -54,16 +67,17 @@ class Crf extends Model
             });
         ;
     }
-    
-     public function tagLocation(){
+
+    public function tagLocation()
+    {
         return $this->belongsTo(TagLocation::class);
     }
 
-     public function borrowedCheck()
+    public function borrowedCheck()
     {
         return $this->morphOne(BorrowedCheck::class, 'checkable');
     }
-      public function checkStatus()
+    public function checkStatus()
     {
         return $this->morphOne(CheckStatus::class, 'checkable');
     }

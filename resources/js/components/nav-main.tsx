@@ -14,6 +14,7 @@ import {
     checkStatus,
     checkVoucher,
     forwardedCheckReleasing,
+    forwardedReleasing,
     notifications,
     report,
     retrievedRecords,
@@ -22,6 +23,7 @@ import {
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
+    Activity,
     Bell,
     BookOpen,
     Check,
@@ -29,8 +31,10 @@ import {
     ChevronRight,
     Database,
     FileSpreadsheet,
+    Forward,
     Key,
     PackageOpen,
+    Rocket,
     Tickets,
     Users,
 } from 'lucide-react';
@@ -96,7 +100,12 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Forwarded Check',
                           href: forwardedCheckReleasing(),
-                          icon: Check,
+                          icon: Forward,
+                     },
+                    {
+                          title: 'Check Releasing(Forwarded)',
+                          href: forwardedReleasing(),
+                          icon: Rocket,
                       },
                   ]
                 : []),
@@ -105,7 +114,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Check Status',
                           href: checkStatus(),
-                          icon: Check,
+                          icon: Activity,
                       },
                   ]
                 : []),

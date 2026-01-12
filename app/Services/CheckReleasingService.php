@@ -17,7 +17,8 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 class CheckReleasingService
 {
-     public function __construct(protected FileHandler $fileHandler){
+    public function __construct(protected FileHandler $fileHandler)
+    {
     }
     public function index(Request $request)
     {
@@ -72,9 +73,7 @@ class CheckReleasingService
                 'caused_by' => $request->user()->id,
             ]);
 
-        $checkCompany = $validated['check'] == 'cv' ?
-            $checkStatus->load('checkable.company')->checkable->company?->company :
-            $checkStatus->load('checkable')->checkable->company;
+        $checkCompany = $checkStatus->load('checkable')->checkStatus->checkable->getCompany;
 
         $label = StringHelper::statusPastTense($validated['status']);
 
@@ -104,6 +103,8 @@ class CheckReleasingService
 
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
     }
+
+
 
     public function cancelCheck(int $id, Request $request)
     {

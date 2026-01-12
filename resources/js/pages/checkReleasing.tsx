@@ -24,6 +24,7 @@ import {
     createReleasingCvColumns,
 } from './checkReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import PdfReader from '@/components/pdf-reader';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -32,17 +33,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
 
 export default function CheckReleasing({
     cheques,
@@ -188,17 +178,8 @@ export default function CheckReleasing({
                     }}
                 />
             </PageContainer>
-             <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
-                <Box sx={{ ...style, width: '70%' }}>
-                    {stream && (
-                        <iframe
-                            src={stream}
-                            style={{ width: '100%', height: '500px' }}
-                            frameBorder={0}
-                        />
-                    )}
-                </Box>
-            </Modal>
+
+            <PdfReader open={openModalPdf} handleClose={() => setOpenModalPdf(false)} stream={stream}/>
         </AppLayout>
     );
 }
