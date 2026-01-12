@@ -7,6 +7,7 @@ use App\Helpers\ModelHelper;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
 use App\Http\Requests\ReleasingCheckRequest;
+use App\Models\CheckForwardedStatus;
 use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
@@ -100,6 +101,10 @@ class ForwardedCheckController extends Controller
             'status' => 'required|string',
         ]);
 
+        if (CheckForwardedStatus::where('check_status_id', $id->id)->exists()) {
+            return redirect()->back()->with(['status' => false, 'message' => 'Duplicate entry in check forward status']);
+        }
+
         $handleFiles = $this->handleFiles($validated, $id->id);
 
         $checkStatus = $id
@@ -111,7 +116,7 @@ class ForwardedCheckController extends Controller
                 'signature' => $handleFiles->signaturePath,
                 'caused_by' => $request->user()->id,
             ]);
-
+            
         $checkCompany = $checkStatus->load('checkStatus.checkable')->checkStatus->checkable->getCompany;
         $location = $checkStatus->load('checkStatus.checkable.tagLocation')->checkStatus->checkable?->getLocation;
 

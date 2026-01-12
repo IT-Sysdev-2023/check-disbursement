@@ -21,8 +21,8 @@ import {
 import { useState } from 'react';
 import TableFilter from '../components/tableFilter';
 import {
+    createForwardedCrfColumns,
     createForwardedCvColumns,
-    createReleasingCrfColumns,
 } from './checkReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
@@ -109,9 +109,9 @@ export default function ForwardedCheck({
         });
     };
 
-    const handleStatusChange = (checkStatusId: number, value: string) => {
+    const handleStatusChange = (checkStatusId: number, value: string, checkId: number) => {
         if (value === 'view') {
-            router.visit(signatureDetails(checkStatusId));
+            router.visit(signatureDetails(checkId));
             return;
         }
         setCheckStatusId(checkStatusId);
@@ -140,7 +140,7 @@ export default function ForwardedCheck({
     };
 
     const cvColumns = createForwardedCvColumns(handleStatusChange);
-    const crfColumns = createReleasingCrfColumns(handleStatusChange);
+    const crfColumns = createForwardedCrfColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

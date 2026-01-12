@@ -73,7 +73,7 @@ class CheckReleasingService
                 'caused_by' => $request->user()->id,
             ]);
 
-        $checkCompany = $checkStatus->load('checkable')->checkStatus->checkable->getCompany;
+        $checkCompany = $checkStatus->load('checkable')->checkable->getCompany;
 
         $label = StringHelper::statusPastTense($validated['status']);
 

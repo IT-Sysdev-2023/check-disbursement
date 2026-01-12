@@ -11,7 +11,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { Box, Modal, SelectChangeEvent } from '@mui/material';
+import {  SelectChangeEvent } from '@mui/material';
 import {
     GridFilterModel,
     GridPaginationModel,
