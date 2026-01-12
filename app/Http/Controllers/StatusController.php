@@ -21,6 +21,9 @@ class StatusController extends Controller
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
         $records = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus')
             ->has('checkStatus')
+            ->when($request->user()->hasRole('forwarded'), function ($query){
+                $query->has('checkStatus.checkForwardedStatus');
+            })
             ->filter($filters)
             ->paginate($request->page)
             ->withQueryString()
@@ -28,6 +31,9 @@ class StatusController extends Controller
 
         $crfs = Crf::with('borrowedCheck', 'checkStatus')
             ->has('checkStatus')
+            ->when($request->user()->hasRole('forwarded'), function ($query){
+                $query->has('checkStatus.checkForwardedStatus');
+            })
             ->filter($filters)
             ->paginate($request->page)
             ->withQueryString()

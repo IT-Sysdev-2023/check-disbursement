@@ -77,7 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
         Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancel'])->name('cancel-check');
 
-        Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+       
     });
 
     //Cebu & Manila
@@ -91,6 +91,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
          Route::post('cancel/{id}', [ForwardedCheckController::class,'cancelForwarded'])->name('cancel-forwarded');
     });
 
+     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+     
     Route::get('report', [ReportController::class, 'index'])->name('report');
     Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
 
