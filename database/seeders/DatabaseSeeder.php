@@ -61,6 +61,7 @@ class DatabaseSeeder extends Seeder
 
         Role::create(['name' => 'releasing']);
         Role::create(['name' => 'scanning']);
+        Role::create(['name' => 'closing']);
         Role::create(['name' => 'forwarded']);
         $admin = Role::create(['name' => 'admin']);
         // $admin->givePermissionTo(Permission::all());

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssignedCheckNumberController;
 use App\Http\Controllers\BorrowedCheckController;
 use App\Http\Controllers\CheckReleasingController;
+use App\Http\Controllers\ClosingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
@@ -87,12 +88,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('store-release-check/{id}', [ForwardedCheckController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
         Route::put('update-receiver-{id}', [ForwardedCheckController::class,'update'])->name('receiver-forwarded');
 
-        Route::get('releasing', [ForwardedCheckController::class,'fowardedReleasing'])->name('forwarded-releasing');
+        Route::get('releasing', [ForwardedCheckController::class,'forwardedReleasing'])->name('forwarded-releasing');
          Route::post('cancel/{id}', [ForwardedCheckController::class,'cancelForwarded'])->name('cancel-forwarded');
     });
 
+    Route::prefix('closing-checks')->group(function () {
+        Route::get('index', [ClosingController::class,'index'])->name('closing-checks');
+    });
+
      Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
-     
+
     Route::get('report', [ReportController::class, 'index'])->name('report');
     Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
 

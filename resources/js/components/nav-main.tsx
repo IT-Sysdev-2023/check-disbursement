@@ -13,6 +13,7 @@ import {
     checkRequestForm,
     checkStatus,
     checkVoucher,
+    closingChecks,
     forwardedCheckReleasing,
     forwardedReleasing,
     notifications,
@@ -25,6 +26,8 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     Activity,
     Bell,
+    Bookmark,
+    BookmarkX,
     BookOpen,
     Check,
     ChevronDown,
@@ -53,6 +56,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const releasing = roles.includes('releasing');
     const scanning = roles.includes('scanning');
     const forwarded = roles.includes('forwarded');
+    const closing = roles.includes('closing');
 
     const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -92,6 +96,15 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           title: 'Check Releasing',
                           href: checkReleasing(),
                           icon: Check,
+                      },
+                  ]
+                : []),
+            ...(isAdmin || closing
+                ? [
+                      {
+                          title: 'CV/ CRF List',
+                          href: closingChecks(),
+                          icon: BookmarkX,
                       },
                   ]
                 : []),
