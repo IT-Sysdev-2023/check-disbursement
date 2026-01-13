@@ -1,6 +1,8 @@
 import PageContainer from '@/components/pageContainer';
+import PdfReader from '@/components/pdf-reader';
 import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import AppLayout from '@/layouts/app-layout';
+import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { releaseCheck } from '@/routes';
 import {
     Crf,
@@ -11,20 +13,11 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import {  SelectChangeEvent } from '@mui/material';
-import {
-    GridFilterModel,
-    GridPaginationModel,
-    GridSortModel,
-} from '@mui/x-data-grid';
+import { SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
-import {
-    createReleasingCrfColumns,
-    createReleasingCvColumns,
-} from './checkReleasing/components/columns';
+import { createReleasingCvColumns } from './checkReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import PdfReader from '@/components/pdf-reader';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -33,15 +26,14 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
 export default function CheckReleasing({
     cheques,
     company,
-    defaultCheck,
+    // defaultCheck,
     filter,
 }: {
     cheques: InertiaPagination<Cv | Crf>;
-    defaultCheck: string;
+    // defaultCheck: string;
     filter: {
         selectedBu: string;
         search: string;
@@ -49,24 +41,12 @@ export default function CheckReleasing({
     };
     company: SelectionType[];
 }) {
-    console.log(cheques);
-    const [check, setCheck] = useState(defaultCheck);
+    const [check, setCheck] = useState('cv');
     const [tableLoading, setTableLoading] = useState(false);
     const [open, setOpen] = useState(false);
-    const [checkId, setCheckId] = useState<number | undefined>(undefined);
+    const [id, setId] = useState<number | undefined>(undefined);
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
-    const handlePagination = (model: GridPaginationModel) => {
-        const page = model.page + 1;
-        const per_page = model.pageSize;
-
-        router.reload({
-            data: {
-                page: page,
-                per_page: per_page,
-            },
-        });
-    };
 
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string; stream?: string };
@@ -79,22 +59,27 @@ export default function CheckReleasing({
         }
     }, [flash]);
 
-    const handleSearch = (model: GridFilterModel) => {
-        const query = model.quickFilterValues?.length
-            ? model.quickFilterValues?.[0]
-            : '';
+    const handleStatusChange = (id: number, value: string) => {
+        if (value === 'cancel') {
+            setId(id);
+            setOpen(true);
+            return;
+        }
 
-        router.reload({
-            data: {
-                search: query,
-            },
-            only: [check === 'cv' ? 'cv' : 'crf'],
-            replace: true,
+        router.push({
+            url: releaseCheck([id, value]).url,
+            component: 'checkReleasing/releaseCheck',
+            props: (curr) => ({
+                ...curr,
+                id: id,
+                status: value,
+                label: value + ' Check',
+            }),
         });
     };
 
     const handleCheck = (event: SelectChangeEvent) => {
-        setCheck(event.target.value);
+        // setCheck(event.target.value);
         router.reload({
             data: {
                 selectedCheck: event.target.value,
@@ -106,45 +91,8 @@ export default function CheckReleasing({
         });
     };
 
-    const handleSort = (model: GridSortModel) => {
-        router.reload({
-            data: {
-                sort: {
-                    field: model[0].field,
-                    sort: model[0].sort,
-                },
-            },
-            only: [check === 'cv' ? 'cv' : 'crf'],
-            replace: true,
-        });
-    };
-
-    const handleStatusChange = (
-        checkId: number,
-        value: string,
-        check: string,
-    ) => {
-        if (value === 'cancel') {
-            setCheckId(checkId);
-            setOpen(true);
-            return;
-        }
-
-        router.push({
-            url: releaseCheck([checkId, value, check]).url,
-            component: 'checkReleasing/releaseCheck',
-            props: (curr) => ({
-                ...curr,
-                checkId: checkId,
-                status: value,
-                check: check,
-                label: value + ' Check',
-            }),
-        });
-    };
-
     const cvColumns = createReleasingCvColumns(handleStatusChange);
-    const crfColumns = createReleasingCrfColumns(handleStatusChange);
+    // const crfColumns = createReleasingCrfColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -164,22 +112,27 @@ export default function CheckReleasing({
                     pagination={handlePagination}
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
-                    columns={check === 'cv' ? cvColumns : crfColumns}
+                    columns={cvColumns}
                     isLoading={tableLoading}
                 />
                 {/* <Copyright sx={{ my: 4 }} /> */}
 
-                <ReasonCancellationModal
-                    checkId={checkId ?? 0}
-                    check={check}
-                    open={open}
-                    handleClose={() => {
-                        setOpen(false);
-                    }}
-                />
+                {id && (
+                    <ReasonCancellationModal
+                        id={id}
+                        open={open}
+                        handleClose={() => {
+                            setOpen(false);
+                        }}
+                    />
+                )}
             </PageContainer>
 
-            <PdfReader open={openModalPdf} handleClose={() => setOpenModalPdf(false)} stream={stream}/>
+            <PdfReader
+                open={openModalPdf}
+                handleClose={() => setOpenModalPdf(false)}
+                stream={stream}
+            />
         </AppLayout>
     );
 }

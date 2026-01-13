@@ -19,24 +19,21 @@ const style = {
 };
 
 export default function ReasonCancellationModal({
-    checkId,
+    id,
     open,
-    check,
     handleClose,
 }: {
-    checkId: number;
+    id: number;
     open: boolean;
-    check: string;
     handleClose: () => void;
 }) {
     const { setData, post, processing, errors, reset } = useForm({
         reason: '',
-        check: check,
     });
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(cancelCheck(checkId).url, {
+        post(cancelCheck(id).url, {
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {

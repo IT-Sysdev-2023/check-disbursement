@@ -151,30 +151,6 @@ export default function RetrievedRecords({
             if (check === 'cv') router.visit(details(id));
             else router.visit(detailsCrf(id));
         },
-        // borrow: (id, bu) => {
-        // if (!bu) return;
-        // setBuBorrow(bu);
-        // setCheckId(id);
-        // setOpen(true);
-        // },
-        // scan: (id) => {
-        //     router.post(
-        //         scanCheck(),
-        //         { check, status: null, id },
-        //         {
-        //             preserveScroll: true,
-        //             preserveState: true,
-        //             onSuccess: (page) => {
-        //                 const m = page.props.flash as FlashReponse;
-
-        //                 notifications.show(m.message, {
-        //                     severity: 'success',
-        //                     autoHideDuration: 3000,
-        //                 });
-        //             },
-        //         },
-        //     );
-        // },
         assign: (id) => {
             router.get(unassignCheck(id));
         },

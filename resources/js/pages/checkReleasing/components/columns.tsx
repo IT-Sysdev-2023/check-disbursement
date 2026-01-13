@@ -4,7 +4,7 @@ import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
 export const createReleasingCvColumns = (
-    handleStatusChange: (checkId: number, value: string, check: string) => void,
+    handleStatusChange: (checkId: number, value: string) => void,
 ): GridColDef[] => [
     {
         field: 'checkNumber',
@@ -13,6 +13,7 @@ export const createReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 50,
+        renderCell: ({ row }) => row.checkable?.checkNumber,
     },
     {
         field: 'checkDate',
@@ -21,12 +22,13 @@ export const createReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
+        renderCell: ({ row }) => row.checkable?.checkDate,
     },
     {
         field: 'cvNo',
         headerName: 'CV Number',
         minWidth: 150,
-        renderCell: (params) => params.row.cvHeader?.cvNo,
+        renderCell: ({ row }) => row.checkable?.cvNo,
     },
     {
         field: 'payee',
@@ -35,6 +37,7 @@ export const createReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
+        renderCell: ({ row }) => row.checkable?.cvNo,
     },
     {
         field: 'checkAmount',
@@ -43,18 +46,19 @@ export const createReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
+        renderCell: ({ row }) => row.checkable?.amount,
     },
     {
         field: 'details',
         headerName: 'Check Details',
         minWidth: 120,
-        renderCell: (params) => {
+        renderCell: ({ row }) => {
             return (
                 <Button
                     variant="contained"
                     size="small"
                     onClick={() => {
-                        router.visit(details(params.row.id));
+                        router.visit(details(row.checkable?.id));
                     }}
                 >
                     View
@@ -69,8 +73,8 @@ export const createReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            return params.row.taggedLocation?.location;
+        renderCell: ({ row }) => {
+            return row.checkable.tagLocation?.location;
         },
     },
 
@@ -81,8 +85,8 @@ export const createReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            return params.row.company.name || '—';
+        renderCell: ({ row }) => {
+            return row.checkable?.company || '—';
         },
     },
 
@@ -94,18 +98,22 @@ export const createReleasingCvColumns = (
         flex: 1,
         headerAlign: 'center',
         sortable: false,
-        renderCell: (params) => {
-            const { id, taggedLocation } = params.row;
+        renderCell: ({ row }) => {
+            const { taggedLocation } = row.checkable;
             return (
                 <Select
                     size="small"
-                    value={null}
+                    value=""
                     label="For Signature"
                     onChange={(e) => {
                         if (!e.target.value) return;
-                        handleStatusChange(id, e.target.value, 'cv');
+                        handleStatusChange(row.id, e.target.value);
                     }}
                 >
+                    <MenuItem value="" disabled>
+                        Select action
+                    </MenuItem>
+
                     <MenuItem value={taggedLocation}>
                         <Chip
                             label={taggedLocation + ' Check'}
@@ -445,106 +453,3 @@ export const createForwardedCrfColumns = (
     },
 ];
 
-export const createReleasingCrfColumns = (
-    handleStatusChange: (id: number, value: string, checkId: string) => void,
-): GridColDef[] => [
-    {
-        field: 'crf',
-        headerName: 'CRF #',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'company',
-        headerName: 'Company',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'no',
-        headerName: 'No.',
-        headerAlign: 'right',
-        align: 'right',
-        minWidth: 80,
-    },
-    {
-        field: 'paidTo',
-        headerName: 'Paid To',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'amount',
-        headerName: 'Amount',
-        headerAlign: 'right',
-        align: 'right',
-        minWidth: 100,
-    },
-    {
-        field: 'ckNo',
-        headerName: 'CK No.',
-        headerAlign: 'right',
-        align: 'right',
-        minWidth: 100,
-    },
-    {
-        field: 'details',
-        headerName: 'Check Details',
-        minWidth: 120,
-        renderCell: (params) => {
-            return (
-                <Button
-                    variant="contained"
-                    size="small"
-                    onClick={() => {
-                        router.visit(detailsCrf(params.row.id));
-                    }}
-                >
-                    View
-                </Button>
-            );
-        },
-    },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 100,
-        align: 'center',
-        flex: 1,
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            const { id, taggedLocation } = params.row;
-
-            return (
-                <Select
-                    size="small"
-                    value={null}
-                    label="For Signature"
-                    onChange={(e) => {
-                        if (!e.target.value) return;
-                        handleStatusChange(id, e.target.value, 'crf');
-                        return null;
-                    }}
-                >
-                    <MenuItem value={taggedLocation}>
-                        <Chip
-                            label={taggedLocation + ' Check'}
-                            color="secondary"
-                        />
-                    </MenuItem>
-
-                    <MenuItem value="cancel">
-                        <Chip label="Cancel Check" color="error" />
-                    </MenuItem>
-                </Select>
-            );
-        },
-    },
-];

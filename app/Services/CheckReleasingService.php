@@ -7,10 +7,12 @@ use App\Helpers\ModelHelper;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
 use App\Http\Requests\ReleasingCheckRequest;
+use App\Models\BorrowedCheck;
 use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\PermissionService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -23,13 +25,25 @@ class CheckReleasingService
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-        $defaultCheck = $filters['selectedCheck'] ?? 'cv';
+        // $defaultCheck = $filters['selectedCheck'] ?? 'cv';
 
-        $chequeRecords = self::chequeRecords($filters, $defaultCheck);
+        $chequeRecords = BorrowedCheck::with('checkable')
+            ->whereNotNull('approver_id')
+            ->whereHasMorph(
+                'checkable',
+                [CvCheckPayment::class, Crf::class],
+                function (Builder $query) {
+                    $query->scanRecords();
+                }
+            )
+            ->doesntHave('checkable.checkStatus')
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
 
         return Inertia::render('checkReleasing', [
             'cheques' => $chequeRecords,
-            'defaultCheck' => $defaultCheck,
+            // 'defaultCheck' => $defaultCheck,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -45,26 +59,25 @@ class CheckReleasingService
         ]);
     }
 
-    public function getReleaseCheck(string $checkId, string $status, string $check)
+    public function getReleaseCheck(string $checkId, string $status)
     {
         return Inertia::render('checkReleasing/releaseCheck', [
-            'checkId' => $checkId,
+            'id' => $checkId,
             'status' => $status,
-            'check' => $check,
             'label' => Str::title($status) . ' Check'
         ]);
     }
 
-    public function storeReleaseCheck(ReleasingCheckRequest $request)
+    public function storeReleaseCheck(BorrowedCheck $id, ReleasingCheckRequest $request)
     {
         $request->validated();
 
         $validatedInputs = $request->safe()->only(['status', 'id', 'signature', 'file']);
-        $handleFiles = $this->handleFiles($validatedInputs);
+        $handleFiles = $this->handleFiles($validatedInputs, $id->checkable_id);
 
         $validated = $request->safe()->except(['signature', 'file']);
-        $checkStatus = ModelHelper::parent($validated['check'], $validated['id'])
-            ->checkStatus()
+
+        $checkStatus = $id->checkable->checkStatus()
             ->create([
                 'status' => Str::lower($validated['status']),
                 'receivers_name' => $validated['receiversName'],
@@ -106,23 +119,19 @@ class CheckReleasingService
 
 
 
-    public function cancelCheck(int $id, Request $request)
+    public function cancelCheck(BorrowedCheck $id, Request $request)
     {
         $request->validate([
             'reason' => 'required|string|max:255',
-            'check' => 'required|string'
         ]);
 
-        DB::transaction(function () use ($id, $request) {
-
-            CheckStatus::create([
-                'checkable_id' => $id,
-                'checkable_type' => $request->check,
+        $id->checkable->checkStatus()
+            ->create([
                 'status' => 'cancel',
                 'cancelled_reason' => $request->reason,
                 'caused_by' => $request->user()->id,
             ]);
-        });
+
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
@@ -194,18 +203,18 @@ class CheckReleasingService
             ->toResourceCollection();
     }
 
-    private function handleFiles(array $validated)
+    private function handleFiles(array $validated, int $id)
     {
         $userId = auth()->user()->id;
 
         $signaturePath = $this->fileHandler
-            ->inFolder($validated['status'] . "/signatures")
-            ->createFileName($validated['id'], $userId, '.png')
+            ->inFolder(Str::lower($validated['status']) . "/signatures")
+            ->createFileName($id, $userId, '.png')
             ->saveSignature($validated['signature']);
 
         $imagePath = $this->fileHandler
-            ->inFolder($validated['status'] . "/images")
-            ->createFileName($validated['id'], $userId, '.png')
+            ->inFolder(Str::lower($validated['status']) . "/images")
+            ->createFileName($id, $userId, '.png')
             ->saveFile($validated['file']);
 
         return (object) [

@@ -35,13 +35,11 @@ interface MyFormData {
 export default function ReleaseCheck({
     status,
     label,
-    check,
-    checkId,
+    id,
 }: {
     status: string;
     label: string;
-    check: string;
-    checkId: number;
+    id: number;
 }) {
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
@@ -82,11 +80,9 @@ export default function ReleaseCheck({
         transform((data) => ({
             ...data,
             status: status,
-            id: checkId,
-            check: check,
         }));
 
-        post(storeReleaseCheck().url, {
+        post(storeReleaseCheck(id).url, {
             preserveScroll: true,
             preserveState: true,
             onError: (e) => {

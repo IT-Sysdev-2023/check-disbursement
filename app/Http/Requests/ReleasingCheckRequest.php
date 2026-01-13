@@ -19,8 +19,6 @@ class ReleasingCheckRequest extends FormRequest
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'signature' => 'required|string',
             'status' => 'required|string',
-            'id' => 'required|unique:check_statuses,checkable_id',
-            'check' => 'required|string'
         ];
     }
 }
