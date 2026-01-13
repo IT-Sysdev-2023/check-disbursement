@@ -87,7 +87,7 @@ class CvCheckPayment extends Model
     public function scopeScanRecords(Builder $builder)
     {
         return $builder
-        ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
+            ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
             ->join('scanned_records', function ($join) {
                 $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
                     ->where(function ($q) {
@@ -105,6 +105,16 @@ class CvCheckPayment extends Model
                                 );
                         });
                     });
+            });
+    }
+
+    public function scopeLeftJoinScanRecords(Builder $builder)
+    {
+        return $builder
+            ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
+            ->leftJoin('scanned_records', function ($join) {
+                $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
+                    ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
             });
     }
     public function cvHeader()

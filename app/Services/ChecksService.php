@@ -7,6 +7,7 @@ use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -25,9 +26,32 @@ class ChecksService
         $isCvHasNoCheckNumber = self::checkIfHasNoCheckNumber();
 
         $chequeRecords = self::chequeRecords($filters, $defaultCheck, $isCvHasNoCheckNumber);
+        
         $borrowedRecords = self::borrowedRecords($tab, $defaultCheck);
-        $manageChecks = self::manageChecks($filters, $tab, $defaultCheck);
+        // $manageChecks = self::manageChecks($filters, $tab, $defaultCheck);
 
+        $manageChecks = BorrowedCheck::with('checkable', 'approver')
+            ->whereNotNull('approver_id')
+            ->whereHasMorph(
+                'checkable',
+                [CvCheckPayment::class, Crf::class],
+                function (Builder $query) {
+                    $query->leftJoinScanRecords();
+                }
+            )
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
+
+            // dd($manageChecks);
+        // return CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
+        //     $query->with('approver:id,name')->whereNotNull('approver_id');
+        // })
+        //     ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
+        //     ->leftJoin('scanned_records', function ($join) {
+        //         $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
+        //             ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
+        //     })
         return Inertia::render('retrievedRecords', [
 
             'cheques' => $chequeRecords,
@@ -147,6 +171,8 @@ class ChecksService
             ->withQueryString()
             ->toResourceCollection();
     }
+
+  
 
     private static function crfManageCheck($filters)
     {

@@ -75,6 +75,13 @@ class Crf extends Model
                 ->on('scanned_records.amount', '=', 'crfs.amount');
         });
     }
+    public function scopeLeftJoinScanRecords(Builder $builder)
+    {
+        return $builder->leftJoin('scanned_records', function ($join) {
+            $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
+                ->on('scanned_records.amount', '=', 'crfs.amount');
+        });
+    }
 
     public function tagLocation()
     {

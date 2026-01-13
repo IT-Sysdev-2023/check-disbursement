@@ -26,6 +26,7 @@ class BorrowedCheckResource extends JsonResource
             'check' => $this->checkable_type,
             'totalChecks' => $this->total_checks,
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
+            'approver' => $this->whenLoaded('approver'),
             'lastBorrowedAt' => Date::parse($this->last_borrowed_at)->format('M d, Y H:i A'),
         ];
     }

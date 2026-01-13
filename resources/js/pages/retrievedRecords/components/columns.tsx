@@ -3,7 +3,13 @@ import { Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
 const renderStatus = (
-    status: 'Releasing' | 'Borrowed' | 'Signature' | 'Assign' | 'Tagged' | 'Tagging',
+    status:
+        | 'Releasing'
+        | 'Borrowed'
+        | 'Signature'
+        | 'Assign'
+        | 'Tagged'
+        | 'Tagging',
 ) => {
     const colors: {
         [index: string]: 'success' | 'error' | 'info' | 'warning';
@@ -13,10 +19,12 @@ const renderStatus = (
         Borrowed: 'error',
         Assign: 'error',
         Tagged: 'success',
-        Tagging: 'info'
+        Tagging: 'info',
     };
 
-    const label = ['Signature', 'Releasing', 'Assign', 'Tagging'].includes(status)
+    const label = ['Signature', 'Releasing', 'Assign', 'Tagging'].includes(
+        status,
+    )
         ? 'For ' + status
         : status;
 
@@ -249,9 +257,7 @@ export const createManageCvColumns = (): GridColDef[] => [
         field: 'cvNo',
         headerName: 'CV Number',
         minWidth: 150,
-        renderCell: (params) => {
-            return params.row.cvHeader?.cvNo;
-        },
+        renderCell: ({ row }) => row.checkable.cvHeader?.cvNo,
     },
     {
         field: 'cvDate',
@@ -259,9 +265,7 @@ export const createManageCvColumns = (): GridColDef[] => [
         headerAlign: 'right',
         align: 'right',
         minWidth: 80,
-        renderCell: (params) => {
-            return params.row.cvHeader?.cvDate;
-        },
+        renderCell: ({ row }) => row.checkable.cvHeader?.cvDate,
     },
     {
         field: 'payee',
@@ -269,6 +273,7 @@ export const createManageCvColumns = (): GridColDef[] => [
         headerAlign: 'right',
         align: 'right',
         flex: 1,
+        renderCell: ({ row }) => row.checkable.payee,
     },
     {
         field: 'name',
@@ -276,14 +281,11 @@ export const createManageCvColumns = (): GridColDef[] => [
         headerAlign: 'center',
         align: 'center',
         flex: 1,
-        renderCell: (params) => {
-            return params.row.company?.name;
-        },
+        renderCell: ({ row }) => row.checkable.company,
     },
     {
         field: 'status',
         headerName: 'Approve Status',
-        flex: 1,
         renderCell: () => {
             return <Chip label="Approved" color="success" size="small" />;
         },
@@ -295,9 +297,7 @@ export const createManageCvColumns = (): GridColDef[] => [
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        renderCell: (params) => {
-            return params.row.borrowedCheck?.approver?.name;
-        },
+        renderCell: ({ row }) => row.approver?.name,
     },
     {
         field: 'syncStatus',
