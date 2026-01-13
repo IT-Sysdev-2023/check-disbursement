@@ -22,6 +22,13 @@ class CvCheckPayment extends Model
 
     }
 
+    protected function getCheckNumber(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->check_number ?? $this->tagLocation?->location,
+        );
+    }
+
     protected function getLocation(): Attribute
     {
         return new Attribute(

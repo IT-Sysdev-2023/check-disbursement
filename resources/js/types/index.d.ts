@@ -69,6 +69,17 @@ export interface SelectionType {
     value: number | string;
 }
 
+export interface ClosingCheckDetailsType {
+    id: number;
+    cvNo: string;
+    releasedAt: string;
+    bank: string;
+    checkNo: string;
+    payee: string;
+    amount: string;
+    receivedBy: string;
+}
+
 export interface DateFilterType {
     start: string | null;
     end: string | null;
@@ -140,7 +151,7 @@ export interface Borrower {
     lastBorrowedAt: string;
     totalChecks: number;
     borrower: string;
-    check: string,
+    check: string;
     borrowerNoClean: number;
 }
 
@@ -150,10 +161,9 @@ export interface ManageChecks {
     payee: string;
     cv_header_id: number;
     company_id: number;
-    assignedCheckNumber: AssignedCheckNumber,
+    assignedCheckNumber: AssignedCheckNumber;
     company: Company;
     cvHeader: CvHeader;
-
 }
 
 export interface AssignedCheckNumber {
@@ -240,7 +250,7 @@ export interface InertiaPagination<T> {
 export type SelectionModelType = {
     type: 'include';
     ids: Set<GridRowId>;
-      meta: Record<GridRowId, { taggedAt: string | null }>;
+    meta: Record<GridRowId, { taggedAt: string | null }>;
     // taggedAt: string | null
 };
 

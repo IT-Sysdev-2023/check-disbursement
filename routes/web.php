@@ -94,6 +94,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('closing-checks')->group(function () {
         Route::get('index', [ClosingController::class,'index'])->name('closing-checks');
+        Route::post('mark-close/{id}', [ClosingController::class,'close'])->name('mark-as-close');
     });
 
      Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');

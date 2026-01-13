@@ -27,16 +27,17 @@ class CvCheckPaymentResource extends JsonResource
             'checkNumber' => $this->check_number != 0 ? $this->check_number : $this->assignedCheckNumber->check_number,
             'checkDate' => $this->check_date ? $this->check_date->toFormattedDateString() : 'N/A',
 
-            'checkAmount' => $this->check_amount ? NumberHelper::currency($this->check_amount) : 0,
+            'amount' => $this->check_amount ? NumberHelper::currency($this->check_amount) : 0,
             'taggedAt' => $this->tagged_at,
             'payee' => $this->payee,
-            'bankName' => $this->bank_name,
+            'bank' => $this->bank_name,
             'bankAccountNo' => $this->bank_account_no,
             'checkClassLocation' => $this->check_class_location ?: 'N/A',
             'clearingDate' => $this->clearing_date ? $this->clearing_date->toFormattedDateString() : 'N/A',
 
             'scannedId' => $this->scanned_id,
             'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
+            'cvNo' => $this->cvHeader?->cv_no,
 
             'company' => $this->whenLoaded('company'),
             'cvHeader' => new CvHeaderResource($this->whenLoaded('cvHeader')),

@@ -25,7 +25,7 @@ class StatusController extends Controller
                 $query->has('checkStatus.checkForwardedStatus');
             })
             ->filter($filters)
-            ->paginate($request->page)
+            ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
 
@@ -35,7 +35,7 @@ class StatusController extends Controller
                 $query->has('checkStatus.checkForwardedStatus');
             })
             ->filter($filters)
-            ->paginate($request->page)
+            ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
 

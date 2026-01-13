@@ -27,14 +27,14 @@ class CrfResource extends JsonResource
             'bank' => $this->bank,
             'particulars' => $this->particulars,
             'amount' => NumberHelper::currency($this->amount),
-            'ckNo' => $this->ck_no,
+            'checkNo' => $this->ck_no,
             'preparedBy' => $this->prepared_by,
             'taggedAt' => $this->tagged_at,
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
             'checkStatus' => $this->whenLoaded('checkStatus'),
 
             'scannedId' => $this->scanned_id,
-             'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
+            'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
         ];
     }
 }

@@ -21,6 +21,7 @@ class CheckStatusResource extends JsonResource
             "id" => $this->id,
             "status" => Str::title($this->status),
             "receiversName" => $this->receivers_name,
+            "receivedBy" => $this->received_by,
             'image' => $this->image
                 ? asset('storage/' . $this->image)
                 : null,

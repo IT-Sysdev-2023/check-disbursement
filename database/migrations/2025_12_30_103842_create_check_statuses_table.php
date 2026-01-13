@@ -17,9 +17,12 @@ return new class extends Migration {
             $table->string('image')->nullable();
             $table->string('signature')->nullable();
             $table->string('cancelled_reason')->nullable();
-            $table->string('received_by')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('received_by')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete(); //this is for check_forward_statuses
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-             $table->morphs('checkable');
+            $table->boolean('is_closed')->default(false);
+
+            $table->morphs('checkable');
+            $table->timestamp('closed_at')->nullable();
             $table->timestamps();
         });
     }
