@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('crfs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('filename');
             $table->string('crf')->nullable();
             $table->string('company');
@@ -28,7 +28,7 @@ return new class extends Migration {
 
             $table->foreignId('tag_location_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamp('tagged_at')->nullable();
-
+            $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
             $table->unique(['no']);

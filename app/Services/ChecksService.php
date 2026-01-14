@@ -25,10 +25,11 @@ class ChecksService
         $tab = $filters['tab'] ?? 'calendar';
         $isCvHasNoCheckNumber = self::checkIfHasNoCheckNumber();
 
+
+        dd(self::mergeRecords($filters));
         $chequeRecords = self::chequeRecords($filters, $defaultCheck, $isCvHasNoCheckNumber);
-        
+
         $borrowedRecords = self::borrowedRecords($tab, $defaultCheck);
-        // $manageChecks = self::manageChecks($filters, $tab, $defaultCheck);
 
         $manageChecks = BorrowedCheck::with('checkable', 'approver')
             ->whereNotNull('approver_id')
@@ -43,15 +44,6 @@ class ChecksService
             ->withQueryString()
             ->toResourceCollection();
 
-            // dd($manageChecks);
-        // return CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
-        //     $query->with('approver:id,name')->whereNotNull('approver_id');
-        // })
-        //     ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
-        //     ->leftJoin('scanned_records', function ($join) {
-        //         $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
-        //             ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
-        //     })
         return Inertia::render('retrievedRecords', [
 
             'cheques' => $chequeRecords,
@@ -136,71 +128,8 @@ class ChecksService
             ? $loader()
             : Inertia::lazy($loader);
     }
-    private static function manageChecks($filters, string $tab, string $defaultCheck)
-    {
-        $isActiveTab = $tab === 'manageChecks';
-        $loader = $defaultCheck === 'cv'
-            ? fn() => self::cvManageChecks($filters)
-            : fn() => self::crfManageCheck($filters);
-        return $isActiveTab
-            ? $loader()
-            : Inertia::lazy($loader);
-    }
 
-    private static function cvManageChecks($filters)
-    {
-        return CvCheckPayment::withWhereHas('borrowedCheck', function ($query) {
-            $query->with('approver:id,name')->whereNotNull('approver_id');
-        })
-            ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
-            ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
-                    ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
-            })
-            ->select(
-                'cv_check_payments.id',
-                'cv_check_payments.check_number',
-                'cv_check_payments.payee',
-                'cv_check_payments.cv_header_id',
-                'cv_check_payments.company_id',
-                'scanned_records.id as scanned_id',
-            )
-            ->filter($filters)
-            ->with('company:id,name', 'cvHeader:id,cv_date,cv_no')
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
-    }
 
-  
-
-    private static function crfManageCheck($filters)
-    {
-        return Crf::withWhereHas('borrowedCheck', function ($query) {
-            $query->with('approver:id,name')->whereNotNull('approver_id');
-        })
-            ->select('crfs.id', 'crfs.amount', 'crfs.ck_no', 'crf', 'company', 'no', 'paid_to', 'scanned_records.id as scanned_id', )
-            ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
-                    ->on('scanned_records.amount', '=', 'crfs.amount');
-            })
-            ->filter($filters)
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
-    }
-
-    private static function crfRecords(array $filters)
-    {
-        return Crf::with('borrowedCheck')
-            ->select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by', 'tagged_at')
-            ->doesntHave('checkStatus')
-            ->doesntHave('borrowedCheck')
-            ->filter($filters)
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
-    }
 
     public static function checkIfHasNoCheckNumber()
     {
@@ -235,24 +164,61 @@ class ChecksService
 
     private static function cvRecords(array $filters, ?bool $hasNoAmount = false)
     {
-
-        return CvCheckPayment::with('cvHeader', 'borrowedCheck', 'company', 'assignedCheckNumber')
-            ->select('check_date', 'check_amount', 'id', 'cv_header_id', 'company_id', 'payee', 'tagged_at')
-            ->doesntHave('borrowedCheck')
-            ->doesntHave('checkStatus')
+        return CvCheckPayment::
+            select('cv_check_payments.id as id', 'companies.name as company_name', 'check_amount as amount', 'payee', 'tagged_at', DB::raw("'cv' as type"),  'cv_check_payments.created_at')
+            ->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
+            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+            ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('borrowed_checks')
+                    ->whereColumn('borrowed_checks.checkable_id', 'cv_check_payments.id');
+            })
             ->when($hasNoAmount, function ($query) {
-                $query->where('check_number', 0)
-                    ->doesntHave('assignedCheckNumber');
+                $query->where('cv_check_payments.check_number', 0)
+                    ->whereNotExists(function ($subQuery) {
+                        $subQuery->select(DB::raw(1))
+                            ->from('assigned_check_numbers')
+                            ->whereColumn('assigned_check_numbers.cv_check_payment_id', 'cv_check_payments.id');
+                    });
             }, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('check_number', '!=', 0)
-                        ->orHas('assignedCheckNumber');
+                    $q->where('cv_check_payments.check_number', '!=', 0)
+                        ->orWhereExists(function ($subQuery) {
+                            $subQuery->select(DB::raw(1))
+                                ->from('assigned_check_numbers')
+                                ->whereColumn('assigned_check_numbers.cv_check_payment_id', 'cv_check_payments.id');
+                        });
                 });
-            })
-            ->filter($filters)
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
+            });
+    }
+
+    private static function crfRecords(array $filters)
+    {
+        return Crf::select('crfs.id',  'amount', 'paid_to', 'tagged_at', DB::raw("'crf' as type"), 'crfs.created_at')
+            // ->leftJoin('companies', 'companies.id', '=', 'crfs.company_id')
+            ->whereNotExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('borrowed_checks')
+                    ->where('checkable_type', Crf::class)
+                    ->whereColumn('borrowed_checks.checkable_id', 'crfs.id');
+            });
+    }
+
+    private static function mergeRecords($filters)
+    {
+        $cvQuery = self::cvRecords($filters);
+        $crfQuery = self::crfRecords($filters);
+
+        return $crfQuery->get();
+        // return DB::query()
+        //     ->fromSub(function ($q) use ($cvQuery, $crfQuery) {
+        //         $q->fromSub($cvQuery, 'cv')
+        //             ->unionAll($crfQuery);
+        //     }, 'merged')
+        //     ->orderBy('created_at', 'desc')
+        //     // ->paginate(15);
+        //     ->get();
     }
 
     private static function distinctMonths()

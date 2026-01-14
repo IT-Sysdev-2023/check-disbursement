@@ -231,7 +231,6 @@ export default function RetrievedRecords({
     const cvColumns = createCvColumns(handleStatusChange);
     const crfColumns = createCrfColumns(handleStatusChange);
     const manageCvColumns = createManageCvColumns();
-    const manageCrfColumns = createManageCrfColumns();
 
     const handleClose = () => {
         setOpen(false);
@@ -387,11 +386,7 @@ export default function RetrievedRecords({
                                 }
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
-                                columns={
-                                    check == 'cv'
-                                        ? manageCvColumns
-                                        : manageCrfColumns
-                                }
+                                columns={manageCvColumns}
                                 isLoading={tableLoading}
                             />
 
