@@ -5,7 +5,6 @@ import {
     detailsCrf,
     getLocation,
     scan,
-    unassignCheck,
     updateLocation,
 } from '@/routes';
 import {
@@ -13,8 +12,7 @@ import {
     ActionType,
     Auth,
     Borrower,
-    Crf,
-    Cv,
+    ChequeType,
     DateFilterType,
     DistinctMonths,
     FlashReponse,
@@ -46,12 +44,12 @@ import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import CalendarView from './retrievedRecords/components/calendarView';
 import {
-    createCrfColumns,
-    createCvColumns,
-    createManageCrfColumns,
+    createChequeColumns,
     createManageCvColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
+import AssignCnModal from './retrievedRecords/components/assignCnModal';
+import AssignCdModal from './retrievedRecords/components/assignCdModal';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -67,7 +65,7 @@ export default function RetrievedRecords({
     company,
     distinctMonths,
     borrowed,
-    hasEmptyCheckNumber,
+    // hasEmptyCheckNumber,
     manageChecks,
     auth,
 }: {
@@ -77,13 +75,13 @@ export default function RetrievedRecords({
         date: DateFilterType;
         tab: string;
     };
-    cheques: InertiaPagination<Cv | Crf>;
+    cheques: InertiaPagination<ChequeType>;
     borrowed: InertiaPagination<Borrower>;
     defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
     manageChecks: InertiaPagination<ManageChecks>;
-    hasEmptyCheckNumber: boolean;
+    // hasEmptyCheckNumber: boolean;
     auth: Auth;
 }) {
     const [check, setCheck] = useState(defaultCheck);
@@ -91,15 +89,17 @@ export default function RetrievedRecords({
     const [openProgress, setOpenProgress] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [openTagModal, setOpenTagModal] = useState(false);
-    const notifications = useNotifications();
+    const [openAssignModal, setOpenAssignModal] = useState(false);
     const [currentTab, setCurrentTab] = useState(filter.tab);
     const [selectedLocation, setSelectedLocation] = useState('');
     const [location, setLocation] = useState<
         { label: string; value: string }[]
     >([]);
 
+    const [chequeData, setChequeData] = useState<ChequeType | null>(null);
     const [checkId, setCheckId] = useState<number | undefined>();
 
+    const notifications = useNotifications();
     const [selectionModel, setSelectionModel] = useState<SelectionModelType>({
         type: 'include',
         ids: new Set(),
@@ -144,27 +144,6 @@ export default function RetrievedRecords({
             only: [check === 'cv' ? 'cv' : 'crf'],
             replace: true,
         });
-    };
-
-    const actionHandlers: Record<string, ActionHandler> = {
-        details: (id) => {
-            if (check === 'cv') router.visit(details(id));
-            else router.visit(detailsCrf(id));
-        },
-        assign: (id) => {
-            router.get(unassignCheck(id));
-        },
-        tag: async (id) => {
-            setCheckId(id);
-            setOpenTagModal(true);
-            const { data } = await axios.get(getLocation().url);
-            setLocation(data);
-        },
-    };
-
-    const handleStatusChange = (id: number, value: ActionType, bu: string) => {
-        const handler = actionHandlers[value];
-        if (handler) handler(id, bu);
     };
 
     const handlePagination = (model: GridPaginationModel, param: string[]) => {
@@ -226,10 +205,38 @@ export default function RetrievedRecords({
         (id) => selectionModel.meta[id]?.taggedAt == null,
     );
 
+    const actionHandlers: Record<string, ActionHandler> = {
+        details: (id) => {
+            if (check === 'cv') router.visit(details(id));
+            else router.visit(detailsCrf(id));
+        },
+        assignCn: (id, data) => {
+            setChequeData(data || null);
+            setOpenAssignModal(true);
+        },
+        assignCd: (id, data) => {
+            setChequeData(data || null);
+            setOpenAssignModal(true);
+        },
+        tag: async (id) => {
+            setCheckId(id);
+            setOpenTagModal(true);
+            const { data } = await axios.get(getLocation().url);
+            setLocation(data);
+        },
+    };
+
+    const handleStatusChange = (
+        id: number,
+        value: ActionType,
+        data: ChequeType,
+    ) => {
+        const handler = actionHandlers[value];
+        if (handler) handler(id, data);
+    };
     // const hasSelection =
     //     selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
-    const cvColumns = createCvColumns(handleStatusChange);
-    const crfColumns = createCrfColumns(handleStatusChange);
+    const chequeColumns = createChequeColumns(handleStatusChange);
     const manageCvColumns = createManageCvColumns();
 
     const handleClose = () => {
@@ -286,9 +293,7 @@ export default function RetrievedRecords({
             },
         );
     };
-    const openBorrowModal = () => {
-        setOpen(true);
-    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">
@@ -326,7 +331,8 @@ export default function RetrievedRecords({
                             <TableDataGrid
                                 data={cheques}
                                 filter={filter.search}
-                                hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
+                                hasSelection={true}
+                                // hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
                                 selectionModel={selectionModel}
                                 handleSelectionChange={(model) => {
                                     setSelectionModel(
@@ -339,9 +345,7 @@ export default function RetrievedRecords({
                                 }
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
-                                columns={
-                                    check === 'cv' ? cvColumns : crfColumns
-                                }
+                                columns={chequeColumns}
                                 isLoading={tableLoading}
                             />
 
@@ -352,13 +356,13 @@ export default function RetrievedRecords({
                             >
                                 <Button
                                     disabled={
-                                        hasEmptyCheckNumber ||
+                                        // hasEmptyCheckNumber ||
                                         hasMissingTaggedAt ||
                                         selectionModel.ids.size === 0
                                     } // !hasSelection &&
                                     variant="outlined"
                                     startIcon={<HandCoins />}
-                                    onClick={openBorrowModal}
+                                    onClick={() => setOpen(true)}
                                 >
                                     Borrow
                                 </Button>
@@ -414,6 +418,19 @@ export default function RetrievedRecords({
                 open={open}
                 handleClose={handleClose}
             />
+            {chequeData && (<AssignCnModal
+                title="Assign Check Number"
+                open={openAssignModal}
+                chequeData={chequeData}
+                onClose={() => setOpenAssignModal(false)}
+            />)}
+
+             {chequeData && (<AssignCdModal
+                title="Assign Check Date"
+                open={openAssignModal}
+                chequeData={chequeData}
+                onClose={() => setOpenAssignModal(false)}
+            />)}
 
             <OnlySelectionModal
                 title="Tag Location"

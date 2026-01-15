@@ -1,16 +1,12 @@
-import PageContainer from '@/components/pageContainer';
-import AppLayout from '@/layouts/app-layout';
-import { retrievedRecords, storeUnassignCheck } from '@/routes';
-import { BreadcrumbItem, Cv } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-// import DeleteIcon from '@mui/icons-material/Delete';
-// import EditIcon from '@mui/icons-material/Edit';
+import { storeAssignCheckNumber } from '@/routes';
+import { ChequeType } from '@/types';
+import { useForm } from '@inertiajs/react';
 import {
     Box,
     Button,
     Divider,
     Grid,
+    Modal,
     Paper,
     Stack,
     TextField,
@@ -18,58 +14,51 @@ import {
 } from '@mui/material';
 import dayjs from 'dayjs';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Unassign CV',
-        href: retrievedRecords().url,
-    },
-    {
-        title: 'CV Details',
-        href: '#',
-    },
-];
-
-export default function UnassignCheck({ cv }: { cv: { data: Cv } }) {
-    const details = cv.data;
-
-    const { data, setData, post, errors } = useForm({
-        checkNumber: details.checkNumber,
-        id: cv.data.id,
+const style = {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: 800,
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+};
+export default function AssignCnModal ({
+    title,
+    open,
+    onClose,
+    chequeData,
+}: {
+    title: string;
+    open: boolean;
+    onClose: () => void;
+    chequeData: ChequeType;
+}) {
+    const { data, setData, errors, put } = useForm({
+        checkNumber: chequeData.checkNumber || 0,
+        id: chequeData.id,
+        type: chequeData.type,
     });
 
     const handleSubmit = () => {
-        post(storeUnassignCheck().url, {
-            preserveScroll: true,
-            preserveState: true,
-        });
+        put(storeAssignCheckNumber().url, {onSuccess: () => onClose() });
     };
-
     return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="CV Details" />
-            <PageContainer title="CV Details">
-                <Box sx={{ flexGrow: 1, width: '100%' }}>
-                    <Grid container spacing={2} sx={{ width: '100%' }}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Paper sx={{ px: 2, py: 1 }}>
-                                <Typography variant="overline">
-                                    CV Number
-                                </Typography>
-                                <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.cvHeader?.cvNo}
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Paper sx={{ px: 2, py: 1 }}>
-                                <Typography variant="overline">
-                                    Payee
-                                </Typography>
-                                <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.payee}
-                                </Typography>
-                            </Paper>
-                        </Grid>
+        <Modal
+            open={open}
+            onClose={onClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={style}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                    {title}
+                </Typography>
+
+                <Box sx={{ flexGrow: 1, width: '100%', mt: 2 }}>
+                    <Grid container spacing={1} sx={{ width: '100%' }}>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
@@ -94,10 +83,21 @@ export default function UnassignCheck({ cv }: { cv: { data: Cv } }) {
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
+                                    Payee
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {chequeData.payee}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
                                     Check Amount
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.checkAmount}
+                                    {chequeData.amount}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -107,7 +107,7 @@ export default function UnassignCheck({ cv }: { cv: { data: Cv } }) {
                                     Check Date
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {dayjs(details.checkDate).format(
+                                    {dayjs(chequeData.checkDate).format(
                                         'MMMM D, YYYY',
                                     )}
                                 </Typography>
@@ -115,31 +115,19 @@ export default function UnassignCheck({ cv }: { cv: { data: Cv } }) {
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
-                                <Typography variant="overline">
-                                    Bank Account No.
-                                </Typography>
+                                <Typography variant="overline">Type</Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.bankAccountNo}
+                                    {chequeData.type}
                                 </Typography>
                             </Paper>
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
-                                    Bank Name
+                                    Company Name
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.bankName}
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Paper sx={{ px: 2, py: 1 }}>
-                                <Typography variant="overline">
-                                    Remarks
-                                </Typography>
-                                <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.cvHeader?.remarks}
+                                    {chequeData.companyName}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -150,13 +138,6 @@ export default function UnassignCheck({ cv }: { cv: { data: Cv } }) {
                         spacing={2}
                         justifyContent="space-between"
                     >
-                        <Button
-                            variant="contained"
-                            startIcon={<ArrowBackIcon />}
-                            onClick={() => window.history.back()}
-                        >
-                            Back
-                        </Button>
                         <Stack direction="row" spacing={2}>
                             <Button
                                 variant="contained"
@@ -168,7 +149,7 @@ export default function UnassignCheck({ cv }: { cv: { data: Cv } }) {
                         </Stack>
                     </Stack>
                 </Box>
-            </PageContainer>
-        </AppLayout>
+            </Box>
+        </Modal>
     );
 }

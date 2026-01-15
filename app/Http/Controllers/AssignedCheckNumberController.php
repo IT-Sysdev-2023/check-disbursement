@@ -12,13 +12,14 @@ class AssignedCheckNumberController extends Controller
     public function __construct(protected AssignedCheckNumberService $service)
     {
     }
-    public function show(CvCheckPayment $id) //show
-    {
-        return $this->service->unassignCheck($id);
-    }
 
     public function store(Request $request) // store
     {
-        return $this->service->storeUnassignCheck($request);
+        return $this->service->updateAssignCheckNumber($request);
+    }
+
+    public function storeCheckDate(Request $request)
+    {
+         return $this->service->updateAssignCheckDate($request);
     }
 }

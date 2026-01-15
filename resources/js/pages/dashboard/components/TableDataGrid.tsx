@@ -1,4 +1,4 @@
-import { Crf, Cv, InertiaPagination, ManageChecks } from '@/types';
+import { ChequeType, Crf, Cv, InertiaPagination, ManageChecks } from '@/types';
 import {
     DataGrid,
     gridClasses,
@@ -26,7 +26,7 @@ export default function TableDataGrid({
     selectionModel,
     handleRowClickSelection,
 }: {
-    data: InertiaPagination<Cv | Crf | ManageChecks>;
+    data: InertiaPagination<Cv | Crf | ManageChecks | ChequeType>;
     columns: GridColDef[];
     isLoading: boolean;
     hasSelection?: boolean;

@@ -1,4 +1,4 @@
-import { ActionType } from '@/types';
+import { ActionType, ChequeType } from '@/types';
 import { Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
@@ -31,23 +31,26 @@ const renderStatus = (
     return <Chip label={label} color={colors[status]} size="small" />;
 };
 
-export const createCvColumns = (
+export const createChequeColumns = (
     handleStatusChange: (
         id: number,
         value: ActionType,
-        companyName: string,
+        type: ChequeType,
     ) => void,
 ): GridColDef[] => [
     {
-        field: 'cvNo',
-        headerName: 'CV Number',
+        field: 'checkNumber',
+        headerName: 'Check Number',
         minWidth: 150,
-        renderCell: (params) => {
-            return params.row.cvHeader?.cvNo;
-        },
     },
     {
-        field: 'checkAmount',
+        field: 'checkDate',
+        headerName: 'Check Date',
+        headerAlign: 'right',
+        align: 'right',
+    },
+    {
+        field: 'amount',
         headerName: 'Check Amount',
         headerAlign: 'right',
         align: 'right',
@@ -62,154 +65,22 @@ export const createCvColumns = (
         flex: 1,
     },
     {
-        field: 'name',
+        field: 'companyName',
         headerName: 'Business Unit',
         headerAlign: 'center',
         align: 'center',
         flex: 1,
-        renderCell: (params) => {
-            return params.row.company?.name;
-        },
     },
-    {
-        field: 'checkDate',
-        headerName: 'Check Date',
-        headerAlign: 'right',
-        align: 'right',
-    },
+
     {
         field: 'status',
         headerName: 'Status',
         minWidth: 120,
-        renderCell: (params) => {
-            if (!params.row.assignedCheckNumbers) {
+        renderCell: ({ row }) => {
+            if (!row.checkNumber) {
                 return renderStatus('Assign');
             }
-
-            if (params.row.taggedAt) {
-                return renderStatus('Signature');
-            }
-
-            return renderStatus(
-                params.row?.borrowedCheck ? 'Borrowed' : 'Tagging',
-            );
-        },
-    },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 130,
-        align: 'center',
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            const { status, id, company } = params.row;
-
-            if (!params.row.assignedCheckNumbers) {
-                return (
-                    <Select
-                        size="small"
-                        value={status ?? ''}
-                        onChange={(e) =>
-                            handleStatusChange(id, e.target.value, company.name)
-                        }
-                    >
-                        <MenuItem value="details">Check Details</MenuItem>
-                        <MenuItem value="assign">Assign</MenuItem>
-                    </Select>
-                );
-            }
-
-            return (
-                <Select
-                    size="small"
-                    value={status ?? ''}
-                    onChange={(e) =>
-                        handleStatusChange(
-                            params.row.id,
-                            e.target.value,
-                            params.row.company.name,
-                        )
-                    }
-                >
-                    <MenuItem value="details">Check Details</MenuItem>
-                    {!params.row.taggedAt && (
-                        <MenuItem value="tag">Tag Location</MenuItem>
-                    )}
-                    {/* {params.row.borrowedCheck == null && (
-                        <MenuItem value="borrow">Borrow Check</MenuItem>
-                    )} */}
-                    {/* <MenuItem value="scan">Scan</MenuItem> */}
-                </Select>
-            );
-        },
-    },
-];
-
-export const createCrfColumns = (
-    handleStatusChange: (
-        id: number,
-        value: ActionType,
-        company: string,
-    ) => void,
-): GridColDef[] => [
-    {
-        field: 'crf',
-        headerName: 'CRF #',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'company',
-        headerName: 'Company',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'no',
-        headerName: 'No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'paidTo',
-        headerName: 'Paid To',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'amount',
-        headerName: 'Amount',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'ckNo',
-        headerName: 'CK No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        minWidth: 120,
-        sortable: false,
-        renderCell: (params) => {
-            const { row } = params;
-
-            if (params.row.taggedAt) {
+            if (row.taggedAt) {
                 return renderStatus('Signature');
             }
 
@@ -223,29 +94,27 @@ export const createCrfColumns = (
         align: 'center',
         headerAlign: 'center',
         sortable: false,
-        renderCell: (params) => {
-            const { status } = params.row;
+        renderCell: ({ row }) => {
+            const { status, id } = row;
+
             return (
                 <Select
                     size="small"
                     value={status ?? ''}
-                    label="For Signature"
                     onChange={(e) =>
-                        handleStatusChange(
-                            params.row.id,
-                            e.target.value,
-                            params.row.company,
-                        )
+                        handleStatusChange(id, e.target.value, row)
                     }
                 >
                     <MenuItem value="details">Check Details</MenuItem>
-                    {!params.row.taggedAt && (
+                    {!row.checkNumber && (
+                        <MenuItem value="assignCn">Assign Check Number</MenuItem>
+                    )}
+                     {!row.checkDate && (
+                        <MenuItem value="assignCd">Assign Check Date</MenuItem>
+                    )}
+                    {!row.taggedAt && (
                         <MenuItem value="tag">Tag Location</MenuItem>
                     )}
-                    {/* {params.row.borrowedCheck == null && (
-                        <MenuItem value="borrow">Borrow Check</MenuItem>
-                    )}
-                    <MenuItem value="scan">Scan</MenuItem> */}
                 </Select>
             );
         },
@@ -315,5 +184,3 @@ export const createManageCvColumns = (): GridColDef[] => [
         },
     },
 ];
-
-

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -25,7 +26,7 @@ class CvCheckPayment extends Model
     protected function checkNumber(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->check_number ?? $this->assignedCheckNumber?->check_number,
+            get: fn() => $this->check_number ?? $this->resolved_check_number,
         );
     }
 
@@ -84,6 +85,23 @@ class CvCheckPayment extends Model
             });
     }
 
+    public function scopeBaseColumns(Builder $builder)
+    {
+        return $builder->select(
+            'cv_check_payments.id as id',
+            DB::raw('CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END as check_number'),
+            'check_date',
+            'companies.name as company_name',
+            'check_amount as amount',
+            'payee',
+            'tagged_at',
+            DB::raw("'cv' as type"),
+            'cv_check_payments.created_at'
+        )
+            ->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
+            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id');
+    }
+
     public function scopeScanRecords(Builder $builder)
     {
         return $builder
@@ -122,10 +140,10 @@ class CvCheckPayment extends Model
         return $this->belongsTo(CvHeader::class);
     }
 
-    public function assignedCheckNumber()
-    {
-        return $this->hasOne(AssignedCheckNumber::class);
-    }
+    // public function assignedCheckNumber()
+    // {
+    //     return $this->hasOne(AssignedCheckNumber::class);
+    // }
 
     public function company()
     {

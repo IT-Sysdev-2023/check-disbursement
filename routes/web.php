@@ -63,8 +63,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('update-location', [RetrievedChecksController::class, 'setLocation'])->name('updateLocation');
 
         Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
-        Route::get('unassign-check/{id}', [AssignedCheckNumberController::class, 'show'])->name('unassignCheck');
-        Route::post('store-unassign-check-number', [AssignedCheckNumberController::class, 'store'])->name('storeUnassignCheck');
+        Route::put('store-assign-check-number', [AssignedCheckNumberController::class, 'store'])->name('store-assign-check-number');
+        Route::put('store-assign-check-date', [AssignedCheckNumberController::class, 'storeCheckDate'])->name('store-assign-check-date');
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
         Route::get('cv/details-signature/{id}', [CvController::class, 'signatureDetails'])->name('signatureDetails');
         Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('detailsCrf');

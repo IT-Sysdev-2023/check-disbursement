@@ -85,9 +85,9 @@ export interface DateFilterType {
     end: string | null;
 }
 
-export type ActionHandler = (id: number, bu?: string) => void;
+export type ActionHandler = (id: number, data?: ChequeType) => void;
 
-export type ActionType = 'details' | 'borrow' | 'scan';
+export type ActionType = 'details' | 'borrow' | 'scan' | 'asssign';
 export type ReleasingType =
     | 'Cebu'
     | 'Manila'
@@ -143,6 +143,18 @@ export interface Cv {
     checkStatus: CheckStatus;
     created_at: string;
     updated_at: string;
+}
+
+export interface ChequeType {
+    id: number;
+    type: 'cv' | 'crf';
+    checkNumber: number;
+    checkDate: string;
+    payee: string;
+    amount: number;
+    companyName?: string;
+    taggedAt: string | null;
+    createdAt: string;
 }
 
 export interface Borrower {

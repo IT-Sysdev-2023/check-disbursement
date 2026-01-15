@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Helpers\NumberHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -18,6 +19,7 @@ class Crf extends Model
     {
         return [
             'date' => 'datetime',
+            'resolved_check_date' => 'datetime',
         ];
 
     }
@@ -40,6 +42,7 @@ class Crf extends Model
             get: fn() => NumberHelper::currency($this->amount),
         );
     }
+
     public function scopeFilter(Builder $builder, $filters)
     {
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
@@ -68,6 +71,21 @@ class Crf extends Model
         ;
     }
 
+    public function scopeBaseColumns(Builder $builder)
+    {
+        return $builder->select(
+            'crfs.id',
+            'ck_no as check_number',
+            'resolved_check_date as check_date',
+            'companies.name as company_name',
+            'amount',
+            'paid_to as payee',
+            'tagged_at',
+            DB::raw("'crf' as type"),
+            'crfs.created_at'
+        )
+            ->join('companies', 'companies.id', '=', 'crfs.company_id');
+    }
     public function scopeScanRecords(Builder $builder)
     {
         return $builder->join('scanned_records', function ($join) {
