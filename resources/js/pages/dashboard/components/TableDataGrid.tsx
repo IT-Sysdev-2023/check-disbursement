@@ -33,7 +33,7 @@ export default function TableDataGrid({
     filter?: string;
     selectionModel?: GridRowSelectionModel;
         density?: GridDensity;
-    handleRowClickSelection?: (id: number, taggedAt: string | null) => void;
+    handleRowClickSelection?: (id: number) => void;
     handleSelectionChange?: (model: GridRowSelectionModel) => void;
     pagination: (model: GridPaginationModel) => void;
     handleSearchFilter: (model: GridFilterModel) => void;
@@ -64,7 +64,7 @@ export default function TableDataGrid({
 
     const handleRowClick = useCallback<GridEventListener<'rowClick'>>(
         ({ row }) => {
-            handleRowClickSelection?.(row.id, row.taggedAt);
+            handleRowClickSelection?.(row.id);
             // router.visit(details(row.id));
         },
         [handleRowClickSelection],

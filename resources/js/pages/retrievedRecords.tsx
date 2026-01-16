@@ -1,12 +1,6 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
-import {
-    details,
-    detailsCrf,
-    getLocation,
-    scan,
-    updateLocation,
-} from '@/routes';
+import { details, detailsCrf, getLocation, scan, tagLocation } from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -23,14 +17,11 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Box, Button, SelectChangeEvent, Tab } from '@mui/material';
-import {
-    GridFilterModel,
-    GridPaginationModel,
-    GridSortModel,
-} from '@mui/x-data-grid';
+import { Box, Button, Tab } from '@mui/material';
+import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
 
+import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
@@ -60,12 +51,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function RetrievedRecords({
     cheques,
-    defaultCheck,
     filter,
     company,
     distinctMonths,
     borrowed,
-    // hasEmptyCheckNumber,
     manageChecks,
     auth,
 }: {
@@ -77,14 +66,11 @@ export default function RetrievedRecords({
     };
     cheques: InertiaPagination<ChequeType>;
     borrowed: InertiaPagination<Borrower>;
-    defaultCheck: string;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
     manageChecks: InertiaPagination<ManageChecks>;
-    // hasEmptyCheckNumber: boolean;
     auth: Auth;
 }) {
-    const [check, setCheck] = useState(defaultCheck);
     const [open, setOpen] = useState(false);
     const [openProgress, setOpenProgress] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
@@ -96,17 +82,14 @@ export default function RetrievedRecords({
     const [location, setLocation] = useState<
         { label: string; value: string }[]
     >([]);
-
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
-    const [checkId, setCheckId] = useState<number | undefined>();
-
-    const notifications = useNotifications();
     const [selectionModel, setSelectionModel] = useState<SelectionModelType>({
         type: 'include',
         ids: new Set(),
         meta: {},
     });
 
+    const notifications = useNotifications();
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
@@ -116,62 +99,8 @@ export default function RetrievedRecords({
                 severity: flash?.status ? 'success' : 'error',
                 autoHideDuration: 3000,
             });
-            setCheck('cv');
         }
     }, [flash, notifications]);
-
-    const handleSearch = (model: GridFilterModel) => {
-        const query = model.quickFilterValues?.length
-            ? model.quickFilterValues?.[0]
-            : '';
-
-        router.reload({
-            data: {
-                search: query,
-            },
-            only: [check === 'cv' ? 'cv' : 'crf'],
-            replace: true,
-        });
-    };
-
-    const handleSort = (model: GridSortModel) => {
-        router.reload({
-            data: {
-                sort: {
-                    field: model[0].field,
-                    sort: model[0].sort,
-                },
-            },
-            only: [check === 'cv' ? 'cv' : 'crf'],
-            replace: true,
-        });
-    };
-
-    const handlePagination = (model: GridPaginationModel, param: string[]) => {
-        const page = model.page + 1;
-        const per_page = model.pageSize;
-
-        router.reload({
-            only: param,
-            data: {
-                page: page,
-                per_page: per_page,
-            },
-        });
-    };
-
-    const handleCheck = (event: SelectChangeEvent) => {
-        setCheck(event.target.value);
-        router.reload({
-            data: {
-                selectedCheck: event.target.value,
-            },
-            only: [currentTab],
-            replace: true,
-            onStart: () => setTableLoading(true),
-            onFinish: () => setTableLoading(false),
-        });
-    };
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
@@ -186,25 +115,16 @@ export default function RetrievedRecords({
         setCurrentTab(newValue);
     };
 
-    const handleRowSelection = (id: number, taggedAt: string | null) => {
+    const handleRowSelection = (id: number) => {
         setSelectionModel((prev) => {
             const ids = new Set(prev.ids);
-            // const meta = { ...prev.meta };
-
             if (ids.has(id)) {
                 ids.delete(id);
-                // delete meta[id];
             } else {
                 ids.add(id);
-                // meta[id] = { taggedAt };
             }
-
             return { ...prev, ids };
         });
-    };
-
-    const handleSelectionChange = (model) => {
-        setSelectionModel(model as SelectionModelType);
     };
 
     const enableButton =
@@ -214,36 +134,32 @@ export default function RetrievedRecords({
             .every((row) => row.taggedAt !== null);
 
     const actionHandlers: Record<string, ActionHandler> = {
-        details: (data) => {
-            if (!data) return;
-            if (check === 'cv') router.visit(details(data.chequeId));
-            else router.visit(detailsCrf(data.chequeId));
+        details: (record) => {
+            if (!record) return;
+            if (record.type === 'cv') router.visit(details(record.chequeId));
+            else router.visit(detailsCrf(record.chequeId));
         },
-        assignCn: (data) => {
-            setChequeData(data || null);
+        assignCn: (record) => {
+            setChequeData(record || null);
             setOpenAssignCnModal(true);
         },
-        assignCd: (data) => {
-            setChequeData(data || null);
+        assignCd: (record) => {
+            setChequeData(record || null);
             setOpenAssignCdModal(true);
         },
         tag: async (record) => {
-            setCheckId(record?.chequeId);
+            setChequeData(record || null);
             setOpenTagModal(true);
             const { data } = await axios.get(getLocation().url);
             setLocation(data);
         },
     };
 
-    const handleStatusChange = (
-        value: ActionType,
-        data: ChequeType,
-    ) => {
+    const handleStatusChange = (value: ActionType, data: ChequeType) => {
         const handler = actionHandlers[value];
         if (handler) handler(data);
     };
-    // const hasSelection =
-    //     selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
+
     const chequeColumns = createChequeColumns(handleStatusChange);
     const manageCvColumns = createManageCvColumns();
 
@@ -281,16 +197,16 @@ export default function RetrievedRecords({
 
     const handleTagSubmit = (e: FormEvent) => {
         e.preventDefault();
-        if (!checkId) return;
+        if (!chequeData) return;
+
         router.put(
-            updateLocation(),
+            tagLocation(),
             {
-                checkId: checkId,
+                id: chequeData.chequeId,
                 locationId: selectedLocation,
-                check: check,
+                type: chequeData.type,
             },
             {
-                only: [currentTab],
                 preserveScroll: true,
                 onError: (e) => {
                     console.log(e);
@@ -330,10 +246,9 @@ export default function RetrievedRecords({
                         <TabPanel value="cheques">
                             <TableFilter
                                 currentTab={currentTab}
-                                handleChangeCheck={handleCheck}
+                                handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}
-                                check={check}
                             />
 
                             <TableDataGrid
@@ -342,11 +257,13 @@ export default function RetrievedRecords({
                                 hasSelection={true}
                                 // hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
                                 selectionModel={selectionModel}
-                                handleSelectionChange={handleSelectionChange}
-                                handleRowClickSelection={handleRowSelection}
-                                pagination={(model) =>
-                                    handlePagination(model, ['cheques'])
+                                handleSelectionChange={(model) =>
+                                    setSelectionModel(
+                                        model as SelectionModelType,
+                                    )
                                 }
+                                handleRowClickSelection={handleRowSelection}
+                                pagination={handlePagination}
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
                                 columns={chequeColumns}
@@ -379,18 +296,15 @@ export default function RetrievedRecords({
                         <TabPanel value="manageChecks">
                             <TableFilter
                                 currentTab={currentTab}
-                                handleChangeCheck={handleCheck}
+                                handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}
-                                check={check}
                             />
                             <TableDataGrid
                                 data={manageChecks}
                                 filter={filter.search}
                                 hasSelection={false} //remove selection if there is no check number
-                                pagination={(model) =>
-                                    handlePagination(model, ['manageChecks'])
-                                }
+                                pagination={handlePagination}
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
                                 columns={manageCvColumns}
@@ -416,7 +330,7 @@ export default function RetrievedRecords({
             </PageContainer>
 
             <BorrowedCheckModal
-                whichCheck={check}
+                whichCheck={'cv'} // check
                 checkId={selectionModel}
                 open={open}
                 handleClose={handleClose}

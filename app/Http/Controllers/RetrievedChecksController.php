@@ -32,7 +32,7 @@ class RetrievedChecksController extends Controller
        return $this->service->getLocation();
     }
 
-    public function setLocation(Request $request)
+    public function updateLocation(Request $request)
     {
         return $this->service->setLocation($request);
     }

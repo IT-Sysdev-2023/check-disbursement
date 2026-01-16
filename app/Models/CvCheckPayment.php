@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class CvCheckPayment extends Model
 {
 
-    protected $fillable = ['resolved_check_number'];
+    protected $guarded = [];
 
     protected function casts(): array
     {

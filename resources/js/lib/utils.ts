@@ -9,12 +9,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export const handlePagination = (model: GridPaginationModel) => {
     const page = model.page + 1;
-    const per_page = model.pageSize;
+    // const per_page = model.pageSize;
 
     router.reload({
         data: {
             page: page,
-            per_page: per_page,
         },
     });
 };

@@ -9,6 +9,7 @@ use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -68,21 +69,6 @@ class ChecksService
         ]);
     }
 
-    // private static function chequeRecords($filters, string $defaultCheck, bool $hasNoCheckNumber)
-    // {
-    //     $isActiveTab = ($filters['tab'] ?? null) === 'cheques';
-
-    //     $loader = $defaultCheck === 'cv'
-    //         ? fn() => self::cvRecords($filters, $hasNoCheckNumber)
-    //         : fn() => self::crfRecords($filters);
-
-    //     return $isActiveTab
-    //         ? $loader()
-    //         : Inertia::lazy($loader);
-    // }
-
-
-
     public static function checkIfHasNoCheckNumber()
     {
         return CvCheckPayment::where([['check_number', 0], ['resolved_check_number', null]])
@@ -99,21 +85,16 @@ class ChecksService
 
     private static function mergeRecords($filters)
     {
+        $cvQuery = CvCheckPayment::baseColumns()
+            ->doesntHave('borrowedCheck');
+
+        $crfQuery = Crf::baseColumns()
+            ->doesntHave('borrowedCheck');
+
         if (self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate()) {
-            $cvQuery = CvCheckPayment::baseColumns()
-                ->doesntHave('borrowedCheck')
-                ->where([['check_number', 0], ['resolved_check_number', null]]);
+            $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
 
-            $crfQuery = Crf::baseColumns()
-                ->doesntHave('borrowedCheck')
-                ->where('resolved_check_date', null);
-        } else {
-
-            $cvQuery = CvCheckPayment::baseColumns()
-                ->doesntHave('borrowedCheck');
-
-            $crfQuery = Crf::baseColumns()
-                ->doesntHave('borrowedCheck');
+            $crfQuery->where('resolved_check_date', null);
         }
 
         $unionQuery = $cvQuery->unionAll($crfQuery);
@@ -165,15 +146,19 @@ class ChecksService
 
     public function setLocation(Request $request)
     {
-        $request->validate([
-            'checkId' => ['required', 'integer'],
+        $validated = $request->validate([
+            'id' => ['required', 'integer'],
             'locationId' => ['required', 'integer'],
-            'check' => ['required', 'string'],
+            'type' => ['required', 'in:cv,crf'],
         ]);
 
-        $model = $request->check === 'cv' ? CvCheckPayment::class : Crf::class;
+        $model = Relation::getMorphedModel($validated['type']);
 
-        $model::where('id', $request->checkId)->update(['tag_location_id' => $request->locationId, 'tagged_at' => now()]);
+        $model::findOrFail($validated['id'])
+            ->update([
+                'tag_location_id' => $validated['locationId'],
+                'tagged_at' => now()
+            ]);
 
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
     }

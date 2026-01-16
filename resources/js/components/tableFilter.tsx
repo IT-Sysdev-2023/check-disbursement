@@ -22,7 +22,6 @@ const checks = [
 
 export default function ({
     company,
-    check,
     handleChangeCheck,
     isCheckDisabled = false,
     filters,
@@ -34,7 +33,6 @@ export default function ({
         date: DateFilterType;
     };
     isCheckDisabled?: boolean;
-    check: string;
     currentTab: string;
     handleChangeCheck: (value: SelectChangeEvent) => void;
 }) {
@@ -105,19 +103,18 @@ export default function ({
         >
             <Stack direction="row" sx={{ gap: 3 }}>
                 <SelectItem
-                    isDisabled={check === 'crf'}
                     handleChange={handleChange}
                     value={bu}
                     title="Company"
                     items={company}
                 />
-                <SelectItem
+                {/* <SelectItem
                     handleChange={handleChangeCheck}
                     isDisabled={isCheckDisabled}
                     value={check}
                     title="Check"
                     items={checks}
-                />
+                /> */}
             </Stack>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <Stack direction="row" alignItems="center" spacing={1}>
@@ -126,7 +123,6 @@ export default function ({
                         value={startDate}
                         onChange={handleStartDateChange}
                         maxDate={endDate || undefined}
-                        disabled={check === 'crf'}
                     />
                     <Box
                         sx={{
@@ -143,7 +139,6 @@ export default function ({
                         value={endDate}
                         onChange={handleEndDateChange}
                         minDate={startDate || undefined}
-                        disabled={check === 'crf'}
                     />
 
                     <Tooltip title="Reset" placement="right" enterDelay={1000}>

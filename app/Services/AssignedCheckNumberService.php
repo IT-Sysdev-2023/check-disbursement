@@ -20,7 +20,7 @@ class AssignedCheckNumberService
             'id' => 'required',
             'checkNumber' => ['required', 'integer', 'regex:/^[1-9]\d*$/'],
         ]);
-//   dd($validated['id']);
+        
         $model = Relation::getMorphedModel($validated['type']);
 
         $model::findOrFail($validated['id'])->update(['resolved_check_number' => $validated['checkNumber']]);
@@ -35,7 +35,7 @@ class AssignedCheckNumberService
             'id' => 'required',
             'checkDate' => ['required', 'date'],
         ]);
-        
+
         $model = Relation::getMorphedModel($validated['type']);
 
         $model::findOrFail($validated['id'])->update(['resolved_check_date' => $validated['checkDate']]);

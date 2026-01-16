@@ -60,7 +60,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('approver', [RetrievedChecksController::class, 'approver'])->name('approverNames');
         Route::put('approve-check', [RetrievedChecksController::class, 'approveCheck'])->name('approveCheck');
         Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('getLocation');
-        Route::put('update-location', [RetrievedChecksController::class, 'setLocation'])->name('updateLocation');
+        Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
 
         Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
         Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
