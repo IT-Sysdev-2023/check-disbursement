@@ -1,6 +1,7 @@
 import { ActionType, ChequeType } from '@/types';
-import { Chip, MenuItem, Select } from '@mui/material';
+import { Box, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
+import { JSX } from 'react';
 
 const renderStatus = (
     status:
@@ -33,7 +34,6 @@ const renderStatus = (
 
 export const createChequeColumns = (
     handleStatusChange: (
-        id: number,
         value: ActionType,
         type: ChequeType,
     ) => void,
@@ -77,7 +77,7 @@ export const createChequeColumns = (
         headerName: 'Status',
         minWidth: 120,
         renderCell: ({ row }) => {
-            if (!row.checkNumber) {
+            if (!row.checkNumber || !row.checkDate) {
                 return renderStatus('Assign');
             }
             if (row.taggedAt) {
@@ -95,27 +95,53 @@ export const createChequeColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            const { status, id } = row;
+            const { status } = row;
 
             return (
-                <Select
-                    size="small"
-                    value={status ?? ''}
-                    onChange={(e) =>
-                        handleStatusChange(id, e.target.value, row)
-                    }
-                >
-                    <MenuItem value="details">Check Details</MenuItem>
-                    {!row.checkNumber && (
-                        <MenuItem value="assignCn">Assign Check Number</MenuItem>
-                    )}
-                     {!row.checkDate && (
-                        <MenuItem value="assignCd">Assign Check Date</MenuItem>
-                    )}
-                    {!row.taggedAt && (
-                        <MenuItem value="tag">Tag Location</MenuItem>
-                    )}
-                </Select>
+                <Box sx={{ width: '100%' }}>
+                    <Select
+                        size="small"
+                        value={status ?? ''}
+                        onChange={(e) =>
+                            handleStatusChange(e.target.value, row)
+                        }
+                    >
+                        <MenuItem value="details">Check Details</MenuItem>
+                        {(() => {
+                            const items: JSX.Element[] = [];
+
+                            if (!row.checkNumber) {
+                                items.push(
+                                    <MenuItem key="assignCn" value="assignCn">
+                                        Assign Check Number
+                                    </MenuItem>,
+                                );
+                            }
+
+                            if (!row.checkDate) {
+                                items.push(
+                                    <MenuItem key="assignCd" value="assignCd">
+                                        Assign Check Date
+                                    </MenuItem>,
+                                );
+                            }
+
+                            if (
+                                row.checkDate &&
+                                row.checkNumber &&
+                                !row.taggedAt
+                            ) {
+                                items.push(
+                                    <MenuItem key="tag" value="tag">
+                                        Tag Location
+                                    </MenuItem>,
+                                );
+                            }
+
+                            return items;
+                        })()}
+                    </Select>
+                </Box>
             );
         },
     },

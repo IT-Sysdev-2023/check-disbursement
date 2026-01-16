@@ -74,7 +74,7 @@ class Crf extends Model
     public function scopeBaseColumns(Builder $builder)
     {
         return $builder->select(
-            'crfs.id',
+            'crfs.id as cheque_id',
             'ck_no as check_number',
             'resolved_check_date as check_date',
             'companies.name as company_name',

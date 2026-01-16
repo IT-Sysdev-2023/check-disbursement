@@ -42,14 +42,14 @@ import TableFilter from '../components/tableFilter';
 import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import AssignCdModal from './retrievedRecords/components/assignCdModal';
+import AssignCnModal from './retrievedRecords/components/assignCnModal';
 import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createChequeColumns,
     createManageCvColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
-import AssignCnModal from './retrievedRecords/components/assignCnModal';
-import AssignCdModal from './retrievedRecords/components/assignCdModal';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -89,7 +89,8 @@ export default function RetrievedRecords({
     const [openProgress, setOpenProgress] = useState(false);
     const [tableLoading, setTableLoading] = useState(false);
     const [openTagModal, setOpenTagModal] = useState(false);
-    const [openAssignModal, setOpenAssignModal] = useState(false);
+    const [openAssignCnModal, setOpenAssignCnModal] = useState(false);
+    const [openAssignCdModal, setOpenAssignCdModal] = useState(false);
     const [currentTab, setCurrentTab] = useState(filter.tab);
     const [selectedLocation, setSelectedLocation] = useState('');
     const [location, setLocation] = useState<
@@ -188,38 +189,46 @@ export default function RetrievedRecords({
     const handleRowSelection = (id: number, taggedAt: string | null) => {
         setSelectionModel((prev) => {
             const ids = new Set(prev.ids);
-            const meta = { ...prev.meta };
+            // const meta = { ...prev.meta };
 
             if (ids.has(id)) {
                 ids.delete(id);
-                delete meta[id];
+                // delete meta[id];
             } else {
                 ids.add(id);
-                meta[id] = { taggedAt };
+                // meta[id] = { taggedAt };
             }
 
-            return { ...prev, ids, meta };
+            return { ...prev, ids };
         });
     };
-    const hasMissingTaggedAt = Array.from(selectionModel.ids).some(
-        (id) => selectionModel.meta[id]?.taggedAt == null,
-    );
+
+    const handleSelectionChange = (model) => {
+        setSelectionModel(model as SelectionModelType);
+    };
+
+    const enableButton =
+        selectionModel.ids.size > 0 &&
+        cheques.data
+            .filter((row) => selectionModel.ids.has(row.id))
+            .every((row) => row.taggedAt !== null);
 
     const actionHandlers: Record<string, ActionHandler> = {
-        details: (id) => {
-            if (check === 'cv') router.visit(details(id));
-            else router.visit(detailsCrf(id));
+        details: (data) => {
+            if (!data) return;
+            if (check === 'cv') router.visit(details(data.chequeId));
+            else router.visit(detailsCrf(data.chequeId));
         },
-        assignCn: (id, data) => {
+        assignCn: (data) => {
             setChequeData(data || null);
-            setOpenAssignModal(true);
+            setOpenAssignCnModal(true);
         },
-        assignCd: (id, data) => {
+        assignCd: (data) => {
             setChequeData(data || null);
-            setOpenAssignModal(true);
+            setOpenAssignCdModal(true);
         },
-        tag: async (id) => {
-            setCheckId(id);
+        tag: async (record) => {
+            setCheckId(record?.chequeId);
             setOpenTagModal(true);
             const { data } = await axios.get(getLocation().url);
             setLocation(data);
@@ -227,12 +236,11 @@ export default function RetrievedRecords({
     };
 
     const handleStatusChange = (
-        id: number,
         value: ActionType,
         data: ChequeType,
     ) => {
         const handler = actionHandlers[value];
-        if (handler) handler(id, data);
+        if (handler) handler(data);
     };
     // const hasSelection =
     //     selectionModel.type === 'include' ? selectionModel.ids.size > 0 : true;
@@ -334,11 +342,7 @@ export default function RetrievedRecords({
                                 hasSelection={true}
                                 // hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
                                 selectionModel={selectionModel}
-                                handleSelectionChange={(model) => {
-                                    setSelectionModel(
-                                        model as SelectionModelType,
-                                    );
-                                }}
+                                handleSelectionChange={handleSelectionChange}
                                 handleRowClickSelection={handleRowSelection}
                                 pagination={(model) =>
                                     handlePagination(model, ['cheques'])
@@ -357,8 +361,7 @@ export default function RetrievedRecords({
                                 <Button
                                     disabled={
                                         // hasEmptyCheckNumber ||
-                                        hasMissingTaggedAt ||
-                                        selectionModel.ids.size === 0
+                                        !enableButton
                                     } // !hasSelection &&
                                     variant="outlined"
                                     startIcon={<HandCoins />}
@@ -418,19 +421,23 @@ export default function RetrievedRecords({
                 open={open}
                 handleClose={handleClose}
             />
-            {chequeData && (<AssignCnModal
-                title="Assign Check Number"
-                open={openAssignModal}
-                chequeData={chequeData}
-                onClose={() => setOpenAssignModal(false)}
-            />)}
+            {chequeData && (
+                <AssignCnModal
+                    title="Assign Check Number"
+                    open={openAssignCnModal}
+                    chequeData={chequeData}
+                    onClose={() => setOpenAssignCnModal(false)}
+                />
+            )}
 
-             {chequeData && (<AssignCdModal
-                title="Assign Check Date"
-                open={openAssignModal}
-                chequeData={chequeData}
-                onClose={() => setOpenAssignModal(false)}
-            />)}
+            {chequeData && (
+                <AssignCdModal
+                    title="Assign Check Date"
+                    open={openAssignCdModal}
+                    chequeData={chequeData}
+                    onClose={() => setOpenAssignCdModal(false)}
+                />
+            )}
 
             <OnlySelectionModal
                 title="Tag Location"

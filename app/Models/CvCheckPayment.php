@@ -14,6 +14,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class CvCheckPayment extends Model
 {
 
+    protected $fillable = ['resolved_check_number'];
+
     protected function casts(): array
     {
         return [
@@ -88,7 +90,7 @@ class CvCheckPayment extends Model
     public function scopeBaseColumns(Builder $builder)
     {
         return $builder->select(
-            'cv_check_payments.id as id',
+            'cv_check_payments.id as cheque_id',
             DB::raw('CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END as check_number'),
             'check_date',
             'companies.name as company_name',
@@ -105,7 +107,6 @@ class CvCheckPayment extends Model
     public function scopeScanRecords(Builder $builder)
     {
         return $builder
-            ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
             ->join('scanned_records', function ($join) {
                 $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
                     ->where(function ($q) {
@@ -119,7 +120,7 @@ class CvCheckPayment extends Model
                             $q->where('cv_check_payments.check_number', 0)
                                 ->whereColumn(
                                     'scanned_records.check_no',
-                                    'assigned_check_numbers.check_number'
+                                    'cv_check_payments.resolved_check_number'
                                 );
                         });
                     });
@@ -129,10 +130,23 @@ class CvCheckPayment extends Model
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder
-            ->leftJoin('assigned_check_numbers', 'assigned_check_numbers.cv_check_payment_id', '=', 'cv_check_payments.id')
             ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.check_no', '=', 'assigned_check_numbers.check_number')
-                    ->on('scanned_records.amount', '=', 'cv_check_payments.check_amount');
+                $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
+                    ->where(function ($q) {
+                        $q->where(function ($q) {
+                            $q->where('cv_check_payments.check_number', '!=', 0)
+                                ->whereColumn(
+                                    'scanned_records.check_no',
+                                    'cv_check_payments.check_number'
+                                );
+                        })->orWhere(function ($q) {
+                            $q->where('cv_check_payments.check_number', 0)
+                                ->whereColumn(
+                                    'scanned_records.check_no',
+                                    'cv_check_payments.resolved_check_number'
+                                );
+                        });
+                    });
             });
     }
     public function cvHeader()

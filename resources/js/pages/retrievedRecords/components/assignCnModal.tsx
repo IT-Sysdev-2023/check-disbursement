@@ -1,4 +1,4 @@
-import { storeAssignCheckNumber } from '@/routes';
+import { updateAssignCheckNumber } from '@/routes';
 import { ChequeType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import {
@@ -25,7 +25,7 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
-export default function AssignCnModal ({
+export default function AssignCnModal({
     title,
     open,
     onClose,
@@ -36,14 +36,23 @@ export default function AssignCnModal ({
     onClose: () => void;
     chequeData: ChequeType;
 }) {
-    const { data, setData, errors, put } = useForm({
+    const { data, setData, errors, put, reset, transform } = useForm({
         checkNumber: chequeData.checkNumber || 0,
-        id: chequeData.id,
-        type: chequeData.type,
     });
-
     const handleSubmit = () => {
-        put(storeAssignCheckNumber().url, {onSuccess: () => onClose() });
+        transform((data) => ({
+            ...data,
+            id: chequeData.chequeId,
+            type: chequeData.type,
+        }));
+        put(updateAssignCheckNumber().url, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                reset();
+                onClose();
+            },
+        });
     };
     return (
         <Modal

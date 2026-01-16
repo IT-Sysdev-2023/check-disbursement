@@ -1,4 +1,4 @@
-import { storeAssignCheckDate } from '@/routes';
+import { updateAssignCheckDate } from '@/routes';
 import { ChequeType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import {
@@ -13,8 +13,7 @@ import {
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, { Dayjs } from 'dayjs';
-import { useState } from 'react';
+import dayjs from 'dayjs';
 
 const style = {
     position: 'absolute',
@@ -38,20 +37,26 @@ export default function AssignCdModal({
     onClose: () => void;
     chequeData: ChequeType;
 }) {
-    const { data, setData, put, errors } = useForm<{
+    const { data, setData, put, errors, reset, transform } = useForm<{
         checkDate: string | null; // store as ISO string
-        id: number;
-        type: string;
     }>({
         checkDate: chequeData.checkDate
             ? dayjs(chequeData.checkDate).format('YYYY-MM-DD')
             : null,
-        id: chequeData.id,
-        type: chequeData.type,
     });
 
     const handleSubmit = () => {
-        put(storeAssignCheckDate().url, { onSuccess: () => onClose() });
+        transform((data) => ({
+            ...data,
+            id: chequeData.chequeId,
+            type: chequeData.type,
+        }));
+        put(updateAssignCheckDate().url, {
+            onSuccess: () => {
+                reset();
+                onClose();
+            },
+        });
     };
     return (
         <Modal
@@ -77,27 +82,6 @@ export default function AssignCdModal({
                                 </Typography>
                             </Paper>
                         </Grid>
-                        {/* <Grid size={{ xs: 12, sm: 6 }}>
-                            <Paper sx={{ px: 2, py: 1 }}>
-                                <Typography variant="overline">
-                                    Check Number
-                                </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    value={data.checkNumber}
-                                    error={!!errors.checkNumber}
-                                    helperText={errors.checkNumber ?? ' '}
-                                    onChange={(e) =>
-                                        setData(
-                                            'checkNumber',
-                                            Number(e.target.value),
-                                        )
-                                    }
-                                    sx={{ mb: 1 }}
-                                />
-                            </Paper>
-                        </Grid> */}
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">

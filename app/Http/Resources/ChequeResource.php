@@ -18,6 +18,7 @@ class ChequeResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'chequeId' => $this->cheque_id,
             'checkNumber' => $this->check_number,
             'checkDate' => $this->check_date ? Date::parse($this->check_date)->toFormattedDateString() : null,
             'companyName' => $this->company_name ?? null,

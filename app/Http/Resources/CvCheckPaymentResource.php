@@ -23,8 +23,7 @@ class CvCheckPaymentResource extends JsonResource
 
             'cvHeaderId' => $this->cv_header_id,
 
-            // 'checkNumber' => $this->check_number,
-            'checkNumber' => $this->check_number != 0 ? $this->check_number : $this->assignedCheckNumber->check_number,
+            'checkNumber' => $this->check_number,
             'checkDate' => $this->check_date ? $this->check_date->toFormattedDateString() : 'N/A',
 
             'amount' => $this->check_amount ? NumberHelper::currency($this->check_amount) : 0,

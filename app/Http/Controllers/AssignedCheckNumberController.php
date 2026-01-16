@@ -13,12 +13,12 @@ class AssignedCheckNumberController extends Controller
     {
     }
 
-    public function store(Request $request) // store
+    public function updateCheckNumber(Request $request) // store
     {
         return $this->service->updateAssignCheckNumber($request);
     }
 
-    public function storeCheckDate(Request $request)
+    public function updateCheckDate(Request $request)
     {
          return $this->service->updateAssignCheckDate($request);
     }

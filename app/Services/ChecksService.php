@@ -21,7 +21,6 @@ class ChecksService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
 
-        //LAZY LOADING APPROACHING MOTHER F*CKERSSSSSSSS hAHAHAHHA
         $defaultCheck = $filters['selectedCheck'] ?? 'cv';
         $tab = $filters['tab'] ?? 'calendar';
 
@@ -29,7 +28,6 @@ class ChecksService
         // $isCrfHasNoCheckDate = self::checkIfHasCheckDate();
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters));
-        // $chequeRecords = self::chequeRecords($filters, $defaultCheck, $isCvHasNoCheckNumber);
 
         $borrowedRecords = self::borrowedRecords($tab, $defaultCheck);
 
@@ -101,24 +99,32 @@ class ChecksService
 
     private static function mergeRecords($filters)
     {
-        $cvQuery = CvCheckPayment::baseColumns()
-            ->doesntHave('borrowedCheck')
-            ->when(self::checkIfHasNoCheckNumber(), function (Builder $builder) {
-                $builder->where([['check_number', 0], ['resolved_check_number', null]]);
-            });
+        if (self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate()) {
+            $cvQuery = CvCheckPayment::baseColumns()
+                ->doesntHave('borrowedCheck')
+                ->where([['check_number', 0], ['resolved_check_number', null]]);
 
-        $crfQuery = Crf::baseColumns()
-            ->doesntHave('borrowedCheck')
-            ->when(self::checkIfHasNoCheckDate(), function (Builder $builder) {
-                $builder->where('resolved_check_date', null);
-            });
+            $crfQuery = Crf::baseColumns()
+                ->doesntHave('borrowedCheck')
+                ->where('resolved_check_date', null);
+        } else {
 
-        // Create union first
+            $cvQuery = CvCheckPayment::baseColumns()
+                ->doesntHave('borrowedCheck');
+
+            $crfQuery = Crf::baseColumns()
+                ->doesntHave('borrowedCheck');
+        }
+
         $unionQuery = $cvQuery->unionAll($crfQuery);
 
-        // Use union as a subquery to order results
         return DB::query()
-            ->fromSub($unionQuery, 'merged')
+            ->fromSub(
+                DB::query()
+                    ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
+                    ->fromSub($unionQuery, 'merged'),
+                'final'
+            )
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();

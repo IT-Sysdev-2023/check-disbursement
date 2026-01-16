@@ -91,8 +91,10 @@ export default function TableDataGrid({
             paginationMode="server"
             checkboxSelection={hasSelection}
             rowSelectionModel={selectionModel}
+            
             onRowClick={handleRowClick}
             onRowSelectionModelChange={handleSelectionChange}
+
             density={density}
             paginationModel={{
                 page: data.meta.current_page - 1,

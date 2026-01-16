@@ -85,7 +85,7 @@ export interface DateFilterType {
     end: string | null;
 }
 
-export type ActionHandler = (id: number, data?: ChequeType) => void;
+export type ActionHandler = (data?: ChequeType) => void;
 
 export type ActionType = 'details' | 'borrow' | 'scan' | 'asssign';
 export type ReleasingType =
@@ -148,6 +148,7 @@ export interface Cv {
 export interface ChequeType {
     id: number;
     type: 'cv' | 'crf';
+    chequeId: number;
     checkNumber: number;
     checkDate: string;
     payee: string;
