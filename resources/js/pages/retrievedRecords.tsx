@@ -1,4 +1,3 @@
-import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import AppLayout from '@/layouts/app-layout';
 import { details, detailsCrf, getLocation, scan, tagLocation } from '@/routes';
 import {
@@ -12,7 +11,6 @@ import {
     FlashReponse,
     InertiaPagination,
     ManageChecks,
-    SelectionModelType,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
@@ -21,6 +19,7 @@ import { Box, Button, Tab } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
 
+import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
@@ -83,11 +82,10 @@ export default function RetrievedRecords({
         { label: string; value: string }[]
     >([]);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
-    const [selectionModel, setSelectionModel] = useState<SelectionModelType>({
-        type: 'include',
-        ids: new Set(),
-        meta: {},
-    });
+
+    const [selectedRows, setSelectedRows] = useState<
+        { chequeId: number; type: string; id: number }[]
+    >([]);
 
     const notifications = useNotifications();
     const { flash } = usePage().props as {
@@ -115,22 +113,22 @@ export default function RetrievedRecords({
         setCurrentTab(newValue);
     };
 
-    const handleRowSelection = (id: number) => {
-        setSelectionModel((prev) => {
-            const ids = new Set(prev.ids);
-            if (ids.has(id)) {
-                ids.delete(id);
-            } else {
-                ids.add(id);
-            }
-            return { ...prev, ids };
-        });
+    const handleSelectionChange = (model: GridRowSelectionModel) => {
+        const selectedR = cheques.data
+            .filter((row) => model.ids.has(row.id))
+            .map((row) => ({
+                id: row.id,
+                chequeId: row.chequeId,
+                type: row.type,
+            }));
+        
+        setSelectedRows(selectedR);
     };
 
     const enableButton =
-        selectionModel.ids.size > 0 &&
+        selectedRows.length > 0 &&
         cheques.data
-            .filter((row) => selectionModel.ids.has(row.id))
+            .filter((row) => selectedRows.some((r) => r.id === row.id))
             .every((row) => row.taggedAt !== null);
 
     const actionHandlers: Record<string, ActionHandler> = {
@@ -165,11 +163,11 @@ export default function RetrievedRecords({
 
     const handleClose = () => {
         setOpen(false);
-        setSelectionModel({
-            type: 'include',
-            ids: new Set(),
-            meta: {},
-        });
+        // setSelectionModel({
+        //     type: 'include',
+        //     ids: new Set(),
+        //     meta: {},
+        // });
     };
 
     const handleSyncScanned = () => {
@@ -256,13 +254,9 @@ export default function RetrievedRecords({
                                 filter={filter.search}
                                 hasSelection={true}
                                 // hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
-                                selectionModel={selectionModel}
-                                handleSelectionChange={(model) =>
-                                    setSelectionModel(
-                                        model as SelectionModelType,
-                                    )
-                                }
-                                handleRowClickSelection={handleRowSelection}
+                                // selectionModel={selectionModel}
+                                handleSelectionChange={handleSelectionChange}
+                                // handleRowClickSelection={handleRowSelection}
                                 pagination={handlePagination}
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
@@ -279,7 +273,7 @@ export default function RetrievedRecords({
                                     disabled={
                                         // hasEmptyCheckNumber ||
                                         !enableButton
-                                    } // !hasSelection &&
+                                    }
                                     variant="outlined"
                                     startIcon={<HandCoins />}
                                     onClick={() => setOpen(true)}
@@ -330,8 +324,7 @@ export default function RetrievedRecords({
             </PageContainer>
 
             <BorrowedCheckModal
-                whichCheck={'cv'} // check
-                checkId={selectionModel}
+                cheque={selectedRows}
                 open={open}
                 handleClose={handleClose}
             />

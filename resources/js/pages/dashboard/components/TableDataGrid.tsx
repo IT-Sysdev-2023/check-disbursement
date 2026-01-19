@@ -4,7 +4,6 @@ import {
     gridClasses,
     GridColDef,
     GridDensity,
-    GridEventListener,
     GridFilterModel,
     GridPaginationModel,
     GridRowSelectionModel,
@@ -23,17 +22,13 @@ export default function TableDataGrid({
     density,
     hasSelection = false,
     handleSelectionChange,
-    selectionModel,
-    handleRowClickSelection,
 }: {
     data: InertiaPagination<Cv | Crf | ManageChecks | ChequeType>;
     columns: GridColDef[];
     isLoading: boolean;
     hasSelection?: boolean;
     filter?: string;
-    selectionModel?: GridRowSelectionModel;
-        density?: GridDensity;
-    handleRowClickSelection?: (id: number) => void;
+    density?: GridDensity;
     handleSelectionChange?: (model: GridRowSelectionModel) => void;
     pagination: (model: GridPaginationModel) => void;
     handleSearchFilter: (model: GridFilterModel) => void;
@@ -62,13 +57,6 @@ export default function TableDataGrid({
         [handleSearchFilter],
     );
 
-    const handleRowClick = useCallback<GridEventListener<'rowClick'>>(
-        ({ row }) => {
-            handleRowClickSelection?.(row.id);
-            // router.visit(details(row.id));
-        },
-        [handleRowClickSelection],
-    );
 
     if (!data) {
         return (
@@ -90,11 +78,8 @@ export default function TableDataGrid({
             filterMode="server"
             paginationMode="server"
             checkboxSelection={hasSelection}
-            rowSelectionModel={selectionModel}
-            
-            onRowClick={handleRowClick}
             onRowSelectionModelChange={handleSelectionChange}
-
+            disableRowSelectionOnClick={false}
             density={density}
             paginationModel={{
                 page: data.meta.current_page - 1,
@@ -104,7 +89,6 @@ export default function TableDataGrid({
             onSortModelChange={handleSortModelChange}
             filterModel={filterModel}
             onFilterModelChange={handleFilterModelChange}
-            disableRowSelectionOnClick
             loading={isLoading}
             showToolbar
             pageSizeOptions={[5, 10, 15, 25]}

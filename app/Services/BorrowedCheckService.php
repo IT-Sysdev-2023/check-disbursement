@@ -9,6 +9,7 @@ use App\Models\BorrowedCheck;
 use App\Models\Borrower;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 
@@ -19,6 +20,7 @@ class BorrowedCheckService
     }
     public function borrowedChecks(Request $request)
     {
+
         $ids = BorrowedCheck::where('borrower_no', $request->borrowerNo)->pluck('checkable_id');
 
         if ($request->check === 'cv') {
@@ -40,73 +42,48 @@ class BorrowedCheckService
         return response()->json($records);
 
     }
-    
-    public function store(BorrowedCheckRequest $request)
+
+    public function store(Request $request)
     {
-        $validated = $request->validated();
 
-        if (!self::checkIds($validated['check'], $validated['ids'])) {
-            return redirect()->back()->with(['status' => false, 'message' => 'Some selected checks have no location assigned. Please assign location before borrowing.']);
-        }
+        $validated = $request->validate([
+            'name' => 'required|exists:borrowers,id',
+            'reason' => 'required|string|max:255',
+            'cheques' => 'required|array',
+        ]);
 
-        $borrowerNo = (BorrowedCheck::max('borrower_no') ?? 0) + 1;
-        if ($validated['type'] === 'exclude') {
-            if ($validated['check'] === 'cv') {
-                CvCheckPayment::doesntHave('borrowedCheck')
-                    ->doesntHave('checkStatus')
-                    ->where(function ($q) {
-                        $q->where('check_number', '!=', 0)
-                            ->orHas('assignedCheckNumber');
-                    })
-                    ->whereNotIn('id', $validated['ids'])
-                    ->chunk(100, function (Collection $items) use ($validated, $borrowerNo) {
 
-                        $data = $items->map(fn($check) => [
-                            'checkable_id' => $check->id,
-                            'checkable_type' => $validated['check'],
-                            'borrower_no' => $borrowerNo,
-                            'borrower_id' => $validated['name'],
-                            'reason' => $validated['reason'],
-                            'user_id' => auth()->user()->id,
-                            'created_at' => now(),
-                            'updated_at' => now()
-                        ])->toArray();
+        foreach ($validated['cheques'] as $cheque) {
+            $model = Relation::getMorphedModel($cheque['type']);
 
-                        BorrowedCheck::insert($data);
-                    });
-            } else {
-                Crf::doesntHave('checkStatus')
-                    ->doesntHave('borrowedCheck')
-                    ->whereNotIn('id', $validated['ids'])
-                    ->chunk(100, function (Collection $items) use ($validated, $borrowerNo) {
+            $hasNoLocation = $model::whereKey($cheque['chequeId'])
+                ->whereNull('tag_location_id')
+                ->exists();
 
-                        $data = $items->map(fn($check) => [
-                            'checkable_id' => $check->id,
-                            'checkable_type' => $validated['check'],
-                            'borrower_no' => $borrowerNo,
-                            'borrower_id' => $validated['name'],
-                            'reason' => $validated['reason'],
-                            'user_id' => auth()->user()->id,
-                            'created_at' => now(),
-                            'updated_at' => now()
-                        ])->toArray();
-
-                        BorrowedCheck::insert($data);
-                    });
-            }
-        } else {
-            foreach ($validated['ids'] as $id) {
-                auth()->user()->borrowedChecks()->create([
-                    'checkable_id' => $id,
-                    'checkable_type' => $validated['check'],
-                    'borrower_no' => $borrowerNo,
-                    'borrower_id' => $validated['name'],
-                    'reason' => $validated['reason'],
+            if ($hasNoLocation) {
+                return redirect()->back()->with([
+                    'status' => false,
+                    'message' => 'Some selected checks have no location assigned. Please assign location before borrowing.',
                 ]);
             }
         }
 
-        return $this->download($borrowerNo, $request->check);
+        $borrowerNo = (BorrowedCheck::max('borrower_no') ?? 0) + 1;
+
+        BorrowedCheck::insert(
+            collect($validated['cheques'])->map(fn($c) => [
+                'checkable_id' => $c['chequeId'],
+                'checkable_type' => $c['type'],
+                'borrower_no' => $borrowerNo,
+                'borrower_id' => $validated['name'],
+                'reason' => $validated['reason'],
+                'user_id' => auth()->user()->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ])->toArray()
+        );
+
+        return $this->download($borrowerNo);
     }
 
     public function borrower()
@@ -116,15 +93,14 @@ class BorrowedCheckService
         return response()->json($transform);
     }
 
-    private function download(int $borrowerNo, string $check)
+    private function download(int $borrowerNo)
     {
         $borrower = BorrowedCheck::with('borrower:id,name')
-            ->with($check === 'cv' ? 'cvCheckPayment.company' : 'crf')
+            ->with('checkable')
             ->where('borrower_no', $borrowerNo)
             ->get();
 
-        $companyNames = $borrower
-            ->pluck($check === 'cv' ? 'cvCheckPayment.company.name' : 'crf.company')
+        $companyNames = $borrower->pluck('checkable.getCompany')
             ->filter()
             ->unique()
             ->implode(', ');
@@ -148,13 +124,5 @@ class BorrowedCheckService
             ->handlePdf($data, 'borrowedPdf');
 
         return redirect()->back()->with(['status' => true, 'stream' => $stream]);
-    }
-    private function checkIds($check, $ids)
-    {
-        $model = $check === 'cv' ? CvCheckPayment::class : Crf::class;
-
-        return $model::whereIn('id', $ids)
-            ->whereNull('tag_location_id')
-            ->count() === 0;
     }
 }

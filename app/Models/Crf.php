@@ -36,6 +36,7 @@ class Crf extends Model
             get: fn() => $this->company,
         );
     }
+    
     protected function formattedAmount(): Attribute
     {
         return Attribute::make(

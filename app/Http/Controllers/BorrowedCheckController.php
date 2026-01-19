@@ -15,7 +15,7 @@ class BorrowedCheckController extends Controller
     {
         return $this->service->borrowedChecks($request);
     }
-    public function store(BorrowedCheckRequest $request)
+    public function store(Request $request)
     {
         return $this->service->store($request);
     }

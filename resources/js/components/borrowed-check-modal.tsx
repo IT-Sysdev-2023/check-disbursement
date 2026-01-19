@@ -1,6 +1,6 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { borrowCheck, borrowerNames } from '@/routes';
-import { FlashReponse, SelectionModelType, SelectionType } from '@/types';
+import { FlashReponse, SelectionType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Grid, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -22,15 +22,13 @@ const style = {
 };
 
 export default function BorrowedCheckModal({
-    checkId,
-    whichCheck,
+    cheque,
     open,
     // bu,
     handleClose,
 }: {
-    checkId: SelectionModelType;
+    cheque: { id: number; chequeId: number; type: string }[];
     open: boolean;
-    whichCheck: string;
     // bu: string;
     handleClose: () => void;
 }) {
@@ -62,9 +60,7 @@ export default function BorrowedCheckModal({
 
         transform((data) => ({
             ...data,
-            type: checkId.type,
-            ids: Array.from(checkId.ids), // convert Set to array
-            check: whichCheck,
+            cheques: cheque, // convert Set to array
         }));
 
         post(borrowCheck().url, {

@@ -263,7 +263,7 @@ export interface InertiaPagination<T> {
 export type SelectionModelType = {
     type: 'include';
     ids: Set<GridRowId>;
-    meta: Record<GridRowId, { taggedAt: string | null }>;
+    meta: Record<GridRowId, { type: 'cv' | 'crf', chequeId: number }>;
     // taggedAt: string | null
 };
 

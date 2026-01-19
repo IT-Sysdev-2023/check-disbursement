@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Invoice</title>
+     <style>
+        /* Apply to all table cells */
+        td {
+            word-wrap: break-word;
+            word-break: break-all; /* breaks even long words without spaces */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* ensures widths are respected */
+        }
+
+        th, td {
+            padding: 5px;
+        }
 </head>
 <body>
     <table class="w-full">
