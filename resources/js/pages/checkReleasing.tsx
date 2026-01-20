@@ -16,7 +16,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
-import { createReleasingCvColumns } from './checkReleasing/components/columns';
+import { createReleasingCvColumns } from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [

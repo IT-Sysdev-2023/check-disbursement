@@ -13,6 +13,7 @@ import {
     checkRequestForm,
     checkStatus,
     checkVoucher,
+    chequeRequests,
     closingChecks,
     forwardedCheckReleasing,
     forwardedReleasing,
@@ -26,7 +27,6 @@ import { Link, usePage } from '@inertiajs/react';
 import {
     Activity,
     Bell,
-    Bookmark,
     BookmarkX,
     BookOpen,
     Check,
@@ -34,6 +34,7 @@ import {
     ChevronRight,
     Database,
     FileSpreadsheet,
+    FolderCheck,
     Forward,
     Key,
     PackageOpen,
@@ -57,6 +58,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const scanning = roles.includes('scanning');
     const forwarded = roles.includes('forwarded');
     const closing = roles.includes('closing');
+    const sectionHead = roles.includes('sh');
 
     const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -90,8 +92,13 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       },
                   ]
                 : []),
-            ...(isAdmin || releasing
+            ...(isAdmin || sectionHead
                 ? [
+                      {
+                          title: 'Check Request',
+                          href: chequeRequests(),
+                          icon: FolderCheck,
+                      },
                       {
                           title: 'Check Releasing',
                           href: checkReleasing(),
@@ -108,14 +115,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       },
                   ]
                 : []),
-             ...(isAdmin || forwarded
+            ...(isAdmin || forwarded
                 ? [
                       {
                           title: 'Forwarded Check',
                           href: forwardedCheckReleasing(),
                           icon: Forward,
-                     },
-                    {
+                      },
+                      {
                           title: 'Check Releasing(Forwarded)',
                           href: forwardedReleasing(),
                           icon: Rocket,

@@ -25,7 +25,6 @@ class CheckReleasingService
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-        // $defaultCheck = $filters['selectedCheck'] ?? 'cv';
 
         $chequeRecords = BorrowedCheck::with('checkable')
             ->whereNotNull('approver_id')
@@ -43,7 +42,6 @@ class CheckReleasingService
 
         return Inertia::render('checkReleasing', [
             'cheques' => $chequeRecords,
-            // 'defaultCheck' => $defaultCheck,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -115,24 +113,6 @@ class CheckReleasingService
             ->handlePdf($data, 'releasingPdf');
 
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
-    }
-
-
-
-    public function cancelCheck(BorrowedCheck $id, Request $request)
-    {
-        $request->validate([
-            'reason' => 'required|string|max:255',
-        ]);
-
-        $id->checkable->checkStatus()
-            ->create([
-                'status' => 'cancel',
-                'cancelled_reason' => $request->reason,
-                'caused_by' => $request->user()->id,
-            ]);
-
-        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
     private static function chequeRecords(array $filters, string $defaultCheck)

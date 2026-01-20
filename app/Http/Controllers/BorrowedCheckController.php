@@ -11,10 +11,7 @@ class BorrowedCheckController extends Controller
     public function __construct(protected BorrowedCheckService $service)
     {
     }
-    public function index(Request $request)
-    {
-        return $this->service->borrowedChecks($request);
-    }
+  
     public function store(Request $request)
     {
         return $this->service->store($request);

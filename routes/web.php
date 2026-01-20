@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssignedCheckNumberController;
 use App\Http\Controllers\BorrowedCheckController;
 use App\Http\Controllers\CheckReleasingController;
+use App\Http\Controllers\CheckRequestController;
 use App\Http\Controllers\ClosingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
@@ -51,34 +52,40 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //! RETRIEVED CHECKS
     Route::prefix('retrieved-checks')->group(function () {
-        Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrievedRecords');
+        Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrieved-records');
 
-        Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrowerNames');
-        Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrowCheck');
-        Route::get('borrowed-checks', [BorrowedCheckController::class, 'index'])->name('borrowedChecks');
+        Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrower-names');
+        Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
 
-        Route::get('approver', [RetrievedChecksController::class, 'approver'])->name('approverNames');
-        Route::put('approve-check', [RetrievedChecksController::class, 'approveCheck'])->name('approveCheck');
-        Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('getLocation');
+        Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
         Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
 
         Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
         Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
         Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
-        Route::get('cv/details-signature/{id}', [CvController::class, 'signatureDetails'])->name('signatureDetails');
-        Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('detailsCrf');
+        Route::get('cv/details-signature/{id}', [CvController::class, 'signatureDetails'])->name('signature-details');
+        Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('details-crf');
     });
 
-    //! CHECK RELEASING
-    Route::prefix('check-releasing')->group(function () {
+    //! CHECK REQUESTS (SH)
+    Route::prefix('check-requests')->group(function () {
+        Route::get('index', [CheckRequestController::class, 'index'])->name('cheque-requests');
+        Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->name('borrowedChecks'); // display cheques from dropdown
+        Route::get('borrowed-number-cheques/{id}', [CheckRequestController::class, 'borrowedNumberCheques'])->name('borrowed-number-cheques'); // display number of cheques borrowed
+        Route::post('cancel-check', [CheckRequestController::class, 'cancelCheck'])->name('cancel-check');
 
+        Route::get('approver', [CheckRequestController::class, 'approver'])->name('approverNames');
+        Route::put('approve-check', [CheckRequestController::class, 'approveCheck'])->name('approveCheck');
+    });
+
+    //! CHECK RELEASING (SH)
+    Route::prefix('check-releasing')->group(function () {
         Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
+
         Route::get('release-check/{checkId}/{status}', [CheckReleasingController::class, 'show'])->name('release-check');
         Route::post('store-release-check/{id}', [CheckReleasingController::class, 'store'])->name('store-release-check');
-        Route::post('cancel-check/{id}', [CheckReleasingController::class, 'cancel'])->name('cancel-check');
 
-       
     });
 
     //Cebu & Manila
@@ -86,18 +93,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', [ForwardedCheckController::class, 'index'])->name('forwarded-check-releasing');
         Route::get('release-check/{id}/{status}', [ForwardedCheckController::class, 'showForwarded'])->name('release-check-forwarded');
         Route::post('store-release-check/{id}', [ForwardedCheckController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
-        Route::put('update-receiver-{id}', [ForwardedCheckController::class,'update'])->name('receiver-forwarded');
+        Route::put('update-receiver-{id}', [ForwardedCheckController::class, 'update'])->name('receiver-forwarded');
 
-        Route::get('releasing', [ForwardedCheckController::class,'forwardedReleasing'])->name('forwarded-releasing');
-         Route::post('cancel/{id}', [ForwardedCheckController::class,'cancelForwarded'])->name('cancel-forwarded');
+        Route::get('releasing', [ForwardedCheckController::class, 'forwardedReleasing'])->name('forwarded-releasing');
+        Route::post('cancel/{id}', [ForwardedCheckController::class, 'cancelForwarded'])->name('cancel-forwarded');
     });
 
     Route::prefix('closing-checks')->group(function () {
-        Route::get('index', [ClosingController::class,'index'])->name('closing-checks');
-        Route::post('mark-close/{id}', [ClosingController::class,'close'])->name('mark-as-close');
+        Route::get('index', [ClosingController::class, 'index'])->name('closing-checks');
+        Route::post('mark-close/{id}', [ClosingController::class, 'close'])->name('mark-as-close');
     });
 
-     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+    Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
 
     Route::get('report', [ReportController::class, 'index'])->name('report');
     Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');

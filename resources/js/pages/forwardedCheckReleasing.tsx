@@ -32,7 +32,7 @@ import TableFilter from '../components/tableFilter';
 import {
     createForwardedReleasingCvColumns,
     createReleasingCrfColumns,
-} from './checkReleasing/components/columns';
+} from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -87,7 +87,7 @@ export default function ForwardedCheckReleasing({
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string; stream?: string };
     };
-    
+
     useEffect(() => {
         if (flash?.status && flash?.stream) {
             setStream(flash.stream);

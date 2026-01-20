@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+import { GridRowId } from '@mui/x-data-grid';
 
 const style = {
     position: 'absolute',
@@ -23,17 +24,22 @@ export default function ReasonCancellationModal({
     open,
     handleClose,
 }: {
-    id: number;
+    id: GridRowId[];
     open: boolean;
     handleClose: () => void;
-}) {
-    const { setData, post, processing, errors, reset } = useForm({
+    }) {
+    const { setData, post, processing, errors, reset, transform } = useForm({
         reason: '',
     });
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        post(cancelCheck(id).url, {
+        transform((data) => ({
+            ...data,
+            ids: id, 
+        }));
+
+        post(cancelCheck().url, {
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {

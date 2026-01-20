@@ -19,6 +19,7 @@ class CheckReleasingController extends Controller
         return $this->service->index($request);
     }
 
+
     public function show(string $checkId, string $status)
     {
         return $this->service->getReleaseCheck($checkId, $status);
@@ -27,11 +28,6 @@ class CheckReleasingController extends Controller
     public function store(BorrowedCheck $id,  ReleasingCheckRequest $request)
     {
         return $this->service->storeReleaseCheck($id, $request);
-    }
-
-    public function cancel(BorrowedCheck $id, Request $request)
-    {
-       return $this->service->cancelCheck($id, $request);
     }
 
 }

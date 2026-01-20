@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Http\Requests\BorrowedCheckRequest;
+use App\Http\Resources\BorrowedCheckResource;
 use App\Models\BorrowedCheck;
 use App\Models\Borrower;
 use App\Models\Crf;
@@ -17,30 +18,6 @@ class BorrowedCheckService
 {
     public function __construct(protected FileHandler $fileHandler)
     {
-    }
-    public function borrowedChecks(Request $request)
-    {
-
-        $ids = BorrowedCheck::where('borrower_no', $request->borrowerNo)->pluck('checkable_id');
-
-        if ($request->check === 'cv') {
-            $records = CvCheckPayment::with('cvHeader', 'company')
-                ->select('check_date', 'check_amount', 'cv_check_payments.id', 'cv_header_id', 'companies.name as company_name', 'payee')
-                ->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
-                ->whereIn('cv_check_payments.id', $ids)
-                ->get()
-                ->each(function ($item) {
-                    $item->date = $item->check_date->toFormattedDateString();
-                    $item->check_amount = NumberHelper::currency($item->check_amount);
-                });
-        } else {
-            $records = Crf::select('id', 'crf', 'company', 'no', 'paid_to', 'particulars', 'amount', 'ck_no', 'prepared_by')
-                ->whereIn('id', $ids)
-                ->get()
-                ->append('formatted_amount');
-        }
-        return response()->json($records);
-
     }
 
     public function store(Request $request)

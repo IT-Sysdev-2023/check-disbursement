@@ -1,4 +1,4 @@
-import { details, detailsCrf } from '@/routes';
+import { details } from '@/routes';
 import { router } from '@inertiajs/react';
 import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
@@ -452,4 +452,3 @@ export const createForwardedCrfColumns = (
         },
     },
 ];
-

@@ -1,4 +1,4 @@
-import { approveCheck, approverNames, borrowedChecks } from '@/routes';
+import { approveCheck, borrowedChecks, borrowedNumberCheques } from '@/routes';
 import { Borrower, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -51,12 +51,13 @@ function Row(props: { row: Borrower }) {
             fetchBorrower();
         }
     }, [open, row.borrowerNoClean, row.check]);
-
+    console.log(borrowerData);
     const handleAction = async (borrowedNo: number) => {
-        setBorrowedId(borrowedNo);
-        const { data } = await axios.get(approverNames().url);
-        setApprover(data);
-        setOpenModal(true);
+        router.visit(borrowedNumberCheques(borrowedNo));
+        // setBorrowedId(borrowedNo);
+        // const { data } = await axios.get(approverNames().url);
+        // setApprover(data);
+        // setOpenModal(true);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -79,7 +80,6 @@ function Row(props: { row: Borrower }) {
             },
         );
     };
-
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -149,20 +149,28 @@ function Row(props: { row: Borrower }) {
                                                         component="th"
                                                         scope="row"
                                                     >
-                                                        {historyRow.date}
+                                                        {
+                                                            historyRow.checkable
+                                                                .checkDate
+                                                        }
                                                     </TableCell>
                                                     <TableCell>
                                                         {
-                                                            historyRow.check_amount
+                                                            historyRow.checkable
+                                                                .amount
                                                         }
                                                     </TableCell>
                                                     <TableCell align="right">
                                                         {
-                                                            historyRow.company_name
+                                                            historyRow.checkable
+                                                                .company
                                                         }
                                                     </TableCell>
                                                     <TableCell align="right">
-                                                        {historyRow.payee}
+                                                        {
+                                                            historyRow.checkable
+                                                                .payee
+                                                        }
                                                     </TableCell>
                                                 </TableRow>
                                             ),
@@ -195,7 +203,9 @@ function Row(props: { row: Borrower }) {
                                                         {historyRow.ck_no}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {historyRow.formatted_amount}
+                                                        {
+                                                            historyRow.formatted_amount
+                                                        }
                                                     </TableCell>
                                                     <TableCell align="right">
                                                         {historyRow.company}
@@ -243,7 +253,6 @@ export default function BorrowedTableGrid({
         _: MouseEvent<HTMLButtonElement> | null,
         newPage: number,
     ) => {
-        console.log(_);
         const page = newPage + 1;
         const per_page = data.meta.per_page;
 
@@ -278,9 +287,17 @@ export default function BorrowedTableGrid({
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {data?.data.map((row) => (
-                            <Row key={row.borrowerNo} row={row} />
-                        ))}
+                        {data?.data?.length ? (
+                            data.data.map((row) => (
+                                <Row key={row.borrowerNo} row={row} />
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center">
+                                    No records found
+                                </TableCell>
+                            </TableRow>
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>

@@ -23,7 +23,7 @@ import TableFilter from '../components/tableFilter';
 import {
     createForwardedCrfColumns,
     createForwardedCvColumns,
-} from './checkReleasing/components/columns';
+} from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 
@@ -109,7 +109,11 @@ export default function ForwardedCheck({
         });
     };
 
-    const handleStatusChange = (checkStatusId: number, value: string, checkId: number) => {
+    const handleStatusChange = (
+        checkStatusId: number,
+        value: string,
+        checkId: number,
+    ) => {
         if (value === 'view') {
             router.visit(signatureDetails(checkId));
             return;

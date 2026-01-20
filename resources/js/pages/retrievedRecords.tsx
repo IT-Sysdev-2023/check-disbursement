@@ -4,7 +4,6 @@ import {
     ActionHandler,
     ActionType,
     Auth,
-    Borrower,
     ChequeType,
     DateFilterType,
     DistinctMonths,
@@ -29,7 +28,6 @@ import { HandCoins } from 'lucide-react';
 import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
-import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import AssignCdModal from './retrievedRecords/components/assignCdModal';
@@ -53,7 +51,6 @@ export default function RetrievedRecords({
     filter,
     company,
     distinctMonths,
-    borrowed,
     manageChecks,
     auth,
 }: {
@@ -64,7 +61,6 @@ export default function RetrievedRecords({
         tab: string;
     };
     cheques: InertiaPagination<ChequeType>;
-    borrowed: InertiaPagination<Borrower>;
     distinctMonths: DistinctMonths;
     company: SelectionType[];
     manageChecks: InertiaPagination<ManageChecks>;
@@ -72,7 +68,6 @@ export default function RetrievedRecords({
 }) {
     const [open, setOpen] = useState(false);
     const [openProgress, setOpenProgress] = useState(false);
-    const [tableLoading, setTableLoading] = useState(false);
     const [openTagModal, setOpenTagModal] = useState(false);
     const [openAssignCnModal, setOpenAssignCnModal] = useState(false);
     const [openAssignCdModal, setOpenAssignCdModal] = useState(false);
@@ -231,7 +226,6 @@ export default function RetrievedRecords({
                                     value="calendar"
                                 />
                                 <Tab label="Table View" value="cheques" />
-                                <Tab label="Borrowed Checks" value="borrowed" />
                                 <Tab
                                     label="Manage Checks"
                                     value="manageChecks"
@@ -252,7 +246,7 @@ export default function RetrievedRecords({
                             <TableDataGrid
                                 data={cheques}
                                 filter={filter.search}
-                                hasSelection={true}
+                                hasSelection
                                 // hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
                                 // selectionModel={selectionModel}
                                 handleSelectionChange={handleSelectionChange}
@@ -261,7 +255,6 @@ export default function RetrievedRecords({
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
                                 columns={chequeColumns}
-                                isLoading={tableLoading}
                             />
 
                             <Box
@@ -271,7 +264,6 @@ export default function RetrievedRecords({
                             >
                                 <Button
                                     disabled={
-                                        // hasEmptyCheckNumber ||
                                         !enableButton
                                     }
                                     variant="outlined"
@@ -282,10 +274,9 @@ export default function RetrievedRecords({
                                 </Button>
                             </Box>
                         </TabPanel>
-                        <TabPanel value="borrowed">
-                            {/* DATE PICKER ONLY FOR FILTERING*/}
+                        {/* <TabPanel value="borrowed">
                             <BorrowedTableGrid data={borrowed} />
-                        </TabPanel>
+                        </TabPanel> */}
 
                         <TabPanel value="manageChecks">
                             <TableFilter
@@ -302,7 +293,6 @@ export default function RetrievedRecords({
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
                                 columns={manageCvColumns}
-                                isLoading={tableLoading}
                             />
 
                             <Box

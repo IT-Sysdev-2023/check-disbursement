@@ -25,12 +25,7 @@ class ChecksService
         $defaultCheck = $filters['selectedCheck'] ?? 'cv';
         $tab = $filters['tab'] ?? 'calendar';
 
-        // $isCvHasNoCheckNumber = self::checkIfHasNoCheckNumber();
-        // $isCrfHasNoCheckDate = self::checkIfHasCheckDate();
-
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters));
-
-        $borrowedRecords = self::borrowedRecords($tab, $defaultCheck);
 
         $manageChecks = BorrowedCheck::with('checkable', 'approver')
             ->whereNotNull('approver_id')
@@ -46,9 +41,7 @@ class ChecksService
             ->toResourceCollection();
 
         return Inertia::render('retrievedRecords', [
-
             'cheques' => $chequeRecords,
-            'borrowed' => $borrowedRecords,
             'manageChecks' => $manageChecks,
             'defaultCheck' => $defaultCheck,
             'filter' => (object) [
@@ -64,7 +57,6 @@ class ChecksService
                 'label' => 'All',
                 'value' => '0'
             ]),
-            // 'hasEmptyCheckNumber' => $isCvHasNoCheckNumber,
             'distinctMonths' => self::distinctMonths()
         ]);
     }
@@ -128,13 +120,14 @@ class ChecksService
     public function approveCheck(Request $request)
     {
         $request->validate([
-            'borrowedNo' => ['required', 'integer'],
+            'borrowedNo' => ['required', 'array'],
             'approver' => ['required', 'integer'],
         ]);
-        BorrowedCheck::where('borrower_no', $request->borrowedNo)
+        
+        $isSuccess = BorrowedCheck::whereIn('id', $request->borrowedNo)
             ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
 
-        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Approved']);
+        return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
     }
 
     public function getLocation()
@@ -163,27 +156,7 @@ class ChecksService
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
     }
 
-    public function borrowedRecords(string $tab, string $selectedCheck)
-    {
-        $loader = fn() => BorrowedCheck::select(
-            'borrower_no',
-            'reason',
-            'checkable_type',
-            'borrowers.name as borrower_name',
-            DB::raw('COUNT(*) as total_checks'),
-            DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
-        )
-            ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
-            ->whereNull('approver_id')
-            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrowers.name', 'checkable_type')
-            ->orderByDesc('borrower_no')
-            ->paginate(5)
-            ->withQueryString()
-            ->toResourceCollection();
 
-        return $tab === 'borrowed' ? $loader()
-            : Inertia::lazy($loader);
-    }
     private static function distinctMonths()
     {
         return CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))

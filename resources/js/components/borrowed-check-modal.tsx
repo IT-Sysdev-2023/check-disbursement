@@ -24,19 +24,15 @@ const style = {
 export default function BorrowedCheckModal({
     cheque,
     open,
-    // bu,
     handleClose,
 }: {
     cheque: { id: number; chequeId: number; type: string }[];
     open: boolean;
-    // bu: string;
     handleClose: () => void;
 }) {
     const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
         [],
     );
-
-    // const [borrower, setBorrower] = useState('');
 
     const { data, setData, post, processing, errors, transform, reset } =
         useForm({
@@ -55,12 +51,13 @@ export default function BorrowedCheckModal({
 
         fetchBorrower();
     }, []);
+    
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         transform((data) => ({
             ...data,
-            cheques: cheque, // convert Set to array
+            cheques: cheque,
         }));
 
         post(borrowCheck().url, {
@@ -102,13 +99,6 @@ export default function BorrowedCheckModal({
                     >
                         Borrower Info
                     </Typography>
-                    {/* <Typography
-                        id="modal-modal-title"
-                        variant="h6"
-                        component="h2"
-                    >
-                        Business Unit: {bu}
-                    </Typography> */}
 
                     <form onSubmit={handleSubmit}>
                         <Grid
@@ -117,18 +107,6 @@ export default function BorrowedCheckModal({
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
                             <Grid size={{ xs: 12, sm: 12 }}>
-                                {/* <TextField
-                                    type="text"
-                                    value={data.name ?? ''}
-                                    onChange={(e) =>
-                                        setData('name', e.target.value)
-                                    }
-                                    name="name"
-                                    label="Borrower Name"
-                                    error={!!errors.name}
-                                    helperText={errors.name ?? ' '}
-                                    fullWidth
-                                /> */}
                                 <SelectItem
                                     handleChange={handleChange}
                                     value={data.name}

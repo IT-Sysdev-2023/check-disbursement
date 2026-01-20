@@ -1,4 +1,4 @@
-import { ChequeType, Crf, Cv, InertiaPagination, ManageChecks } from '@/types';
+import { Borrower, ChequeType, Crf, Cv, InertiaPagination, ManageChecks } from '@/types';
 import {
     DataGrid,
     gridClasses,
@@ -15,7 +15,7 @@ export default function TableDataGrid({
     data,
     columns,
     pagination,
-    isLoading,
+    isLoading = false,
     filter,
     handleSearchFilter,
     handleSortFilter,
@@ -23,9 +23,9 @@ export default function TableDataGrid({
     hasSelection = false,
     handleSelectionChange,
 }: {
-    data: InertiaPagination<Cv | Crf | ManageChecks | ChequeType>;
+    data: InertiaPagination<Cv | Crf | ManageChecks | ChequeType | Borrower>;
     columns: GridColDef[];
-    isLoading: boolean;
+    isLoading?: boolean;
     hasSelection?: boolean;
     filter?: string;
     density?: GridDensity;
