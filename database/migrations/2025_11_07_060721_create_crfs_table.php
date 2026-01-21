@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('filename');
             $table->string('crf')->nullable();
-            $table->string('company');
+            $table->string('company_office');
             $table->unsignedBigInteger('no');
             $table->string('location');
             $table->dateTime('date')->nullable();

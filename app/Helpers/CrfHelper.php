@@ -145,7 +145,7 @@ class CrfHelper
             'causer_id' => $userId,
             'filename' => $this->filename,
             'crf' => $this->crf,
-            'company' => $this->company,
+            'company_office' => $this->company,
             'no' => $this->no,
             'location' => $this->location,
             'date' => $this->date,

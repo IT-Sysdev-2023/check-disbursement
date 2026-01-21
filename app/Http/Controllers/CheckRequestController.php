@@ -109,7 +109,6 @@ class CheckRequestController extends Controller
             'reason' => 'required|string|max:255',
             'ids' => 'required|array',
         ]);
-
         BorrowedCheck::whereIn('id', $request->ids)
             ->chunkById(100, function ($checks) use ($request) {
                 foreach ($checks as $check) {

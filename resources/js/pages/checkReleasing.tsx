@@ -102,7 +102,7 @@ console.log(cheques);
 
                 {id && (
                     <ReasonCancellationModal
-                        id={id}
+                        id={[id]}
                         open={open}
                         handleClose={() => {
                             setOpen(false);

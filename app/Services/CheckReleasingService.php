@@ -59,7 +59,7 @@ class CheckReleasingService
 
     public function getReleaseCheck(string $checkId, string $status)
     {
-        return Inertia::render('checkReleasing/releaseCheck', [
+        return Inertia::render('chequeReleasing/releaseCheck', [
             'id' => $checkId,
             'status' => $status,
             'label' => Str::title($status) . ' Check'

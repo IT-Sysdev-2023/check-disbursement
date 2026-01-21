@@ -24,7 +24,7 @@ export default function ReasonCancellationModal({
     open,
     handleClose,
 }: {
-    id: GridRowId[];
+    id: GridRowId[] | number;
     open: boolean;
     handleClose: () => void;
     }) {

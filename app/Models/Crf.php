@@ -32,7 +32,7 @@ class Crf extends Model
     protected function getCompany(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->company,
+            get: fn() => $this->company?->name,
         );
     }
 
