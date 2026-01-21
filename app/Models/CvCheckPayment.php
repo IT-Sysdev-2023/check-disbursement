@@ -95,7 +95,7 @@ class CvCheckPayment extends Model
             'check_date',
             'companies.name as company_name',
             'check_amount as amount',
-            'payee',
+            'cv_check_payments.payee',
             'tagged_at',
             DB::raw("'cv' as type"),
             'cv_check_payments.created_at'
@@ -149,6 +149,7 @@ class CvCheckPayment extends Model
                     });
             });
     }
+
     public function cvHeader()
     {
         return $this->belongsTo(CvHeader::class);

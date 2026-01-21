@@ -30,12 +30,13 @@ import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import AssignAmountPayeeModal from './retrievedRecords/components/assignAmountPayeeModal';
 import AssignCdModal from './retrievedRecords/components/assignCdModal';
 import AssignCnModal from './retrievedRecords/components/assignCnModal';
 import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createChequeColumns,
-    createManageCvColumns,
+    createManageColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
 
@@ -71,18 +72,20 @@ export default function RetrievedRecords({
     const [openTagModal, setOpenTagModal] = useState(false);
     const [openAssignCnModal, setOpenAssignCnModal] = useState(false);
     const [openAssignCdModal, setOpenAssignCdModal] = useState(false);
+    const [openInputDetails, setOpenInputDetails] = useState(false);
+    const [scannedId, setScannedId] = useState<number>();
     const [currentTab, setCurrentTab] = useState(filter.tab);
     const [selectedLocation, setSelectedLocation] = useState('');
     const [location, setLocation] = useState<
         { label: string; value: string }[]
     >([]);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
-
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
 
     const notifications = useNotifications();
+
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
@@ -116,7 +119,7 @@ export default function RetrievedRecords({
                 chequeId: row.chequeId,
                 type: row.type,
             }));
-        
+
         setSelectedRows(selectedR);
     };
 
@@ -151,18 +154,6 @@ export default function RetrievedRecords({
     const handleStatusChange = (value: ActionType, data: ChequeType) => {
         const handler = actionHandlers[value];
         if (handler) handler(data);
-    };
-
-    const chequeColumns = createChequeColumns(handleStatusChange);
-    const manageCvColumns = createManageCvColumns();
-
-    const handleClose = () => {
-        setOpen(false);
-        // setSelectionModel({
-        //     type: 'include',
-        //     ids: new Set(),
-        //     meta: {},
-        // });
     };
 
     const handleSyncScanned = () => {
@@ -201,15 +192,20 @@ export default function RetrievedRecords({
             },
             {
                 preserveScroll: true,
-                onError: (e) => {
-                    console.log(e);
-                },
                 onSuccess: () => {
                     setOpenTagModal(false);
                 },
             },
         );
     };
+
+    const handleUpdateScanned = (id: number) => {
+            setOpenInputDetails(true);
+            setScannedId(id);
+    };
+
+    const chequeColumns = createChequeColumns(handleStatusChange);
+    const manageCvColumns = createManageColumns(handleUpdateScanned);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -247,10 +243,7 @@ export default function RetrievedRecords({
                                 data={cheques}
                                 filter={filter.search}
                                 hasSelection
-                                // hasSelection={!hasEmptyCheckNumber} //remove selection if there is no check number
-                                // selectionModel={selectionModel}
                                 handleSelectionChange={handleSelectionChange}
-                                // handleRowClickSelection={handleRowSelection}
                                 pagination={handlePagination}
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
@@ -263,9 +256,7 @@ export default function RetrievedRecords({
                                 mt={3}
                             >
                                 <Button
-                                    disabled={
-                                        !enableButton
-                                    }
+                                    disabled={!enableButton}
                                     variant="outlined"
                                     startIcon={<HandCoins />}
                                     onClick={() => setOpen(true)}
@@ -288,7 +279,6 @@ export default function RetrievedRecords({
                             <TableDataGrid
                                 data={manageChecks}
                                 filter={filter.search}
-                                hasSelection={false} //remove selection if there is no check number
                                 pagination={handlePagination}
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
@@ -316,7 +306,7 @@ export default function RetrievedRecords({
             <BorrowedCheckModal
                 cheque={selectedRows}
                 open={open}
-                handleClose={handleClose}
+                handleClose={() => setOpen(false)}
             />
             {chequeData && (
                 <AssignCnModal
@@ -333,6 +323,15 @@ export default function RetrievedRecords({
                     open={openAssignCdModal}
                     chequeData={chequeData}
                     onClose={() => setOpenAssignCdModal(false)}
+                />
+            )}
+
+            {scannedId && (
+                <AssignAmountPayeeModal
+                    id={scannedId}
+                    title="Check Details"
+                    open={openInputDetails}
+                    onClose={() => setOpenInputDetails(false)}
                 />
             )}
 

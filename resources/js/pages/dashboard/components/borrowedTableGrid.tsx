@@ -1,4 +1,4 @@
-import { approveCheck, borrowedChecks, borrowedNumberCheques } from '@/routes';
+import { borrowedChecks, borrowedNumberCheques } from '@/routes';
 import { Borrower, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -18,20 +18,11 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { ArrowBigRightDash } from 'lucide-react';
 import { MouseEvent, useEffect, useState } from 'react';
-import OnlySelectionModal from './onlySelectionModal';
 
 function Row(props: { row: Borrower }) {
     const { row } = props;
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
-
-    const [approver, setApprover] = useState<
-        { label: string; value: string }[]
-    >([]);
-
-    const [openModal, setOpenModal] = useState(false);
-    const [selectedApprover, setSelectedApprover] = useState('');
-    const [borrowedId, setBorrowedId] = useState<number | null>(null);
 
     useEffect(() => {
         if (open) {
@@ -51,34 +42,9 @@ function Row(props: { row: Borrower }) {
             fetchBorrower();
         }
     }, [open, row.borrowerNoClean, row.check]);
-    console.log(borrowerData);
+
     const handleAction = async (borrowedNo: number) => {
         router.visit(borrowedNumberCheques(borrowedNo));
-        // setBorrowedId(borrowedNo);
-        // const { data } = await axios.get(approverNames().url);
-        // setApprover(data);
-        // setOpenModal(true);
-    };
-
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!borrowedId) return;
-        router.put(
-            approveCheck(),
-            {
-                approver: selectedApprover,
-                borrowedNo: borrowedId,
-            },
-            {
-                onError: (e) => {
-                    console.log(e);
-                },
-                onSuccess: (e) => {
-                    console.log(e);
-                    setOpenModal(false);
-                },
-            },
-        );
     };
     return (
         <>
@@ -178,66 +144,11 @@ function Row(props: { row: Borrower }) {
                                     </TableBody>
                                 </Table>
                             )}
-                            {row.check == 'crf' && (
-                                <Table size="small" aria-label="cv">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Amount</TableCell>
-                                            <TableCell>Check No</TableCell>
-                                            <TableCell align="right">
-                                                Company
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                CRF No
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                Paid To
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {borrowerData[row.borrowerNoClean]?.map(
-                                            (historyRow) => (
-                                                <TableRow key={historyRow.id}>
-                                                    <TableCell>
-                                                        {historyRow.ck_no}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {
-                                                            historyRow.formatted_amount
-                                                        }
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {historyRow.company}
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {historyRow.crf}
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {historyRow.paid_to}
-                                                    </TableCell>
-                                                </TableRow>
-                                            ),
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            )}
                         </Box>
                     </Collapse>
                 </TableCell>
             </TableRow>
 
-            <OnlySelectionModal
-                title="Approver Name"
-                open={openModal}
-                onClose={() => setOpenModal(false)}
-                handleSubmit={handleSubmit}
-                handleSelectedItem={(event) =>
-                    setSelectedApprover(event.target.value)
-                }
-                selectedItem={selectedApprover}
-                item={approver}
-            />
         </>
     );
 }

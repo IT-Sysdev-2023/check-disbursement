@@ -36,15 +36,6 @@ class BorrowedCheck extends Model
         return $this->belongsTo(CvCheckPayment::class, 'checkable_id');
     }
 
-    public function checkRelation(string $type)
-    {
-        return match ($type) {
-            'cv' => $this->cvCheckPayment(),
-            'crf' => $this->crf(),
-            default => null,
-        };
-    }
-
     public function checkable()
     {
         return $this->morphTo();

@@ -23,7 +23,12 @@ class Crf extends Model
         ];
 
     }
-
+ public function getScanned()
+    {
+        $d = ScannedRecords::where('check_number', $this->ck_no)->first();
+        dd($d);
+        // return Scanned
+    }
     protected function getLocation(): Attribute
     {
         return new Attribute(
@@ -79,7 +84,7 @@ class Crf extends Model
             'ck_no as check_number',
             'resolved_check_date as check_date',
             'companies.name as company_name',
-            'amount',
+            'crfs.amount',
             'paid_to as payee',
             'tagged_at',
             DB::raw("'crf' as type"),

@@ -1,6 +1,7 @@
-import { ActionType, ChequeType } from '@/types';
-import { Box, Chip, MenuItem, Select } from '@mui/material';
+import { ActionType, ChequeType, ManageChecks } from '@/types';
+import { Box, Chip, IconButton, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
+import { ArrowBigRightDash } from 'lucide-react';
 import { JSX } from 'react';
 
 const renderStatus = (
@@ -33,10 +34,7 @@ const renderStatus = (
 };
 
 export const createChequeColumns = (
-    handleStatusChange: (
-        value: ActionType,
-        type: ChequeType,
-    ) => void,
+    handleStatusChange: (value: ActionType, type: ChequeType) => void,
 ): GridColDef[] => [
     {
         field: 'checkNumber',
@@ -147,20 +145,20 @@ export const createChequeColumns = (
     },
 ];
 
-export const createManageCvColumns = (): GridColDef[] => [
+export const createManageColumns = (
+    handleAction: (rec: number) => void,
+): GridColDef[] => [
     {
-        field: 'cvNo',
-        headerName: 'CV Number',
+        field: 'checkNumber',
+        headerName: 'Check Number',
         minWidth: 150,
-        renderCell: ({ row }) => row.checkable.cvHeader?.cvNo,
     },
     {
-        field: 'cvDate',
-        headerName: 'Cv Date',
+        field: 'checkDate',
+        headerName: 'Check Date',
         headerAlign: 'right',
         align: 'right',
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.cvHeader?.cvDate,
     },
     {
         field: 'payee',
@@ -168,15 +166,13 @@ export const createManageCvColumns = (): GridColDef[] => [
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        renderCell: ({ row }) => row.checkable.payee,
     },
     {
-        field: 'name',
+        field: 'companyName',
         headerName: 'Business Unit',
         headerAlign: 'center',
         align: 'center',
         flex: 1,
-        renderCell: ({ row }) => row.checkable.company,
     },
     {
         field: 'status',
@@ -206,6 +202,28 @@ export const createManageCvColumns = (): GridColDef[] => [
                 <Chip label="Scanned" color="success" size="small" />
             ) : (
                 <Chip label="Not Scanned" color="error" size="small" />
+            );
+        },
+    },
+    {
+        field: 'actions',
+        headerName: 'Action',
+        width: 130,
+        align: 'center',
+        headerAlign: 'center',
+        sortable: false,
+        renderCell: ({ row }) => {
+            if (row.scannedPayee && row.scannedAmount) {
+                return null;
+            }
+            return (
+                <IconButton
+                    size="small"
+                    color="primary"
+                    onClick={() => handleAction(row.scannedId)}
+                >
+                    <ArrowBigRightDash />
+                </IconButton>
             );
         },
     },

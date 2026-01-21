@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\ScanProgress;
+use App\Http\Resources\ScannedRecordResource;
 use App\Models\ScannedRecords;
 use App\Services\ScannedRecordsService;
 use Illuminate\Http\Request;
@@ -16,12 +17,13 @@ class ScannedRecordsController extends Controller
      * Display a listing of the resource.
      */
 
-    public function __construct(protected ScannedRecordsService $service){
+    public function __construct(protected ScannedRecordsService $service)
+    {
 
     }
     public function index()
     {
-        
+
     }
 
     /**
@@ -31,44 +33,20 @@ class ScannedRecordsController extends Controller
     {
         return $this->service->scan($request->user()->id);
     }
-    
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function getScannedRecords(ScannedRecords $id)
     {
-        //
+        return response()->json(new ScannedRecordResource($id));
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(ScannedRecords $scannedRecords)
+    public function update(ScannedRecords $id, Request $request)
     {
-        //
+        $status = $id->update(['amount' => $request->amount, 'payee' => $request->payee]);
+
+         return redirect()->back()->with(['status' => $status, 'message' => $status ? 'Successfully Updated' : 'Update Failed!']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ScannedRecords $scannedRecords)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, ScannedRecords $scannedRecords)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ScannedRecords $scannedRecords)
-    {
-        //
-    }
 }

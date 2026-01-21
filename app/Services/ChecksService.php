@@ -3,12 +3,14 @@
 namespace App\Services;
 
 use App\Http\Resources\ChequeCollection;
+use App\Http\Resources\ChequeResource;
 use App\Models\Approver;
 use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -27,22 +29,41 @@ class ChecksService
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters));
 
-        $manageChecks = BorrowedCheck::with('checkable', 'approver')
-            ->whereNotNull('approver_id')
-            ->whereHasMorph(
-                'checkable',
-                [CvCheckPayment::class, Crf::class],
-                function (Builder $query) {
-                    $query->leftJoinScanRecords();
-                }
+        // LAST OPTION : JOIN TYPE AND CHECKABLE
+        $cv = CvCheckPayment::whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
+            ->baseColumns()
+            ->leftJoinScanRecords()
+            ->addSelect(
+                'scanned_records.id as scanned_id',
+                'scanned_records.payee as scanned_payee',
+                'scanned_records.amount as scanned_amount'
+            );
+
+        $crf = Crf::whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
+            ->baseColumns()
+            ->leftJoinScanRecords()
+            ->addSelect(
+                'scanned_records.id as scanned_id',
+                'scanned_records.payee as scanned_payee',
+                'scanned_records.amount as scanned_amount'
+            );
+
+        $unionQuery = $cv->unionAll($crf);
+
+        $rec = DB::query()
+            ->fromSub(
+                DB::query()
+                    ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
+                    ->fromSub($unionQuery, 'merged'),
+                'final'
             )
+            ->orderByDesc('created_at')
             ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
+            ->withQueryString();
 
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
-            'manageChecks' => $manageChecks,
+            'manageChecks' => new ChequeCollection($rec),
             'defaultCheck' => $defaultCheck,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
@@ -123,7 +144,7 @@ class ChecksService
             'borrowedNo' => ['required', 'array'],
             'approver' => ['required', 'integer'],
         ]);
-        
+
         $isSuccess = BorrowedCheck::whereIn('id', $request->borrowedNo)
             ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
 

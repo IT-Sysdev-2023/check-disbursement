@@ -263,7 +263,7 @@ export interface InertiaPagination<T> {
 export type SelectionModelType = {
     type: 'include';
     ids: Set<GridRowId>;
-    meta: Record<GridRowId, { type: 'cv' | 'crf', chequeId: number }>;
+    meta: Record<GridRowId, { type: 'cv' | 'crf'; chequeId: number }>;
     // taggedAt: string | null
 };
 
@@ -278,6 +278,19 @@ export interface ProgressState {
         buffer: number;
         message: string;
     };
+}
+
+export interface ScannedRecords {
+    id: number;
+    accountNo: string;
+    amount: number;
+    branchCode: string;
+    branchName: string;
+    bu: string;
+    checkNo: string;
+    payee: string;
+    postedDate: string;
+    seq: string;
 }
 
 export interface EventType {

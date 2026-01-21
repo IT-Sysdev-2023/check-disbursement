@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('branch_code');
             $table->string('branch_name');
             $table->decimal('amount', 20);
+            $table->string('payee')->nullable();
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
