@@ -206,7 +206,6 @@ export default function RetrievedRecords({
 
     const chequeColumns = createChequeColumns(handleStatusChange);
     const manageCvColumns = createManageColumns(handleUpdateScanned);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">

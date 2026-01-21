@@ -28,7 +28,8 @@ class ChequeResource extends JsonResource
             'type' => $this->type,
             'createdAt' => $this->created_at,
 
-            'scannedId' => $this->scanned_id ??null,
+            'approversName' => $this->approver_name ?? null,
+            'scannedId' => $this->scanned_id ?? null,
             'scannedPayee' => $this->scanned_payee ?? null,
             'scannedAmount' => $this->scanned_amount ?? null,
         ];

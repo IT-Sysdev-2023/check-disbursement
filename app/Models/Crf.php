@@ -23,7 +23,7 @@ class Crf extends Model
         ];
 
     }
- public function getScanned()
+    public function getScanned()
     {
         $d = ScannedRecords::where('check_number', $this->ck_no)->first();
         dd($d);
@@ -41,7 +41,7 @@ class Crf extends Model
             get: fn() => $this->company,
         );
     }
-    
+
     protected function formattedAmount(): Attribute
     {
         return Attribute::make(
@@ -101,10 +101,14 @@ class Crf extends Model
     }
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
-        return $builder->leftJoin('scanned_records', function ($join) {
-            $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
-                ->on('scanned_records.amount', '=', 'crfs.amount');
-        });
+        return $builder->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'crfs.id')
+            ->join('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
+            ->where('borrowed_checks.checkable_type', 'crf')
+            ->whereNotNull('borrowed_checks.approver_id')
+            ->leftJoin('scanned_records', function ($join) {
+                $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
+                    ->on('scanned_records.amount', '=', 'crfs.amount');
+            });
     }
 
     public function tagLocation()

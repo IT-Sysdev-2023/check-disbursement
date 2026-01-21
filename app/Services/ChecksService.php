@@ -30,10 +30,11 @@ class ChecksService
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters));
 
         // LAST OPTION : JOIN TYPE AND CHECKABLE
-        $cv = CvCheckPayment::whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
-            ->baseColumns()
+        $cv = CvCheckPayment::
+            baseColumns()
             ->leftJoinScanRecords()
             ->addSelect(
+                'approvers.name as approver_name',
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'
@@ -43,6 +44,7 @@ class ChecksService
             ->baseColumns()
             ->leftJoinScanRecords()
             ->addSelect(
+                'approvers.name as approver_name',
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'

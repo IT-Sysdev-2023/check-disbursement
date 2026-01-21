@@ -1,4 +1,4 @@
-import { ActionType, ChequeType, ManageChecks } from '@/types';
+import { ActionType, ChequeType } from '@/types';
 import { Box, Chip, IconButton, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { ArrowBigRightDash } from 'lucide-react';
@@ -174,21 +174,20 @@ export const createManageColumns = (
         align: 'center',
         flex: 1,
     },
-    {
-        field: 'status',
-        headerName: 'Approve Status',
-        renderCell: () => {
-            return <Chip label="Approved" color="success" size="small" />;
-        },
-    },
+    // {
+    //     field: 'status',
+    //     headerName: 'Approve Status',
+    //     renderCell: () => {
+    //         return <Chip label="Approved" color="success" size="small" />;
+    //     },
+    // },
 
     {
-        field: 'approvedBy',
+        field: 'approversName',
         headerName: 'Approved By',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        renderCell: ({ row }) => row.approver?.name,
     },
     {
         field: 'syncStatus',
@@ -214,7 +213,7 @@ export const createManageColumns = (
         sortable: false,
         renderCell: ({ row }) => {
             if (row.scannedPayee && row.scannedAmount) {
-                return null;
+                return <Chip label="Completed" color="secondary" size="small" />;
             }
             return (
                 <IconButton
