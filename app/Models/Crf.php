@@ -96,7 +96,8 @@ class Crf extends Model
     {
         return $builder->join('scanned_records', function ($join) {
             $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
-                ->on('scanned_records.amount', '=', 'crfs.amount');
+                ->on('scanned_records.amount', '=', 'crfs.amount')
+                ->whereNotNull('scanned_records.payee');
         });
     }
     public function scopeLeftJoinScanRecords(Builder $builder)

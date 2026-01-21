@@ -59,7 +59,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
         Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
-        
+
         Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
         Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');
         Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
@@ -108,6 +108,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+    Route::get('scanned-records-amount-checkNo', [StatusController::class, 'scannedRecordsAmountCheckNo'])->name('scanned-records-amount-checkNo');
 
     Route::get('report', [ReportController::class, 'index'])->name('report');
     Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');

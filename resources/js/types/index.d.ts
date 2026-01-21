@@ -141,6 +141,8 @@ export interface Cv {
     cvHeader?: CvHeader;
     borrowedCheck: BorrowedCheck;
     checkStatus: CheckStatus;
+    amount: string;
+    bank: string;
     created_at: string;
     updated_at: string;
 }
@@ -291,6 +293,13 @@ export interface ScannedRecords {
     payee: string;
     postedDate: string;
     seq: string;
+}
+
+export interface CheckScannedDetails {
+    id: number;
+    type: 'cv' | 'crf';
+    amount: string;
+    checkNumber: string;
 }
 
 export interface EventType {

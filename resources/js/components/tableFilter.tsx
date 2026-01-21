@@ -15,26 +15,16 @@ import { PickerValue } from '@mui/x-date-pickers/internals';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
-const checks = [
-    { value: 'cv', label: 'CV' },
-    { value: 'crf', label: 'CRF' },
-];
-
 export default function ({
     company,
-    handleChangeCheck,
-    isCheckDisabled = false,
     filters,
-    currentTab,
 }: {
     company: SelectionType[];
     filters: {
         selectedBu: string;
         date: DateFilterType;
     };
-    isCheckDisabled?: boolean;
-    currentTab: string;
-    handleChangeCheck: (value: SelectChangeEvent) => void;
+    handleChangeCheck?: (value: SelectChangeEvent) => void;
 }) {
     const [bu, setBu] = useState<string>(filters.selectedBu);
     const [startDate, setStartDate] = useState<Dayjs | null>(
@@ -47,7 +37,6 @@ export default function ({
     const handleChange = (event: SelectChangeEvent) => {
         setBu(event.target.value);
         router.reload({
-            only: [currentTab],
             data: {
                 bu: event.target.value,
             },
@@ -72,7 +61,6 @@ export default function ({
                         end: endDate.format('YYYY-MM-DD'),
                     },
                 },
-                only: [currentTab],
                 replace: true,
             });
         }
@@ -80,7 +68,6 @@ export default function ({
 
     const handleReset = () => {
         router.reload({
-            only: [currentTab],
             data: {
                 date: null,
             },

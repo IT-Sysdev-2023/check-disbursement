@@ -89,6 +89,7 @@ export default function RetrievedRecords({
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
+    
     useEffect(() => {
         if (flash?.message) {
             notifications.show(flash.message, {

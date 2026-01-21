@@ -30,6 +30,7 @@ class ChecksService
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters));
 
         // LAST OPTION : JOIN TYPE AND CHECKABLE
+        // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
         $cv = CvCheckPayment::
             baseColumns()
             ->leftJoinScanRecords()

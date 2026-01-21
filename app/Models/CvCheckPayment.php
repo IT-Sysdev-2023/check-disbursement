@@ -109,6 +109,7 @@ class CvCheckPayment extends Model
         return $builder
             ->join('scanned_records', function ($join) {
                 $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
+                    ->whereNotNull('scanned_records.payee')
                     ->where(function ($q) {
                         $q->where(function ($q) {
                             $q->where('cv_check_payments.check_number', '!=', 0)

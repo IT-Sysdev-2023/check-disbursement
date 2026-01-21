@@ -19,7 +19,7 @@ class CheckStatusResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "status" => Str::title($this->status),
+            "status" => $this->status,
             "receiversName" => $this->receivers_name,
             "receivedBy" => $this->received_by,
             'image' => $this->image

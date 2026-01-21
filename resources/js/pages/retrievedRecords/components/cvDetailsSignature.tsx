@@ -9,10 +9,9 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
-import dayjs from 'dayjs';
 
 export default function CvDetailsSignature({ details }: { details: Cv }) {
-
+    console.log(details);
     return (
         <Box sx={{ flexGrow: 1, width: '100%' }}>
             <Grid container spacing={2} sx={{ width: '100%' }}>
@@ -44,28 +43,32 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Check Amount</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.checkAmount}
+                            {details.amount}
                         </Typography>
                     </Paper>
                 </Grid>
-                <Grid size={{ xs: 12, sm: 6 }}>
-                    <Paper sx={{ px: 2, py: 1 }}>
-                        <Typography variant="overline">Released Date:</Typography>
-                        <Typography variant="body1" sx={{ mb: 1 }}>
-                            {dayjs(details.checkStatus?.created_at).format('MMMM D, YYYY')}
-                        </Typography>
-                    </Paper>
-                </Grid>
+                {details.checkStatus && (
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Paper sx={{ px: 2, py: 1 }}>
+                            <Typography variant="overline">
+                                Released Date:
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 1 }}>
+                                {details.checkStatus?.created_at ?? '-'}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                )}
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Bank Name</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.bankName}
+                            {details.bank}
                         </Typography>
                     </Paper>
                 </Grid>
                 {details?.checkStatus?.image && (
-                    <Grid size={{ xs: 12 ,sm: 6 }}>
+                    <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">Image</Typography>
 

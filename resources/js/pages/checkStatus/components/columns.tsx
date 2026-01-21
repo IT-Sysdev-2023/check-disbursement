@@ -1,9 +1,9 @@
-import { Chip, IconButton } from '@mui/material';
+import { CheckScannedDetails } from '@/types';
+import { Box, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { ArrowBigRightDash } from 'lucide-react';
 
-export const createStatusCvColumns = (
-    handleStatusChange: (id: number) => void,
+export const createStatusChequeColumns = (
+    handleStatusChange: (value: string, record: CheckScannedDetails) => void,
 ): GridColDef[] => [
     {
         field: 'checkNumber',
@@ -12,6 +12,7 @@ export const createStatusCvColumns = (
         align: 'right',
         flex: 0.5,
         minWidth: 50,
+        renderCell: ({ row }) => row.checkable.checkNumber,
     },
     {
         field: 'checkAmount',
@@ -20,6 +21,7 @@ export const createStatusCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
+        renderCell: ({ row }) => row.checkable.amount,
     },
     {
         field: 'bankAccountNo',
@@ -28,6 +30,7 @@ export const createStatusCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
+        renderCell: ({ row }) => row.checkable.bankAccountNo,
     },
     {
         field: 'bankName',
@@ -36,6 +39,7 @@ export const createStatusCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
+        renderCell: ({ row }) => row.checkable.bank,
     },
     {
         field: 'checkDate',
@@ -44,13 +48,14 @@ export const createStatusCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
+        renderCell: ({ row }) => row.checkable.checkDate,
     },
     {
         field: 'status',
         headerName: 'Status',
         minWidth: 120,
         flex: 1,
-        renderCell: (params) => {
+        renderCell: ({ row }) => {
             const statusMap: Record<
                 string,
                 {
@@ -67,11 +72,11 @@ export const createStatusCvColumns = (
             return (
                 <Chip
                     label={
-                        statusMap[params.row.checkStatus.status]?.label ||
+                        statusMap[row.checkable.checkStatus?.status]?.label ||
                         'For Releasing'
                     }
                     color={
-                        statusMap[params.row.checkStatus.status]?.color ||
+                        statusMap[row.checkable.checkStatus?.status]?.color ||
                         'default'
                     }
                 />
@@ -86,140 +91,34 @@ export const createStatusCvColumns = (
         flex: 1,
         headerAlign: 'center',
         sortable: false,
-        renderCell: (params) => {
-            return (
-                <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() =>
-                        handleStatusChange(params.row.id)
-                    }
-                >
-                    <ArrowBigRightDash />
-                </IconButton>
-            );
-        },
-    },
-];
-
-export const createStatusCrfColumns = (
-    handleStatusChange: (id: number) => void,
-): GridColDef[] => [
-    {
-        field: 'crf',
-        headerName: 'CRF #',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'company',
-        headerName: 'Company',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'no',
-        headerName: 'No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'paidTo',
-        headerName: 'Paid To',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'amount',
-        headerName: 'Amount',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'ckNo',
-        headerName: 'CK No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        flex: 1,
-        minWidth: 120,
-        renderCell: (params) => {
-            const statusMap: Record<
-                string,
-                {
-                    label: string;
-                    color: 'primary' | 'success' | 'warning' | 'error';
-                }
-            > = {
-                release: { label: 'Released', color: 'primary' },
-                forward: { label: 'Forwarded', color: 'warning' },
-                deposit: { label: 'Deposit', color: 'success' },
-                cancel: { label: 'Cancelled', color: 'error' },
+        renderCell: ({ row }) => {
+            const record = {
+                id: row.checkable.id,
+                type: row.check,
+                amount: row.checkable.unformattedAmount,
+                checkNumber: row.checkable.checkNumber,
             };
 
             return (
-                <Chip
-                    label={
-                        statusMap[params.row.checkStatus.status]?.label ||
-                        'For Releasing'
-                    }
-                    color={
-                        statusMap[params.row.checkStatus.status]?.color ||
-                        'default'
-                    }
-                />
-            );
-        },
-    },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 130,
-        align: 'center',
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            return (
-                <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() =>
-                        handleStatusChange(params.row.id)
-                    }
-                >
-                    <ArrowBigRightDash />
-                </IconButton>
-                // <Select
-                //     size="small"
-                //     value={''}
-                //     label="For Signature"
-                //     onChange={(e) =>
-                //         handleStatusChange(params.row.id, e.target.value)
-                //     }
-                // >
-                //     <MenuItem value="details">
-                //         {' '}
-                //         Check Request Form Details
-                //     </MenuItem>
-                //     {/* <MenuItem value="scannedCheck">
-                //         Scanned Check Details
-                //     </MenuItem> */}
-                // </Select>
+                <Box sx={{ width: '100%' }}>
+                    <Select
+                        size="small"
+                        value={status ?? ''}
+                        onChange={(e) =>
+                            handleStatusChange(
+                                e.target.value,
+                                record
+                            )
+                        }
+                    >
+                        <MenuItem value="details">
+                            Check Request Form Details
+                        </MenuItem>
+                        {row.checkable?.checkStatus?.status !== 'cancel' && <MenuItem value="scannedDetails">
+                            Scanned Check Details
+                        </MenuItem>}
+                    </Select>
+                </Box>
             );
         },
     },

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CvCheckPaymentCollection;
+use App\Http\Resources\ScannedRecordResource;
 use App\Models\BorrowedCheck;
 use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
+use App\Models\ScannedRecords;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
@@ -19,30 +21,35 @@ class StatusController extends Controller
     public function checkStatus(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-        $records = CvCheckPayment::with('cvHeader', 'borrowedCheck', 'checkStatus')
-            ->has('checkStatus')
-            ->when($request->user()->hasRole('forwarded'), function ($query){
-                $query->has('checkStatus.checkForwardedStatus');
-            })
-            ->filter($filters)
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
 
-        $crfs = Crf::with('borrowedCheck', 'checkStatus')
-            ->has('checkStatus')
-            ->when($request->user()->hasRole('forwarded'), function ($query){
-                $query->has('checkStatus.checkForwardedStatus');
+        $cheque = BorrowedCheck::query()
+            ->with('checkable.checkStatus')
+            ->where(function (Builder $q) {
+                $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
+                    $q->whereNotNull('approver_id')
+                        ->whereHasMorph(
+                            'checkable',
+                            [CvCheckPayment::class, Crf::class],
+                            fn(Builder $q) => $q->scanRecords()
+                        )
+                        ->whereDoesntHave('checkable.checkStatus');
+                })
+                    ->orWhere(function (Builder $q) { // GET ALL THE CHEQUES STORED IN check_status table
+                        $q->whereHasMorph(
+                            'checkable',
+                            [CvCheckPayment::class, Crf::class],
+                            fn(Builder $q) => $q->when(auth()->user()->hasRole('forwarded'), function ($query) {
+                            $query->has('checkStatus.checkForwardedStatus');
+                        })->has('checkStatus')
+                        );
+                    });
             })
-            ->filter($filters)
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
 
         return Inertia::render('checkStatus', [
-            'cv' => $records,
-            'crf' => $crfs,
-            'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
+            'cheques' => $cheque,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -56,5 +63,18 @@ class StatusController extends Controller
                 'value' => '0'
             ]),
         ]);
+    }
+
+    public function scannedRecordsAmountCheckNo(Request $request)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|string',
+            'checkNo' => 'required|string'
+        ]);
+        $data = ScannedRecords::where('amount', $validated['amount'])
+            ->where('check_no', $validated['checkNo'])
+            ->first();
+            
+        return response()->json(new ScannedRecordResource($data));
     }
 }
