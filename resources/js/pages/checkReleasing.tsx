@@ -16,7 +16,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
-import { createReleasingCvColumns } from './chequeReleasing/components/columns';
+import { createReleasingColumns, createReleasingCvColumns } from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -77,33 +77,16 @@ export default function CheckReleasing({
             }),
         });
     };
-
-    const handleCheck = (event: SelectChangeEvent) => {
-        // setCheck(event.target.value);
-        router.reload({
-            data: {
-                selectedCheck: event.target.value,
-            },
-            only: ['cheques'],
-            replace: true,
-            onStart: () => setTableLoading(true),
-            onFinish: () => setTableLoading(false),
-        });
-    };
-
-    const cvColumns = createReleasingCvColumns(handleStatusChange);
-    // const crfColumns = createReleasingCrfColumns(handleStatusChange);
-
+;
+    const cvColumns = createReleasingColumns(handleStatusChange);
+console.log(cheques);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
             <PageContainer title="Check Releasing">
                 <TableFilter
-                    currentTab="cheques"
-                    handleChangeCheck={handleCheck}
                     company={company}
                     filters={filter}
-                    check={check}
                 />
 
                 <TableDataGrid

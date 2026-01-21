@@ -23,12 +23,6 @@ class Crf extends Model
         ];
 
     }
-    public function getScanned()
-    {
-        $d = ScannedRecords::where('check_number', $this->ck_no)->first();
-        dd($d);
-        // return Scanned
-    }
     protected function getLocation(): Attribute
     {
         return new Attribute(
@@ -124,5 +118,10 @@ class Crf extends Model
     public function checkStatus()
     {
         return $this->morphOne(CheckStatus::class, 'checkable');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

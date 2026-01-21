@@ -26,7 +26,7 @@ class CheckReleasingService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
-        $chequeRecords = BorrowedCheck::with('checkable')
+        $chequeRecords = BorrowedCheck::with('checkable.tagLocation')
             ->whereNotNull('approver_id')
             ->whereHasMorph(
                 'checkable',

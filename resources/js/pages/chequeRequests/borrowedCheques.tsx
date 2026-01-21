@@ -23,7 +23,7 @@ import { createRequestsChequeColumns } from './components/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Releasing',
+        title: 'Check Requests',
         href: chequeRequests().url,
     },
     {
@@ -92,8 +92,7 @@ export default function BorrowedCheques({
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         setSelectedRows(model.ids);
     };
-
-    const cvColumns = createRequestsChequeColumns();
+    const columns = createRequestsChequeColumns();
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -105,7 +104,7 @@ export default function BorrowedCheques({
                     pagination={handlePagination}
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
-                    columns={cvColumns}
+                    columns={columns}
                     handleSelectionChange={handleSelectionChange}
                 />
 

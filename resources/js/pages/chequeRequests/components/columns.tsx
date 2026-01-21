@@ -1,6 +1,4 @@
-
 import { GridColDef } from '@mui/x-data-grid';
-
 
 export const createRequestsChequeColumns = (): GridColDef[] => [
     {
@@ -34,7 +32,7 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable?.cvNo,
+        renderCell: ({ row }) => row.checkable?.payee,
     },
     {
         field: 'checkAmount',
@@ -52,9 +50,7 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => {
-            return row.checkable.tagLocation?.location;
-        },
+        renderCell: ({ row }) => row.checkable.tagLocation?.location,
     },
 
     {

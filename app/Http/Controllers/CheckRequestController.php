@@ -42,7 +42,7 @@ class CheckRequestController extends Controller
     public function borrowedChecks(Request $request)
     {
         $records = BorrowedCheck::with('checkable')
-            ->where('borrower_no', $request->borrowerNo)
+            ->where([['borrower_no', $request->borrowerNo], ['approver_id', null]])
             ->whereDoesntHaveMorph(
                 'checkable',
                 [CvCheckPayment::class, Crf::class],
@@ -79,7 +79,7 @@ class CheckRequestController extends Controller
 
     public function borrowedNumberCheques(int $id)
     {
-        $record = BorrowedCheck::with('checkable')
+        $record = BorrowedCheck::with('checkable.tagLocation')
             ->where([['borrower_no', $id], ['approver_id', null]])
             ->whereDoesntHaveMorph(
                 'checkable',

@@ -233,7 +233,6 @@ export default function RetrievedRecords({
                         </TabPanel>
                         <TabPanel value="cheques">
                             <TableFilter
-                                currentTab={currentTab}
                                 handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}
@@ -271,7 +270,6 @@ export default function RetrievedRecords({
 
                         <TabPanel value="manageChecks">
                             <TableFilter
-                                currentTab={currentTab}
                                 handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}

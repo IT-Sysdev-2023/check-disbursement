@@ -18,22 +18,24 @@ class CrfResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'crf' => $this->crf,
+            'cvNo' => $this->crf,
             'no' => $this->no,
-            'company' => $this->company,
+            'company' => $this->companyRelation?->name,
+            'checkDate' => $this->resolved_check_date ? $this->resolved_check_date->toFormattedDateString() : 'N/A',
             'location' => $this->location,
             'date' => $this->date ? $this->date->toFormattedDateString() : 'N/A',
-            'paidTo' => $this->paid_to,
+            'payee' => $this->paid_to,
             'bank' => $this->bank,
             'particulars' => $this->particulars,
             'amount' => NumberHelper::currency($this->amount),
             'unformattedAmount' => $this->amount,
-            'checkNo' => $this->ck_no,
+            'checkNumber' => $this->ck_no,
             'preparedBy' => $this->prepared_by,
             'taggedAt' => $this->tagged_at,
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
             'checkStatus' => $this->whenLoaded('checkStatus'),
 
+            'tagLocation' => $this->whenLoaded('tagLocation'),
             'scannedId' => $this->scanned_id,
             'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
         ];

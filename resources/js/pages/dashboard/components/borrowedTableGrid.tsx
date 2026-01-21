@@ -69,6 +69,7 @@ function Row(props: { row: Borrower }) {
                 <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
                 <TableCell align="right">{'For Signature'}</TableCell>
+                <TableCell align="right">{row.check}</TableCell>
                 <TableCell align="center">
                     <IconButton
                         size="small"
@@ -93,62 +94,57 @@ function Row(props: { row: Borrower }) {
                             >
                                 Checks
                             </Typography>
-                            {row.check == 'cv' && (
-                                <Table size="small" aria-label="cv">
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Check Date</TableCell>
-                                            <TableCell>Check Amount</TableCell>
-                                            <TableCell align="right">
-                                                Company
-                                            </TableCell>
-                                            <TableCell align="right">
-                                                Payee
-                                            </TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        {borrowerData[row.borrowerNoClean]?.map(
-                                            (historyRow) => (
-                                                <TableRow key={historyRow.id}>
-                                                    <TableCell
-                                                        component="th"
-                                                        scope="row"
-                                                    >
-                                                        {
-                                                            historyRow.checkable
-                                                                .checkDate
-                                                        }
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {
-                                                            historyRow.checkable
-                                                                .amount
-                                                        }
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {
-                                                            historyRow.checkable
-                                                                .company
-                                                        }
-                                                    </TableCell>
-                                                    <TableCell align="right">
-                                                        {
-                                                            historyRow.checkable
-                                                                .payee
-                                                        }
-                                                    </TableCell>
-                                                </TableRow>
-                                            ),
-                                        )}
-                                    </TableBody>
-                                </Table>
-                            )}
+
+                            <Table size="small" aria-label="cv">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Check Date</TableCell>
+                                        <TableCell>Check Amount</TableCell>
+                                        <TableCell align="right">
+                                            Company
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            Payee
+                                        </TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {borrowerData[row.borrowerNoClean]?.map(
+                                        (historyRow) => (
+                                            <TableRow key={historyRow.id}>
+                                                <TableCell
+                                                    component="th"
+                                                    scope="row"
+                                                >
+                                                    {
+                                                        historyRow.checkable
+                                                            .checkDate
+                                                    }
+                                                </TableCell>
+                                                <TableCell>
+                                                    {
+                                                        historyRow.checkable
+                                                            .amount
+                                                    }
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    {
+                                                        historyRow.checkable
+                                                            .company
+                                                    }
+                                                </TableCell>
+                                                <TableCell align="right">
+                                                    {historyRow.checkable.payee}
+                                                </TableCell>
+                                            </TableRow>
+                                        ),
+                                    )}
+                                </TableBody>
+                            </Table>
                         </Box>
                     </Collapse>
                 </TableCell>
             </TableRow>
-
         </>
     );
 }
@@ -192,6 +188,7 @@ export default function BorrowedTableGrid({
                             <TableCell align="right">Borrower Name</TableCell>
                             <TableCell align="right">Reason</TableCell>
                             <TableCell align="right">Purpose</TableCell>
+                            <TableCell align="right">Type</TableCell>
                             <TableCell align="right">
                                 Borrower Details
                             </TableCell>

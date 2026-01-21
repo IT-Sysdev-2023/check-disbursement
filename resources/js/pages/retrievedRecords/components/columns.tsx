@@ -196,8 +196,8 @@ export const createManageColumns = (
         align: 'center',
         headerAlign: 'center',
         sortable: false,
-        renderCell: (params) => {
-            return params.row.scannedId ? (
+        renderCell: ({row}) => {
+            return row.scannedId ? (
                 <Chip label="Scanned" color="success" size="small" />
             ) : (
                 <Chip label="Not Scanned" color="error" size="small" />
@@ -212,6 +212,9 @@ export const createManageColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
+            if (!row.scannedId) {
+                return null;
+            }
             if (row.scannedPayee && row.scannedAmount) {
                 return <Chip label="Completed" color="secondary" size="small" />;
             }
