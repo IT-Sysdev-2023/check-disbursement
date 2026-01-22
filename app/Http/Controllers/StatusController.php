@@ -31,16 +31,19 @@ class StatusController extends Controller
                             'checkable',
                             fn(Builder $q) => $q->scanRecords()
                         )
-                        ->whereDoesntHave('checkable.checkStatus');
+                        ->whereDoesntHaveMorph(
+                            'checkable',
+                            [CvCheckPayment::class, Crf::class],
+                            fn($query) => $query->has('checkStatus')
+                        );
                 })
                     ->orWhere(function (Builder $q) { // GET ALL THE CHEQUES STORED IN check_status table
-                        $q->whereHas(
+                        $q->whereHasMorph(
                             'checkable',
-                            fn(Builder $q) => $q->when(
-                                auth()->user()->hasRole('forwarded'),
-                                fn($query) =>
-                                $query->has('checkStatus.checkForwardedStatus')
-                            )->has('checkStatus')
+                            [CvCheckPayment::class, Crf::class],
+                            fn(Builder $q) => $q->when(auth()->user()->hasRole('forwarded'), function ($query) {
+                            $query->has('checkStatus.checkForwardedStatus');
+                        })->has('checkStatus')
                         );
                     });
             })

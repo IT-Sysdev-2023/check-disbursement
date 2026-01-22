@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\CheckRequestController;
 use App\Http\Resources\ChequeCollection;
 use App\Http\Resources\ChequeResource;
 use App\Models\Approver;
@@ -22,12 +23,22 @@ class ChecksService
 
     public function records(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'tab']);
 
-        $defaultCheck = $filters['selectedCheck'] ?? 'cv';
         $tab = $filters['tab'] ?? 'calendar';
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters));
+
+        $waitingForApproval = BorrowedCheck::with('checkable')
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [CvCheckPayment::class, Crf::class],
+                fn($query) => $query->has('checkStatus')
+            )
+            ->whereNull('approver_id')
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
 
         // LAST OPTION : JOIN TYPE AND CHECKABLE
         // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
@@ -66,8 +77,8 @@ class ChecksService
 
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
+            'pending' => $waitingForApproval,
             'manageChecks' => new ChequeCollection($rec),
-            'defaultCheck' => $defaultCheck,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',

@@ -4,6 +4,7 @@ import {
     ActionHandler,
     ActionType,
     Auth,
+    Borrower,
     ChequeType,
     DateFilterType,
     DistinctMonths,
@@ -37,6 +38,7 @@ import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createChequeColumns,
     createManageColumns,
+    createPendingChequeColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
 
@@ -49,10 +51,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function RetrievedRecords({
     cheques,
+    manageChecks,
+    pending,
     filter,
     company,
     distinctMonths,
-    manageChecks,
     auth,
 }: {
     filter: {
@@ -63,6 +66,7 @@ export default function RetrievedRecords({
     };
     cheques: InertiaPagination<ChequeType>;
     distinctMonths: DistinctMonths;
+    pending: InertiaPagination<Borrower>;
     company: SelectionType[];
     manageChecks: InertiaPagination<ManageChecks>;
     auth: Auth;
@@ -89,7 +93,7 @@ export default function RetrievedRecords({
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string };
     };
-    
+
     useEffect(() => {
         if (flash?.message) {
             notifications.show(flash.message, {
@@ -201,11 +205,12 @@ export default function RetrievedRecords({
     };
 
     const handleUpdateScanned = (id: number) => {
-            setOpenInputDetails(true);
-            setScannedId(id);
+        setOpenInputDetails(true);
+        setScannedId(id);
     };
 
     const chequeColumns = createChequeColumns(handleStatusChange);
+        const pendingColumns = createPendingChequeColumns();
     const manageCvColumns = createManageColumns(handleUpdateScanned);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -222,6 +227,10 @@ export default function RetrievedRecords({
                                     value="calendar"
                                 />
                                 <Tab label="Table View" value="cheques" />
+                                <Tab
+                                    label="Waiting for Approval"
+                                    value="pending"
+                                />
                                 <Tab
                                     label="Manage Checks"
                                     value="manageChecks"
@@ -264,9 +273,17 @@ export default function RetrievedRecords({
                                 </Button>
                             </Box>
                         </TabPanel>
-                        {/* <TabPanel value="borrowed">
-                            <BorrowedTableGrid data={borrowed} />
-                        </TabPanel> */}
+
+                        <TabPanel value="pending">
+                            <TableDataGrid
+                                data={pending}
+                                filter={filter.search}
+                                pagination={handlePagination}
+                                handleSearchFilter={handleSearch}
+                                handleSortFilter={handleSort}
+                                columns={pendingColumns}
+                            />
+                        </TabPanel>
 
                         <TabPanel value="manageChecks">
                             <TableFilter

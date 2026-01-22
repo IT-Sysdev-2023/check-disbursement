@@ -33,7 +33,11 @@ class CheckReleasingService
                 fn(Builder $query) =>
                 $query->scanRecords()
             )
-            ->doesntHave('checkable.checkStatus')
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [CvCheckPayment::class, Crf::class],
+                fn($query) => $query->has('checkStatus')
+            )
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();

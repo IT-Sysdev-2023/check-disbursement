@@ -25,7 +25,7 @@ class AssignedCheckNumberService
 
         $model::findOrFail($validated['id'])->update(['resolved_check_number' => $validated['checkNumber']]);
 
-        return Redirect::route('retrievedRecords', ['tab' => 'cheques'])->with(['status' => true, 'message' => 'Successfully Assigned']);
+        return Redirect::route('retrieved-records', ['tab' => 'cheques'])->with(['status' => true, 'message' => 'Successfully Assigned']);
     }
 
     public function updateAssignCheckDate(Request $request)
@@ -40,6 +40,6 @@ class AssignedCheckNumberService
 
         $model::findOrFail($validated['id'])->update(['resolved_check_date' => $validated['checkDate']]);
 
-        return Redirect::route('retrievedRecords', ['tab' => 'cheques'])->with(['status' => true, 'message' => 'Successfully Assigned']);
+        return Redirect::route('retrieved-records', ['tab' => 'cheques'])->with(['status' => true, 'message' => 'Successfully Assigned']);
     }
 }

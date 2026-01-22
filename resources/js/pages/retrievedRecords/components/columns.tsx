@@ -145,6 +145,56 @@ export const createChequeColumns = (
     },
 ];
 
+export const createPendingChequeColumns = (): GridColDef[] => [
+    {
+        field: 'checkNumber',
+        headerName: 'Check Number',
+        minWidth: 150,
+        renderCell: ({ row }) => row.checkable.checkNumber,
+    },
+    {
+        field: 'checkDate',
+        headerName: 'Check Date',
+        headerAlign: 'right',
+        align: 'right',
+        renderCell: ({ row }) => row.checkable.checkDate,
+    },
+    {
+        field: 'amount',
+        headerName: 'Check Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: ({ row }) => row.checkable.amount,
+    },
+    {
+        field: 'payee',
+        headerName: 'Payee',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        renderCell: ({ row }) => row.checkable.payee,
+    },
+    {
+        field: 'companyName',
+        headerName: 'Business Unit',
+        headerAlign: 'center',
+        align: 'center',
+        flex: 1,
+        renderCell: ({ row }) => row.checkable.company,
+    },
+
+    {
+        field: 'status',
+        headerName: 'Status',
+        minWidth: 120,
+        renderCell: () => {
+            return <Chip label="Pending" color="secondary" size="small" />;
+        },
+    },
+];
+
 export const createManageColumns = (
     handleAction: (rec: number) => void,
 ): GridColDef[] => [
@@ -196,7 +246,7 @@ export const createManageColumns = (
         align: 'center',
         headerAlign: 'center',
         sortable: false,
-        renderCell: ({row}) => {
+        renderCell: ({ row }) => {
             return row.scannedId ? (
                 <Chip label="Scanned" color="success" size="small" />
             ) : (
@@ -216,7 +266,9 @@ export const createManageColumns = (
                 return null;
             }
             if (row.scannedPayee && row.scannedAmount) {
-                return <Chip label="Completed" color="secondary" size="small" />;
+                return (
+                    <Chip label="Completed" color="secondary" size="small" />
+                );
             }
             return (
                 <IconButton

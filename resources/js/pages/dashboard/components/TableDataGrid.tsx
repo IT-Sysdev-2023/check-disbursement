@@ -1,4 +1,4 @@
-import { Borrower, ChequeType, Crf, Cv, InertiaPagination, ManageChecks } from '@/types';
+import { BorrowedCheck, Borrower, ChequeType, Crf, Cv, InertiaPagination, ManageChecks } from '@/types';
 import {
     DataGrid,
     gridClasses,
