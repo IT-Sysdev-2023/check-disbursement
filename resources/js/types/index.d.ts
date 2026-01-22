@@ -199,13 +199,12 @@ export interface BorrowedCheck {
 
 export interface CheckStatus {
     id: number;
-    user_id: number;
-    check_id: number;
     status: 'release' | 'forward' | 'deposit' | 'cancel' | 'stale';
-    check: 'crf' | 'cv';
-    receivers_name?: string | null;
+    checkableType: 'CRF' | 'CV';
+    receiversName?: string | null;
     image: string | null;
     signature: string | null;
+    checkable: Cv | Crf;
     created_at: string;
     updated_at: string;
 }

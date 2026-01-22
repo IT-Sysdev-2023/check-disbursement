@@ -57,7 +57,7 @@ class ChecksService
 
         $unionQuery = $cv->unionAll($crf);
 
-        $rec = DB::query()
+        $manageCheques = DB::query()
             ->fromSub(
                 DB::query()
                     ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
@@ -71,7 +71,7 @@ class ChecksService
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
             'pending' => $waitingForApproval,
-            'manageChecks' => new ChequeCollection($rec),
+            'manageChecks' => new ChequeCollection($manageCheques),
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',

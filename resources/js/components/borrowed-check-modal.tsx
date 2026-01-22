@@ -134,7 +134,6 @@ export default function BorrowedCheckModal({
                                 type="submit"
                                 variant="contained"
                                 size="large"
-                                //  disabled={processing}
                                 loading={processing}
                             >
                                 Save

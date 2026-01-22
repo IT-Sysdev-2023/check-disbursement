@@ -129,7 +129,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       },
                   ]
                 : []),
-            ...(isAdmin || releasing || officer || forwarded || sectionHead
+            ...(isAdmin || releasing || officer || forwarded || sectionHead ||closing
                 ? [
                       {
                           title: 'Check Status',

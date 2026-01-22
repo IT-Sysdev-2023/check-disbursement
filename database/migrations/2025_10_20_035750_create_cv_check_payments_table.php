@@ -32,7 +32,7 @@ return new class extends Migration {
             $table->string('check_class_location');
             $table->string('payee');
 
-            $table->unsignedBigInteger('resolved_check_number')->nullable();
+            $table->string('resolved_check_number')->nullable();
             $table->timestamp('resolved_check_date')->nullable();
             $table->foreignId('tag_location_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamp('tagged_at')->nullable();

@@ -1,4 +1,12 @@
-import { BorrowedCheck, Borrower, ChequeType, Crf, Cv, InertiaPagination, ManageChecks } from '@/types';
+import {
+    Borrower,
+    CheckStatus,
+    ChequeType,
+    Crf,
+    Cv,
+    InertiaPagination,
+    ManageChecks,
+} from '@/types';
 import {
     DataGrid,
     gridClasses,
@@ -23,7 +31,9 @@ export default function TableDataGrid({
     hasSelection = false,
     handleSelectionChange,
 }: {
-    data: InertiaPagination<Cv | Crf | ManageChecks | ChequeType | Borrower>;
+    data: InertiaPagination<
+        Cv | Crf | ManageChecks | ChequeType | Borrower | CheckStatus
+    >;
     columns: GridColDef[];
     isLoading?: boolean;
     hasSelection?: boolean;
@@ -56,7 +66,6 @@ export default function TableDataGrid({
         },
         [handleSearchFilter],
     );
-
 
     if (!data) {
         return (

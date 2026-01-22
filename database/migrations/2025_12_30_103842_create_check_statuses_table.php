@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('check_statuses', function (Blueprint $table) {
             $table->id();
-            $table->enum('status', ['release', 'forward', 'deposit', 'stale', 'cancel'])->nullable();
+            $table->enum('status', ['released', 'forwarded', 'deposited', 'staled', 'cancelled'])->nullable();
             $table->string('receivers_name')->nullable();
             $table->string('image')->nullable();
             $table->string('signature')->nullable();

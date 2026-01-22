@@ -1,5 +1,5 @@
 import { ClosingCheckDetailsType } from '@/types';
-import { Chip, IconButton } from '@mui/material';
+import { IconButton } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { ArrowBigRightDash } from 'lucide-react';
 
@@ -29,7 +29,7 @@ export const createClosingCvColumns = (
         },
     },
     {
-        field: 'toc',
+        field: 'checkableType',
         headerName: 'Type of Check',
         headerAlign: 'right',
         align: 'right',
@@ -99,111 +99,6 @@ export const createClosingCvColumns = (
                     size="small"
                     color="primary"
                     onClick={() => handleStatusChange(data)}
-                >
-                    <ArrowBigRightDash />
-                </IconButton>
-            );
-        },
-    },
-];
-
-export const createClosingCrfColumns = (
-    handleStatusChange: (data: ClosingCheckDetailsType) => void,
-): GridColDef[] => [
-    {
-        field: 'crf',
-        headerName: 'CRF #',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'company',
-        headerName: 'Company',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'no',
-        headerName: 'No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'paidTo',
-        headerName: 'Paid To',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'amount',
-        headerName: 'Amount',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'ckNo',
-        headerName: 'CK No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'status',
-        headerName: 'Status',
-        flex: 1,
-        minWidth: 120,
-        renderCell: (params) => {
-            const statusMap: Record<
-                string,
-                {
-                    label: string;
-                    color: 'primary' | 'success' | 'warning' | 'error';
-                }
-            > = {
-                release: { label: 'Released', color: 'primary' },
-                forward: { label: 'Forwarded', color: 'warning' },
-                deposit: { label: 'Deposit', color: 'success' },
-                cancel: { label: 'Cancelled', color: 'error' },
-            };
-
-            return (
-                <Chip
-                    label={
-                        statusMap[params.row.checkStatus.status]?.label ||
-                        'For Releasing'
-                    }
-                    color={
-                        statusMap[params.row.checkStatus.status]?.color ||
-                        'default'
-                    }
-                />
-            );
-        },
-    },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 130,
-        align: 'center',
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            return (
-                <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => handleStatusChange(params.row.id)}
                 >
                     <ArrowBigRightDash />
                 </IconButton>

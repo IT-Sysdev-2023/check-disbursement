@@ -57,20 +57,33 @@ export const createStatusChequeColumns = (
         flex: 1,
         renderCell: ({ row }) => {
             const { checkStatus } = row.checkable;
-            const status =
-                checkStatus?.forwardedStatus?.status ?? checkStatus?.status;
+            let status = checkStatus?.status;
+
+            if (checkStatus?.forwardedStatus?.status) {
+                status = checkStatus.forwardedStatus.status;
+            }
+
+            if (checkStatus?.isClosed) {
+                status = 'closed';
+            }
 
             const statusMap: Record<
                 string,
                 {
                     label: string;
-                    color: 'primary' | 'success' | 'warning' | 'error';
+                    color:
+                        | 'default'
+                        | 'primary'
+                        | 'success'
+                        | 'warning'
+                        | 'error';
                 }
             > = {
-                release: { label: 'Released', color: 'primary' },
-                forward: { label: 'Forwarded', color: 'warning' },
-                deposit: { label: 'Deposit', color: 'success' },
-                cancel: { label: 'Cancelled', color: 'error' },
+                closed: { label: 'Closed', color: 'primary' },
+                released: { label: 'Released', color: 'default' },
+                forwarded: { label: 'Forwarded', color: 'warning' },
+                deposited: { label: 'Deposit', color: 'success' },
+                cancelled: { label: 'Cancelled', color: 'error' },
             };
 
             return (

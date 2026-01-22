@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Models\CheckStatus;
 use App\Models\Crf;
@@ -12,12 +13,16 @@ use Inertia\Inertia;
 
 class ClosingController extends Controller
 {
+    public function __construct(protected FileHandler $fileHandler)
+    {
+    }
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
-        $cheques = CheckStatus::with(['checkable' => ['cvHeader', 'borrowedCheck']])
+        $cheques = CheckStatus::with('checkable.borrowedCheck')
             ->where('is_closed', false)
+            ->whereNot('status', 'cancel')
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
@@ -43,33 +48,33 @@ class ClosingController extends Controller
 
     public function close(CheckStatus $id)
     {
-        $id->update([
+        $isSuccess = $id->update([
             'is_closed' => true,
             'closed_at' => now()
         ]);
 
+        if ($isSuccess) {
+        $data = [
+            'transactionNo' => NumberHelper::padLeft($id->id),
+            'items' => [
+                [
+                    'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
 
-        // $data = [
-        //     'transactionNo' => NumberHelper::padLeft($id->id),
-        //     'items' => [
-        //         [
-        //             'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
+                    'forwardedBy' => "",
 
-        //             'forwardedBy' => $validated['receiversName'],
+                    'dateReceived' => '',
 
-        //             'dateReceived' => $validated['receiversName'],
+                    'receivedBy' => '',
+                ]
+            ]
+        ];
 
-        //             'receivedBy' => $id->receivers_name,
-        //         ]
-        //     ]
-        // ];
+        $stream = $this->fileHandler
+            ->inFolder('pdfs/releasing/closing/')
+            ->createFileName($id->id, auth()->user()->id, '.pdf')
+            ->handlePdf($data, 'closingPdf');
 
-        // $stream = $this->fileHandler
-        //     ->inFolder('pdfs/releasing/' . $label . '/')
-        //     ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
-        //     ->handlePdf($data, 'releasingPdf');
-
-        // return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
-        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
+        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
+    }
     }
 }

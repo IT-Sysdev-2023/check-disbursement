@@ -1,12 +1,11 @@
-import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
+import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { markAsClose } from '@/routes';
 import {
+    CheckStatus,
     ClosingCheckDetailsType,
-    Crf,
-    Cv,
     DateFilterType,
     FlashReponse,
     InertiaPagination,
@@ -14,24 +13,9 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import {
-    Box,
-    Button,
-    Grid,
-    Modal,
-    SelectChangeEvent,
-    Typography,
-} from '@mui/material';
-import {
-    GridFilterModel,
-    GridPaginationModel,
-    GridSortModel,
-} from '@mui/x-data-grid';
+import { Box, Button, Grid, Modal, Typography } from '@mui/material';
 import { useState } from 'react';
-import {
-    createClosingCrfColumns,
-    createClosingCvColumns,
-} from './closing/components/columns';
+import { createClosingCvColumns } from './closing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -55,74 +39,22 @@ export default function CvCrfList({
     cheques,
     company,
     filter,
-    defaultCheck,
 }: {
-    cheques: InertiaPagination<Cv | Crf>;
+    cheques: InertiaPagination<CheckStatus>;
     company: SelectionType[];
     filter: {
         selectedBu: string;
         search: string;
         date: DateFilterType;
     };
-    defaultCheck: string;
 }) {
-    const [check, setCheck] = useState(defaultCheck);
-    const [tableLoading, setTableLoading] = useState(false);
     const [openModal, setOpenModal] = useState(false);
     const [recordDetails, setRecordDetails] =
         useState<ClosingCheckDetailsType | null>(null);
-    const notifications = useNotifications();
-    const handlePagination = (model: GridPaginationModel) => {
-        const page = model.page + 1;
-        const per_page = model.pageSize;
 
-        router.reload({
-            data: {
-                page: page,
-                per_page: per_page,
-            },
-        });
-    };
+    const [stream, setStream] = useState('');
+    const [openModalPdf, setOpenModalPdf] = useState(false);
 
-    const handleSearch = (model: GridFilterModel) => {
-        const query = model.quickFilterValues?.length
-            ? model.quickFilterValues?.[0]
-            : '';
-
-        router.reload({
-            data: {
-                search: query,
-            },
-            only: [check === 'cv' ? 'cv' : 'crf'],
-            replace: true,
-        });
-    };
-
-    const handleCheck = (event: SelectChangeEvent) => {
-        setCheck(event.target.value);
-        router.reload({
-            data: {
-                selectedCheck: event.target.value,
-            },
-            only: ['crf'],
-            replace: true,
-            onStart: () => setTableLoading(true),
-            onFinish: () => setTableLoading(false),
-        });
-    };
-
-    const handleSort = (model: GridSortModel) => {
-        router.reload({
-            data: {
-                sort: {
-                    field: model[0].field,
-                    sort: model[0].sort,
-                },
-            },
-            only: [check === 'cv' ? 'cv' : 'crf'],
-            replace: true,
-        });
-    };
     const handleStatusChange = (data: ClosingCheckDetailsType) => {
         setRecordDetails(data);
         setOpenModal(true);
@@ -140,29 +72,22 @@ export default function CvCrfList({
                         const m = props.flash as FlashReponse;
 
                         setOpenModal(false);
-                        notifications.show(m.message, {
-                            severity: 'success',
-                            autoHideDuration: 3000,
-                        });
+                        if (m.status) {
+                            setStream(m.stream);
+                            setOpenModalPdf(true);
+                        }
                     },
                 },
             );
     };
 
-    const cvColumns = createClosingCvColumns(handleStatusChange);
-    const crfColumns = createClosingCrfColumns(handleStatusChange);
+    const columns = createClosingCvColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
             <PageContainer title="Check Status">
-                <TableFilter
-                    currentTab="cheques"
-                    handleChangeCheck={handleCheck}
-                    company={company}
-                    filters={filter}
-                    check={check}
-                />
+                <TableFilter company={company} filters={filter} />
 
                 <TableDataGrid
                     data={cheques}
@@ -170,8 +95,7 @@ export default function CvCrfList({
                     pagination={handlePagination}
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
-                    columns={check === 'cv' ? cvColumns : crfColumns}
-                    isLoading={tableLoading}
+                    columns={columns}
                 />
             </PageContainer>
 
@@ -245,6 +169,18 @@ export default function CvCrfList({
                             Mark as Close
                         </Button>
                     </Box>
+                </Box>
+            </Modal>
+
+            <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
+                <Box sx={{ ...style, width: '70%' }}>
+                    {stream && (
+                        <iframe
+                            src={stream}
+                            style={{ width: '100%', height: '500px' }}
+                            frameBorder={0}
+                        />
+                    )}
                 </Box>
             </Modal>
         </AppLayout>
