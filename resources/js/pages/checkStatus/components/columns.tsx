@@ -24,13 +24,13 @@ export const createStatusChequeColumns = (
         renderCell: ({ row }) => row.checkable.amount,
     },
     {
-        field: 'bankAccountNo',
-        headerName: 'Bank Account No.',
+        field: 'stat',
+        headerName: 'Handling Status',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.bankAccountNo,
+        renderCell: ({ row }) => row.checkable.taggedLocation,
     },
     {
         field: 'bankName',
@@ -56,6 +56,11 @@ export const createStatusChequeColumns = (
         minWidth: 120,
         flex: 1,
         renderCell: ({ row }) => {
+            console.log(row);
+            const { checkStatus } = row.checkable;
+            const status =
+                checkStatus?.forwardedStatus?.status ?? checkStatus?.status;
+
             const statusMap: Record<
                 string,
                 {
@@ -71,14 +76,8 @@ export const createStatusChequeColumns = (
 
             return (
                 <Chip
-                    label={
-                        statusMap[row.checkable.checkStatus?.status]?.label ||
-                        'For Releasing'
-                    }
-                    color={
-                        statusMap[row.checkable.checkStatus?.status]?.color ||
-                        'default'
-                    }
+                    label={statusMap[status]?.label || 'For Releasing'}
+                    color={statusMap[status]?.color || 'default'}
                 />
             );
         },
@@ -105,18 +104,17 @@ export const createStatusChequeColumns = (
                         size="small"
                         value={status ?? ''}
                         onChange={(e) =>
-                            handleStatusChange(
-                                e.target.value,
-                                record
-                            )
+                            handleStatusChange(e.target.value, record)
                         }
                     >
                         <MenuItem value="details">
                             Check Request Form Details
                         </MenuItem>
-                        {row.checkable?.checkStatus?.status !== 'cancel' && <MenuItem value="scannedDetails">
-                            Scanned Check Details
-                        </MenuItem>}
+                        {row.checkable?.checkStatus?.status !== 'cancel' && (
+                            <MenuItem value="scannedDetails">
+                                Scanned Check Details
+                            </MenuItem>
+                        )}
                     </Select>
                 </Box>
             );

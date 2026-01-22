@@ -26,7 +26,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface MyFormData {
-    causedBy: string;
     receiversName: string;
     file: File | null;
     signature: string | null;
@@ -44,7 +43,6 @@ export default function ReleaseCheck({
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
-            causedBy: '',
             file: null,
             signature: null,
         });
@@ -133,14 +131,6 @@ export default function ReleaseCheck({
                             onChange={handleTextChange}
                             error={!!errors.receiversName}
                             helperText={errors.receiversName ?? ' '}
-                        />
-                        <TextField
-                            label={label + ' By'}
-                            variant="outlined"
-                            value={data.causedBy}
-                            onChange={handleTextChange}
-                            error={!!errors.causedBy}
-                            helperText={errors.causedBy ?? ' '}
                         />
 
                         {/* File Upload */}

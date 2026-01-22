@@ -144,9 +144,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 50,
-        renderCell: (params) => {
-            return params.row.checkable.checkNumber;
-        },
+        renderCell: ({ row }) => row.checkable.checkNumber,
     },
     {
         field: 'checkDate',
@@ -155,9 +153,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: (params) => {
-            return params.row.checkable.checkDate;
-        },
+        renderCell: ({ row }) => row.checkable.checkDate,
     },
     {
         field: 'type',
@@ -166,17 +162,16 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: (params) => {
-            return params.row.checkableType;
-        },
+        renderCell: ({ row }) => row.checkableType,
     },
     {
         field: 'accountName',
-        headerName: 'Account Name',
+        headerName: 'Bank',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
+        renderCell: ({ row }) => row.checkable?.bank,
     },
     {
         field: 'checkAmount',
@@ -185,9 +180,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            return params.row.checkable.checkAmount;
-        },
+        renderCell: ({ row }) => row.checkable.amount,
     },
     {
         field: 'location',
@@ -196,10 +189,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            console.log(params.row);
-            return params.row.checkable.tagLocation?.location;
-        },
+        renderCell: ({ row }) => row.checkable.tagLocation?.location,
     },
 
     {
@@ -209,9 +199,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            return params.row.status || '—';
-        },
+        renderCell: ({ row }) => row.status || '—',
     },
 
     {
@@ -245,7 +233,7 @@ export const createForwardedCvColumns = (
     },
 ];
 
-export const createForwardedReleasingCvColumns = (
+export const createForwardedReleasingColumns = (
     handleStatusChange: (id: number, value: string) => void,
 ): GridColDef[] => [
     {
@@ -255,9 +243,7 @@ export const createForwardedReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 50,
-        renderCell: (params) => {
-            return params.row.checkable.checkNumber;
-        },
+        renderCell: ({ row }) => row.checkable.checkNumber,
     },
     {
         field: 'checkDate',
@@ -266,9 +252,7 @@ export const createForwardedReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: (params) => {
-            return params.row.checkable.checkDate;
-        },
+        renderCell: ({ row }) => row.checkable.checkDate,
     },
     {
         field: 'type',
@@ -277,17 +261,16 @@ export const createForwardedReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: (params) => {
-            return params.row.checkableType;
-        },
+        renderCell: ({ row }) => row.checkableType,
     },
     {
-        field: 'accountName',
-        headerName: 'Account Name',
+        field: 'bank',
+        headerName: 'Bank',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
+        renderCell: ({ row }) => row.checkable.bank,
     },
     {
         field: 'checkAmount',
@@ -296,9 +279,7 @@ export const createForwardedReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            return params.row.checkable.checkAmount;
-        },
+        renderCell: ({ row }) => row.checkable.amount,
     },
     {
         field: 'location',
@@ -307,10 +288,7 @@ export const createForwardedReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            console.log(params.row);
-            return params.row.checkable.tagLocation?.location;
-        },
+        renderCell: ({ row }) => row.checkable.tagLocation?.location,
     },
 
     {
@@ -320,9 +298,7 @@ export const createForwardedReleasingCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: (params) => {
-            return params.row.status || '—';
-        },
+        renderCell: ({ row }) => row.status || '—',
     },
 
     {
@@ -333,8 +309,8 @@ export const createForwardedReleasingCvColumns = (
         flex: 1,
         headerAlign: 'center',
         sortable: false,
-        renderCell: (params) => {
-            const { id } = params.row;
+        renderCell: ({row}) => {
+            const { id } = row;
             return (
                 <Select
                     size="small"
@@ -349,103 +325,6 @@ export const createForwardedReleasingCvColumns = (
                     </MenuItem>
                     <MenuItem value="cancel">
                         <Chip label="Cancel Check" color="info" />
-                    </MenuItem>
-                </Select>
-            );
-        },
-    },
-];
-
-export const createForwardedCrfColumns = (
-    handleStatusChange: (id: number, value: string, checkId: number) => void,
-): GridColDef[] => [
-    {
-        field: 'crf',
-        headerName: 'CRF #',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'company',
-        headerName: 'Company',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'no',
-        headerName: 'No.',
-        headerAlign: 'right',
-        align: 'right',
-        minWidth: 80,
-    },
-    {
-        field: 'paidTo',
-        headerName: 'Paid To',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'amount',
-        headerName: 'Amount',
-        headerAlign: 'right',
-        align: 'right',
-        minWidth: 100,
-    },
-    {
-        field: 'ckNo',
-        headerName: 'CK No.',
-        headerAlign: 'right',
-        align: 'right',
-        minWidth: 100,
-    },
-    // {
-    //     field: 'details',
-    //     headerName: 'Check Details',
-    //     minWidth: 120,
-    //     renderCell: (params) => {
-    //         return (
-    //             <Button
-    //                 variant="contained"
-    //                 size="small"
-    //                 onClick={() => {
-    //                     router.visit(detailsCrf(params.row.id));
-    //                 }}
-    //             >
-    //                 View
-    //             </Button>
-    //         );
-    //     },
-    // },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 100,
-        align: 'center',
-        flex: 1,
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            const { id, checkable } = params.row;
-            return (
-                <Select
-                    size="small"
-                    value={null}
-                    onChange={(e) => {
-                        if (!e.target.value) return;
-                        handleStatusChange(id, e.target.value, checkable.id);
-                    }}
-                >
-                    <MenuItem value="received">
-                        <Chip label="Received" color="primary" />
-                    </MenuItem>
-                    <MenuItem value="view">
-                        <Chip label="View Forwarded Info" color="info" />
                     </MenuItem>
                 </Select>
             );

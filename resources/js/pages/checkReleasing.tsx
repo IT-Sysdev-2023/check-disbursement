@@ -13,10 +13,9 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
-import { createReleasingColumns, createReleasingCvColumns } from './chequeReleasing/components/columns';
+import { createReleasingColumns } from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -29,11 +28,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function CheckReleasing({
     cheques,
     company,
-    // defaultCheck,
     filter,
 }: {
     cheques: InertiaPagination<Cv | Crf>;
-    // defaultCheck: string;
     filter: {
         selectedBu: string;
         search: string;
@@ -41,8 +38,6 @@ export default function CheckReleasing({
     };
     company: SelectionType[];
 }) {
-    const [check, setCheck] = useState('cv');
-    const [tableLoading, setTableLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [id, setId] = useState<number | undefined>(undefined);
     const [stream, setStream] = useState('');
@@ -68,7 +63,7 @@ export default function CheckReleasing({
 
         router.push({
             url: releaseCheck([id, value]).url,
-            component: 'checkReleasing/releaseCheck',
+            component: 'chequeReleasing/releaseCheck',
             props: (curr) => ({
                 ...curr,
                 id: id,
@@ -78,8 +73,8 @@ export default function CheckReleasing({
         });
     };
 ;
-    const cvColumns = createReleasingColumns(handleStatusChange);
-console.log(cheques);
+    const columns = createReleasingColumns(handleStatusChange);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -95,8 +90,7 @@ console.log(cheques);
                     pagination={handlePagination}
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
-                    columns={cvColumns}
-                    isLoading={tableLoading}
+                    columns={columns}
                 />
                 {/* <Copyright sx={{ my: 4 }} /> */}
 

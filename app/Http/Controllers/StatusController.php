@@ -23,24 +23,24 @@ class StatusController extends Controller
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
         $cheque = BorrowedCheck::query()
-            ->with('checkable.checkStatus')
+            ->with('checkable.checkStatus.checkForwardedStatus')
             ->where(function (Builder $q) {
                 $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
                     $q->whereNotNull('approver_id')
-                        ->whereHasMorph(
+                        ->whereHas(
                             'checkable',
-                            [CvCheckPayment::class, Crf::class],
                             fn(Builder $q) => $q->scanRecords()
                         )
                         ->whereDoesntHave('checkable.checkStatus');
                 })
                     ->orWhere(function (Builder $q) { // GET ALL THE CHEQUES STORED IN check_status table
-                        $q->whereHasMorph(
+                        $q->whereHas(
                             'checkable',
-                            [CvCheckPayment::class, Crf::class],
-                            fn(Builder $q) => $q->when(auth()->user()->hasRole('forwarded'), function ($query) {
-                            $query->has('checkStatus.checkForwardedStatus');
-                        })->has('checkStatus')
+                            fn(Builder $q) => $q->when(
+                                auth()->user()->hasRole('forwarded'),
+                                fn($query) =>
+                                $query->has('checkStatus.checkForwardedStatus')
+                            )->has('checkStatus')
                         );
                     });
             })
@@ -74,7 +74,7 @@ class StatusController extends Controller
         $data = ScannedRecords::where('amount', $validated['amount'])
             ->where('check_no', $validated['checkNo'])
             ->first();
-            
+
         return response()->json(new ScannedRecordResource($data));
     }
 }

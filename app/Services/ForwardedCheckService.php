@@ -17,11 +17,10 @@ class ForwardedCheckService
     }
      public function index(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-        $defaultCheck = $filters['selectedCheck'] ?? 'cv';
+        $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['cvHeader', 'borrowedCheck', 'checkStatus', 'company', 'tagLocation']])
+            ->with(['checkable' => ['borrowedCheck', 'checkStatus', 'company', 'tagLocation']])
             ->whereHas('checkable.checkStatus', function ($query) {
                 $query->where(['status' => 'forward', 'received_by' => null]);
             })
@@ -38,7 +37,6 @@ class ForwardedCheckService
 
         return Inertia::render('forwardedCheck', [
             'cheques' => $chequeRecords,
-            'defaultCheck' => $defaultCheck,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -78,7 +76,7 @@ class ForwardedCheckService
 
     public function showForwarded(string $id, string $status)
     {
-        return Inertia::render('checkReleasing/releaseCheckForwarded', [
+        return Inertia::render('chequeReleasing/releaseCheckForwarded', [
             'id' => $id,
             'status' => $status,
             'label' => Str::title($status) . ' Check'
@@ -141,11 +139,10 @@ class ForwardedCheckService
 
      public function forwardedReleasing(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-        $defaultCheck = $filters['selectedCheck'] ?? 'cv';
+        $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['cvHeader', 'borrowedCheck', 'checkStatus', 'company', 'tagLocation']])
+            ->with(['checkable' => ['borrowedCheck', 'checkStatus', 'company', 'tagLocation']])
             ->whereHas('checkable.checkStatus', function ($query) {
                 $query->where(['status' => 'forward'])
                     ->whereNotNull('received_by');
@@ -157,7 +154,6 @@ class ForwardedCheckService
 
         return Inertia::render('forwardedCheckReleasing', [
             'cheques' => $chequeRecords,
-            'defaultCheck' => $defaultCheck,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',

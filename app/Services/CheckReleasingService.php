@@ -28,12 +28,10 @@ class CheckReleasingService
 
         $chequeRecords = BorrowedCheck::with('checkable.tagLocation')
             ->whereNotNull('approver_id')
-            ->whereHasMorph(
+            ->whereHas(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
-                function (Builder $query) {
-                    $query->scanRecords();
-                }
+                fn(Builder $query) =>
+                $query->scanRecords()
             )
             ->doesntHave('checkable.checkStatus')
             ->paginate(10)
@@ -96,7 +94,7 @@ class CheckReleasingService
                     'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
                     'causedLabel' => $label . ' By:',
-                    'causedBy' => $validated['receiversName'],
+                    'causedBy' => auth()->user()->name,
 
                     'receivedLabel' => 'Received By:',
                     'receivedBy' => $validated['receiversName'],

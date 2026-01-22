@@ -55,7 +55,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     );
     const isAdmin = roles.includes('admin');
     const releasing = roles.includes('releasing');
-    const scanning = roles.includes('scanning');
+    const officer = roles.includes('officer');
     const forwarded = roles.includes('forwarded');
     const closing = roles.includes('closing');
     const sectionHead = roles.includes('sh');
@@ -66,7 +66,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const finalItems = useMemo(() => {
         return [
             ...items,
-            ...(isAdmin || scanning
+            ...(isAdmin || officer
                 ? [
                       {
                           title: 'Extract',
@@ -129,7 +129,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       },
                   ]
                 : []),
-            ...(isAdmin || releasing || scanning || forwarded
+            ...(isAdmin || releasing || officer || forwarded || sectionHead
                 ? [
                       {
                           title: 'Check Status',
@@ -174,7 +174,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 icon: Bell,
             },
         ];
-    }, [items, isAdmin, releasing, scanning]);
+    }, [items, isAdmin, releasing, officer, closing, forwarded, sectionHead]);
 
     // Automatically open submenu if current page belongs to it
     useEffect(() => {

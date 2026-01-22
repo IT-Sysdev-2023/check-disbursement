@@ -33,6 +33,7 @@ class CheckStatusResource extends JsonResource
             "causedBy" => $this->caused_by,
             "checkableType" => Str::upper($this->checkable_type),
             "checkableId" => $this->checkable_id,
+            'forwardedStatus' => $this->whenLoaded('checkForwardedStatus'),
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
             "createdAt" => $this->created_at ? $this->created_at->toFormattedDateString() : 'N/A',
             "updatedAt" => $this->updated_at,

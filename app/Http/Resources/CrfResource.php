@@ -33,7 +33,7 @@ class CrfResource extends JsonResource
             'preparedBy' => $this->prepared_by,
             'taggedAt' => $this->tagged_at,
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
-            'checkStatus' => $this->whenLoaded('checkStatus'),
+            'checkStatus' => new CheckStatusResource($this->whenLoaded('checkStatus')),
 
             'tagLocation' => $this->whenLoaded('tagLocation'),
             'scannedId' => $this->scanned_id,

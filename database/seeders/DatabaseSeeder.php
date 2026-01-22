@@ -59,8 +59,9 @@ class DatabaseSeeder extends Seeder
         //     Permission::create(['name' => $item->name]);
         // });
 
-        Role::create(['name' => 'releasing']);
-        Role::create(['name' => 'scanning']);
+        // Role::create(['name' => 'releasing']);
+        // Role::create(['name' => 'scanning']);
+        Role::create(['name' => 'officer']);
         Role::create(['name' => 'closing']);
         Role::create(['name' => 'forwarded']);
         Role::create(['name' => 'sh']); //section head
