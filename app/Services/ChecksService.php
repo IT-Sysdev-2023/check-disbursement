@@ -27,18 +27,11 @@ class ChecksService
 
         $tab = $filters['tab'] ?? 'calendar';
 
-        $chequeRecords = new ChequeCollection(self::mergeRecords($filters));
+        $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
 
-        $waitingForApproval = BorrowedCheck::with('checkable')
-            ->whereDoesntHaveMorph(
-                'checkable',
-                [CvCheckPayment::class, Crf::class],
-                fn($query) => $query->has('checkStatus')
-            )
-            ->whereNull('approver_id')
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
+        $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $hasMissingField));
+
+        $waitingForApproval = self::pendingRecords();
 
         // LAST OPTION : JOIN TYPE AND CHECKABLE
         // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
@@ -92,8 +85,23 @@ class ChecksService
                 'label' => 'All',
                 'value' => '0'
             ]),
+            'hasMissingFields' => $hasMissingField,
             'distinctMonths' => self::distinctMonths()
         ]);
+    }
+
+    private static function pendingRecords()
+    {
+        return BorrowedCheck::with('checkable')
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [CvCheckPayment::class, Crf::class],
+                fn($query) => $query->has('checkStatus')
+            )
+            ->whereNull('approver_id')
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
     }
 
     public static function checkIfHasNoCheckNumber()
@@ -110,7 +118,7 @@ class ChecksService
             ->exists();
     }
 
-    private static function mergeRecords($filters)
+    private static function mergeRecords($filters, bool $hasMissingField)
     {
         $cvQuery = CvCheckPayment::baseColumns()
             ->doesntHave('borrowedCheck');
@@ -118,7 +126,7 @@ class ChecksService
         $crfQuery = Crf::baseColumns()
             ->doesntHave('borrowedCheck');
 
-        if (self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate()) {
+        if ($hasMissingField) {
             $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
 
             $crfQuery->where('resolved_check_date', null);

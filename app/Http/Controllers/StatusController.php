@@ -20,9 +20,10 @@ class StatusController extends Controller
 
     public function checkStatus(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
 
         $cheque = BorrowedCheck::query()
+            ->filter($filters)
             ->with('checkable.checkStatus.checkForwardedStatus')
             ->where(function (Builder $q) {
                 $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
@@ -56,6 +57,7 @@ class StatusController extends Controller
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
+                'tab' => $filters['tab'] ?? 'all',
                 'date' => $filters['date'] ?? (object) [
                     'start' => null,
                     'end' => null

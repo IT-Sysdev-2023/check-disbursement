@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class BorrowedCheck extends Model
 {
@@ -16,6 +17,19 @@ class BorrowedCheck extends Model
 
     }
 
+    public function scopeFilter(Builder $builder, array $filters): Builder
+    {
+        return $builder->when(
+            isset($filters['tab']) && $filters['tab'] !== 'all',
+            function (Builder $query) use ($filters) {
+                $query->whereHas('checkable.checkStatus', function (Builder $q) use ($filters) {
+                    $q->where('status', $filters['tab']);
+                });
+            }
+        );
+    }
+
+
     public function borrower()
     {
         return $this->belongsTo(Borrower::class);
@@ -24,16 +38,6 @@ class BorrowedCheck extends Model
     public function approver()
     {
         return $this->belongsTo(Approver::class);
-    }
-
-    public function crf()
-    {
-        return $this->belongsTo(Crf::class, 'checkable_id');
-    }
-
-    public function cvCheckPayment()
-    {
-        return $this->belongsTo(CvCheckPayment::class, 'checkable_id');
     }
 
     public function checkable()

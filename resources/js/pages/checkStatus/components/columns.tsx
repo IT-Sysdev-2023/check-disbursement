@@ -56,7 +56,6 @@ export const createStatusChequeColumns = (
         minWidth: 120,
         flex: 1,
         renderCell: ({ row }) => {
-            console.log(row);
             const { checkStatus } = row.checkable;
             const status =
                 checkStatus?.forwardedStatus?.status ?? checkStatus?.status;

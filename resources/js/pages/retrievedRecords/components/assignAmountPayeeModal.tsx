@@ -48,8 +48,8 @@ export default function AssignAmountPayeeModal({
             const { data } = await axios.get(getScannedRecords(id).url);
             setRecord(data);
             setData({
-                payee: data.payee,
-                amount: data.amount,
+                payee: data.payee ?? '',
+                amount: data.amount ?? 0,
             });
         };
 

@@ -15,7 +15,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Box, Button, Tab } from '@mui/material';
+import { Alert, Box, Button, Tab } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
 
@@ -56,6 +56,7 @@ export default function RetrievedRecords({
     filter,
     company,
     distinctMonths,
+    hasMissingFields,
     auth,
 }: {
     filter: {
@@ -69,6 +70,7 @@ export default function RetrievedRecords({
     pending: InertiaPagination<Borrower>;
     company: SelectionType[];
     manageChecks: InertiaPagination<ManageChecks>;
+    hasMissingFields: boolean;
     auth: Auth;
 }) {
     const [open, setOpen] = useState(false);
@@ -210,7 +212,7 @@ export default function RetrievedRecords({
     };
 
     const chequeColumns = createChequeColumns(handleStatusChange);
-        const pendingColumns = createPendingChequeColumns();
+    const pendingColumns = createPendingChequeColumns();
     const manageCvColumns = createManageColumns(handleUpdateScanned);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -227,10 +229,7 @@ export default function RetrievedRecords({
                                     value="calendar"
                                 />
                                 <Tab label="Table View" value="cheques" />
-                                <Tab
-                                    label="Waiting for Approval"
-                                    value="pending"
-                                />
+                                <Tab label="Borrowed Checks" value="pending" />
                                 <Tab
                                     label="Manage Checks"
                                     value="manageChecks"
@@ -241,6 +240,11 @@ export default function RetrievedRecords({
                             <CalendarView distinctMonths={distinctMonths} />
                         </TabPanel>
                         <TabPanel value="cheques">
+                            {hasMissingFields && (
+                                <Alert variant="filled" severity="error">
+                                    NO CHECK NUMBERS
+                                </Alert>
+                            )}
                             <TableFilter
                                 handleChangeCheck={() => null}
                                 company={company}
