@@ -37,7 +37,7 @@ export default function AssignCnModal({
     chequeData: ChequeType;
 }) {
     const { data, setData, errors, put, reset, transform } = useForm({
-        checkNumber: chequeData.checkNumber || 0,
+        checkNumber: 0,
     });
     const handleSubmit = () => {
         transform((data) => ({

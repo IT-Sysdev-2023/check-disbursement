@@ -128,7 +128,6 @@ class ChequeRequestService
         return BorrowedCheck::select(
             'borrower_no',
             'reason',
-            'checkable_type',
             'borrowers.name as borrower',
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
@@ -140,7 +139,7 @@ class ChequeRequestService
                 fn($query) => $query->has('checkStatus')
             )
             ->whereNull('approver_id')
-            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrowers.name', 'checkable_type')
+            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrowers.name')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()

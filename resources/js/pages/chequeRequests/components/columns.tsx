@@ -46,18 +46,27 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
     {
         field: 'location',
         headerName: 'Location',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => row.checkable.tagLocation?.location,
+    },
+     {
+        field: 'check',
+        headerName: 'Check Type',
+        headerAlign: 'center',
+        align: 'center',
+        flex: 1,
+        minWidth: 80,
+        renderCell: ({ row }) => row.checkable.check,
     },
 
     {
         field: 'businessUnit',
         headerName: 'Business Unit',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => {

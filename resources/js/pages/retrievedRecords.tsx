@@ -213,6 +213,7 @@ export default function RetrievedRecords({
             {
                 preserveScroll: true,
                 onSuccess: () => {
+                    setSelectedLocation('');
                     setOpenTagModal(false);
                 },
             },

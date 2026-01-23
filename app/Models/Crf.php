@@ -23,6 +23,13 @@ class Crf extends Model
         ];
 
     }
+
+     protected function checkNumber(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->ck_no,
+        );
+    }
     protected function getLocation(): Attribute
     {
         return new Attribute(

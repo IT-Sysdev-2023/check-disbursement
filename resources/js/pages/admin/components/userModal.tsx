@@ -129,12 +129,12 @@ export default function UserModal({
                         Name: {details?.name}
                     </Typography>
 
-                     <SelectItem
+                     {/* <SelectItem
                                         handleChange={handleChange}
                                         value={bu}
                                         title="Company"
                                         items={company}
-                    />
+                    /> */}
                     
                     <Typography id="modal-modal-description" sx={{ mt: 3 }}>
                         Assign Business Unit

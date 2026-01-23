@@ -82,6 +82,11 @@ class BorrowedCheckService
             ->unique()
             ->implode(', ');
 
+        $chequeNumbers = $borrower->pluck('checkable.checkNumber')
+            ->filter()
+            ->unique()
+            ->implode(', ');
+
         $data = [
             'dateBorrowed' => $borrower->first()->created_at->isoFormat('MMMM D, YYYY h:mm A'),
             'items' => [
@@ -91,6 +96,7 @@ class BorrowedCheckService
                     'borrowedBy' => $borrower->first()->borrower?->name,
                     'company' => $companyNames,
                     'purpose' => 'For Signature',
+                    'chequeNumbers' => $chequeNumbers
                 ]
             ]
         ];

@@ -41,6 +41,10 @@
             <td>{{ $item['noOfChecks'] }}</td>
         </tr>
         <tr>
+            <th style="text-align: left;">Check Numbers:</th>
+            <td>{{ $item['chequeNumbers'] }}</td>
+        </tr>
+        <tr>
             <th style="text-align: left;">Borrowed By:</th>
             <td>{{ $item['borrowedBy'] }}</td>
         </tr>

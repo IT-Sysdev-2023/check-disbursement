@@ -46,6 +46,7 @@ function Row(props: { row: Borrower }) {
     const handleAction = async (borrowedNo: number) => {
         router.visit(borrowedNumberCheques(borrowedNo));
     };
+    console.log(borrowerData);
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -69,7 +70,6 @@ function Row(props: { row: Borrower }) {
                 <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
                 <TableCell align="right">{'For Signature'}</TableCell>
-                <TableCell align="right">{row.check}</TableCell>
                 <TableCell align="center">
                     <IconButton
                         size="small"
@@ -83,7 +83,7 @@ function Row(props: { row: Borrower }) {
             <TableRow>
                 <TableCell
                     style={{ paddingBottom: 0, paddingTop: 0 }}
-                    colSpan={6}
+                    colSpan={7}
                 >
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
@@ -100,12 +100,9 @@ function Row(props: { row: Borrower }) {
                                     <TableRow>
                                         <TableCell>Check Date</TableCell>
                                         <TableCell>Check Amount</TableCell>
-                                        <TableCell align="right">
-                                            Company
-                                        </TableCell>
-                                        <TableCell align="right">
-                                            Payee
-                                        </TableCell>
+                                        <TableCell>Company</TableCell>
+                                        <TableCell>Payee</TableCell>
+                                        <TableCell>Check Type</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -127,14 +124,17 @@ function Row(props: { row: Borrower }) {
                                                             .amount
                                                     }
                                                 </TableCell>
-                                                <TableCell align="right">
+                                                <TableCell>
                                                     {
                                                         historyRow.checkable
                                                             .company
                                                     }
                                                 </TableCell>
-                                                <TableCell align="right">
+                                                <TableCell>
                                                     {historyRow.checkable.payee}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {historyRow.check}
                                                 </TableCell>
                                             </TableRow>
                                         ),
@@ -188,7 +188,6 @@ export default function BorrowedTableGrid({
                             <TableCell align="right">Borrower Name</TableCell>
                             <TableCell align="right">Reason</TableCell>
                             <TableCell align="right">Purpose</TableCell>
-                            <TableCell align="right">Type</TableCell>
                             <TableCell align="right">
                                 Borrower Details
                             </TableCell>

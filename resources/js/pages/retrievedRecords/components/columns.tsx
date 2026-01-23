@@ -255,6 +255,13 @@ export const createManageColumns = (
         },
     },
     {
+        field: 'type',
+        headerName: 'Check Type',
+        headerAlign: 'center',
+        align: 'center',
+        flex: 1,
+    },
+    {
         field: 'actions',
         headerName: 'Action',
         width: 130,
