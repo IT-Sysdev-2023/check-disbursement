@@ -23,13 +23,15 @@ class ChecksService
 
     public function records(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'tab']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'tab', 'assignment']);
 
         $tab = $filters['tab'] ?? 'calendar';
 
+        $assignment = $filters['assignment'] ?? 'toAssign';
         $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
 
-        $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $hasMissingField));
+        $isToAssign = $hasMissingField ? 'toAssign' : '';
+        $chequeRecords = new ChequeCollection(self::mergeRecords($filters, false));
 
         $waitingForApproval = self::pendingRecords();
 
@@ -79,6 +81,7 @@ class ChecksService
                     'start' => null,
                     'end' => null
                 ],
+                'assignment' => $assignment,
                 'tab' => $tab
             ],
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
@@ -127,6 +130,10 @@ class ChecksService
             ->doesntHave('borrowedCheck');
 
         if ($hasMissingField) {
+            $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
+
+            $crfQuery->where('resolved_check_date', null);
+        }else{
             $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
 
             $crfQuery->where('resolved_check_date', null);

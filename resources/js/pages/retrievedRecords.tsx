@@ -30,6 +30,7 @@ import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
+import SelectItem from './dashboard/components/SelectItem';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import AssignAmountPayeeModal from './retrievedRecords/components/assignAmountPayeeModal';
 import AssignCdModal from './retrievedRecords/components/assignCdModal';
@@ -49,6 +50,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const assignment = [
+    {
+        label: 'Completed',
+        value: 'completed',
+    },
+    {
+        label: 'To Assign',
+        value: 'toAssign',
+    },
+];
 export default function RetrievedRecords({
     cheques,
     manageChecks,
@@ -64,6 +75,7 @@ export default function RetrievedRecords({
         search: string;
         date: DateFilterType;
         tab: string;
+        assignment: string;
     };
     cheques: InertiaPagination<ChequeType>;
     distinctMonths: DistinctMonths;
@@ -86,6 +98,7 @@ export default function RetrievedRecords({
         { label: string; value: string }[]
     >([]);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
+    const [assign, setAssin] = useState(filter.assignment);
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
@@ -211,6 +224,21 @@ export default function RetrievedRecords({
         setScannedId(id);
     };
 
+    const handleAssignment = ({
+        target,
+    }: {
+        target: { value: string; name: string | null };
+    }) => {
+        setAssin(target.value);
+        router.reload({
+            only: ['cheques'],
+            data: {
+                assignment: target.value,
+            },
+        });
+        console.log(target);
+    };
+
     const chequeColumns = createChequeColumns(handleStatusChange);
     const pendingColumns = createPendingChequeColumns();
     const manageCvColumns = createManageColumns(handleUpdateScanned);
@@ -249,8 +277,14 @@ export default function RetrievedRecords({
                                 handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}
-                            />
-
+                            >
+                                <SelectItem
+                                    handleChange={handleAssignment}
+                                    value={assign}
+                                    title="Assignment"
+                                    items={assignment}
+                                />
+                            </TableFilter>
                             <TableDataGrid
                                 data={cheques}
                                 filter={filter.search}
@@ -261,7 +295,6 @@ export default function RetrievedRecords({
                                 handleSortFilter={handleSort}
                                 columns={chequeColumns}
                             />
-
                             <Box
                                 display="flex"
                                 justifyContent="flex-end"

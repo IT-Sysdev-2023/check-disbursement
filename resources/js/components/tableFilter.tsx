@@ -18,12 +18,14 @@ import { useState } from 'react';
 export default function ({
     company,
     filters,
+    children
 }: {
     company: SelectionType[];
     filters: {
         selectedBu: string;
         date: DateFilterType;
     };
+    children?: React.ReactNode;
     handleChangeCheck?: (value: SelectChangeEvent) => void;
 }) {
     const [bu, setBu] = useState<string>(filters.selectedBu);
@@ -95,6 +97,8 @@ export default function ({
                     title="Company"
                     items={company}
                 />
+
+                {children}
                 {/* <SelectItem
                     handleChange={handleChangeCheck}
                     isDisabled={isCheckDisabled}
