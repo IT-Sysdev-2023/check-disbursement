@@ -28,10 +28,10 @@ class ChecksService
         $tab = $filters['tab'] ?? 'calendar';
 
         $assignment = $filters['assignment'] ?? 'toAssign';
-        $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
 
-        $isToAssign = $hasMissingField ? 'toAssign' : '';
-        $chequeRecords = new ChequeCollection(self::mergeRecords($filters, false));
+        $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
+        
+        $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
         $waitingForApproval = self::pendingRecords();
 
@@ -134,9 +134,8 @@ class ChecksService
 
             $crfQuery->where('resolved_check_date', null);
         }else{
-            $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
-
-            $crfQuery->where('resolved_check_date', null);
+            $cvQuery->whereNotNull('resolved_check_number')->whereNot('check_number');
+            $crfQuery->whereNotNull('resolved_check_date');
         }
 
         $unionQuery = $cvQuery->unionAll($crfQuery);

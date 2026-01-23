@@ -268,11 +268,11 @@ export default function RetrievedRecords({
                             <CalendarView distinctMonths={distinctMonths} />
                         </TabPanel>
                         <TabPanel value="cheques">
-                            {hasMissingFields && (
+                            {/* {hasMissingFields && (
                                 <Alert variant="filled" severity="error">
                                     NO CHECK NUMBERS
                                 </Alert>
-                            )}
+                            )} */}
                             <TableFilter
                                 handleChangeCheck={() => null}
                                 company={company}

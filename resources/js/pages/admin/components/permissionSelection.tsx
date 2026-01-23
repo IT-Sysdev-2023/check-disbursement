@@ -40,10 +40,10 @@ export default function PermissionSelection({
 
     return (
         <div>
-            <FormControl sx={{ m: 1, width: 300 }}>
-                <InputLabel id="demo-multiple-chip-label">
+            <FormControl sx={{ width: 300 }}>
+                {/* <InputLabel id="demo-multiple-chip-label">
                     Permission
-                </InputLabel>
+                </InputLabel> */}
                 <Select
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"

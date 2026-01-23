@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class AdminController extends Controller
 {
@@ -21,8 +22,24 @@ class AdminController extends Controller
 
     public function permissions()
     {
-        $permissions = Company::select('id', 'name')->get();
-        return response()->json($permissions);
+        $permissions = Company::select('id', 'name')
+            ->get()
+            ->map(function ($name) {
+                return [
+                    'label' => $name->name,
+                    'value' => $name->id,
+                ];
+            });
+
+        $roles = Role::select('id', 'name')
+            ->get()
+            ->map(function ($name) {
+                return [
+                    'label' => $name->name,
+                    'value' => $name->id,
+                ];
+            });
+        return response()->json(['permissions' => $permissions, 'roles' => $roles]);
     }
 
     public function assignPermissions(Request $request)
@@ -32,7 +49,7 @@ class AdminController extends Controller
             'selectedPermission' => 'required|array|min:1',
             'id' => 'required|int'
         ]);
-
+        dd($request->all());
         // Get all company IDs at once
         $companyIds = Company::whereIn('name', $request->selectedPermission)->pluck('id', 'name');
 

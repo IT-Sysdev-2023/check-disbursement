@@ -1,5 +1,6 @@
 import { assignPermissions, permissions } from '@/routes';
 import { FlashReponse, Permission, User } from '@/types';
+import { router } from '@inertiajs/react';
 import {
     Alert,
     Button,
@@ -13,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import PermissionSelection from './permissionSelection';
-import { router } from '@inertiajs/react';
+import SelectItem from '@/pages/dashboard/components/SelectItem';
 
 const style = {
     position: 'absolute',
@@ -27,6 +28,10 @@ const style = {
     p: 4,
 };
 
+type PermissionRoleType = {
+    roles: any[];
+    permissions: Permission[];
+};
 export default function UserModal({
     open,
     details,
@@ -38,12 +43,11 @@ export default function UserModal({
 }) {
     const [openSnackBar, setOpenSnackBar] = useState(false);
     const [message, setMessage] = useState('');
-    const [selectedPermission, setSelectedPermission] = useState<
-        string[]
-    >([]);
-    const [permissionsList, setPermissionsList] = useState<Permission[]>(
-        [],
-    );
+    const [selectedPermission, setSelectedPermission] = useState<string[]>([]);
+    const [permissionsList, setPermissionsList] = useState<PermissionRoleType>({
+        roles: [],
+        permissions: [],
+    });
 
     useEffect(() => {
         const fetchPermissions = async () => {
@@ -60,12 +64,9 @@ export default function UserModal({
 
     //Set Defaul User Permission to the UI
     useEffect(() => {
-            setSelectedPermission(
-                details?.company_permissions.map((p) => 
-                     p.company.name
-                ),
-            );
-        
+        setSelectedPermission(
+            details?.company_permissions.map((p) => p.company.name),
+        );
     }, [details?.company_permissions]);
 
     const handleChange = (
@@ -127,16 +128,33 @@ export default function UserModal({
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                         Name: {details?.name}
                     </Typography>
-                    <Typography id="modal-modal-description" sx={{ mt: 3 }}>
-                        Permissions
-                    </Typography>
 
+                     <SelectItem
+                                        handleChange={handleChange}
+                                        value={bu}
+                                        title="Company"
+                                        items={company}
+                    />
+                    
+                    <Typography id="modal-modal-description" sx={{ mt: 3 }}>
+                        Assign Business Unit
+                    </Typography>
                     <PermissionSelection
-                        permissions={permissionsList}
+                        permissions={permissionsList.permissions}
                         selectedPermission={selectedPermission}
                         handleChange={handleChange}
                     />
-                    <Button variant="contained" onClick={onSave}>
+
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Assign Role
+                    </Typography>
+                    <PermissionSelection
+                        permissions={permissionsList.roles}
+                        selectedPermission={selectedPermission}
+                        handleChange={handleChange}
+                    />
+
+                    <Button variant="contained" onClick={onSave} sx={{ mt: 3 }}>
                         Save
                     </Button>
                 </Box>
