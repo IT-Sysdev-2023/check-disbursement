@@ -23,6 +23,10 @@ class RegisteredUserController extends Controller
         return Inertia::render('auth/register');
     }
 
+    public function ipPhones(){
+         return Inertia::render('auth/ip-phones');
+    }
+
     /**
      * Handle an incoming registration request.
      *

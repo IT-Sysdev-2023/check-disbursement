@@ -6,7 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
+import { ipPhones, register } from '@/routes';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
@@ -20,7 +20,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     return (
         <AuthLayout
             title="Check Disbursement Monitoring"
-            description="Enter your username and password below to log in"
+            description="Monitor and manage check disbursements"
         >
             <Head title="Log in" />
 
@@ -42,7 +42,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="username"
-                                    placeholder="piolo pacquiao"
+                                    placeholder="Enter Username"
                                 />
                                 <InputError message={errors.username} />
                             </div>
@@ -67,7 +67,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="********"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -97,8 +97,8 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                         <div className="text-center text-sm text-muted-foreground">
                             Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
+                            <TextLink href={ipPhones()} tabIndex={5}>
+                                Contact Us
                             </TextLink>
                         </div>
                     </>
