@@ -1,5 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf, getLocation, scan, tagLocation } from '@/routes';
+import {
+    details,
+    detailsCrf,
+    getLocation,
+    scan,
+    signatureDetails,
+    tagLocation,
+} from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -15,7 +22,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Alert, Box, Button, Tab } from '@mui/material';
+import { Box, Button, Tab } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
 
@@ -240,9 +247,17 @@ export default function RetrievedRecords({
         console.log(target);
     };
 
+    const handleDetails = (id: number, type: string) => {
+        if (type === 'cv') router.visit(details(id));
+        else router.visit(detailsCrf(id));
+    };
+
     const chequeColumns = createChequeColumns(handleStatusChange);
     const pendingColumns = createPendingChequeColumns();
-    const manageCvColumns = createManageColumns(handleUpdateScanned);
+    const manageCvColumns = createManageColumns(
+        handleDetails,
+        handleUpdateScanned,
+    );
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">

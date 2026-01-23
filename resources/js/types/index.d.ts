@@ -217,17 +217,17 @@ export interface CvHeader {
 
 export interface Crf {
     id: number;
-    crf: string;
+    cvNo: string;
     filename: string;
     company: string;
     no: number;
     location: string;
     date: string;
-    paidTo: string;
+    payee: string;
     particulars: string;
     amount: number;
     bank: string;
-    ckNo: number;
+    checkNumber: number;
     preparedBy: string;
     created_at: string;
     updated_at: string;

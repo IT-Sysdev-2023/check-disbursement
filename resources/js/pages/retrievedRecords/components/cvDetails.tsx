@@ -45,7 +45,7 @@ export default function CvDetails({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Check Amount</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.checkAmount}
+                            {details.amount}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -71,7 +71,7 @@ export default function CvDetails({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Bank Name</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.bankName}
+                            {details.bank}
                         </Typography>
                     </Paper>
                 </Grid>

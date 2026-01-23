@@ -1,7 +1,7 @@
 import { ActionType, ChequeType } from '@/types';
-import { Box, Chip, IconButton, MenuItem, Select } from '@mui/material';
+import { Box, Chip, IconButton, MenuItem, Select, Stack } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { ArrowBigRightDash } from 'lucide-react';
+import { ArrowBigRightDash, NotepadText } from 'lucide-react';
 import { JSX } from 'react';
 
 const renderStatus = (
@@ -196,6 +196,7 @@ export const createPendingChequeColumns = (): GridColDef[] => [
 ];
 
 export const createManageColumns = (
+    handleDetails: (id: number, type: string) => void,
     handleAction: (rec: number) => void,
 ): GridColDef[] => [
     {
@@ -269,23 +270,46 @@ export const createManageColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            if (!row.scannedId) {
-                return null;
-            }
-            if (row.scannedPayee && row.scannedAmount) {
-                return (
-                    <Chip label="Completed" color="secondary" size="small" />
-                );
-            }
             return (
-                <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => handleAction(row.scannedId)}
-                >
-                    <ArrowBigRightDash />
-                </IconButton>
+                <Stack direction="row" sx={{ gap: 1 }}>
+                    <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleDetails(row.chequeId, row.type)}
+                    >
+                        <NotepadText />
+                    </IconButton>
+
+                    {row.scannedId &&
+                        !row.scannedPayee &&
+                        !row.scannedAmount && (
+                            <IconButton
+                                size="small"
+                                color="primary"
+                                onClick={() => handleAction(row.scannedId)}
+                            >
+                                <ArrowBigRightDash />
+                            </IconButton>
+                        )}
+                </Stack>
             );
+            // if (!row.scannedId) {
+            //     return null;
+            // }
+            // if (row.scannedPayee && row.scannedAmount) {
+            //     return (
+            //         <Chip label="Completed" color="secondary" size="small" />
+            //     );
+            // }
+            // return (
+            //     <IconButton
+            //         size="small"
+            //         color="primary"
+            //         onClick={() => handleAction(row.scannedId)}
+            //     >
+            //         <ArrowBigRightDash />
+            //     </IconButton>
+            // );
         },
     },
 ];

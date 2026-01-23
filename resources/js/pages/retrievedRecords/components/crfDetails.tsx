@@ -19,7 +19,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Crf #</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.crf}
+                            {details.cvNo}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -52,7 +52,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Paid To</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.paidTo}
+                            {details.payee}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -84,7 +84,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Ck No</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.ckNo}
+                            {details.checkNumber}
                         </Typography>
                     </Paper>
                 </Grid>
