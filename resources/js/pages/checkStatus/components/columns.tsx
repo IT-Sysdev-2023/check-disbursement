@@ -49,6 +49,14 @@ export const createStatusChequeColumns = (
         flex: 1,
         minWidth: 100,
         renderCell: ({ row }) => row.checkable.checkDate,
+        },
+    {
+        field: 'check',
+        headerName: 'Check Type',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
     },
     {
         field: 'status',
@@ -56,8 +64,8 @@ export const createStatusChequeColumns = (
         minWidth: 120,
         flex: 1,
         renderCell: ({ row }) => {
+            console.log(row);
             const { checkStatus } = row.checkable;
-            console.log(checkStatus);
             let status = checkStatus?.status;
 
             if (checkStatus?.forwardedStatus?.status) {

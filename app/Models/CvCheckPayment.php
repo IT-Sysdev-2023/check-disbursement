@@ -97,11 +97,13 @@ class CvCheckPayment extends Model
             'check_amount as amount',
             'cv_check_payments.payee',
             'tagged_at',
+            'tag_locations.location',
             DB::raw("'cv' as type"),
             'cv_check_payments.created_at'
         )
             ->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
-            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id');
+            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+            ->join('tag_locations', 'tag_locations.id', '=', 'cv_check_payments.tag_location_id');
     }
 
     public function scopeScanRecords(Builder $builder)

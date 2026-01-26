@@ -24,7 +24,7 @@ class Crf extends Model
 
     }
 
-     protected function checkNumber(): Attribute
+    protected function checkNumber(): Attribute
     {
         return new Attribute(
             get: fn() => $this->ck_no,
@@ -88,23 +88,26 @@ class Crf extends Model
             'crfs.amount',
             'paid_to as payee',
             'tagged_at',
+            'tag_locations.location',
             DB::raw("'crf' as type"),
             'crfs.created_at'
         )
-            ->join('companies', 'companies.id', '=', 'crfs.company_id');
+            ->join('companies', 'companies.id', '=', 'crfs.company_id')
+            ->join('tag_locations', 'tag_locations.id', '=', 'crfs.tag_location_id');
     }
     public function scopeScanRecords(Builder $builder)
     {
         return $builder->join('scanned_records', function ($join) {
             $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
                 ->on('scanned_records.amount', '=', 'crfs.amount');
-                // ->whereNotNull('scanned_records.payee');
+            // ->whereNotNull('scanned_records.payee');
         });
     }
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'crfs.id')
             ->join('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
+            
             ->where('borrowed_checks.checkable_type', 'crf')
             ->whereNotNull('borrowed_checks.approver_id')
             ->leftJoin('scanned_records', function ($join) {

@@ -260,6 +260,13 @@ export const createManageColumns = (
         headerAlign: 'center',
         align: 'center',
         flex: 1,
+        },
+      {
+        field: 'location',
+        headerName: 'Location',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
     },
     {
         field: 'actions',
@@ -269,6 +276,7 @@ export const createManageColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
+            console.log(row);
             return (
                 <>
                     {row.scannedId && (

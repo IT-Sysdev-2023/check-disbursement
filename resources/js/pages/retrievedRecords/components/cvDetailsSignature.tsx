@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 
 export default function CvDetailsSignature({ details }: { details: Cv }) {
-    console.log(details);
+
     return (
         <Box sx={{ flexGrow: 1, width: '100%' }}>
             <Grid container spacing={2} sx={{ width: '100%' }}>
@@ -47,6 +47,14 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         </Typography>
                     </Paper>
                 </Grid>
+                <Grid size={{ xs: 12, sm: 6 }}>
+                    <Paper sx={{ px: 2, py: 1 }}>
+                        <Typography variant="overline">Company</Typography>
+                        <Typography variant="body1" sx={{ mb: 1 }}>
+                            {details.company}
+                        </Typography>
+                    </Paper>
+                </Grid>
                 {details.checkStatus && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
@@ -54,7 +62,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                 Released Date:
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 1 }}>
-                                {details.checkStatus?.created_at ?? '-'}
+                                {details.checkStatus?.createdAt ?? '-'}
                             </Typography>
                         </Paper>
                     </Grid>
@@ -67,6 +75,18 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         </Typography>
                     </Paper>
                 </Grid>
+                {details?.checkStatus?.receiversName && (
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Paper sx={{ px: 2, py: 1 }}>
+                            <Typography variant="overline">
+                                Receivers Name
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 1 }}>
+                                {details.checkStatus?.receiversName}
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                )}
                 {details?.checkStatus?.image && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>

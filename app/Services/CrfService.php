@@ -89,7 +89,7 @@ class CrfService
     public function detailsCrf(Crf $id)
     {
         return Inertia::render('retrievedRecords/checkDetailsCrf', [
-            'crf' => $id->toResource()
+            'crf' => $id->load('checkStatus.checkForwardedStatus')->toResource()
         ]);
     }
 }

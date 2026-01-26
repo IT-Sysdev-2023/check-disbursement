@@ -130,6 +130,7 @@ export interface Cv {
     id: number;
     nav_table_id: number;
     cv_number: string;
+    company: string;
     checkNumber: number;
     checkAmount: string;
     checkDate: string;
@@ -205,7 +206,7 @@ export interface CheckStatus {
     image: string | null;
     signature: string | null;
     checkable: Cv | Crf;
-    created_at: string;
+    createdAt: string;
     updated_at: string;
 }
 
@@ -231,6 +232,7 @@ export interface Crf {
     preparedBy: string;
     created_at: string;
     updated_at: string;
+    checkStatus: CheckStatus
 }
 
 export interface Links {

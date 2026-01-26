@@ -17,7 +17,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CheckDetailsCrf({ crf }: { crf: { data: Crf } }) {
-
+console.log(crf);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CRF Details" />
