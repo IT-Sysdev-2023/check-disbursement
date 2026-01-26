@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\NumberHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +18,7 @@ class ScannedRecordResource extends JsonResource
         return [
             'id' => $this->id,
             'accountNo' => $this->account_no,
-            "amount" => $this->amount,
+            "amount" => NumberHelper::currency($this->amount),
             'branchCode' => $this->branch_code,
             "branchName" => $this->branch_name,
             'bu' => $this->bu,

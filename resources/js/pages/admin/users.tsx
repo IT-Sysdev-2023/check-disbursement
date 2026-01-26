@@ -15,6 +15,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Users({ users }: { users: InertiaPagination<User> }) {
+
+    console.log(users);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
@@ -23,7 +25,7 @@ export default function Users({ users }: { users: InertiaPagination<User> }) {
                     Users
                 </Typography>
                 <Stack direction="row" sx={{ gap: 1 }}>
-                    <Search />
+                    {/* <Search /> */}
                 </Stack>
                 <Grid container spacing={2} columns={12}>
                     <UsersDataGrid usersList={users} />

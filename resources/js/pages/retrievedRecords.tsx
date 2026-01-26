@@ -1,12 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import {
-    details,
-    detailsCrf,
-    getLocation,
-    scan,
-    signatureDetails,
-    tagLocation,
-} from '@/routes';
+import { details, detailsCrf, getLocation, scan, tagLocation } from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -74,7 +67,7 @@ export default function RetrievedRecords({
     filter,
     company,
     distinctMonths,
-    hasMissingFields,
+    // hasMissingFields,
     auth,
 }: {
     filter: {
@@ -89,7 +82,7 @@ export default function RetrievedRecords({
     pending: InertiaPagination<Borrower>;
     company: SelectionType[];
     manageChecks: InertiaPagination<ManageChecks>;
-    hasMissingFields: boolean;
+    // hasMissingFields: boolean;
     auth: Auth;
 }) {
     const [open, setOpen] = useState(false);
@@ -109,7 +102,6 @@ export default function RetrievedRecords({
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
-
     const notifications = useNotifications();
 
     const { flash } = usePage().props as {
@@ -247,15 +239,16 @@ export default function RetrievedRecords({
         console.log(target);
     };
 
-    const handleDetails = (id: number, type: string) => {
-        if (type === 'cv') router.visit(details(id));
-        else router.visit(detailsCrf(id));
-    };
+    // const handleDetails = (scannedId: number) => {
+    //     setOpenScannedModal(true);
+    //     if(scannedId)
+    //     setScannedRecordId(scannedId);
+    // };
 
     const chequeColumns = createChequeColumns(handleStatusChange);
     const pendingColumns = createPendingChequeColumns();
     const manageCvColumns = createManageColumns(
-        handleDetails,
+        // handleDetails,
         handleUpdateScanned,
     );
     return (

@@ -82,4 +82,8 @@ class StatusController extends Controller
 
         return response()->json(new ScannedRecordResource($data));
     }
+
+    public function scannedRecords(ScannedRecords $id){
+         return response()->json(new ScannedRecordResource($id));
+    }
 }

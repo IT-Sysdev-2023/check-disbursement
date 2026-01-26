@@ -11,6 +11,7 @@ class ScannedRecords extends Model
     {
         return [
             'posted_date' => 'datetime',
+            'date' => 'datetime'
         ];
 
     }

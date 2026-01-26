@@ -109,6 +109,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
     Route::get('scanned-records-amount-checkNo', [StatusController::class, 'scannedRecordsAmountCheckNo'])->name('scanned-records-amount-checkNo');
+    Route::get('scanned-records/{id}', [StatusController::class, 'scannedRecords'])->name('scanned-records');
 
     Route::get('report', [ReportController::class, 'index'])->name('report');
     Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');

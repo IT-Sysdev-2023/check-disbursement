@@ -29,7 +29,7 @@ class ChecksService
 
         $assignment = $filters['assignment'] ?? 'toAssign';
 
-        $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
+        // $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
         
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
@@ -88,7 +88,7 @@ class ChecksService
                 'label' => 'All',
                 'value' => '0'
             ]),
-            'hasMissingFields' => $hasMissingField,
+            // 'hasMissingFields' => $hasMissingField,
             'distinctMonths' => self::distinctMonths()
         ]);
     }

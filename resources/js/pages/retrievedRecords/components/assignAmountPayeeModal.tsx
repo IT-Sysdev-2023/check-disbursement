@@ -40,32 +40,34 @@ export default function AssignAmountPayeeModal({
     const [record, setRecord] = useState<ScannedRecords>();
     const { data, setData, errors, put, reset } = useForm({
         payee: '',
-        amount: 0,
+        // amount: 0,
     });
 
     useEffect(() => {
+        if (!open || !id) return;
         const getRecord = async () => {
             const { data } = await axios.get(getScannedRecords(id).url);
+
             setRecord(data);
             setData({
                 payee: data.payee ?? '',
-                amount: data.amount ?? 0,
+                // amount: data.amount ?? 0,
             });
         };
 
         getRecord();
-    }, [id]);
+    }, [id, open]);
 
     const handleSubmit = () => {
-        if (!record?.id) return;
-        put(updateScannedRecord(record.id).url, {
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                reset();
-                onClose();
-            },
-        });
+        if (record)
+            put(updateScannedRecord(record.id).url, {
+                preserveScroll: true,
+                onSuccess: () => {
+                    reset();
+                    setRecord(undefined);
+                    onClose();
+                },
+            });
     };
     return (
         <Modal
@@ -147,6 +149,16 @@ export default function AssignAmountPayeeModal({
                                 <Typography variant="overline">
                                     Amount
                                 </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.amount}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        {/* <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Amount
+                                </Typography>
                                 <TextField
                                     fullWidth
                                     size="small"
@@ -167,28 +179,35 @@ export default function AssignAmountPayeeModal({
                                     sx={{ mb: 1 }}
                                 />
                             </Paper>
-                        </Grid>
+                        </Grid> */}
+
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
                                     Payee
                                 </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    value={data.payee}
-                                    error={!!errors.payee}
-                                    helperText={errors.payee ?? ' '}
-                                    onChange={(e) =>
-                                        setData('payee', e.target.value)
-                                    }
-                                    sx={{ mb: 1 }}
-                                />
+                                {record?.payee ? (
+                                    <Typography variant="body1" sx={{ mb: 1 }}>
+                                        {record.payee}
+                                    </Typography>
+                                ) : (
+                                    <TextField
+                                        fullWidth
+                                        size="small"
+                                        value={data.payee}
+                                        error={!!errors.payee}
+                                        helperText={errors.payee ?? ' '}
+                                        onChange={(e) =>
+                                            setData('payee', e.target.value)
+                                        }
+                                        sx={{ mb: 1 }}
+                                    />
+                                )}
                             </Paper>
                         </Grid>
                     </Grid>
                     <Divider sx={{ my: 3 }} />
-                    <Stack
+                    {!record?.payee && <Stack
                         direction="row"
                         spacing={2}
                         justifyContent="space-between"
@@ -199,10 +218,10 @@ export default function AssignAmountPayeeModal({
                                 color="secondary"
                                 onClick={handleSubmit}
                             >
-                                Submit
+                                Update
                             </Button>
                         </Stack>
-                    </Stack>
+                    </Stack>}
                 </Box>
             </Box>
         </Modal>
