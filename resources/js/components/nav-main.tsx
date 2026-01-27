@@ -95,7 +95,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             ...(isAdmin || sectionHead
                 ? [
                       {
-                          title: 'Check Request',
+                          title: 'Check Receiving',
                           href: chequeRequests(),
                           icon: FolderCheck,
                       },

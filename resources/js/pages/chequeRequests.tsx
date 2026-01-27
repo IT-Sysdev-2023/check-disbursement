@@ -6,7 +6,7 @@ import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Requests',
+        title: 'Check Receiving',
         href: '#',
     },
 ];
@@ -18,8 +18,8 @@ export default function CheckReleasing({
 }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="CV" />
-            <PageContainer title="Check Requests">
+            <Head title="CR" />
+            <PageContainer title="Assign Approver">
                 <BorrowedTableGrid data={cheques} />
             </PageContainer>
         </AppLayout>

@@ -1,8 +1,13 @@
 import { DistinctMonths } from '@/types';
+import { router } from '@inertiajs/react';
 import { Badge, Box, styled } from '@mui/material';
-import { DateCalendar, LocalizationProvider, PickersDay } from '@mui/x-date-pickers';
+import {
+    DateCalendar,
+    LocalizationProvider,
+    PickersDay,
+} from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 const HighlightedDay = styled(PickersDay)(({ theme }) => ({
     backgroundColor: theme.palette.primary.main,
@@ -12,9 +17,29 @@ const HighlightedDay = styled(PickersDay)(({ theme }) => ({
 
 export default function CalendarView({
     distinctMonths,
+    onChangeTab,
 }: {
     distinctMonths: DistinctMonths;
-    }) {
+    onChangeTab: () => void;
+}) {
+    const handleDate = (date: Dayjs | null) => {
+        if (!date) return;
+
+        const formattedDate = date.format('YYYY-MM-DD');
+        router.reload({
+            data: {
+                date: {
+                    start: formattedDate,
+                    end: formattedDate,
+                },
+                tab: 'cheques',
+            },
+            replace: true,
+            onSuccess: () => {
+                onChangeTab();
+            },
+        });
+    };
     return (
         <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Box sx={{ width: '100%', p: 2 }}>
@@ -30,7 +55,7 @@ export default function CalendarView({
                         return (
                             <DateCalendar
                                 key={key}
-                                readOnly
+                                onChange={handleDate}
                                 referenceDate={dayjs(`${year}-${month}-01`)}
                                 onMonthChange={() => {}}
                                 onYearChange={() => {}}

@@ -274,7 +274,7 @@ export default function RetrievedRecords({
                             </TabList>
                         </Box>
                         <TabPanel value="calendar">
-                            <CalendarView distinctMonths={distinctMonths} />
+                            <CalendarView distinctMonths={distinctMonths} onChangeTab={() => setCurrentTab('cheques')}/>
                         </TabPanel>
                         <TabPanel value="cheques">
                             {/* {hasMissingFields && (

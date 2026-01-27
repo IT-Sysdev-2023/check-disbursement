@@ -69,6 +69,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
         Route::get('cv/details-signature/{id}', [CvController::class, 'signatureDetails'])->name('signature-details');
         Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('details-crf');
+
+        Route::get('calendar', [CrfController::class, 'calendar'])->name('calendar');
     });
 
     //! CHECK REQUESTS (SH)

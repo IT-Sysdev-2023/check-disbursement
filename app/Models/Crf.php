@@ -93,7 +93,7 @@ class Crf extends Model
             'crfs.created_at'
         )
             ->join('companies', 'companies.id', '=', 'crfs.company_id')
-            ->join('tag_locations', 'tag_locations.id', '=', 'crfs.tag_location_id');
+            ->leftJoin('tag_locations', 'tag_locations.id', '=', 'crfs.tag_location_id');
     }
     public function scopeScanRecords(Builder $builder)
     {

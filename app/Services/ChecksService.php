@@ -30,7 +30,7 @@ class ChecksService
         $assignment = $filters['assignment'] ?? 'toAssign';
 
         // $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
-        
+
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
         $waitingForApproval = self::pendingRecords();
@@ -124,6 +124,7 @@ class ChecksService
     private static function mergeRecords($filters, bool $hasMissingField)
     {
         $cvQuery = CvCheckPayment::baseColumns()
+            ->filter($filters)
             ->doesntHave('borrowedCheck');
 
         $crfQuery = Crf::baseColumns()
@@ -133,7 +134,7 @@ class ChecksService
             $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
 
             $crfQuery->where('resolved_check_date', null);
-        }else{
+        } else {
             $cvQuery->whereNotNull('resolved_check_number')->whereNot('check_number');
             $crfQuery->whereNotNull('resolved_check_date');
         }
