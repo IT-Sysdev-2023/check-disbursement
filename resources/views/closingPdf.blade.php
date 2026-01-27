@@ -1,39 +1,127 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Check Releasing</title>
-</head>
-<body>
-    <table class="w-full">
-        <tr>
-             <th style="text-align: left;"><h2>Transaction No: </h2></th>
-            <td><h3> {{  $data['transactionNo'] }}</h3></td>
-        </tr>
-    </table>
- 
-   @foreach($data['items'] as $item)
-    <table class="products margin-top" style="margin-bottom: 20px;">
-        <tr>
-            <th style="text-align: left;">Date Forwarded:</th>
-            <td>{{ $item['dateForwarded'] }}</td>
-        </tr>
-        <tr>
-            <th style="text-align: left;">Forwarded By:</th>
-            <td>{{ $item['forwardedBy'] }}</td>
-        </tr>
-        <tr>
-            <th style="text-align: left;">Date Received:</th>
-            <td>{{ $item['dateReceived'] }}</td>
-        </tr>
-        <tr>
-            <th style="text-align: left;">Received By:</th>
-            <td>{{ $item['receivedBy'] }}</td>
-        </tr>
-    </table>
-@endforeach
 
-</body>
-</html>
+<style>
+    .document-container {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 40px;
+        font-family: Arial, sans-serif;
+        color: #000;
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .header h1 {
+        margin: 0;
+        font-size: 24px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .header p {
+        margin: 5px 0;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    .info-section {
+        margin-bottom: 30px;
+    }
+
+    .info-row {
+        display: flex;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .label-fixed {
+        width: 600px;
+    }
+
+    .value-bold {
+        font-weight: bold;
+    }
+
+  .form-group {
+        display: flex;
+        /* Aligns label to the top of the box as it grows */
+        align-items: flex-start; 
+        margin-bottom: 15px;
+    }
+
+    .form-label {
+        width: 180px;
+        font-size: 18px;
+        /* Matches the padding of the box to keep text level */
+        padding-top: 12px; 
+    }
+    .form-box {
+        flex: 1;
+        border: 2px solid #ccc;
+        padding: 12px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+        
+        /* THE DYNAMIC FIXES: */
+        height: auto;           /* Allows the box to grow vertically */
+        min-height: 50px;       /* Minimum size if data is empty */
+        word-wrap: break-word;  /* Prevents long strings from breaking layout */
+        overflow: hidden;       /* Ensures no scrollbars appear on the printout */
+    }
+
+    .check-list-item {
+        margin-bottom: 4px;
+    }
+
+    .check-list-item:last-child {
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="document-container">
+    <div class="header">
+        <h1>Closing Check</h1>
+    </div>
+
+    <div class="form-content">
+        
+        <div class="form-group">
+            <div class="form-label">Transaction No: </div>
+            <div class="form-box" style="letter-spacing: 4px;">
+                {{ $data['transactionNo'] ?? '-' }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-label">Date Forwarded :</div>
+            <div class="form-box">
+                {{ $item['dateForwarded'] ?? '-' }}
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="form-label">Forwarded By :</div>
+            <div class="form-box">
+                {{ $item['forwardedBy'] ?? '-' }}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-label">Date Received :</div>
+            <div class="form-box">
+                {{ $item['dateReceived'] ?? '-' }}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-label">Received By :</div>
+            <div class="form-box">
+                {{ $item['receivedBy'] ?? '-' }}
+            </div>
+        </div>
+
+      
+
+    </div>
+</div>

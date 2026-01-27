@@ -117,18 +117,16 @@ class ForwardedCheckService
 
             $data = [
                 'transactionNo' => NumberHelper::padLeft($checkStatus->id),
-                'items' => [
-                    [
-                        'dateLabel' => 'Date ' . $label . ':',
-                        'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                        'causedLabel' => $label . ' By:',
-                        'causedBy' => $validated['receiversName'],
+                'dateLabel' => 'Date ' . $label . ':',
+                'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                        'company' => $checkCompany,
-                        'location' => $location,
-                    ]
-                ]
+                'causedLabel' => $label . ' By:',
+                'causedBy' => $validated['receiversName'],
+
+                'company' => $checkCompany,
+                'location' => $location,
+
             ];
 
             return $this->fileHandler

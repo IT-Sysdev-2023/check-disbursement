@@ -94,21 +94,19 @@ class CheckReleasingService
 
             $data = [
                 'transactionNo' => NumberHelper::padLeft($checkStatus->id),
-                'items' => [
-                    [
-                        'dateLabel' => 'Date ' . $label . ':',
-                        'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                        'causedLabel' => $label . ' By:',
-                        'causedBy' => auth()->user()->name,
+                'dateLabel' => 'Date ' . $label . ':',
+                'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                        'receivedLabel' => 'Received By:',
-                        'receivedBy' => $validated['receiversName'],
+                'causedLabel' => $label . ' By:',
+                'causedBy' => auth()->user()->name,
 
-                        'company' => $checkCompany,
-                        'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
-                    ]
-                ]
+                'receivedLabel' => 'Received By:',
+                'receivedBy' => $validated['receiversName'],
+
+                'company' => $checkCompany,
+                'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
+
             ];
 
             return $this->fileHandler

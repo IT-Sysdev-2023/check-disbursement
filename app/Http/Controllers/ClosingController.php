@@ -59,17 +59,13 @@ class ClosingController extends Controller
             if ($isSuccess) {
                 $data = [
                     'transactionNo' => NumberHelper::padLeft($id->id),
-                    'items' => [
-                        [
-                            'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
+                    'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
 
-                            'forwardedBy' => "",
+                    'forwardedBy' => "",
 
-                            'dateReceived' => '',
+                    'dateReceived' => '',
 
-                            'receivedBy' => '',
-                        ]
-                    ]
+                    'receivedBy' => '',
                 ];
 
                 return $this->fileHandler
