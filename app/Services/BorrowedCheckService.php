@@ -89,21 +89,16 @@ class BorrowedCheckService
 
         $chequeNumbers = $borrower->pluck('checkable.checkNumber')
             ->filter()
-            ->unique()
-            ->implode(', ');
+            ->unique();
 
         $data = [
             'dateBorrowed' => $borrower->first()->created_at->isoFormat('MMMM D, YYYY h:mm A'),
-            'items' => [
-                [
-                    'borrowerNo' => NumberHelper::padLeft($borrowerNo),
-                    'noOfChecks' => $borrower->count(),
-                    'borrowedBy' => $borrower->first()->borrower?->name,
-                    'company' => $companyNames,
-                    'purpose' => 'For Signature',
-                    'chequeNumbers' => $chequeNumbers
-                ]
-            ]
+            'company' => $companyNames,
+            'borrowerNo' => NumberHelper::padLeft($borrowerNo),
+            'noOfChecks' => $borrower->count(),
+            'purpose' => 'For Signature',
+            'borrowedBy' => $borrower->first()->borrower?->name,
+            'chequeNumbers' => $chequeNumbers
         ];
 
         return $this->fileHandler

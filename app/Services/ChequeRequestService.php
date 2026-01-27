@@ -114,7 +114,7 @@ class ChequeRequestService
             ->chunkById(100, function ($checks) use ($request) {
                 foreach ($checks as $check) {
                     $check->checkable?->checkStatus()->create([
-                        'status' => 'cancel',
+                        'status' => 'cancelled',
                         'cancelled_reason' => $request->reason,
                         'caused_by' => $request->user()->id,
                     ]);

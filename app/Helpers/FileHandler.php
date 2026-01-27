@@ -31,8 +31,8 @@ class FileHandler
         return $this;
     }
 
-    public function handlePdf(array $data, string $bladeTemplate){
-        $pdf = Pdf::loadView($bladeTemplate, ['data' => $data])->setPaper('A5');
+    public function handlePdf(array $data, string $bladeTemplate, $paper = 'letter'){
+        $pdf = Pdf::loadView($bladeTemplate, ['data' => $data])->setPaper($paper);
 
         // Get raw PDF output
         $output = $pdf->output();

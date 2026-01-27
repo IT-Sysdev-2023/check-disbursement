@@ -27,6 +27,24 @@ use Inertia\Inertia;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
+
+// Route::get('/welcome', function () {
+//      $data = [
+//             'dateBorrowed' => 'now',
+//             'items' => [
+//                 [
+//                     'borrowerNo' => '2323',
+//                     'noOfChecks' => 2,
+//                     'borrowedBy' => 'Ambot kinsa',
+//                     'company' => 'Alturas',
+//                     'purpose' => 'For Signature',
+//                     'chequeNumbers' => 1223
+//                 ]
+//             ]
+//         ];
+//     return view('borrowedPdf', ['data' => $data]);
+// });
+
 Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home')->middleware('guest');
