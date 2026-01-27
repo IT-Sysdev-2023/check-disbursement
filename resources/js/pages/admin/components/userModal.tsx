@@ -1,20 +1,14 @@
+import useNotifications from '@/components/notifications/useNotifications';
 import { assignPermissions, permissions } from '@/routes';
-import { FlashReponse, Permission, User } from '@/types';
+import { FlashReponse, SelectionType, User } from '@/types';
 import { router } from '@inertiajs/react';
-import {
-    Alert,
-    Button,
-    SelectChangeEvent,
-    Snackbar,
-    SnackbarCloseReason,
-} from '@mui/material';
+import { Button, SelectChangeEvent } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import PermissionSelection from './permissionSelection';
-import SelectItem from '@/pages/dashboard/components/SelectItem';
 
 const style = {
     position: 'absolute',
@@ -29,9 +23,10 @@ const style = {
 };
 
 type PermissionRoleType = {
-    roles: any[];
-    permissions: Permission[];
+    roles: SelectionType[];
+    permissions: SelectionType[];
 };
+
 export default function UserModal({
     open,
     details,
@@ -41,9 +36,8 @@ export default function UserModal({
     details: User;
     onClose: () => void;
 }) {
-    const [openSnackBar, setOpenSnackBar] = useState(false);
-    const [message, setMessage] = useState('');
     const [selectedPermission, setSelectedPermission] = useState<string[]>([]);
+    const [selectedRole, setSelectedRole] = useState<string[]>([]);
     const [permissionsList, setPermissionsList] = useState<PermissionRoleType>({
         roles: [],
         permissions: [],
@@ -75,38 +69,44 @@ export default function UserModal({
         const {
             target: { value },
         } = event;
+        console.log(event);
         setSelectedPermission(
             typeof value === 'string' ? value.split(',') : value,
         );
     };
+
+    const handleChangeRole = (
+        event: SelectChangeEvent<typeof selectedPermission>,
+    ) => {
+        const {
+            target: { value },
+        } = event;
+        setSelectedRole(typeof value === 'string' ? value.split(',') : value);
+    };
+    const notifications = useNotifications();
 
     const onSave = () => {
         router.post(
             assignPermissions(),
             {
                 selectedPermission,
+                selectedRole,
                 id: details?.id,
             },
             {
-                preserveState: true,
                 preserveScroll: true,
                 onSuccess: (page) => {
-                    setOpenSnackBar(true);
                     const m = page.props.flash as FlashReponse;
-                    setMessage(m.message);
+                    if (m?.message) {
+                        notifications.show(m.message, {
+                            severity: m?.status ? 'success' : 'error',
+                            autoHideDuration: 3000,
+                        });
+                    }
+                    onClose();
                 },
             },
         );
-    };
-    const handleClose = (
-        event?: React.SyntheticEvent | Event,
-        reason?: SnackbarCloseReason,
-    ) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-
-        setOpenSnackBar(false);
     };
 
     return (
@@ -129,13 +129,6 @@ export default function UserModal({
                         Name: {details?.name}
                     </Typography>
 
-                     {/* <SelectItem
-                                        handleChange={handleChange}
-                                        value={bu}
-                                        title="Company"
-                                        items={company}
-                    /> */}
-                    
                     <Typography id="modal-modal-description" sx={{ mt: 3 }}>
                         Assign Business Unit
                     </Typography>
@@ -150,8 +143,8 @@ export default function UserModal({
                     </Typography>
                     <PermissionSelection
                         permissions={permissionsList.roles}
-                        selectedPermission={selectedPermission}
-                        handleChange={handleChange}
+                        selectedPermission={selectedRole}
+                        handleChange={handleChangeRole}
                     />
 
                     <Button variant="contained" onClick={onSave} sx={{ mt: 3 }}>
@@ -159,20 +152,6 @@ export default function UserModal({
                     </Button>
                 </Box>
             </Modal>
-            <Snackbar
-                open={openSnackBar}
-                autoHideDuration={6000}
-                onClose={handleClose}
-            >
-                <Alert
-                    onClose={handleClose}
-                    severity="success"
-                    variant="filled"
-                    sx={{ width: '100%' }}
-                >
-                    {message}
-                </Alert>
-            </Snackbar>
         </div>
     );
 }

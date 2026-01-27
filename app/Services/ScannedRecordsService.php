@@ -19,10 +19,11 @@ class ScannedRecordsService
     {
         $selectedFiles = self::checkFiles();
 
-        if($selectedFiles->isEmpty()){
+        if ($selectedFiles->isEmpty()) {
             return redirect()->back()->with(['status' => false, 'message' => 'Files Already Synced']);
         }
         foreach ($selectedFiles as $fileIndex => $file) {
+
             $this->filename = $this->getBuLazy($file);
             $totalFiles = count($selectedFiles);
 
@@ -88,9 +89,11 @@ class ScannedRecordsService
     private static function checkFiles()
     {
         $files = self::directory();
+
         $syncedFiles = ScannedSync::pluck('filename')->toArray();
 
         return collect($files)->filter(function ($file) use ($syncedFiles) {
+
             return !in_array($file->getFilename(), $syncedFiles, true);
         });
     }
@@ -101,15 +104,19 @@ class ScannedRecordsService
             return fopen($file->getPathname(), 'r');
         }
 
-        return Storage::disk('scanned')->readStream($file);
+        // return $file->readStream($file);
+        return fopen($file->getPathname(), 'r');
+        // return Storage::disk('scanned')->readStream($file);
     }
 
-    private static function directory()
+    private static function directory(): array
     {
         if (PHP_OS_FAMILY === 'Linux') {
             return File::files('/mnt/sharedTeo');
         }
-        return Storage::disk('scanned')->files();//windows
+
+        return File::files('\\\\172.16.42.91\\jessan');
+        // return Storage::disk('scanned')->files();//windows
     }
 
     private static function lazyFiles($file)

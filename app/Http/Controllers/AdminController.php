@@ -49,7 +49,6 @@ class AdminController extends Controller
             'selectedPermission' => 'required|array|min:1',
             'id' => 'required|int'
         ]);
-        dd($request->all());
         // Get all company IDs at once
         $companyIds = Company::whereIn('name', $request->selectedPermission)->pluck('id', 'name');
 

@@ -13,6 +13,7 @@ use App\Models\CvCheckPayment;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BorrowedCheckService
 {
@@ -47,20 +48,24 @@ class BorrowedCheckService
 
         $borrowerNo = (BorrowedCheck::max('borrower_no') ?? 0) + 1;
 
-        BorrowedCheck::insert(
-            collect($validated['cheques'])->map(fn($c) => [
-                'checkable_id' => $c['chequeId'],
-                'checkable_type' => $c['type'],
-                'borrower_no' => $borrowerNo,
-                'borrower_id' => $validated['name'],
-                'reason' => $validated['reason'],
-                'user_id' => auth()->user()->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ])->toArray()
-        );
+        $stream = DB::transaction(function () use ($borrowerNo, $validated) {
 
-        return $this->download($borrowerNo);
+            BorrowedCheck::insert(
+                collect($validated['cheques'])->map(fn($c) => [
+                    'checkable_id' => $c['chequeId'],
+                    'checkable_type' => $c['type'],
+                    'borrower_no' => $borrowerNo,
+                    'borrower_id' => $validated['name'],
+                    'reason' => $validated['reason'],
+                    'user_id' => auth()->user()->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ])->toArray()
+            );
+            return $this->download($borrowerNo);
+        });
+
+        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
     }
 
     public function borrower()
@@ -101,11 +106,11 @@ class BorrowedCheckService
             ]
         ];
 
-        $stream = $this->fileHandler
+        return $this->fileHandler
             ->inFolder('pdfs/borrowed/')
             ->createFileName($borrowerNo, auth()->user()->id, '.pdf')
             ->handlePdf($data, 'borrowedPdf');
 
-        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
+
     }
 }

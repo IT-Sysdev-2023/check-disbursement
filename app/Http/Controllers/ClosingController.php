@@ -9,6 +9,7 @@ use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ClosingController extends Controller
@@ -48,33 +49,38 @@ class ClosingController extends Controller
 
     public function close(CheckStatus $id)
     {
-        $isSuccess = $id->update([
-            'is_closed' => true,
-            'closed_at' => now()
-        ]);
 
-        if ($isSuccess) {
-        $data = [
-            'transactionNo' => NumberHelper::padLeft($id->id),
-            'items' => [
-                [
-                    'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
+        $stream = DB::transaction(function () use ($id) {
+            $isSuccess = $id->update([
+                'is_closed' => true,
+                'closed_at' => now()
+            ]);
 
-                    'forwardedBy' => "",
+            if ($isSuccess) {
+                $data = [
+                    'transactionNo' => NumberHelper::padLeft($id->id),
+                    'items' => [
+                        [
+                            'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
 
-                    'dateReceived' => '',
+                            'forwardedBy' => "",
 
-                    'receivedBy' => '',
-                ]
-            ]
-        ];
+                            'dateReceived' => '',
 
-        $stream = $this->fileHandler
-            ->inFolder('pdfs/releasing/closing/')
-            ->createFileName($id->id, auth()->user()->id, '.pdf')
-            ->handlePdf($data, 'closingPdf');
+                            'receivedBy' => '',
+                        ]
+                    ]
+                ];
+
+                return $this->fileHandler
+                    ->inFolder('pdfs/releasing/closing/')
+                    ->createFileName($id->id, auth()->user()->id, '.pdf')
+                    ->handlePdf($data, 'closingPdf');
+
+            }
+        });
 
         return redirect()->back()->with(['status' => true, 'stream' => $stream]);
-    }
+
     }
 }

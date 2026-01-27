@@ -8,14 +8,15 @@ use App\Helpers\StringHelper;
 use App\Models\CheckForwardedStatus;
 use App\Models\CheckStatus;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 class ForwardedCheckService
 {
-     public function __construct(protected FileHandler $fileHandler)
+    public function __construct(protected FileHandler $fileHandler)
     {
     }
-     public function index(Request $request)
+    public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
@@ -98,46 +99,49 @@ class ForwardedCheckService
 
         $handleFiles = $this->handleFiles($validated, $id->id);
 
-        $checkStatus = $id
-            ->checkForwardedStatus()
-            ->create([
-                'status' => Str::lower($validated['status']),
-                'receivers_name' => $validated['receiversName'],
-                'image' => $handleFiles->imagePath,
-                'signature' => $handleFiles->signaturePath,
-                'caused_by' => $request->user()->id,
-            ]);
+        $stream = DB::transaction(function () use ($id, $validated, $handleFiles, $request) {
+            $checkStatus = $id
+                ->checkForwardedStatus()
+                ->create([
+                    'status' => Str::lower($validated['status']),
+                    'receivers_name' => $validated['receiversName'],
+                    'image' => $handleFiles->imagePath,
+                    'signature' => $handleFiles->signaturePath,
+                    'caused_by' => $request->user()->id,
+                ]);
 
-        $checkCompany = $checkStatus->load('checkStatus.checkable')->checkStatus->checkable->getCompany;
-        $location = $checkStatus->load('checkStatus.checkable.tagLocation')->checkStatus->checkable?->getLocation;
+            $checkCompany = $checkStatus->load('checkStatus.checkable')->checkStatus->checkable->getCompany;
+            $location = $checkStatus->load('checkStatus.checkable.tagLocation')->checkStatus->checkable?->getLocation;
 
-        $label = StringHelper::statusPastTense($validated['status']);
+            $label = StringHelper::statusPastTense($validated['status']);
 
-        $data = [
-            'transactionNo' => NumberHelper::padLeft($checkStatus->id),
-            'items' => [
-                [
-                    'dateLabel' => 'Date ' . $label . ':',
-                    'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
+            $data = [
+                'transactionNo' => NumberHelper::padLeft($checkStatus->id),
+                'items' => [
+                    [
+                        'dateLabel' => 'Date ' . $label . ':',
+                        'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                    'causedLabel' => $label . ' By:',
-                    'causedBy' => $validated['receiversName'],
+                        'causedLabel' => $label . ' By:',
+                        'causedBy' => $validated['receiversName'],
 
-                    'company' => $checkCompany,
-                    'location' => $location,
+                        'company' => $checkCompany,
+                        'location' => $location,
+                    ]
                 ]
-            ]
-        ];
+            ];
 
-        $stream = $this->fileHandler
-            ->inFolder('pdfs/releasing/' . $label . '/')
-            ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
-            ->handlePdf($data, 'releasingPdf');
+            return $this->fileHandler
+                ->inFolder('pdfs/releasing/' . $label . '/')
+                ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
+                ->handlePdf($data, 'releasingPdf');
+        });
+
 
         return redirect()->route('forwarded-releasing')->with(['status' => true, 'stream' => $stream]);
     }
 
-     public function forwardedReleasing(Request $request)
+    public function forwardedReleasing(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
@@ -169,7 +173,7 @@ class ForwardedCheckService
         ]);
     }
 
-     private function handleFiles(array $validated, string $id)
+    private function handleFiles(array $validated, string $id)
     {
         $userId = auth()->user()->id;
 

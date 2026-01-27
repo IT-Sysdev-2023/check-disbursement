@@ -16,7 +16,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Users({ users }: { users: InertiaPagination<User> }) {
 
-    console.log(users);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />

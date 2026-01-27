@@ -77,42 +77,45 @@ class CheckReleasingService
 
         $validated = $request->safe()->except(['signature', 'file']);
 
-        $checkStatus = $id->checkable->checkStatus()
-            ->create([
-                'status' => Str::lower($validated['status']),
-                'receivers_name' => $validated['receiversName'],
-                'image' => $handleFiles->imagePath,
-                'signature' => $handleFiles->signaturePath,
-                'caused_by' => $request->user()->id,
-            ]);
 
-        $checkCompany = $checkStatus->load('checkable')->checkable->getCompany;
+        $stream = DB::transaction(function () use ($id, $validated, $handleFiles, $request) {
+            $checkStatus = $id->checkable->checkStatus()
+                ->create([
+                    'status' => Str::lower($validated['status']),
+                    'receivers_name' => $validated['receiversName'],
+                    'image' => $handleFiles->imagePath,
+                    'signature' => $handleFiles->signaturePath,
+                    'caused_by' => $request->user()->id,
+                ]);
 
-        $label = StringHelper::statusPastTense($validated['status']);
+            $checkCompany = $checkStatus->load('checkable')->checkable->getCompany;
 
-        $data = [
-            'transactionNo' => NumberHelper::padLeft($checkStatus->id),
-            'items' => [
-                [
-                    'dateLabel' => 'Date ' . $label . ':',
-                    'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
+            $label = StringHelper::statusPastTense($validated['status']);
 
-                    'causedLabel' => $label . ' By:',
-                    'causedBy' => auth()->user()->name,
+            $data = [
+                'transactionNo' => NumberHelper::padLeft($checkStatus->id),
+                'items' => [
+                    [
+                        'dateLabel' => 'Date ' . $label . ':',
+                        'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                    'receivedLabel' => 'Received By:',
-                    'receivedBy' => $validated['receiversName'],
+                        'causedLabel' => $label . ' By:',
+                        'causedBy' => auth()->user()->name,
 
-                    'company' => $checkCompany,
-                    'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
+                        'receivedLabel' => 'Received By:',
+                        'receivedBy' => $validated['receiversName'],
+
+                        'company' => $checkCompany,
+                        'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
+                    ]
                 ]
-            ]
-        ];
+            ];
 
-        $stream = $this->fileHandler
-            ->inFolder('pdfs/releasing/' . $label . '/')
-            ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
-            ->handlePdf($data, 'releasingPdf');
+            return $this->fileHandler
+                ->inFolder('pdfs/releasing/' . $label . '/')
+                ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
+                ->handlePdf($data, 'releasingPdf');
+        });
 
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
     }

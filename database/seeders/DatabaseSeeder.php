@@ -67,6 +67,8 @@ class DatabaseSeeder extends Seeder
         Role::create(['name' => 'sh']); //section head
         Role::create(['name' => 'admin']);
         // $admin->givePermissionTo(Permission::all());
+       
+
         $user = User::first();
         $user->assignRole('admin');
 

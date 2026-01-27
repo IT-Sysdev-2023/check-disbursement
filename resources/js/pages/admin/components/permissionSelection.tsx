@@ -1,8 +1,7 @@
-import { Permission } from '@/types';
+import { SelectionType } from '@/types';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
@@ -32,18 +31,14 @@ export default function PermissionSelection({
     handleChange,
     permissions,
 }: {
-    permissions: Permission[];
+    permissions: SelectionType[];
     selectedPermission: string[];
     handleChange: (event: SelectChangeEvent<string[]>) => void;
 }) {
     const theme = useTheme();
-
     return (
         <div>
             <FormControl sx={{ width: 300 }}>
-                {/* <InputLabel id="demo-multiple-chip-label">
-                    Permission
-                </InputLabel> */}
                 <Select
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
@@ -64,17 +59,17 @@ export default function PermissionSelection({
                     )}
                     MenuProps={MenuProps}
                 >
-                    {permissions?.map((permission) => (
+                    {permissions.map((permission) => (
                         <MenuItem
-                            key={permission.id}
-                            value={permission.name}
+                            key={permission.value}
+                            value={permission.label}
                             style={getStyles(
-                                permission.name,
+                                permission.label,
                                 selectedPermission,
                                 theme,
                             )}
                         >
-                            {permission.name}
+                            {permission.label}
                         </MenuItem>
                     ))}
                 </Select>

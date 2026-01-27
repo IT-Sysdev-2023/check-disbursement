@@ -77,7 +77,6 @@ export default function UsersDataGrid({
             filterable: false,
             width: 150,
             renderCell: (params) => (
-                
                 <Stack direction="row" spacing={1}>
                     <Button
                         variant="outlined"
@@ -137,11 +136,13 @@ export default function UsersDataGrid({
                     },
                 }}
             />
-            <UserModal
-                open={openModal}
-                details={userDetails}
-                onClose={handleClose}
-            />
+            {userDetails && (
+                <UserModal
+                    open={openModal}
+                    details={userDetails}
+                    onClose={handleClose}
+                />
+            )}
         </>
     );
 }
