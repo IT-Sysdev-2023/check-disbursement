@@ -78,9 +78,11 @@ export default function CheckStatus({
                                 aria-label="tabs"
                             >
                                 <Tab label="All" value="all" />
-                                <Tab label="Forwarded" value="forward" />
-                                <Tab label="Deposited" value="deposit" />
-                                <Tab label="Released" value="release" />
+                                {/* <Tab label="Forwarded" value="forward" /> */}
+                                <Tab label="Deposited" value="deposited" />
+                                <Tab label="Released" value="released" />
+                                <Tab label="Cancelled" value="cancelled" />
+                                <Tab label="Staled" value="staled" />
                             </TabList>
                         </Box>
                         <TableFilter company={company} filters={filter} />

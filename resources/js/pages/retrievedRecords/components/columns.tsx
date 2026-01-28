@@ -1,7 +1,7 @@
 import { ActionType, ChequeType } from '@/types';
-import { Box, Chip, IconButton, MenuItem, Select } from '@mui/material';
+import { Box, Chip, IconButton, MenuItem, Select, Stack } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { ArrowBigRightDash } from 'lucide-react';
+import { ArrowBigRightDash, NotepadText } from 'lucide-react';
 import { JSX } from 'react';
 
 const renderStatus = (
@@ -212,6 +212,7 @@ export const createPendingChequeColumns = (): GridColDef[] => [
 ];
 
 export const createManageColumns = (
+    handleDetails: (id: number, type: 'cv' | 'crf') => void,
     handleAction: (rec: number) => void,
 ): GridColDef[] => [
     {
@@ -294,7 +295,15 @@ export const createManageColumns = (
         renderCell: ({ row }) => {
             console.log(row);
             return (
-                <>
+                <Stack direction="row" sx={{ gap: 1 }}>
+                    <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleDetails(row.chequeId, row.type)}
+                    >
+                        <NotepadText />
+                    </IconButton>
+
                     {row.scannedId && (
                         <IconButton
                             size="small"
@@ -304,7 +313,10 @@ export const createManageColumns = (
                             <ArrowBigRightDash />
                         </IconButton>
                     )}
-                </>
+                </Stack>
+                // <>
+
+                // </>
             );
         },
     },

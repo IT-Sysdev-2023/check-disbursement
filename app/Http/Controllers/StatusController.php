@@ -25,7 +25,7 @@ class StatusController extends Controller
         $cheque = BorrowedCheck::query()
             ->filter($filters)
             ->with('checkable.checkStatus.checkForwardedStatus')
-            ->where(function (Builder $q) {
+            ->where(function (Builder $q) use ($filters) {
                 $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
                     $q->whereNotNull('approver_id')
                         ->whereHas(
@@ -37,16 +37,19 @@ class StatusController extends Controller
                             [CvCheckPayment::class, Crf::class],
                             fn($query) => $query->has('checkStatus')
                         );
-                })
-                    ->orWhere(function (Builder $q) { // GET ALL THE CHEQUES STORED IN check_status table
+                });
+                if (isset($filters['tab']) && $filters['tab'] !== 'all') {
+                    $q->orWhere(function (Builder $q) { // GET ALL THE CHEQUES STORED IN check_status table
                         $q->whereHasMorph(
                             'checkable',
                             [CvCheckPayment::class, Crf::class],
                             fn(Builder $q) => $q->when(auth()->user()->hasRole('forwarded'), function ($query) {
-                            $query->has('checkStatus.checkForwardedStatus');
-                        })->has('checkStatus')
+                                $query->has('checkStatus.checkForwardedStatus');
+                            })->has('checkStatus')
                         );
                     });
+                }
+    
             })
             ->paginate(10)
             ->withQueryString()
@@ -83,7 +86,8 @@ class StatusController extends Controller
         return response()->json(new ScannedRecordResource($data));
     }
 
-    public function scannedRecords(ScannedRecords $id){
-         return response()->json(new ScannedRecordResource($id));
+    public function scannedRecords(ScannedRecords $id)
+    {
+        return response()->json(new ScannedRecordResource($id));
     }
 }

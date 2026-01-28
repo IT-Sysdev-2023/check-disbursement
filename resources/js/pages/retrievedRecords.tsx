@@ -221,16 +221,15 @@ export default function RetrievedRecords({
         });
     };
 
-    // const handleDetails = (scannedId: number) => {
-    //     setOpenScannedModal(true);
-    //     if(scannedId)
-    //     setScannedRecordId(scannedId);
-    // };
+    const handleDetails = (id: number, type: 'cv' | 'crf') => {
+        if (type === 'cv') router.visit(details(id));
+        else router.visit(detailsCrf(id));
+    };
 
     const chequeColumns = createChequeColumns(handleStatusChange);
     const pendingColumns = createPendingChequeColumns();
     const manageCvColumns = createManageColumns(
-        // handleDetails,
+        handleDetails,
         handleUpdateScanned,
     );
     return (
