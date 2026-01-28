@@ -49,16 +49,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const assignment = [
-    {
-        label: 'Completed',
-        value: 'completed',
-    },
-    {
-        label: 'To Assign',
-        value: 'toAssign',
-    },
-];
 export default function RetrievedRecords({
     cheques,
     manageChecks,
@@ -74,7 +64,6 @@ export default function RetrievedRecords({
         search: string;
         date: DateFilterType;
         tab: string;
-        assignment: string;
     };
     cheques: InertiaPagination<ChequeType>;
     distinctMonths: DistinctMonths;
@@ -97,7 +86,7 @@ export default function RetrievedRecords({
         { label: string; value: string }[]
     >([]);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
-    const [assign, setAssin] = useState(filter.assignment);
+    // const [assign, setAssin] = useState(filter.assignment);
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
@@ -223,19 +212,13 @@ export default function RetrievedRecords({
         setScannedId(id);
     };
 
-    const handleAssignment = ({
-        target,
-    }: {
-        target: { value: string; name: string | null };
-    }) => {
-        setAssin(target.value);
+    const handleAssignment = (value: 'completed' | 'toAssign') => {
         router.reload({
             only: ['cheques'],
             data: {
-                assignment: target.value,
+                assignment: value,
             },
         });
-        console.log(target);
     };
 
     // const handleDetails = (scannedId: number) => {
@@ -295,11 +278,19 @@ export default function RetrievedRecords({
                                     title="Assignment"
                                     items={assignment}
                                 /> */}
-                                <Button variant="outlined" onClick={() => null}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => handleAssignment('toAssign')}
+                                >
                                     Assignment
                                 </Button>
 
-                                <Button variant="outlined" onClick={() => null}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() =>
+                                        handleAssignment('completed')
+                                    }
+                                >
                                     Completed
                                 </Button>
                             </TableFilter>

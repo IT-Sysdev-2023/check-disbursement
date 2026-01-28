@@ -21,7 +21,7 @@ class StatusController extends Controller
     public function checkStatus(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
-
+        // dd(1);
         $cheque = BorrowedCheck::query()
             ->filter($filters)
             ->with('checkable.checkStatus.checkForwardedStatus')

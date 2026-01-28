@@ -81,7 +81,6 @@ class ChecksService
                     'start' => null,
                     'end' => null
                 ],
-                'assignment' => $assignment,
                 'tab' => $tab
             ],
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
