@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\NumberHelper;
+use App\Helpers\StringHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
@@ -20,6 +21,7 @@ class ChequeResource extends JsonResource
             'id' => $this->id,
             'chequeId' => $this->cheque_id,
             'checkNumber' => $this->check_number,
+            'borrowedCheckId' => $this->borrowedCheckId ?? null,
             'checkDate' => $this->check_date ? Date::parse($this->check_date)->toFormattedDateString() : null,
             'companyName' => $this->company_name ?? null,
             'amount' => NumberHelper::currency($this->amount),
@@ -28,6 +30,7 @@ class ChequeResource extends JsonResource
             'type' => $this->type,
             'createdAt' => $this->created_at,
             'location' => $this->location,
+            'taggedLocation' => StringHelper::statusLocation($this->location),
 
             'approversName' => $this->approver_name ?? null,
             'scannedId' => $this->scanned_id ?? null,

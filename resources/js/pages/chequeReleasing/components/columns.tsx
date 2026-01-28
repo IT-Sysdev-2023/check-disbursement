@@ -13,7 +13,7 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 50,
-        renderCell: ({ row }) => row.checkable?.checkNumber,
+        renderCell: ({ row }) => row.checkNumber,
     },
     {
         field: 'checkDate',
@@ -22,14 +22,14 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable?.checkDate,
+        renderCell: ({ row }) => row.checkDate,
     },
-    {
-        field: 'cvNo',
-        headerName: 'CV Number',
-        minWidth: 150,
-        renderCell: ({ row }) => row.checkable?.cvNo,
-    },
+    // {
+    //     field: 'cvNo',
+    //     headerName: 'CV Number',
+    //     minWidth: 150,
+    //     renderCell: ({ row }) => row.cvNo,
+    // },
     {
         field: 'payee',
         headerName: 'Payee',
@@ -37,7 +37,7 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable?.cvNo,
+        renderCell: ({ row }) => row.cvNo,
     },
     {
         field: 'checkAmount',
@@ -46,7 +46,7 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable?.amount,
+        renderCell: ({ row }) => row.amount,
     },
     {
         field: 'details',
@@ -58,7 +58,7 @@ export const createReleasingColumns = (
                     variant="contained"
                     size="small"
                     onClick={() => {
-                        router.visit(details(row.checkable?.id));
+                        router.visit(details(row.chequeId));
                     }}
                 >
                     View
@@ -74,7 +74,7 @@ export const createReleasingColumns = (
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => {
-            return row.checkable.tagLocation?.location;
+            return row.location;
         },
     },
 
@@ -86,7 +86,7 @@ export const createReleasingColumns = (
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => {
-            return row.checkable?.company || '—';
+            return row.companyName || '—';
         },
     },
 
@@ -99,7 +99,11 @@ export const createReleasingColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            const { taggedLocation } = row.checkable;
+            const { taggedLocation, scannedId, borrowedCheckId } = row;
+
+            if (!scannedId) {
+                return null;
+            }
             return (
                 <Select
                     size="small"
@@ -107,7 +111,7 @@ export const createReleasingColumns = (
                     label="For Signature"
                     onChange={(e) => {
                         if (!e.target.value) return;
-                        handleStatusChange(row.id, e.target.value);
+                        handleStatusChange(borrowedCheckId, e.target.value);
                     }}
                 >
                     <MenuItem value="" disabled>
@@ -309,7 +313,7 @@ export const createForwardedReleasingColumns = (
         flex: 1,
         headerAlign: 'center',
         sortable: false,
-        renderCell: ({row}) => {
+        renderCell: ({ row }) => {
             const { id } = row;
             return (
                 <Select

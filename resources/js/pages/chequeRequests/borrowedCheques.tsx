@@ -23,7 +23,7 @@ import { createRequestsChequeColumns } from './components/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Requests',
+        title: 'Check Receiving',
         href: chequeRequests().url,
     },
     {

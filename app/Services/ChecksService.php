@@ -35,40 +35,7 @@ class ChecksService
 
         $waitingForApproval = self::pendingRecords();
 
-        // LAST OPTION : JOIN TYPE AND CHECKABLE
-        // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
-        $cv = CvCheckPayment::
-            baseColumns()
-            ->leftJoinScanRecords()
-            ->addSelect(
-                'approvers.name as approver_name',
-                'scanned_records.id as scanned_id',
-                'scanned_records.payee as scanned_payee',
-                'scanned_records.amount as scanned_amount'
-            );
-
-        $crf = Crf::whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
-            ->baseColumns()
-            ->leftJoinScanRecords()
-            ->addSelect(
-                'approvers.name as approver_name',
-                'scanned_records.id as scanned_id',
-                'scanned_records.payee as scanned_payee',
-                'scanned_records.amount as scanned_amount'
-            );
-
-        $unionQuery = $cv->unionAll($crf);
-
-        $manageCheques = DB::query()
-            ->fromSub(
-                DB::query()
-                    ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
-                    ->fromSub($unionQuery, 'merged'),
-                'final'
-            )
-            ->orderByDesc('created_at')
-            ->paginate(10)
-            ->withQueryString();
+        $manageCheques = self::manageChecks();
 
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
@@ -90,6 +57,49 @@ class ChecksService
             // 'hasMissingFields' => $hasMissingField,
             'distinctMonths' => self::distinctMonths()
         ]);
+    }
+
+    public static function manageChecks()
+    {
+        // LAST OPTION : JOIN TYPE AND CHECKABLE
+        // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
+        $cv = CvCheckPayment::
+            baseColumns()
+            ->doesntHave('checkStatus')
+            ->leftJoinScanRecords()
+            ->addSelect(
+                'borrowed_checks.id as borrowedCheckId',
+                'approvers.name as approver_name',
+                'scanned_records.id as scanned_id',
+                'scanned_records.payee as scanned_payee',
+                'scanned_records.amount as scanned_amount'
+            );
+
+        $crf = Crf::
+        // whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
+            baseColumns()
+            ->doesntHave('checkStatus')
+            ->leftJoinScanRecords()
+            ->addSelect(
+                'borrowed_checks.id as borrowedCheckId',
+                'approvers.name as approver_name',
+                'scanned_records.id as scanned_id',
+                'scanned_records.payee as scanned_payee',
+                'scanned_records.amount as scanned_amount'
+            );
+
+        $unionQuery = $cv->unionAll($crf);
+
+        return DB::query()
+            ->fromSub(
+                DB::query()
+                    ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
+                    ->fromSub($unionQuery, 'merged'),
+                'final'
+            )
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
     }
 
     private static function pendingRecords()

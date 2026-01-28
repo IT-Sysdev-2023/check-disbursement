@@ -7,6 +7,7 @@ use App\Helpers\ModelHelper;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
 use App\Http\Requests\ReleasingCheckRequest;
+use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheck;
 use App\Models\CheckStatus;
 use App\Models\Crf;
@@ -26,24 +27,10 @@ class CheckReleasingService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
-        $chequeRecords = BorrowedCheck::with('checkable.tagLocation')
-            ->whereNotNull('approver_id')
-            ->whereHas(
-                'checkable',
-                fn(Builder $query) =>
-                $query->scanRecords()
-            )
-            ->whereDoesntHaveMorph(
-                'checkable',
-                [CvCheckPayment::class, Crf::class],
-                fn($query) => $query->has('checkStatus')
-            )
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
+        $chequeRecords = ChecksService::manageChecks();
 
         return Inertia::render('checkReleasing', [
-            'cheques' => $chequeRecords,
+            'cheques' => new ChequeCollection($chequeRecords),
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
@@ -79,9 +66,11 @@ class CheckReleasingService
 
 
         $stream = DB::transaction(function () use ($id, $validated, $handleFiles, $request) {
+            $label = StringHelper::statusPastTense($validated['status']);
+
             $checkStatus = $id->checkable->checkStatus()
                 ->create([
-                    'status' => Str::lower($validated['status']),
+                    'status' => Str::lower($label),
                     'receivers_name' => $validated['receiversName'],
                     'image' => $handleFiles->imagePath,
                     'signature' => $handleFiles->signaturePath,
@@ -90,7 +79,7 @@ class CheckReleasingService
 
             $checkCompany = $checkStatus->load('checkable')->checkable->getCompany;
 
-            $label = StringHelper::statusPastTense($validated['status']);
+            
 
             $data = [
                 'transactionNo' => NumberHelper::padLeft($checkStatus->id),
