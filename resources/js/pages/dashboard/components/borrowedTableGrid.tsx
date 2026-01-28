@@ -3,7 +3,7 @@ import { Borrower, InertiaPagination } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { TablePagination } from '@mui/material';
+import { InputAdornment, TablePagination, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Collapse from '@mui/material/Collapse';
 import IconButton from '@mui/material/IconButton';
@@ -16,8 +16,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
-import { ArrowBigRightDash } from 'lucide-react';
-import { MouseEvent, useEffect, useState } from 'react';
+import { ArrowBigRightDash, SearchIcon } from 'lucide-react';
+import { ChangeEvent, MouseEvent, useEffect, useState } from 'react';
 
 function Row(props: { row: Borrower }) {
     const { row } = props;
@@ -46,7 +46,6 @@ function Row(props: { row: Borrower }) {
     const handleAction = async (borrowedNo: number) => {
         router.visit(borrowedNumberCheques(borrowedNo));
     };
-    console.log(borrowerData);
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -154,7 +153,7 @@ export default function BorrowedTableGrid({
     data: InertiaPagination<Borrower>;
 }) {
     const [rowsPerPage, setRowsPerPage] = useState(data?.meta.per_page || 10);
-
+    const [search, setSearch] = useState('');
     const handleChangePage = (
         _: MouseEvent<HTMLButtonElement> | null,
         newPage: number,
@@ -175,8 +174,33 @@ export default function BorrowedTableGrid({
         // setRowsPerPage(parseInt(event.target.value, 10));
         // setPage(0);
     };
+
+    const onSearch = (e: ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+
+        router.reload({
+            data: {
+                search: e.target.value,
+            },
+        });
+    };
     return (
         <>
+            <TextField
+                fullWidth
+                placeholder="Search borrower..."
+                value={search}
+                onChange={onSearch}
+                size="small"
+                sx={{ mb: 2 }}
+                InputProps={{
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon />
+                        </InputAdornment>
+                    ),
+                }}
+            />
             <TableContainer component={Paper}>
                 <Table aria-label="collapsible table">
                     <TableHead>

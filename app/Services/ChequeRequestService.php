@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\NumberHelper;
 use App\Http\Resources\BorrowedCheckResource;
 use App\Models\Approver;
 use App\Models\BorrowedCheck;
@@ -19,7 +20,7 @@ class ChequeRequestService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
-        $borrowedRecords = self::borrowedRecords();
+        $borrowedRecords = self::borrowedRecords($filters);
 
         return Inertia::render('chequeRequests', [
             'cheques' => $borrowedRecords,
@@ -123,7 +124,7 @@ class ChequeRequestService
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
-    private static function borrowedRecords()
+    private static function borrowedRecords(array $filters)
     {
         return BorrowedCheck::select(
             'borrower_no',
@@ -133,6 +134,19 @@ class ChequeRequestService
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
             ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
+            ->when($filters['search'] ?? null, function (Builder $query, $search) {
+                $query->where(function ($q) use ($search) {
+
+                    if (is_numeric($search)) { //FOR FILTERING BORROWER NUMBER
+                
+                        $clean = ltrim($search, '0');
+
+                        $q->where('borrower_no', 'LIKE', "%{$clean}%");
+                    }
+
+                    $q->orWhere('borrowers.name', 'LIKE', "%{$search}%");
+                });
+            })
             ->whereDoesntHaveMorph(
                 'checkable',
                 [CvCheckPayment::class, Crf::class],
