@@ -18,7 +18,7 @@ import { useState } from 'react';
 export default function ({
     company,
     filters,
-    children
+    children,
 }: {
     company: SelectionType[];
     filters: {
@@ -90,7 +90,7 @@ export default function ({
                 marginBottom: 2,
             }}
         >
-            <Stack direction="row" sx={{ gap: 3 }}>
+            <Stack direction="row" sx={{ gap: 1 }} alignItems="center">
                 <SelectItem
                     handleChange={handleChange}
                     value={bu}

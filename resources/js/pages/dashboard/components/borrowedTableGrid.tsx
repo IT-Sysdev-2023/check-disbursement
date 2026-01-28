@@ -69,7 +69,6 @@ function Row(props: { row: Borrower }) {
                 <TableCell align="right">{row.lastBorrowedAt}</TableCell>
                 <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
-                <TableCell align="right">{'For Signature'}</TableCell>
                 <TableCell align="center">
                     <IconButton
                         size="small"
@@ -187,7 +186,6 @@ export default function BorrowedTableGrid({
                             <TableCell align="right">Borrowed Date</TableCell>
                             <TableCell align="right">Borrower Name</TableCell>
                             <TableCell align="right">Reason</TableCell>
-                            <TableCell align="right">Purpose</TableCell>
                             <TableCell align="right">
                                 Borrower Details
                             </TableCell>

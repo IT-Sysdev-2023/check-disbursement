@@ -39,7 +39,7 @@ export const createChequeColumns = (
     {
         field: 'checkNumber',
         headerName: 'Check Number',
-        minWidth: 150,
+        // minWidth: 150,
     },
     {
         field: 'checkDate',
@@ -73,11 +73,27 @@ export const createChequeColumns = (
     {
         field: 'status',
         headerName: 'Status',
-        minWidth: 120,
+        minWidth: 200,
         renderCell: ({ row }) => {
-            if (!row.checkNumber || !row.checkDate) {
-                return renderStatus('Assign');
+            if (!row.checkNumber) {
+                return (
+                    <Chip
+                        label="Assign Check Number"
+                        color="error"
+                        size="small"
+                    />
+                );
             }
+            if (!row.checkDate) {
+                return (
+                    <Chip
+                        label="Assign Check Date"
+                        color="error"
+                        size="small"
+                    />
+                );
+            }
+
             if (row.taggedAt) {
                 return renderStatus('Signature');
             }
@@ -260,8 +276,8 @@ export const createManageColumns = (
         headerAlign: 'center',
         align: 'center',
         flex: 1,
-        },
-      {
+    },
+    {
         field: 'location',
         headerName: 'Location',
         headerAlign: 'right',

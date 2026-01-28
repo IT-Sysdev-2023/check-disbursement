@@ -30,7 +30,6 @@ import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
-import SelectItem from './dashboard/components/SelectItem';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import AssignAmountPayeeModal from './retrievedRecords/components/assignAmountPayeeModal';
 import AssignCdModal from './retrievedRecords/components/assignCdModal';
@@ -274,7 +273,10 @@ export default function RetrievedRecords({
                             </TabList>
                         </Box>
                         <TabPanel value="calendar">
-                            <CalendarView distinctMonths={distinctMonths} onChangeTab={() => setCurrentTab('cheques')}/>
+                            <CalendarView
+                                distinctMonths={distinctMonths}
+                                onChangeTab={() => setCurrentTab('cheques')}
+                            />
                         </TabPanel>
                         <TabPanel value="cheques">
                             {/* {hasMissingFields && (
@@ -287,12 +289,19 @@ export default function RetrievedRecords({
                                 company={company}
                                 filters={filter}
                             >
-                                <SelectItem
+                                {/* <SelectItem
                                     handleChange={handleAssignment}
                                     value={assign}
                                     title="Assignment"
                                     items={assignment}
-                                />
+                                /> */}
+                                <Button variant="outlined" onClick={() => null}>
+                                    Assignment
+                                </Button>
+
+                                <Button variant="outlined" onClick={() => null}>
+                                    Completed
+                                </Button>
                             </TableFilter>
                             <TableDataGrid
                                 data={cheques}
