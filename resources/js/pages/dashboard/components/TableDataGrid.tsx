@@ -6,6 +6,7 @@ import {
     Cv,
     InertiaPagination,
     ManageChecks,
+    User,
 } from '@/types';
 import {
     DataGrid,
@@ -32,7 +33,7 @@ export default function TableDataGrid({
     handleSelectionChange,
 }: {
     data: InertiaPagination<
-        Cv | Crf | ManageChecks | ChequeType | Borrower | CheckStatus
+        Cv | Crf | ManageChecks | ChequeType | Borrower | CheckStatus | User
     >;
     columns: GridColDef[];
     isLoading?: boolean;

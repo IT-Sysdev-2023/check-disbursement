@@ -12,7 +12,10 @@ class AdminService
 {
     public function users()
     {
-        $users = User::with('roles', 'permissions', 'companyPermissions.company')->select('id', 'name', 'username')->where('is_active', true)->paginate();
+        $users = User::with('roles', 'permissions', 'companyPermissions.company')->select('id', 'name', 'username')->where('is_active', true)
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
         return Inertia::render('admin/users', [
             'users' => $users
         ]);

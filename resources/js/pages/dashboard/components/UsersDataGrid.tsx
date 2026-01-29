@@ -1,10 +1,12 @@
+import { handleSearch, handleSort } from '@/lib/utils';
 import UserModal from '@/pages/admin/components/userModal';
 import { users } from '@/routes';
 import { InertiaPagination, Permission, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Stack } from '@mui/material';
-import { DataGrid, GridColDef, GridPaginationModel } from '@mui/x-data-grid';
+import { GridColDef, GridPaginationModel } from '@mui/x-data-grid';
 import { useState } from 'react';
+import TableDataGrid from './TableDataGrid';
 
 export default function UsersDataGrid({
     usersList,
@@ -76,25 +78,33 @@ export default function UsersDataGrid({
             sortable: false,
             filterable: false,
             width: 150,
-            renderCell: ({row}) => {
+            renderCell: ({ row }) => {
                 return (
-                <Stack direction="row" spacing={1}>
-                    <Button
-                        variant="outlined"
-                        size="small"
-                        // startIcon={<VisibilityIcon />}
-                        onClick={() => handleModal(row)}
-                    >
-                        Assign
-                    </Button>
-                </Stack>
-            )},
+                    <Stack direction="row" spacing={1}>
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            // startIcon={<VisibilityIcon />}
+                            onClick={() => handleModal(row)}
+                        >
+                            Assign
+                        </Button>
+                    </Stack>
+                );
+            },
         },
     ];
 
     return (
         <>
-            <DataGrid
+            <TableDataGrid
+                data={usersList}
+                pagination={handlePagination}
+                handleSearchFilter={handleSearch}
+                handleSortFilter={handleSort}
+                columns={columns}
+            />
+            {/* <DataGrid
                 rows={usersList.data}
                 columns={columns}
                 rowCount={usersList.total}
@@ -136,7 +146,7 @@ export default function UsersDataGrid({
                         },
                     },
                 }}
-            />
+            /> */}
             {userDetails && (
                 <UserModal
                     open={openModal}

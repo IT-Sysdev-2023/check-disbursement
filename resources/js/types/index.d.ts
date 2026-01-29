@@ -53,7 +53,7 @@ export interface User {
     updated_at: string;
     roles: Role[];
     permissions: Permission[];
-    company_permissions: {
+    companyPermissions: {
         id: number;
         user_id: number;
         company_id: number;
