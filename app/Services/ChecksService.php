@@ -29,6 +29,7 @@ class ChecksService
 
         $assignment = $filters['assignment'] ?? 'toAssign';
 
+        // dd($request->user()->companyPermissions);
         // $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));

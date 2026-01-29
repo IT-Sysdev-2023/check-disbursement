@@ -55,13 +55,16 @@ export default function UserModal({
 
         fetchPermissions();
     }, []);
-
+    
     //Set Defaul User Permission to the UI
     useEffect(() => {
         setSelectedPermission(
             details?.company_permissions.map((p) => p.company.name),
         );
-    }, [details?.company_permissions]);
+        setSelectedRole(
+            details?.roles.map((p) => p.name),
+        );
+    }, [details?.company_permissions, details?.roles]);
 
     const handleChange = (
         event: SelectChangeEvent<typeof selectedPermission>,

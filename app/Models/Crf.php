@@ -3,13 +3,16 @@
 namespace App\Models;
 
 use App\Helpers\NumberHelper;
+use App\Models\Scopes\BusinessUnitAssignedScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([BusinessUnitAssignedScope::class])]
 class Crf extends Model
 {
     protected $guarded = [];

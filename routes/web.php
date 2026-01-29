@@ -28,29 +28,19 @@ use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 
-// Route::get('/welcome', function () {
-//      $data = [
-//             'dateBorrowed' => 'now',
-//             'items' => [
-//                 [
-//                     'borrowerNo' => '2323',
-//                     'noOfChecks' => 2,
-//                     'borrowedBy' => 'Ambot kinsa',
-//                     'company' => 'Alturas',
-//                     'purpose' => 'For Signature',
-//                     'chequeNumbers' => 1223
-//                 ]
-//             ]
-//         ];
-//     return view('borrowedPdf', ['data' => $data]);
-// });
-
 Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home')->middleware('guest');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
+        Route::get('users', [AdminController::class, 'users'])->name('users');
+
+        Route::get('permissions', [AdminController::class, 'permissions'])->name('permissions');
+        Route::post('assign-permissions', [AdminController::class, 'assignPermissions'])->name('assignPermissions');
+    });
 
     Route::middleware('role:disbursement_officer|admin')->group(function () {
         //! EXTRACT CHECKS
@@ -95,6 +85,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
         Route::get('cv/details-signature/{id}', [CvController::class, 'signatureDetails'])->name('signature-details');
         Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('details-crf');
+
+        Route::get('scanned-records-amount-checkNo', [StatusController::class, 'scannedRecordsAmountCheckNo'])->name('scanned-records-amount-checkNo');
+        Route::get('scanned-records/{id}', [StatusController::class, 'scannedRecords'])->name('scanned-records');
     });
 
     //! SECTION HEAD
@@ -134,9 +127,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
-    Route::get('scanned-records-amount-checkNo', [StatusController::class, 'scannedRecordsAmountCheckNo'])->name('scanned-records-amount-checkNo');
-    Route::get('scanned-records/{id}', [StatusController::class, 'scannedRecords'])->name('scanned-records');
-
     Route::get('report', [ReportController::class, 'index'])->name('report');
     Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
 
@@ -151,15 +141,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('notifications', function () {
         return Inertia::render('dashboard');
     })->name('notifications');
-
-    Route::prefix('admin')->group(function () {
-        Route::get('users', [AdminController::class, 'users'])->name('users');
-
-        Route::get('permissions', [AdminController::class, 'permissions'])->name('permissions');
-        Route::post('assign-permissions', [AdminController::class, 'assignPermissions'])->name('assignPermissions');
-    });
-
-
 
 });
 Route::get('/test', function () {

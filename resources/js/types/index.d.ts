@@ -51,7 +51,7 @@ export interface User {
     two_factor_enabled?: boolean;
     created_at: string;
     updated_at: string;
-    roles?: Role[];
+    roles: Role[];
     permissions: Permission[];
     company_permissions: {
         id: number;

@@ -76,18 +76,19 @@ export default function UsersDataGrid({
             sortable: false,
             filterable: false,
             width: 150,
-            renderCell: (params) => (
+            renderCell: ({row}) => {
+                return (
                 <Stack direction="row" spacing={1}>
                     <Button
                         variant="outlined"
                         size="small"
                         // startIcon={<VisibilityIcon />}
-                        onClick={() => handleModal(params.row)}
+                        onClick={() => handleModal(row)}
                     >
                         Assign
                     </Button>
                 </Stack>
-            ),
+            )},
         },
     ];
 

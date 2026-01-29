@@ -2,19 +2,23 @@
 
 namespace App\Models;
 
+use App\Models\Scopes\BusinessUnitAssignedScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
+#[ScopedBy([BusinessUnitAssignedScope::class])]
 class CvCheckPayment extends Model
 {
 
     protected $guarded = [];
+    
 
     protected function casts(): array
     {
