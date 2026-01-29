@@ -54,6 +54,10 @@ class ChecksService
                 'label' => 'All',
                 'value' => '0'
             ]),
+            'counts' => (object) [
+                'toAssign' => self::countToAssign(),
+                'completed' => self::countCompleted()
+            ],
             // 'hasMissingFields' => $hasMissingField,
             'distinctMonths' => self::distinctMonths()
         ]);
@@ -76,7 +80,7 @@ class ChecksService
             );
 
         $crf = Crf::
-        // whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
+            // whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
             baseColumns()
             ->doesntHave('checkStatus')
             ->leftJoinScanRecords()
@@ -128,6 +132,43 @@ class ChecksService
         return Crf::where('resolved_check_date', null)
             ->doesntHave('borrowedCheck')
             ->exists();
+    }
+
+    private function countToAssign()
+    {
+        $cvQuery = CvCheckPayment::baseColumns()
+            ->doesntHave('borrowedCheck')
+            ->where([['check_number', 0], ['resolved_check_number', null]]);
+
+        $crfQuery = Crf::baseColumns()
+            ->doesntHave('borrowedCheck')
+            ->where('resolved_check_date', null);
+        ;
+
+
+        return DB::query()
+            ->fromSub(
+                $cvQuery->unionAll($crfQuery),
+                'to_assign'
+            )
+            ->count();
+    }
+    private function countCompleted()
+    {
+        $cvQuery = CvCheckPayment::baseColumns()
+            ->doesntHave('borrowedCheck')
+            ->whereNotNull('resolved_check_number')->whereNot('check_number');
+
+        $crfQuery = Crf::baseColumns()
+            ->doesntHave('borrowedCheck')
+            ->whereNotNull('resolved_check_date');
+
+        return DB::query()
+            ->fromSub(
+                $cvQuery->unionAll($crfQuery),
+                'completed'
+            )
+            ->count();
     }
 
     private static function mergeRecords($filters, bool $hasMissingField)

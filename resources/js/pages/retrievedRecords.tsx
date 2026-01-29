@@ -1,5 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf, getLocation, retrievedRecords, scan, tagLocation } from '@/routes';
+import {
+    details,
+    detailsCrf,
+    getLocation,
+    retrievedRecords,
+    scan,
+    tagLocation,
+} from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -15,7 +22,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router, usePage } from '@inertiajs/react';
-import { Box, Button, Tab } from '@mui/material';
+import { Badge, Box, Button, Tab } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
 
@@ -56,6 +63,7 @@ export default function RetrievedRecords({
     filter,
     company,
     distinctMonths,
+    counts,
     // hasMissingFields,
     auth,
 }: {
@@ -64,6 +72,10 @@ export default function RetrievedRecords({
         search: string;
         date: DateFilterType;
         tab: string;
+    };
+    counts: {
+        toAssign: string;
+        completed: string;
     };
     cheques: InertiaPagination<ChequeType>;
     distinctMonths: DistinctMonths;
@@ -107,7 +119,8 @@ export default function RetrievedRecords({
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
-            router.get(retrievedRecords(), // your Laravel route
+            router.get(
+                retrievedRecords(), // your Laravel route
                 {
                     tab: newValue,
                     page: 1,
@@ -285,7 +298,12 @@ export default function RetrievedRecords({
                                     variant="outlined"
                                     onClick={() => handleAssignment('toAssign')}
                                 >
-                                    Assignment
+                                    <Badge
+                                        badgeContent={counts.toAssign}
+                                        color="error"
+                                    >
+                                        Assignment
+                                    </Badge>
                                 </Button>
 
                                 <Button
@@ -294,7 +312,12 @@ export default function RetrievedRecords({
                                         handleAssignment('completed')
                                     }
                                 >
-                                    Completed
+                                    <Badge
+                                        badgeContent={counts.completed}
+                                        color="error"
+                                    >
+                                        Completed
+                                    </Badge>
                                 </Button>
                             </TableFilter>
                             <TableDataGrid
