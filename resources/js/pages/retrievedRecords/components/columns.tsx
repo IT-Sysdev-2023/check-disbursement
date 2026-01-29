@@ -293,7 +293,6 @@ export const createManageColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            console.log(row);
             return (
                 <Stack direction="row" sx={{ gap: 1 }}>
                     <IconButton

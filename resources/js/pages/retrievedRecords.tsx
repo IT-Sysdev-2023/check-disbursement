@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { details, detailsCrf, getLocation, scan, tagLocation } from '@/routes';
+import { details, detailsCrf, getLocation, retrievedRecords, scan, tagLocation } from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -107,13 +107,17 @@ export default function RetrievedRecords({
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
-            router.reload({
-                data: {
-                    page: 1,
+            router.get(retrievedRecords(), // your Laravel route
+                {
                     tab: newValue,
+                    page: 1,
                 },
-                only: [newValue],
-            });
+                {
+                    preserveState: true,
+                    preserveScroll: true,
+                    replace: false, // 👈 REQUIRED for Back button
+                },
+            );
         }
         setCurrentTab(newValue);
     };
