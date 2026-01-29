@@ -54,11 +54,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         [user?.roles],
     );
     const isAdmin = roles.includes('admin');
-    const releasing = roles.includes('releasing');
-    const officer = roles.includes('officer');
-    const forwarded = roles.includes('forwarded');
-    const closing = roles.includes('closing');
-    const sectionHead = roles.includes('sh');
+    // const releasing = roles.includes('releasing');
+    const disbursementOfficer = roles.includes('disbursement_officer');
+    const regionalOfficer = roles.includes('regional_officer');
+    const closingOfficer = roles.includes('closing_officer');
+    const sectionHead = roles.includes('section_head');
 
     const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -66,7 +66,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const finalItems = useMemo(() => {
         return [
             ...items,
-            ...(isAdmin || officer
+            ...(isAdmin || disbursementOfficer
                 ? [
                       {
                           title: 'Extract',
@@ -106,7 +106,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       },
                   ]
                 : []),
-            ...(isAdmin || closing
+            ...(isAdmin || closingOfficer
                 ? [
                       {
                           title: 'CV/ CRF List',
@@ -115,7 +115,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       },
                   ]
                 : []),
-            ...(isAdmin || forwarded
+            ...(isAdmin || regionalOfficer
                 ? [
                       {
                           title: 'Forwarded Check',
@@ -129,7 +129,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       },
                   ]
                 : []),
-            ...(isAdmin || releasing || officer || forwarded || sectionHead ||closing
+            ...(isAdmin ||
+            disbursementOfficer ||
+            regionalOfficer ||
+            sectionHead ||
+            closingOfficer
                 ? [
                       {
                           title: 'Check Status',
@@ -174,7 +178,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 icon: Bell,
             },
         ];
-    }, [items, isAdmin, releasing, officer, closing, forwarded, sectionHead]);
+    }, [
+        items,
+        isAdmin,
+        disbursementOfficer,
+        closingOfficer,
+        regionalOfficer,
+        sectionHead,
+    ]);
 
     // Automatically open submenu if current page belongs to it
     useEffect(() => {

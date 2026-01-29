@@ -55,6 +55,7 @@ export default function CalendarView({
                         return (
                             <DateCalendar
                                 key={key}
+                                views={['day']}
                                 onChange={handleDate}
                                 referenceDate={dayjs(`${year}-${month}-01`)}
                                 onMonthChange={() => {}}
