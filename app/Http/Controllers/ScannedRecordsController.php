@@ -44,9 +44,7 @@ class ScannedRecordsController extends Controller
 
     public function update(ScannedRecords $id, Request $request)
     {
-        $status = $id->update(['payee' => $request->payee]);
-
-         return redirect()->back()->with(['status' => $status, 'message' => $status ? 'Successfully Updated' : 'Update Failed!']);
+        return $this->service->update($id, $request);
     }
 
 }

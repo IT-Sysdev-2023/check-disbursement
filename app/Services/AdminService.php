@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Company;
+use App\Models\CompanyPermission;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Inertia\Inertia;
+use Spatie\Permission\Models\Role;
+class AdminService
+{
+    public function users()
+    {
+        $users = User::with('roles', 'permissions', 'companyPermissions.company')->select('id', 'name', 'username')->where('is_active', true)->paginate();
+        return Inertia::render('admin/users', [
+            'users' => $users
+        ]);
+    }
+
+    public function permissions()
+    {
+        $permissions = Company::select('id', 'name')
+            ->get()
+            ->map(function ($name) {
+                return [
+                    'label' => $name->name,
+                    'value' => $name->id,
+                ];
+            });
+
+        $roles = Role::select('id', 'name')
+            ->get()
+            ->map(function ($name) {
+                return [
+                    'label' => $name->name,
+                    'value' => $name->id,
+                ];
+            });
+        return response()->json(['permissions' => $permissions, 'roles' => $roles]);
+    }
+
+    public function assignPermissions(Request $request)
+    {
+
+        $request->validate([
+            'selectedPermission' => 'required|array|min:1',
+            'id' => 'required|int'
+        ]);
+        // Get all company IDs at once
+        $companyIds = Company::whereIn('name', $request->selectedPermission)->pluck('id', 'name');
+
+        $records = [];
+
+        foreach ($request->selectedPermission as $permissionName) {
+            if (!isset($companyIds[$permissionName]))
+                continue;
+
+            $records[] = [
+                'user_id' => $request->id,
+                'company_id' => $companyIds[$permissionName],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+        }
+
+        // Replace old permissions with new ones
+        CompanyPermission::where('user_id', $request->id)->delete();
+
+        // Bulk insert
+        CompanyPermission::insert($records);
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
+    }
+}

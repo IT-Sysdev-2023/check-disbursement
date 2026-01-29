@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Http\Request;
 
 class ScannedRecordsService
 {
@@ -131,5 +132,12 @@ class ScannedRecordsService
 
             fclose($handle);
         });
+    }
+
+     public function update(ScannedRecords $id, Request $request)
+    {
+        $status = $id->update(['payee' => $request->payee]);
+
+         return redirect()->back()->with(['status' => $status, 'message' => $status ? 'Successfully Updated' : 'Update Failed!']);
     }
 }

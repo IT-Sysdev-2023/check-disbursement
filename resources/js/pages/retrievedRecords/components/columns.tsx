@@ -8,7 +8,6 @@ const renderStatus = (
     status:
         | 'Releasing'
         | 'Borrowed'
-        | 'Signature'
         | 'Assign'
         | 'Tagged'
         | 'Tagging',
@@ -16,7 +15,6 @@ const renderStatus = (
     const colors: {
         [index: string]: 'success' | 'error' | 'info' | 'warning';
     } = {
-        Signature: 'success',
         Releasing: 'success',
         Borrowed: 'error',
         Assign: 'error',
@@ -24,7 +22,7 @@ const renderStatus = (
         Tagging: 'info',
     };
 
-    const label = ['Signature', 'Releasing', 'Assign', 'Tagging'].includes(
+    const label = ['Releasing', 'Assign', 'Tagging'].includes(
         status,
     )
         ? 'For ' + status
@@ -95,7 +93,9 @@ export const createChequeColumns = (
             }
 
             if (row.taggedAt) {
-                return renderStatus('Signature');
+                return (
+                    <Chip label="For Signature" color="success" size="small" />
+                );
             }
 
             return renderStatus(row?.borrowedCheck ? 'Borrowed' : 'Tagging');

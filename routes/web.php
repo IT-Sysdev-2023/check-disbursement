@@ -52,47 +52,53 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    //! EXTRACT CHECKS
-    Route::prefix('extract')->group(function () {
+    Route::middleware('role:disbursement_officer|admin')->group(function () {
+        //! EXTRACT CHECKS
+        Route::prefix('extract')->group(function () {
 
-        Route::prefix('check-voucher')->group(function () {
-            Route::get('index', [CvController::class, 'index'])->name('check-voucher');
-            Route::post('extract-cv', [CvController::class, 'extractCv'])->name('extractCv');
+            Route::prefix('check-voucher')->group(function () {
+                Route::get('index', [CvController::class, 'index'])->name('check-voucher');
+                Route::post('extract-cv', [CvController::class, 'extractCv'])->name('extract-cv');
+            });
+
+            Route::prefix('crf')->group(function () {
+                Route::get('index', [CrfController::class, 'index'])->name('check-request-form');
+                Route::post('extract-crf', [CrfController::class, 'extractCrf'])->name('extract-crf');
+
+            });
+
         });
 
-        Route::prefix('crf')->group(function () {
-            Route::get('index', [CrfController::class, 'index'])->name('check-request-form');
-            Route::post('extract-crf', [CrfController::class, 'extractCrf'])->name('extractCrf');
+        //! RETRIEVED CHECKS
+        Route::prefix('retrieved-checks')->group(function () {
+            Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrieved-records');
 
+            Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrower-names');
+            Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
+
+            Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
+            Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
+
+            Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
+            Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');
+            Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
+
+            Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
+            Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');
+
+            Route::get('calendar', [CrfController::class, 'calendar'])->name('calendar');
         });
-
     });
 
-    //! RETRIEVED CHECKS
-    Route::prefix('retrieved-checks')->group(function () {
-        Route::get('index', [RetrievedChecksController::class, 'index'])->name('retrieved-records');
 
-        Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrower-names');
-        Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
-
-        Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
-        Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
-
-        Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
-        Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');
-        Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
-
-        Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
-        Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');
+    Route::prefix('details')->group(function () {
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
         Route::get('cv/details-signature/{id}', [CvController::class, 'signatureDetails'])->name('signature-details');
         Route::get('crf/details/{id}', [CrfController::class, 'detailsCrf'])->name('details-crf');
-
-        Route::get('calendar', [CrfController::class, 'calendar'])->name('calendar');
     });
 
-    //! CHECK REQUESTS (SH)
-    Route::prefix('check-requests')->group(function () {
+    //! SECTION HEAD
+    Route::prefix('check-receiving')->middleware('role:section_head|admin')->group(function () {
         Route::get('index', [CheckRequestController::class, 'index'])->name('cheque-requests');
         Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->name('borrowedChecks'); // display cheques from dropdown
         Route::get('borrowed-number-cheques/{id}', [CheckRequestController::class, 'borrowedNumberCheques'])->name('borrowed-number-cheques'); // display number of cheques borrowed
@@ -100,19 +106,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('approver', [CheckRequestController::class, 'approver'])->name('approverNames');
         Route::put('approve-check', [CheckRequestController::class, 'approveCheck'])->name('approveCheck');
+
+        Route::prefix('check-releasing')->group(function () {
+            Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
+
+            Route::get('release-check/{checkId}/{status}', [CheckReleasingController::class, 'show'])->name('release-check');
+            Route::post('store-release-check/{id}', [CheckReleasingController::class, 'store'])->name('store-release-check');
+
+        });
     });
 
-    //! CHECK RELEASING (SH)
-    Route::prefix('check-releasing')->group(function () {
-        Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
-
-        Route::get('release-check/{checkId}/{status}', [CheckReleasingController::class, 'show'])->name('release-check');
-        Route::post('store-release-check/{id}', [CheckReleasingController::class, 'store'])->name('store-release-check');
-
-    });
-
+    //! REGIONAL OFFICER
     //Cebu & Manila
-    Route::prefix('forwarded-check')->group(function () {
+    Route::prefix('forwarded-check')->middleware('role:regional_officer|admin')->group(function () {
         Route::get('index', [ForwardedCheckController::class, 'index'])->name('forwarded-check-releasing');
         Route::get('release-check/{id}/{status}', [ForwardedCheckController::class, 'showForwarded'])->name('release-check-forwarded');
         Route::post('store-release-check/{id}', [ForwardedCheckController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
