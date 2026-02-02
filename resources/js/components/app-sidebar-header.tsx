@@ -1,17 +1,103 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
-
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import { Badge, Box, IconButton, Popover, Typography } from '@mui/material';
+import { useState } from 'react';
 export function AppSidebarHeader({
     breadcrumbs = [],
 }: {
     breadcrumbs?: BreadcrumbItemType[];
 }) {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+    const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const open = Boolean(anchorEl);
     return (
         <header className="flex h-16 shrink-0 items-center gap-2 border-b border-sidebar-border/50 px-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 md:px-4">
+            {/* Left */}
             <div className="flex items-center gap-2">
                 <SidebarTrigger className="-ml-1" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
+            </div>
+
+            {/* Right */}
+            <div className="ml-auto">
+                <IconButton onClick={handleOpen}>
+                    <Badge badgeContent={3} color="error">
+                        <NotificationsIcon />
+                    </Badge>
+                </IconButton>
+
+                <Popover
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleClose}
+                    anchorOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'right',
+                    }}
+                    slotProps={{
+                        paper: {
+                            sx: {
+                                mt: 1, // theme spacing (8px)
+                            },
+                        },
+                    }}
+                >
+                    <Box sx={{ width: 320, p: 2 }}>
+                        <Typography fontWeight={600} mb={1}>
+                            Notifications
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 1,
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    p: 1,
+                                    borderRadius: 1,
+                                    bgcolor: 'action.hover',
+                                }}
+                            >
+                                ✔ Payment approved
+                            </Box>
+                            <Box
+                                sx={{
+                                    p: 1,
+                                    borderRadius: 1,
+                                    bgcolor: 'action.hover',
+                                }}
+                            >
+                                ⚠ Check pending review
+                            </Box>
+                            <Box
+                                sx={{
+                                    p: 1,
+                                    borderRadius: 1,
+                                    bgcolor: 'action.hover',
+                                }}
+                            >
+                                📄 New CV uploaded
+                            </Box>
+                        </Box>
+                    </Box>
+                </Popover>
             </div>
         </header>
     );

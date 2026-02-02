@@ -18,7 +18,7 @@ class CvCheckPayment extends Model
 {
 
     protected $guarded = [];
-    
+
 
     protected function casts(): array
     {
@@ -52,10 +52,14 @@ class CvCheckPayment extends Model
     public function scopeFilter(Builder $builder, array $filters)
     {
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
-            $query->whereHas('cvHeader', function (Builder $query) use ($search) {
-                $query->whereAny([
-                    'cv_no',
-                ], 'LIKE', '%' . $search . '%');
+            $query->where(function ($q) use ($search) {
+                $q->whereAny([
+                    'check_amount',
+                    'payee'
+                ], 'LIKE', '%' . $search . '%')
+                    ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {
+                        $q2->where('cv_no', 'LIKE', '%' . $search . '%');
+                    });
             });
         })
             ->when($filters['bu'] ?? null, function ($query, $bu) {

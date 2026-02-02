@@ -38,7 +38,7 @@ export default function PermissionSelection({
     const theme = useTheme();
     return (
         <div>
-            <FormControl sx={{ width: 300 }}>
+            <FormControl sx={{ width: 270 }}>
                 <Select
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"

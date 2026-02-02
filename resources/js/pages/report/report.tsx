@@ -9,8 +9,6 @@ import {
     FormHelperText,
     Grid,
     InputLabel,
-    MenuItem,
-    Select,
     SelectChangeEvent,
     Typography,
 } from '@mui/material';
@@ -23,7 +21,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { ChangeEvent, ReactNode, useEffect } from 'react';
-import SelectItem from '../dashboard/components/SelectItem';
+import PermissionSelection from '../admin/components/permissionSelection';
 
 const SectionCard = ({
     title,
@@ -78,19 +76,22 @@ export default function EmployeeReportFilters({
     statuses,
     borrower,
     location,
+    bu,
 }: {
     columns: string[];
     cvColumns: string[];
     crfColumns: string[];
-    statuses: string[];
+    statuses: SelectionType[];
     borrower: SelectionType[];
     location: SelectionType[];
+    bu: SelectionType[];
 }) {
     const { data, setData, post, processing, errors, transform, reset } =
         useForm({
-            borrower: '',
-            status: '',
-            location: '',
+            bu: [] as string[],
+            borrower: [] as string[],
+            status: [] as string[],
+            location: [] as string[],
             selectedChecks: [] as string[],
             columns: [] as string[],
         });
@@ -126,19 +127,19 @@ export default function EmployeeReportFilters({
         });
     }, [data.selectedChecks]);
 
-    const handleSelectionChange = (
-        event: SelectChangeEvent,
-        filter: 'borrower' | 'location' | 'status',
-    ) => {
-        setData(filter, event.target.value);
-    };
+    // const handleSelectionChange = (
+    //     event: SelectChangeEvent,
+    //     filter: 'borrower' | 'location' | 'status' | 'bu',
+    // ) => {
+    //     setData(filter, event.target.value);
+    // };
 
     const onGenerate = () => {
         post(generateReport().url, {
             preserveScroll: true,
             preserveState: true,
-            onSuccess: (page) => {
-                const m = page.props.flash as FlashReponse;
+            onSuccess: () => {
+                // const m = page.props.flash as FlashReponse;
 
                 reset();
             },
@@ -146,6 +147,16 @@ export default function EmployeeReportFilters({
                 console.log(e);
             },
         });
+    };
+
+    const handleChangeSelection = (
+        event: SelectChangeEvent<string[]>,
+        filter: 'borrower' | 'location' | 'status' | 'bu',
+    ) => {
+        const {
+            target: { value },
+        } = event;
+        setData(filter, typeof value === 'string' ? value.split(',') : value);
     };
 
     return (
@@ -244,46 +255,45 @@ export default function EmployeeReportFilters({
                                 sx={{ mb: 2, mt: 3 }}
                             >
                                 <InputLabel>Status</InputLabel>
-                                <Select
-                                    label="Current Status"
-                                    value={data.status}
-                                    onChange={(e) =>
-                                        handleSelectionChange(e, 'status')
-                                    }
-                                >
-                                    {statuses.map((status) => (
-                                        <MenuItem
-                                            key={status}
-                                            value={status}
-                                            sx={{ width: '100%' }} // full clickable row
-                                        >
-                                            {status.charAt(0).toUpperCase() +
-                                                status.slice(1)}{' '}
-                                            {/* optional capitalization */}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-
-                            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                                <SelectItem
+                                <PermissionSelection
+                                    permissions={statuses}
+                                    selectedPermission={data.status}
                                     handleChange={(e) =>
-                                        handleSelectionChange(e, 'borrower')
+                                        handleChangeSelection(e, 'status')
                                     }
-                                    value={data.borrower}
-                                    title="Borrower Name"
-                                    items={borrower}
                                 />
                             </FormControl>
 
                             <FormControl fullWidth size="small" sx={{ mb: 3 }}>
-                                <SelectItem
+                                <InputLabel>Business Unit</InputLabel>
+                                <PermissionSelection
+                                    permissions={bu}
+                                    selectedPermission={data.bu}
                                     handleChange={(e) =>
-                                        handleSelectionChange(e, 'location')
+                                        handleChangeSelection(e, 'bu')
                                     }
-                                    value={data.location}
-                                    title="Tag location"
-                                    items={location}
+                                />
+                            </FormControl>
+
+                            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                                <InputLabel>Borrower Name</InputLabel>
+                                <PermissionSelection
+                                    permissions={borrower}
+                                    selectedPermission={data.borrower}
+                                    handleChange={(e) =>
+                                        handleChangeSelection(e, 'borrower')
+                                    }
+                                />
+                            </FormControl>
+
+                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+                                <InputLabel>Tag Location</InputLabel>
+                                <PermissionSelection
+                                    permissions={location}
+                                    selectedPermission={data.location}
+                                    handleChange={(e) =>
+                                        handleChangeSelection(e, 'location')
+                                    }
                                 />
                             </FormControl>
 

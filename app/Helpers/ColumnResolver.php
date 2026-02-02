@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 class ColumnResolver
 {
     public const DEFAULT_COLUMNS = [
@@ -59,6 +60,17 @@ class ColumnResolver
             }
         }
 
-        return $enumValues;
+        return collect($enumValues)->values()->map(fn($status, $key) => [
+            'label' => $status,
+            'value' => $key + 1,
+        ]);
+    }
+
+    public static function transformColumn($type)
+    {
+        return array_map(
+            fn($value) => Str::snake($value),
+            $type
+        );
     }
 }

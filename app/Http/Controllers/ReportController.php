@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ReportExport;
 use App\Helpers\ColumnResolver;
 use App\Models\Borrower;
+use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class ReportController extends Controller
 {
@@ -17,6 +21,15 @@ class ReportController extends Controller
     {
         $columns = ColumnResolver::resolve($request->check);
 
+
+        $bu = $request->user()
+            ->companyPermissions()
+            ->with('company:id,name')
+            ->get()
+            ->map(fn($permission) => [
+                'label' => $permission->company->name,
+                'value' => $permission->company->id,
+            ]);
         $borrower = Borrower::borrowerSelection();
         $location = TagLocation::locationSelection();
         return Inertia::render('report/report', [
@@ -26,22 +39,26 @@ class ReportController extends Controller
             'statuses' => ColumnResolver::statusColumnEnums(),
             'borrower' => $borrower,
             'location' => $location,
+            'bu' => $bu
         ]);
 
     }
 
     public function generate(Request $request)
     {
-        // $request->validate([
-        //     'selectedChecks' => 'required | array | min:1',
-        //     'selectedChecks.*' => 'string',
-        //     'columns' => 'required | array | min:1',
-        //     'columns.*' => 'string',
-        // ]);
+
+
+        // return Excel::download(new ReportExport, 'report.xlsx');
+        $validated = $request->validate([
+            'selectedChecks' => 'required | array | min:1',
+            'selectedChecks.*' => 'string',
+            'columns' => 'required | array | min:1',
+            'columns.*' => 'string',
+        ]);
         $result = [];
 
-        foreach ($request->columns as $column) {
-            foreach ($request->selectedChecks as $check) {
+        foreach ($validated['columns'] as $column) {
+            foreach ($validated['selectedChecks'] as $check) {
                 if (in_array($column, ColumnResolver::TYPE_COLUMNS[$check], true)) {
                     $result[$check][] = $column;
                 }
@@ -52,38 +69,49 @@ class ReportController extends Controller
             }
         }
 
+        $cvRecords = [];
+
         if (isset($result['cv'])) {
-            $transform = array_map(
-                fn($value) => Str::snake($value),
-                $result['cv']
+            // dd($result['cv']);
+            $cvColumns = ColumnResolver::transformColumn($result['cv']);
+
+            Excel::store(
+                new ReportExport($cvColumns, $validated),
+                'exports/report.xlsx',
+                'local',
+                ExcelExcel::XLSX
             );
-            $data = CvCheckPayment::select($transform)
-                ->leftjoin('cv_headers', 'cv_check_payments.cv_header_id', '=', 'cv_headers.id')
-                ->join('tag_locations', 'cv_check_payments.tag_location_id', '=', 'tag_locations.id')
-                ->join('companies', 'cv_check_payments.company_id', '=', 'companies.id')
-                ->join('check_statuses', 'cv_check_payments.id', '=', 'check_statuses.checkable_id')
-                ->join('borrowed_checks', 'cv_check_payments.id', '=', 'borrowed_checks.checkable_id')
-                ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
-                ->join('approvers', 'borrowed_checks.approver_id', '=', 'approvers.id')
-                // ->join check number here...
-                ->where(['borrowed_checks.checkable_type' => 'cv', 'check_statuses.checkable_type' => 'cv'])
-                ->get();
-
-            dd($data);
-        } else {
-            $transform = array_map(
-                fn($value) => Str::snake($value),
-                $result['crf']
-            );
-
-            $data = Crf::select($transform)
-                ->join('tag_locations', 'crfs.tag_location_id', '=', 'tag_locations.id')
-                ->join('check_statuses', 'crfs.id', '=', 'check_statuses.checkable_id')
-                ->join('borrowed_checks', 'crfs.id', '=', 'borrowed_checks.checkable_id');
-
-            dd($data);
         }
-        dd($request->all(), $result);
+        dd(1);
+        $crfRecords = [];
+        if (isset($result['crf'])) {
+            $transform = ColumnResolver::transformColumn($result['crf']);
+
+            $crfRecords = CheckStatus::select($transform)
+                ->join('crfs', 'crfs.id', '=', 'check_statuses.checkable_id')
+                ->join('companies', 'crfs.company_id', '=', 'companies.id')
+                ->join('borrowed_checks', 'crfs.id', '=', 'borrowed_checks.checkable_id')
+                ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
+                ->join('tag_locations', 'crfs.tag_location_id', '=', 'tag_locations.id')
+                ->leftJoin('approvers', 'borrowed_checks.approver_id', '=', 'approvers.id')
+                ->where([['check_statuses.checkable_type', 'crf'], ['borrowed_checks.checkable_type', 'crf']])
+                ->when(!empty($validated['status']), function ($query) use ($validated) {
+                    $query->whereIn('check_statuses.status', $validated['status']);
+                })
+                ->when(!empty($validated['bu']), function ($query) use ($validated) {
+                    $query->whereIn('companies.name', $validated['bu']);
+                })
+                ->when(!empty($validated['borrower']), function ($query) use ($validated) {
+                    $query->whereIn('borrowers.name', $validated['borrower']);
+                })
+                ->when(!empty($validated['location']), function ($query) use ($validated) {
+                    $query->whereIn('tag_locations.location', $validated['location']);
+                })
+
+                ->get();
+        }
+
+        dd($crfRecords, $cvRecords);
     }
 
 }
