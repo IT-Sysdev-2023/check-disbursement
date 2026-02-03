@@ -58,7 +58,7 @@ export function AppSidebarHeader({
                 >
                     <Box sx={{ width: 320, p: 2 }}>
                         <Typography fontWeight={600} mb={1}>
-                            Notifications
+                            Reports
                         </Typography>
 
                         <Box

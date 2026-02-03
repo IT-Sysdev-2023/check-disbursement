@@ -15,6 +15,7 @@ class ColumnResolver
         'approvers.name',
         'check_statuses.status',
         'receivers name',
+        'check_date'
     ];
 
     public const TYPE_COLUMNS = [
@@ -32,6 +33,7 @@ class ColumnResolver
             'bank',
             'ck no',
             'prepared by',
+
         ],
     ];
 

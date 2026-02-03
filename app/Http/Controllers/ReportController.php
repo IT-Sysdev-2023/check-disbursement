@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\CvReportExport;
 use App\Exports\ReportExport;
 use App\Helpers\ColumnResolver;
 use App\Models\Borrower;
@@ -46,8 +47,6 @@ class ReportController extends Controller
 
     public function generate(Request $request)
     {
-
-
         // return Excel::download(new ReportExport, 'report.xlsx');
         $validated = $request->validate([
             'selectedChecks' => 'required | array | min:1',
@@ -69,49 +68,18 @@ class ReportController extends Controller
             }
         }
 
-        $cvRecords = [];
+        $cvColumns = isset($result['cv'])
+            ? ColumnResolver::transformColumn($result['cv'])
+            : [];
 
-        if (isset($result['cv'])) {
-            // dd($result['cv']);
-            $cvColumns = ColumnResolver::transformColumn($result['cv']);
+        $crfColumns = isset($result['crf'])
+            ? ColumnResolver::transformColumn($result['crf'])
+            : [];
 
-            Excel::store(
-                new ReportExport($cvColumns, $validated),
-                'exports/report.xlsx',
-                'local',
-                ExcelExcel::XLSX
-            );
-        }
-        dd(1);
-        $crfRecords = [];
-        if (isset($result['crf'])) {
-            $transform = ColumnResolver::transformColumn($result['crf']);
+        $filename = "reports/report-{$request->user()->id}.xlsx";
+        Excel::store(new ReportExport($cvColumns, $crfColumns, $request->all()), $filename);
 
-            $crfRecords = CheckStatus::select($transform)
-                ->join('crfs', 'crfs.id', '=', 'check_statuses.checkable_id')
-                ->join('companies', 'crfs.company_id', '=', 'companies.id')
-                ->join('borrowed_checks', 'crfs.id', '=', 'borrowed_checks.checkable_id')
-                ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
-                ->join('tag_locations', 'crfs.tag_location_id', '=', 'tag_locations.id')
-                ->leftJoin('approvers', 'borrowed_checks.approver_id', '=', 'approvers.id')
-                ->where([['check_statuses.checkable_type', 'crf'], ['borrowed_checks.checkable_type', 'crf']])
-                ->when(!empty($validated['status']), function ($query) use ($validated) {
-                    $query->whereIn('check_statuses.status', $validated['status']);
-                })
-                ->when(!empty($validated['bu']), function ($query) use ($validated) {
-                    $query->whereIn('companies.name', $validated['bu']);
-                })
-                ->when(!empty($validated['borrower']), function ($query) use ($validated) {
-                    $query->whereIn('borrowers.name', $validated['borrower']);
-                })
-                ->when(!empty($validated['location']), function ($query) use ($validated) {
-                    $query->whereIn('tag_locations.location', $validated['location']);
-                })
-
-                ->get();
-        }
-
-        dd($crfRecords, $cvRecords);
+        return redirect()->back()->with(['status' => true, 'message' => 'Report generated Generated']);
     }
 
 }

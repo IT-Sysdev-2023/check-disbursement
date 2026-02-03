@@ -104,7 +104,7 @@ class ForwardedCheckService
                 ->checkForwardedStatus()
                 ->create([
                     'status' => Str::lower($validated['status']),
-                    'receivers_name' => $validated['receiversName'],
+                    'forwarded_receivers_name' => $validated['receiversName'],
                     'image' => $handleFiles->imagePath,
                     'signature' => $handleFiles->signaturePath,
                     'caused_by' => $request->user()->id,

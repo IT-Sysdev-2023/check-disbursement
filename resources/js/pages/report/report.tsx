@@ -16,12 +16,13 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { generateReport } from '@/routes';
 import { BreadcrumbItem, SelectionType } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { ChangeEvent, ReactNode, useEffect } from 'react';
 import PermissionSelection from '../admin/components/permissionSelection';
+import useNotifications from '@/components/notifications/useNotifications';
 
 const SectionCard = ({
     title,
@@ -119,6 +120,21 @@ export default function EmployeeReportFilters({
         return 'text.primary';
     };
 
+     const notifications = useNotifications();
+    
+        const { flash } = usePage().props as {
+            flash?: { status?: boolean; message?: string };
+        };
+    
+    useEffect(() => {
+        if (flash?.message) {
+            notifications.show(flash.message, {
+                severity: flash?.status ? 'success' : 'error',
+                autoHideDuration: 3000,
+            });
+        }
+    }, [flash, notifications]);
+
     useEffect(() => {
         router.reload({
             data: {
@@ -126,13 +142,6 @@ export default function EmployeeReportFilters({
             },
         });
     }, [data.selectedChecks]);
-
-    // const handleSelectionChange = (
-    //     event: SelectChangeEvent,
-    //     filter: 'borrower' | 'location' | 'status' | 'bu',
-    // ) => {
-    //     setData(filter, event.target.value);
-    // };
 
     const onGenerate = () => {
         post(generateReport().url, {

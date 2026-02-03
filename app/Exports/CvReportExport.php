@@ -1,0 +1,102 @@
+<?php
+
+namespace App\Exports;
+
+use App\Helpers\ColumnResolver;
+use App\Models\CheckStatus;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithTitle;
+
+class CvReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoSize
+{
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+
+    protected array $columns;
+    protected array $validated;
+    public function __construct(array $columns, array $validated)
+    {
+        $this->columns = $columns;
+        $this->validated = $validated;
+    }
+
+      public function title(): string
+    {
+        return 'Cv Report';
+    }
+
+    public function headings(): array
+    {
+        return array_map(
+            fn($value) => Str::headline($value),
+            $this->columns
+        );
+    }
+
+    public function query()
+    {
+        $validated = $this->validated;
+
+        $columns = $this->columns;
+
+        $doesIncludeCN = in_array('check_number', $columns);
+        $doesIncludeCD = in_array('check_date', $columns);
+
+        if ($doesIncludeCN) {
+            $columns = array_map(fn($col) => $col === 'check_number' ? DB::raw('CASE WHEN check_number != 0 THEN check_number ELSE resolved_check_number END as check_number') : $col, $columns);
+        }
+
+        if ($doesIncludeCD) {
+            $columns = array_map(fn($col) => $col === 'check_date' ? DB::raw('CASE WHEN check_date IS NOT NULL THEN check_date ELSE resolved_check_date END as check_date') : $col, $columns);
+        }
+
+        if (in_array('status', $columns)) { //select the 'check_forwarded_statuses' status if there is a relationship there otherwise use the 
+            $columns = array_map(
+                fn($col) => $col === 'status'
+                ? DB::raw('COALESCE(check_forwarded_statuses.status, check_statuses.status) AS status')
+                : $col,
+                $columns
+            );
+        }
+
+        return CheckStatus::select($columns)
+            ->join('cv_check_payments', 'cv_check_payments.id', '=', 'check_statuses.checkable_id')
+              ->join('borrowed_checks', function ($join) {
+                $join->on('cv_check_payments.id', '=', 'borrowed_checks.checkable_id')
+                    ->where('borrowed_checks.checkable_type', 'cv');
+            })
+            ->leftJoin('cv_headers', 'cv_check_payments.cv_header_id', '=', 'cv_headers.id')
+            ->join('companies', 'cv_check_payments.company_id', '=', 'companies.id')
+            ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
+            ->join('tag_locations', 'cv_check_payments.tag_location_id', '=', 'tag_locations.id')
+            ->leftJoin('approvers', 'borrowed_checks.approver_id', '=', 'approvers.id')
+            ->leftJoin('check_forwarded_statuses', 'check_forwarded_statuses.check_status_id', '=', 'check_statuses.id')
+            ->where('check_statuses.checkable_type', 'cv')
+            ->when(
+                !empty($validated['status']),
+                fn($query) =>
+                $query->whereIn(DB::raw('COALESCE(check_forwarded_statuses.status, check_statuses.status)'), $validated['status'])
+            )
+            ->when(
+                !empty($validated['bu']),
+                fn($query) =>
+                $query->whereIn('companies.name', $validated['bu'])
+            )
+            ->when(
+                !empty($validated['borrower']),
+                fn($query) =>
+                $query->whereIn('borrowers.name', $validated['borrower'])
+            )
+            ->when(
+                !empty($validated['location']),
+                fn($query) =>
+                $query->whereIn('tag_locations.location', $validated['location'])
+            );
+    }
+}

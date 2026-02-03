@@ -13,8 +13,8 @@ return new class extends Migration {
         Schema::create('check_forwarded_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('check_status_id')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->enum('status', ['release','cancel'])->nullable();
-            $table->string('receivers_name')->nullable();
+            $table->enum('status', ['released','cancelled'])->nullable();
+            $table->string('forwarded_receivers_name')->nullable();
             $table->string('image')->nullable();
             $table->string('signature')->nullable();
             $table->string('cancelled_reason')->nullable();
