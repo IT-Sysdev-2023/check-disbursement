@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+use App\Models\Company;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -141,10 +142,16 @@ class CrfHelper
 
     public function getRecords(int $userId)
     {
+
+      
+        $extractedCompany = explode(' ', $this->company);
+        $companyId = Company::whereIn('name', $extractedCompany)->first()->id;
+
         return [
             'causer_id' => $userId,
             'filename' => $this->filename,
             'crf' => $this->crf,
+            'company_id' => $companyId,
             'company_office' => $this->company,
             'no' => $this->no,
             'location' => $this->location,
@@ -161,17 +168,15 @@ class CrfHelper
         ];
     }
 
-    public static function checkProperties(Collection $record, array $bu)
+    public static function checkProperties(Collection $records, array $bu)
     {
-
-
-        return $record->every(function ($item) use ($bu) {
-            return (!empty($item['company']) && !empty($item['no'])
+        return $records->every(function ($item) use ($bu) {
+            return (!empty($item['company_office']) && !empty($item['no'])
                 && !empty($item['location']) && !empty($item['date'])
                 && !empty($item['bank']) && !empty($item['ck_no'])
                 && !empty($item['prepared_by']) && !empty($item['paid_to'])
                 && !empty($item['amount']) && !empty($item['particulars'])) &&
-                (Str::contains($item['company'], $bu, ignoreCase: true)); // disable case sensitivity
+                (Str::contains($item['company_office'], $bu, ignoreCase: true)); // disable case sensitivity
         });
     }
 

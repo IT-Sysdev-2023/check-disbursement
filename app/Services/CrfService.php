@@ -64,9 +64,9 @@ class CrfService
             return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);
         }
 
-        $uniqueKeys = $records->pluck('no');
-        $existing = Crf::whereIn('no', $uniqueKeys)->pluck('filename');
-
+        $uniqueKeys = $records->pluck('ck_no');
+        $existing = Crf::whereIn('ck_no', $uniqueKeys)->pluck('filename');
+        
         DB::transaction(function () use ($records) {
             Crf::insertOrIgnore($records->toArray());
         });
