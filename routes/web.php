@@ -127,8 +127,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
-    Route::get('report', [ReportController::class, 'index'])->name('report');
-    Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
+
+    Route::prefix('reports')->group(function () {
+        Route::get('report', [ReportController::class, 'index'])->name('report');
+        Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
+        Route::get('generated-reports', [ReportController::class, 'generatedReports'])->name('generatedReport');
+
+        Route::get('download-report', [ReportController::class, 'download'])->name('download-report');
+    });
 
     Route::get('about', function () {
         return Inertia::render('dashboard');

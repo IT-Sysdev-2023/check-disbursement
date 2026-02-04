@@ -232,7 +232,7 @@ export interface Crf {
     preparedBy: string;
     created_at: string;
     updated_at: string;
-    checkStatus: CheckStatus
+    checkStatus: CheckStatus;
 }
 
 export interface Links {
@@ -281,6 +281,13 @@ export interface ProgressState {
         buffer: number;
         message: string;
     };
+}
+
+export interface FileReport {
+    extension: string;
+    file: string;
+    filename: string;
+    last_modified: string;
 }
 
 export interface ScannedRecords {

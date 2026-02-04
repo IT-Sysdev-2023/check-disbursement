@@ -13,7 +13,9 @@ class BusinessUnitAssignedScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $roleIds = auth()->user()->companyPermissions->pluck('company_id');
-        $builder->whereIn($model->getTable() . '.company_id',$roleIds);
+        if (auth()->user()->hasRole('disbursement_officer')) {
+            $roleIds = auth()->user()->companyPermissions->pluck('company_id');
+            $builder->whereIn($model->getTable() . '.company_id', $roleIds);
+        }
     }
 }

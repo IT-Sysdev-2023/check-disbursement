@@ -12,10 +12,15 @@ class FileHandler
     protected string $folderName = '';
 
     protected string $fileName = '';
-    protected $disk;
+    protected Filesystem $disk;
     public function __construct(Filesystem $disk)
     {
         $this->disk = $disk;
+    }
+
+    public function disk(): Filesystem
+    {
+        return $this->disk;
     }
 
     public function inFolder(string $folderName)
@@ -117,6 +122,7 @@ class FileHandler
     {
         $filename = Str::start($file, '/');
         $fullpath = $this->folder() . $subfolder . $filename;
+        
         if ($this->disk->exists($fullpath)) {
             return $this->disk->download($fullpath);
         } else {

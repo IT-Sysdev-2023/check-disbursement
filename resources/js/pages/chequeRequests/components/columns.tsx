@@ -50,7 +50,7 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
         align: 'center',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.tagLocation?.location,
+        renderCell: ({ row }) => row.checkable?.tagLocation?.location,
     },
      {
         field: 'check',
@@ -59,7 +59,7 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
         align: 'center',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.check,
+        renderCell: ({ row }) => row.checkable?.check,
     },
 
     {

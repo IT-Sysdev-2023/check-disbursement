@@ -1,8 +1,11 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { generatedReport } from '@/routes';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { router } from '@inertiajs/react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Badge, Box, IconButton, Popover, Typography } from '@mui/material';
+import { Download } from 'lucide-react';
 import { useState } from 'react';
 export function AppSidebarHeader({
     breadcrumbs = [],
@@ -14,6 +17,10 @@ export function AppSidebarHeader({
     const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
+
+    const handleDownloads = () => {
+        router.get(generatedReport());
+    }
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -30,11 +37,16 @@ export function AppSidebarHeader({
 
             {/* Right */}
             <div className="ml-auto">
-                <IconButton onClick={handleOpen}>
-                    <Badge badgeContent={3} color="error">
-                        <NotificationsIcon />
+                <IconButton onClick={handleDownloads} sx={{ m: 1 }}>
+                    <Badge color="error">
+                        <Download />
                     </Badge>
                 </IconButton>
+                {/* <IconButton onClick={handleOpen}>
+                    <Badge color="error">
+                        <NotificationsIcon />
+                    </Badge>
+                </IconButton> */}
 
                 <Popover
                     open={open}
@@ -58,7 +70,7 @@ export function AppSidebarHeader({
                 >
                     <Box sx={{ width: 320, p: 2 }}>
                         <Typography fontWeight={600} mb={1}>
-                            Reports
+                            Under Maintenance
                         </Typography>
 
                         <Box

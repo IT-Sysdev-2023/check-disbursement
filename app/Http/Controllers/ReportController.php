@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Exports\CvReportExport;
 use App\Exports\ReportExport;
 use App\Helpers\ColumnResolver;
+use App\Helpers\FileHandler;
 use App\Models\Borrower;
 use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
@@ -18,6 +21,11 @@ use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class ReportController extends Controller
 {
+    protected ?string $userType;
+    public function __construct(protected FileHandler $fileHandler)
+    {
+        $this->userType = auth()->user()->roles->first()->name;
+    }
     public function index(Request $request)
     {
         $columns = ColumnResolver::resolve($request->check);
@@ -76,10 +84,47 @@ class ReportController extends Controller
             ? ColumnResolver::transformColumn($result['crf'])
             : [];
 
-        $filename = "reports/report-{$request->user()->id}.xlsx";
-        Excel::store(new ReportExport($cvColumns, $crfColumns, $request->all()), $filename);
+        $role = $this->userType;
+        $date = now()->format('Ymd_His');
+
+        $filename = "reports/{$role}/report-{$request->user()->id}-{$date}.xlsx";
+        Excel::store(new ReportExport($cvColumns, $crfColumns, $request->all()), $filename, 'public');
 
         return redirect()->back()->with(['status' => true, 'message' => 'Report generated Generated']);
+    }
+
+    public function generatedReports(Request $request)
+    {
+        $getFiles = $this->fileHandler
+            ->inFolder('reports')
+            ->getFilesFromDirectory($this->userType, true);
+
+        $files = $getFiles->transform(function ($item) {
+
+            $extension = pathinfo($item, PATHINFO_EXTENSION);
+            return [
+                'file' => basename($item),
+                'filename' => Str::of(basename($item))->basename('.' . $extension),
+                'extension' => $extension,
+                // 'icon' => $extension === 'pdf' ? 'pdf.png' : 'excel.png',
+                'last_modified' => Date::createFromTimestamp(
+                    $this->fileHandler->disk()->lastModified($item),
+                    'Asia/Manila'
+                )->format('M d, Y h:i A'),
+            ];
+        })->sortByDesc('date')->values();
+
+        return Inertia::render('report/generatedReports', [
+            'files' => $files,
+        ]);
+    }
+
+    public function download(Request $request)
+    {
+
+        return $this->fileHandler
+            ->inFolder('reports')
+            ->download($request->file, $this->userType);
     }
 
 }
