@@ -22,6 +22,7 @@ import {
     retrievedRecords,
     users,
 } from '@/routes';
+import { reset } from '@/routes/password';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
@@ -167,16 +168,16 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 href: about(),
                 icon: Users,
             },
-            {
-                title: 'Change Password',
-                href: changePassword(),
-                icon: Key,
-            },
-            {
-                title: 'Notifications',
-                href: notifications(),
-                icon: Bell,
-            },
+            // {
+            //     title: 'Change Password',
+            //     href: reset(),
+            //     icon: Key,
+            // },
+            // {
+            //     title: 'Notifications',
+            //     href: notifications(),
+            //     icon: Bell,
+            // },
         ];
     }, [
         items,

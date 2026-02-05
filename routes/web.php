@@ -137,12 +137,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('about', function () {
-        return Inertia::render('dashboard');
+        return Inertia::render('aboutUs/aboutus');
     })->name('about');
-
-    Route::get('change-password', function () {
-        return Inertia::render('dashboard');
-    })->name('change-password');
 
     Route::get('notifications', function () {
         return Inertia::render('dashboard');
