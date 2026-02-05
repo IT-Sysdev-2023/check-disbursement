@@ -322,5 +322,5 @@ export interface FlashReponse {
     status: boolean;
     message: string;
     duplicates: string[];
-    stream: string;
+    stream?: string;
 }

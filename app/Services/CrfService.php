@@ -71,10 +71,13 @@ class CrfService
             Crf::insertOrIgnore($records->toArray());
         });
 
+        // $hasExisting = !empty($existing) ? 'Duplicates are listed below and were ignored.' : '';
+
         return redirect()->back()->with([
             'status' => true,
-            'message' => ' Files Successfully uploadeded, duplicated records were ignored',
-            'duplicates' => $existing //retrieve duplicated files
+            'message' => ' Files Successfully uploaded. ',
+            'duplicates' => []
+            // 'duplicates' => $existing //retrieve duplicated files
         ]);
     }
 
