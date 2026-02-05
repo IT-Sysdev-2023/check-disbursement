@@ -294,6 +294,8 @@ export interface ScannedRecords {
     id: number;
     accountNo: string;
     amount: number;
+    checkDate: string;
+    bank: string;
     branchCode: string;
     branchName: string;
     bu: string;

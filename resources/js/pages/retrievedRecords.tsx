@@ -38,9 +38,9 @@ import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import AssignAmountPayeeModal from './retrievedRecords/components/assignAmountPayeeModal';
 import AssignCdModal from './retrievedRecords/components/assignCdModal';
 import AssignCnModal from './retrievedRecords/components/assignCnModal';
+import AssignScanDetailsModal from './retrievedRecords/components/assignScanDetailsModal';
 import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createChequeColumns,
@@ -48,6 +48,7 @@ import {
     createPendingChequeColumns,
 } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
+import ScanDetails from './retrievedRecords/components/scanDetails';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -91,7 +92,9 @@ export default function RetrievedRecords({
     const [openAssignCnModal, setOpenAssignCnModal] = useState(false);
     const [openAssignCdModal, setOpenAssignCdModal] = useState(false);
     const [openInputDetails, setOpenInputDetails] = useState(false);
+    const [scannedDetailsModal, setScannedDetailsModal] = useState(false);
     const [scannedId, setScannedId] = useState<number>();
+    const [checkRecords, setCheckRecords] = useState<number>();
     const [currentTab, setCurrentTab] = useState(filter.tab);
     const [selectedLocation, setSelectedLocation] = useState('');
     const [location, setLocation] = useState<
@@ -224,9 +227,13 @@ export default function RetrievedRecords({
         );
     };
 
-    const handleUpdateScanned = (id: number) => {
+    const handleUpdateScanned = (
+        borrowedCheckId: number,
+    ) => {
         setOpenInputDetails(true);
-        setScannedId(id);
+
+        if(borrowedCheckId)
+        setCheckRecords(borrowedCheckId);
     };
 
     const handleAssignment = (value: 'completed' | 'toAssign') => {
@@ -236,6 +243,11 @@ export default function RetrievedRecords({
                 assignment: value,
             },
         });
+    };
+
+    const handleScanDetails = (id: number) => {
+        setScannedDetailsModal(true);
+        setScannedId(id);
     };
 
     const handleDetails = (id: number, type: 'cv' | 'crf') => {
@@ -248,6 +260,7 @@ export default function RetrievedRecords({
     const manageCvColumns = createManageColumns(
         handleDetails,
         handleUpdateScanned,
+        handleScanDetails,
     );
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -372,7 +385,7 @@ export default function RetrievedRecords({
                                 columns={manageCvColumns}
                             />
 
-                            <Box
+                            {/* <Box
                                 display="flex"
                                 justifyContent="flex-end"
                                 mt={3}
@@ -384,7 +397,7 @@ export default function RetrievedRecords({
                                 >
                                     Sync Check Scanned
                                 </Button>
-                            </Box>
+                            </Box> */}
                         </TabPanel>
                     </TabContext>
                 </Box>
@@ -395,6 +408,7 @@ export default function RetrievedRecords({
                 open={open}
                 handleClose={() => setOpen(false)}
             />
+
             {chequeData && (
                 <AssignCnModal
                     title="Assign Check Number"
@@ -412,11 +426,20 @@ export default function RetrievedRecords({
                     onClose={() => setOpenAssignCdModal(false)}
                 />
             )}
-
-            {scannedId && (
-                <AssignAmountPayeeModal
+            {/* scannedDetailsModal */}
+             {scannedId && (
+                <ScanDetails
                     id={scannedId}
-                    title="Check Details"
+                    title="Scanned Check Details"
+                    open={scannedDetailsModal}
+                    onClose={() => setScannedDetailsModal(false)}
+                />
+            )}
+
+            {checkRecords && (
+                <AssignScanDetailsModal
+                    borrowedCheckId={checkRecords}
+                    title="Input Check Details"
                     open={openInputDetails}
                     onClose={() => setOpenInputDetails(false)}
                 />

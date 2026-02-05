@@ -18,7 +18,9 @@ class ScannedRecordResource extends JsonResource
         return [
             'id' => $this->id,
             'accountNo' => $this->account_no,
+            'bank' =>$this->bank,
             "amount" => NumberHelper::currency($this->amount),
+            'checkDate' => $this->check_date ? $this->check_date->toFormattedDateString() : 'N/A',
             'branchCode' => $this->branch_code,
             "branchName" => $this->branch_name,
             'bu' => $this->bu,

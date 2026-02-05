@@ -1,16 +1,11 @@
 import { ActionType, ChequeType } from '@/types';
 import { Box, Chip, IconButton, MenuItem, Select, Stack } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { ArrowBigRightDash, NotepadText } from 'lucide-react';
+import { Edit2, Notebook, NotepadText } from 'lucide-react';
 import { JSX } from 'react';
 
 const renderStatus = (
-    status:
-        | 'Releasing'
-        | 'Borrowed'
-        | 'Assign'
-        | 'Tagged'
-        | 'Tagging',
+    status: 'Releasing' | 'Borrowed' | 'Assign' | 'Tagged' | 'Tagging',
 ) => {
     const colors: {
         [index: string]: 'success' | 'error' | 'info' | 'warning';
@@ -22,9 +17,7 @@ const renderStatus = (
         Tagging: 'info',
     };
 
-    const label = ['Releasing', 'Assign', 'Tagging'].includes(
-        status,
-    )
+    const label = ['Releasing', 'Assign', 'Tagging'].includes(status)
         ? 'For ' + status
         : status;
 
@@ -213,7 +206,8 @@ export const createPendingChequeColumns = (): GridColDef[] => [
 
 export const createManageColumns = (
     handleDetails: (id: number, type: 'cv' | 'crf') => void,
-    handleAction: (rec: number) => void,
+    handleAction: (id: number) => void,
+    handleScanDetails: (id: number) => void,
 ): GridColDef[] => [
     {
         field: 'checkNumber',
@@ -307,15 +301,26 @@ export const createManageColumns = (
                         <IconButton
                             size="small"
                             color="primary"
-                            onClick={() => handleAction(row.scannedId)}
+                            onClick={() => handleScanDetails(row.scannedId)}
                         >
-                            <ArrowBigRightDash />
+                            <Notebook />
+                        </IconButton>
+                    )}
+
+                    {!row.scannedId && (
+                        <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() =>
+                                handleAction(
+                                    row.borrowedCheckId
+                                )
+                            }
+                        >
+                            <Edit2 />
                         </IconButton>
                     )}
                 </Stack>
-                // <>
-
-                // </>
             );
         },
     },

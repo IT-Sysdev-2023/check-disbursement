@@ -12,16 +12,18 @@ return new class extends Migration {
     {
         Schema::create('scanned_records', function (Blueprint $table) {
             $table->id();
-            $table->string('bu');
-            $table->string('seq');
-            $table->dateTime('date');
+            $table->string('bu')->nullable();
+            $table->string('seq')->nullable();
+            $table->dateTime('date')->nullable();
             $table->string('account_no');
-            $table->dateTime('posted_date');
+            $table->dateTime('posted_date')->nullable();
             $table->string('check_no');
-            $table->unsignedBigInteger('branch_code');
-            $table->string('branch_name');
+            $table->unsignedBigInteger('branch_code')->nullable();
+            $table->string('branch_name')->nullable();
             $table->decimal('amount', 20);
             $table->string('payee')->nullable();
+            $table->string('bank')->nullable();
+            $table->timestamp('check_date')->nullable();
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 

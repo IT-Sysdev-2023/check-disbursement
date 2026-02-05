@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Events\ScanProgress;
 use App\Http\Resources\ScannedRecordResource;
+use App\Models\BorrowedCheck;
 use App\Models\ScannedRecords;
 use App\Services\ScannedRecordsService;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\File;
@@ -45,6 +47,53 @@ class ScannedRecordsController extends Controller
     public function update(ScannedRecords $id, Request $request)
     {
         return $this->service->update($id, $request);
+    }
+
+    public function store(BorrowedCheck $id, Request $request)
+    {
+
+        $validated = $request->validate([
+            "bank" => "required | string",
+            "accountNumber" => "required | string",
+            "checkNumber" => "required | string",
+            "checkDate" => "required | date",
+            "payee" => "required | string",
+            "amount" => 'required | numeric | gt:0'
+        ]);
+
+        $check = $id->load('checkable')->checkable;
+
+        $expectedCheckNo = $check->check_number == 0
+            ? $check->resolved_check_number
+            : $check->check_number;
+
+        $expectedAmount = $check->check_amount;
+
+        // Normalize before comparison
+        if ((string) $expectedCheckNo !== (string) $validated['checkNumber']) {
+            throw ValidationException::withMessages([
+                'checkNumber' => 'Check number mismatch.',
+            ]);
+        }
+
+        if ((float) $expectedAmount !== (float) $validated['amount']) {
+            throw ValidationException::withMessages([
+                'amount' => 'Check amount mismatch.',
+            ]);
+        }
+
+        ScannedRecords::create([
+            'bank' => $request->bank,
+            'account_no' => $request->accountNumber,
+            'check_no' => $request->checkNumber,
+            'check_date' => $request->checkDate,
+            'payee' => $request->payee,
+            'amount' => $request->amount,
+            'caused_by' => $request->user()->id
+        ]);
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Submitted']);
+
     }
 
 }

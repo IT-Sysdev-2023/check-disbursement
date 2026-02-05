@@ -71,7 +71,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
             Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');
-            Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
+            // Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
+Route::post('store-scan-record/{id}', [ScannedRecordsController::class, 'store'])->name('store-scan-record');
 
             Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
             Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');

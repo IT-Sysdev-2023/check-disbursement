@@ -25,6 +25,7 @@ class ChequeResource extends JsonResource
             'checkDate' => $this->check_date ? Date::parse($this->check_date)->toFormattedDateString() : null,
             'companyName' => $this->company_name ?? null,
             'amount' => NumberHelper::currency($this->amount),
+            'amountUnformatted' => $this->amount,
             'payee' => $this->payee,
             'taggedAt' => $this->tagged_at,
             'type' => $this->type,

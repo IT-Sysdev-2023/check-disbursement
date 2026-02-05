@@ -100,7 +100,7 @@ class CvCheckPayment extends Model
         return $builder->select(
             'cv_check_payments.id as cheque_id',
             DB::raw('CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END as check_number'),
-            'check_date',
+            'cv_check_payments.check_date',
             'companies.name as company_name',
             'check_amount as amount',
             'cv_check_payments.payee',
