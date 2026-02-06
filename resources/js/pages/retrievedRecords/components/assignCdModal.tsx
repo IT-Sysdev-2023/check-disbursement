@@ -107,7 +107,7 @@ export default function AssignCdModal({
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
                                 <Paper sx={{ px: 2, py: 1 }}>
                                     <DatePicker
-                                        label="Start Date"
+                                        label="Check Date"
                                         value={
                                             data.checkDate
                                                 ? dayjs(data.checkDate)

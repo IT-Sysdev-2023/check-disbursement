@@ -99,6 +99,7 @@ export const createReleasingColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
+ 
             const { taggedLocation, scannedId, borrowedCheckId } = row;
 
             if (!scannedId) {
