@@ -8,7 +8,6 @@ import {
 
 import {
     about,
-    changePassword,
     checkReleasing,
     checkRequestForm,
     checkStatus,
@@ -17,17 +16,14 @@ import {
     closingChecks,
     forwardedCheckReleasing,
     forwardedReleasing,
-    notifications,
     report,
     retrievedRecords,
     users,
 } from '@/routes';
-import { reset } from '@/routes/password';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
     Activity,
-    Bell,
     BookmarkX,
     BookOpen,
     Check,
@@ -37,8 +33,8 @@ import {
     FileSpreadsheet,
     FolderCheck,
     Forward,
-    Key,
     PackageOpen,
+    Pen,
     Rocket,
     Tickets,
     Users,
@@ -86,6 +82,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                               },
                           ],
                       },
+
                       {
                           title: 'Retrieved CV/CRF',
                           href: retrievedRecords(),
@@ -145,6 +142,18 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 : []),
             ...(isAdmin
                 ? [
+                      {
+                          title: 'Set Up',
+                          href: '#',
+                          icon: Pen,
+                          submenu: [
+                              {
+                                  title: 'Bank & Bank Accounts',
+                                  href: checkVoucher(),
+                                  icon: Tickets,
+                              },
+                          ],
+                      },
                       {
                           title: 'Users',
                           href: users(),

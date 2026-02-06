@@ -62,22 +62,27 @@ class ScannedRecordsController extends Controller
 
         $check = $id->load('checkable')->checkable;
 
-        $expectedCheckNo = $check->check_number == 0
-            ? $check->resolved_check_number
-            : $check->check_number;
+        $dbCheckNo = $check->check_number ?: $check->resolved_check_number;
 
-        $expectedAmount = $check->check_amount;
+        $dbCheckDate = $check->check_date ?: $check->resolved_check_date;
+        $dbAmount = $check->check_amount;
 
         // Normalize before comparison
-        if ((string) $expectedCheckNo !== (string) $validated['checkNumber']) {
+        if ((string) $dbCheckNo !== (string) $validated['checkNumber']) {
             throw ValidationException::withMessages([
                 'checkNumber' => 'Check number mismatch.',
             ]);
         }
 
-        if ((float) $expectedAmount !== (float) $validated['amount']) {
+        if ((float) $dbAmount !== (float) $validated['amount']) {
             throw ValidationException::withMessages([
                 'amount' => 'Check amount mismatch.',
+            ]);
+        }
+
+        if (!$dbCheckDate->isSameDay(Date::parse($validated['checkDate']))) {
+            throw ValidationException::withMessages([
+                'checkDate' => 'Check Date mismatch.',
             ]);
         }
 

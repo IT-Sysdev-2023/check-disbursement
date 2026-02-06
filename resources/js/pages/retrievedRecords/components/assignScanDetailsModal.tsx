@@ -1,3 +1,4 @@
+import NumberFormatInput from '@/components/numberFormatInput';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { banks, storeScanRecord } from '@/routes';
 import { SelectionType } from '@/types';
@@ -213,7 +214,18 @@ export default function AssignScanDetailsModal({
                                 <Typography variant="overline">
                                     Amount
                                 </Typography>
-                                <TextField
+                                 <NumberFormatInput
+                                    fullWidth
+                                    size="small"
+                                    value={data.amount}
+                                    error={!!errors.amount}
+                                    helperText={errors.amount ?? ' '}
+                                    onChange={(e) =>
+                                        setData('amount', e.target.value)
+                                    }
+                                    sx={{ mb: 1 }}
+                                />
+                                {/* <TextField
                                     fullWidth
                                     size="small"
                                     value={data.amount}
@@ -226,7 +238,7 @@ export default function AssignScanDetailsModal({
                                         )
                                     }
                                     sx={{ mb: 1 }}
-                                />
+                                /> */}
                             </Paper>
                         </Grid>
                     </Grid>

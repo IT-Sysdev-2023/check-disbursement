@@ -41,6 +41,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::get('permissions', [AdminController::class, 'permissions'])->name('permissions');
         Route::post('assign-permissions', [AdminController::class, 'assignPermissions'])->name('assignPermissions');
+
+        // Route::prefix('setup')->group(){
+
+        // }
     });
 
     Route::middleware('role:disbursement_officer|admin')->group(function () {
