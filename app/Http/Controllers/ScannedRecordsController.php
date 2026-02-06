@@ -51,10 +51,8 @@ class ScannedRecordsController extends Controller
 
     public function store(BorrowedCheck $id, Request $request)
     {
-
         $validated = $request->validate([
-            "bank" => "required | string",
-            "accountNumber" => "required | string",
+            "accountNumber" => "required",
             "checkNumber" => "required | string",
             "checkDate" => "required | date",
             "payee" => "required | string",
@@ -83,8 +81,7 @@ class ScannedRecordsController extends Controller
         }
 
         ScannedRecords::create([
-            'bank' => $request->bank,
-            'account_no' => $request->accountNumber,
+            'bank_account_id' => $request->accountNumber,
             'check_no' => $request->checkNumber,
             'check_date' => $request->checkDate,
             'payee' => $request->payee,

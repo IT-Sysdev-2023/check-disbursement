@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssignedCheckNumberController;
+use App\Http\Controllers\BankController;
 use App\Http\Controllers\BorrowedCheckController;
 use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CheckRequestController;
@@ -71,8 +72,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
             Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');
+            Route::get('get-banks', [BankController::class, 'banks'])->name('banks');
             // Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
-Route::post('store-scan-record/{id}', [ScannedRecordsController::class, 'store'])->name('store-scan-record');
+            Route::post('store-scan-record/{id}', [ScannedRecordsController::class, 'store'])->name('store-scan-record');
 
             Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
             Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');

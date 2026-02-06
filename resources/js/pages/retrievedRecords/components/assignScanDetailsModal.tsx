@@ -1,4 +1,6 @@
-import { storeScanRecord } from '@/routes';
+import SelectItem from '@/pages/dashboard/components/SelectItem';
+import { banks, storeScanRecord } from '@/routes';
+import { SelectionType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import {
     Box,
@@ -7,13 +9,16 @@ import {
     Grid,
     Modal,
     Paper,
+    SelectChangeEvent,
     Stack,
     TextField,
     Typography,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import axios from 'axios';
 import dayjs from 'dayjs';
+import { useEffect, useMemo, useState } from 'react';
 
 const style = {
     position: 'absolute',
@@ -37,31 +42,27 @@ export default function AssignScanDetailsModal({
     borrowedCheckId: number;
     onClose: () => void;
 }) {
+    const [bank, setBank] = useState('');
+    const [bankRecords, setBankRecords] = useState<SelectionType[]>([]);
     const { data, setData, errors, post, reset, transform } = useForm({
-        bank: '',
         accountNumber: '',
         checkNumber: '',
         checkDate: null as any,
         payee: '',
         amount: 0,
     });
-    // useEffect(() => {
-    //     if (!open || !id) return;
-    //     const getRecord = async () => {
-    //         const { data } = await axios.get(getScannedRecords(id).url);
 
-    //         setRecord(data);
-    //         setData({
-    //             payee: data.payee ?? '',
-    //             // amount: data.amount ?? 0,
-    //         });
-    //     };
+    useEffect(() => {
+        const getRecord = async () => {
+            const { data } = await axios.get(banks().url);
 
-    //     getRecord();
-    // }, [id, open]);
+            setBankRecords(data);
+        };
+
+        getRecord();
+    }, []);
 
     const handleSubmit = () => {
-
         transform((data) => ({
             ...data,
             checkDate: dayjs(data.checkDate).format('YYYY-MM-DD'),
@@ -71,11 +72,27 @@ export default function AssignScanDetailsModal({
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-                // setRecord(undefined);
                 onClose();
             },
         });
     };
+
+    const handleBankChange = (e: SelectChangeEvent) => {
+        setBank(e.target.value);
+        setData('accountNumber', ''); // reset
+    };
+
+    const accountOptions = useMemo(() => {
+        const selectedBank = bankRecords.find((b) => b.value === bank);
+
+        if (!selectedBank?.bank_accounts) return [];
+
+        return selectedBank.bank_accounts.map((acc) => ({
+            value: acc.id,
+            label: String(acc.account_no),
+        }));
+    }, [bankRecords, bank]);
+
     return (
         <Modal
             open={open}
@@ -93,17 +110,13 @@ export default function AssignScanDetailsModal({
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">Bank</Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    value={data.bank}
-                                    error={!!errors.bank}
-                                    helperText={errors.bank ?? ' '}
-                                    onChange={(e) =>
-                                        setData('bank', e.target.value)
-                                    }
-                                    sx={{ mb: 1 }}
+                                <SelectItem
+                                    handleChange={handleBankChange}
+                                    value={bank}
+                                    title=""
+                                    items={bankRecords}
                                 />
+                                
                             </Paper>
                         </Grid>
 
@@ -112,17 +125,23 @@ export default function AssignScanDetailsModal({
                                 <Typography variant="overline">
                                     Account Number
                                 </Typography>
-                                <TextField
-                                    fullWidth
-                                    size="small"
-                                    value={data.accountNumber}
-                                    error={!!errors.accountNumber}
-                                    helperText={errors.accountNumber ?? ' '}
-                                    onChange={(e) =>
+                                <SelectItem
+                                    handleChange={(e) =>
                                         setData('accountNumber', e.target.value)
                                     }
-                                    sx={{ mb: 1 }}
+                                    value={data.accountNumber}
+                                    title=""
+                                    items={accountOptions}
                                 />
+                                {errors.accountNumber && (
+                                    <Typography
+                                        variant="caption"
+                                        color="error"
+                                        sx={{ mt: 0.5, display: 'block' }}
+                                    >
+                                        {errors.accountNumber}
+                                    </Typography>
+                                )}
                             </Paper>
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
@@ -143,7 +162,6 @@ export default function AssignScanDetailsModal({
                                 />
                             </Paper>
                         </Grid>
-                    
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <LocalizationProvider dateAdapter={AdapterDayjs}>

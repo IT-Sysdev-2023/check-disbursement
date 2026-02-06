@@ -133,7 +133,7 @@ export default function BorrowedCheckModal({
             </Modal>
 
             <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
-                <Box sx={{ ...style, width: '70%' }}>
+                <Box sx={{ ...modalStyle, width: '70%' }}>
                     {stream && (
                         <iframe
                             src={stream}

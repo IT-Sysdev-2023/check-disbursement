@@ -67,6 +67,10 @@ export interface User {
 export interface SelectionType {
     label: string;
     value: number | string;
+    bank_accounts?: {
+        id: number;
+        account_no: number | string;
+    }[];
 }
 
 export interface ClosingCheckDetailsType {
