@@ -1,3 +1,4 @@
+import { modalStyle } from '@/lib/modalStyle';
 import { cancelCheck } from '@/routes';
 import { useForm } from '@inertiajs/react';
 import { Grid, TextField } from '@mui/material';
@@ -6,18 +7,6 @@ import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { GridRowId } from '@mui/x-data-grid';
-
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
 
 export default function ReasonCancellationModal({
     id,
@@ -57,7 +46,7 @@ export default function ReasonCancellationModal({
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={style}>
+                <Box sx={modalStyle}>
                     <Typography
                         id="modal-modal-title"
                         variant="h6"
