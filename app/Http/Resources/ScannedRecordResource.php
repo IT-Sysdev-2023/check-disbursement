@@ -27,7 +27,9 @@ class ScannedRecordResource extends JsonResource
             'checkNo' => $this->check_no,
             'payee' => $this->payee,
             'postedDate' =>  $this->posted_date ? $this->posted_date->toFormattedDateString() : 'N/A',
-            'seq' => $this->seq
+            'seq' => $this->seq,
+
+            'bankAccount' => $this->whenLoaded('bankAccount')
         ];
     }
 }

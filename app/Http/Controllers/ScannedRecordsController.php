@@ -41,6 +41,7 @@ class ScannedRecordsController extends Controller
      */
     public function getScannedRecords(ScannedRecords $id)
     {
+        $record = $id->load('bankAccount.bank');
         return response()->json(new ScannedRecordResource($id));
     }
 

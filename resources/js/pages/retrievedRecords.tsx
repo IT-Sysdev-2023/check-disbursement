@@ -4,7 +4,6 @@ import {
     detailsCrf,
     getLocation,
     retrievedRecords,
-    scan,
     tagLocation,
 } from '@/routes';
 import {
@@ -15,7 +14,6 @@ import {
     ChequeType,
     DateFilterType,
     DistinctMonths,
-    FlashReponse,
     InertiaPagination,
     ManageChecks,
     SelectionType,
@@ -183,28 +181,28 @@ export default function RetrievedRecords({
         if (handler) handler(data);
     };
 
-    const handleSyncScanned = () => {
-        router.get(
-            scan(),
-            {},
-            {
-                preserveState: true,
-                preserveScroll: true,
-                onStart: () => {
-                    setOpenProgress(true);
-                },
-                onSuccess: ({ props }) => {
-                    const m = props.flash as FlashReponse;
+    // const handleSyncScanned = () => {
+    //     router.get(
+    //         scan(),
+    //         {},
+    //         {
+    //             preserveState: true,
+    //             preserveScroll: true,
+    //             onStart: () => {
+    //                 setOpenProgress(true);
+    //             },
+    //             onSuccess: ({ props }) => {
+    //                 const m = props.flash as FlashReponse;
 
-                    setOpenProgress(false);
-                    notifications.show(m.message, {
-                        severity: 'error',
-                        autoHideDuration: 3000,
-                    });
-                },
-            },
-        );
-    };
+    //                 setOpenProgress(false);
+    //                 notifications.show(m.message, {
+    //                     severity: 'error',
+    //                     autoHideDuration: 3000,
+    //                 });
+    //             },
+    //         },
+    //     );
+    // };
 
     const handleTagSubmit = (e: FormEvent) => {
         e.preventDefault();

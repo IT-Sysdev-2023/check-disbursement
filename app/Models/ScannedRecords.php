@@ -16,4 +16,8 @@ class ScannedRecords extends Model
         ];
 
     }
+
+    public function bankAccount(){
+        return $this->belongsTo(BankAccount::class);
+    }
 }

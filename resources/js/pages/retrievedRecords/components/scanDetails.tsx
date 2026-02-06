@@ -59,7 +59,7 @@ export default function ScanDetails({
                                     Bank:
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.bank}
+                                    {record?.bankAccount.bank.acronym}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -90,7 +90,7 @@ export default function ScanDetails({
                                     Account Number
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.accountNo}
+                                    {record?.bankAccount.account_no}
                                 </Typography>
                             </Paper>
                         </Grid>

@@ -307,6 +307,12 @@ export interface ScannedRecords {
     payee: string;
     postedDate: string;
     seq: string;
+    bankAccount: {
+        account_no: string;
+        bank: {
+            acronym;
+        };
+    };
 }
 
 export interface CheckScannedDetails {
