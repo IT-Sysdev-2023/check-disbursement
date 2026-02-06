@@ -1,4 +1,4 @@
-import { modalStyle } from '@/lib/modalStyle';
+import { modalMediumStyle } from '@/lib/modalStyle';
 import { cancelCheck } from '@/routes';
 import { useForm } from '@inertiajs/react';
 import { Grid, TextField } from '@mui/material';
@@ -16,7 +16,7 @@ export default function ReasonCancellationModal({
     id: GridRowId[] | number;
     open: boolean;
     handleClose: () => void;
-    }) {
+}) {
     const { setData, post, processing, errors, reset, transform } = useForm({
         reason: '',
     });
@@ -25,7 +25,7 @@ export default function ReasonCancellationModal({
 
         transform((data) => ({
             ...data,
-            ids: id, 
+            ids: id,
         }));
 
         post(cancelCheck().url, {
@@ -46,7 +46,7 @@ export default function ReasonCancellationModal({
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                <Box sx={modalStyle}>
+                <Box sx={modalMediumStyle}>
                     <Typography
                         id="modal-modal-title"
                         variant="h6"
@@ -63,7 +63,7 @@ export default function ReasonCancellationModal({
                         >
                             <Grid size={{ xs: 12, sm: 12 }}>
                                 <TextField
-                                    id="outlined-multiline-static"
+                                    id="reason"
                                     label="Type your reason here..."
                                     onChange={(e) =>
                                         setData('reason', e.target.value)
@@ -71,7 +71,14 @@ export default function ReasonCancellationModal({
                                     error={!!errors.reason}
                                     helperText={errors.reason}
                                     multiline
+                                    rows={4}
                                     fullWidth
+                                    sx={{
+                                        '& .MuiInputBase-root': {
+                                            minHeight: 120,
+                                            alignItems: 'flex-start',
+                                        },
+                                    }}
                                 />
                             </Grid>
                         </Grid>

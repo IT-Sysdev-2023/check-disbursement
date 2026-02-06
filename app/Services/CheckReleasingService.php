@@ -87,7 +87,7 @@ class CheckReleasingService
                 'dateLabel' => 'Date ' . $label . ':',
                 'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                'causedLabel' => $label . ' By:',
+                'causedLabel' => 'Released By:',
                 'causedBy' => auth()->user()->name,
 
                 'receivedLabel' => 'Received By:',

@@ -8,7 +8,7 @@ import {
     Typography,
 } from '@mui/material';
 import SelectItem from './SelectItem';
-import { modalStyle } from '@/lib/modalStyle';
+import { modalMediumStyle } from '@/lib/modalStyle';
 
 export default function ({
     title,
@@ -34,7 +34,7 @@ export default function ({
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
-            <Box sx={modalStyle}>
+            <Box sx={modalMediumStyle}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     {title}
                 </Typography>
