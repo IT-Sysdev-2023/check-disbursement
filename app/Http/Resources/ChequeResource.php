@@ -17,13 +17,26 @@ class ChequeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+
+        $checkDate = $this->check_date ? Date::parse($this->check_date) : null;
+        $staleThreshold = Date::today()->subMonths(6);
+
+        $status = null;
+        if ($checkDate) {
+            if ($checkDate->lt($staleThreshold)) {
+                $status = 'Stale Check';
+            }
+        }
+
         return [
             'id' => $this->id,
             'chequeId' => $this->cheque_id,
             'checkNumber' => $this->check_number,
             'borrowedCheckId' => $this->borrowedCheckId ?? null,
-            'checkDate' => $this->check_date ? Date::parse($this->check_date)->toFormattedDateString() : null,
+            'checkDate' => $checkDate ? $checkDate->toFormattedDateString() : null,
             'companyName' => $this->company_name ?? null,
+            'checkDateStatus' => $status,
             'amount' => NumberHelper::currency($this->amount),
             'amountUnformatted' => $this->amount,
             'payee' => $this->payee,

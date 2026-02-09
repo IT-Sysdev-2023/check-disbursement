@@ -89,6 +89,26 @@ export const createReleasingColumns = (
             return row.companyName || '—';
         },
     },
+    {
+        field: 'checkDateStatus',
+        headerName: 'Status',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: ({ row }) => {
+            console.log(row);
+            return row.checkDateStatus ? (
+                <Chip
+                    label={row.checkDateStatus}
+                    color="primary"
+                    variant="outlined"
+                />
+            ) : (
+                ''
+            );
+        },
+    },
 
     {
         field: 'actions',
@@ -99,7 +119,6 @@ export const createReleasingColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
- 
             const { taggedLocation, scannedId, borrowedCheckId } = row;
 
             if (!scannedId) {
