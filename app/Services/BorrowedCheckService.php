@@ -108,4 +108,8 @@ class BorrowedCheckService
 
 
     }
+
+    public function pendingDetails(BorrowedCheck $id){
+         return response()->json(new BorrowedCheckResource($id->load('checkable.tagLocation')));
+    }
 }

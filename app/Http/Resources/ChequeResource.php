@@ -17,8 +17,6 @@ class ChequeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-
         $checkDate = $this->check_date ? Date::parse($this->check_date) : null;
         $staleThreshold = Date::today()->subMonths(6);
 

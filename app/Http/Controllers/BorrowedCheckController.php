@@ -13,7 +13,7 @@ class BorrowedCheckController extends Controller
     public function __construct(protected BorrowedCheckService $service)
     {
     }
-  
+
     public function store(Request $request)
     {
         return $this->service->store($request);
@@ -24,10 +24,10 @@ class BorrowedCheckController extends Controller
         return $this->service->borrower();
     }
 
-    public function pendingDetails(BorrowedCheck $id){
+    public function pendingDetails(BorrowedCheck $id)
+    {
 
-        // dd($id->load('checkable'));
-        return response()->json(new BorrowedCheckResource($id->load('checkable.tagLocation')));
+        return $this->service->pendingDetails($id);
     }
 
 }
