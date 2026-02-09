@@ -29,12 +29,9 @@ class ChecksService
 
         $assignment = $filters['assignment'] ?? 'toAssign';
 
-        // dd($request->user()->companyPermissions);
-        // $hasMissingField = self::checkIfHasNoCheckNumber() || self::checkIfHasNoCheckDate();
-
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
-        $waitingForApproval = self::pendingRecords();
+        $waitingForApproval = self::pendingRecords($filters);
 
         $manageCheques = self::manageChecks();
 
@@ -107,9 +104,10 @@ class ChecksService
             ->withQueryString();
     }
 
-    private static function pendingRecords()
+    private static function pendingRecords(array $filters)
     {
         return BorrowedCheck::with('checkable')
+        ->filter($filters)
             ->whereDoesntHaveMorph(
                 'checkable',
                 [CvCheckPayment::class, Crf::class],

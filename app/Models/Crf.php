@@ -58,7 +58,7 @@ class Crf extends Model
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->whereAny([
                 'crf',
-                'company',
+                'company_office',
                 'no',
                 'paid_to',
                 'particulars',
@@ -110,7 +110,7 @@ class Crf extends Model
     {
         return $builder->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'crfs.id')
             ->join('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
-            
+
             ->where('borrowed_checks.checkable_type', 'crf')
             ->whereNotNull('borrowed_checks.approver_id')
             ->leftJoin('scanned_records', function ($join) {

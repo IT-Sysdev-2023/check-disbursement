@@ -6,7 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class TagLocation extends Model
 {
-        public static function locationSelection()
+    protected function casts(): array
+    {
+        return [
+            'created_at' => 'datetime',
+        ];
+
+    }
+
+    public static function locationSelection()
     {
         return self::select('id', 'location')
             ->get()

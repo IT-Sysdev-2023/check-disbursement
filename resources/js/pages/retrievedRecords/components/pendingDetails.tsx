@@ -1,5 +1,5 @@
-import { getScannedRecords } from '@/routes';
-import { ScannedRecords } from '@/types';
+import { pendingDetails } from '@/routes';
+import { Borrower } from '@/types';
 import { Box, Divider, Grid, Modal, Paper, Typography } from '@mui/material';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
@@ -15,7 +15,7 @@ const style = {
     boxShadow: 24,
     p: 4,
 };
-export default function ScanDetails({
+export default function PendingDetails({
     title,
     open,
     onClose,
@@ -26,12 +26,12 @@ export default function ScanDetails({
     id: number;
     onClose: () => void;
 }) {
-    const [record, setRecord] = useState<ScannedRecords>();
+    const [record, setRecord] = useState<Borrower>();
 
     useEffect(() => {
         if (!open || !id) return;
         const getRecord = async () => {
-            const { data } = await axios.get(getScannedRecords(id).url);
+            const { data } = await axios.get(pendingDetails(id).url);
 
             setRecord(data);
         };
@@ -53,26 +53,13 @@ export default function ScanDetails({
 
                 <Box sx={{ flexGrow: 1, width: '100%', mt: 2 }}>
                     <Grid container spacing={1} sx={{ width: '100%' }}>
-                        {record?.bankAccount && (
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Paper sx={{ px: 2, py: 1 }}>
-                                    <Typography variant="overline">
-                                        Bank:
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ mb: 1 }}>
-                                        {record?.bankAccount?.bank.acronym}
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                        )}
-
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
                                     Check Number
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.checkNo}
+                                    {record?.checkable?.checkNumber}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -82,29 +69,17 @@ export default function ScanDetails({
                                     Check Date
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.checkDate}
+                                    {record?.checkable?.checkDate}
                                 </Typography>
                             </Paper>
                         </Grid>
-                        {record?.bankAccount && (
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Paper sx={{ px: 2, py: 1 }}>
-                                    <Typography variant="overline">
-                                        Account Number
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ mb: 1 }}>
-                                        {record?.bankAccount?.account_no}
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                        )}
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
                                     Payee
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.payee}
+                                    {record?.checkable.payee}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -114,7 +89,47 @@ export default function ScanDetails({
                                     Amount
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.amount}
+                                    {record?.checkable.amount}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                         <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Borrower
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.borrower.name}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                         <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                   Reason for Borrowing
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.reason}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Tagged Location
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.checkable.tagLocation?.location}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                         <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Tagged At
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.checkable.tagLocation?.createdAt}
                                 </Typography>
                             </Paper>
                         </Grid>

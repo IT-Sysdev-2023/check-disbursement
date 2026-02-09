@@ -45,6 +45,7 @@ import {
     createManageColumns,
     createPendingChequeColumns,
 } from './retrievedRecords/components/columns';
+import PendingDetails from './retrievedRecords/components/pendingDetails';
 import ProgressModal from './retrievedRecords/components/progressModal';
 import ScanDetails from './retrievedRecords/components/scanDetails';
 
@@ -100,6 +101,9 @@ export default function RetrievedRecords({
     >([]);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
     // const [assign, setAssin] = useState(filter.assignment);
+    const [pendingId, setPendingId] = useState<number>();
+    const [pendingModal, setPendingModal] = useState(false);
+
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
@@ -121,7 +125,7 @@ export default function RetrievedRecords({
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
             router.get(
-                retrievedRecords(), // your Laravel route
+                retrievedRecords(),
                 {
                     tab: newValue,
                     page: 1,
@@ -129,7 +133,7 @@ export default function RetrievedRecords({
                 {
                     preserveState: true,
                     preserveScroll: true,
-                    replace: false, // 👈 REQUIRED for Back button
+                    replace: false,
                 },
             );
         }
@@ -225,13 +229,10 @@ export default function RetrievedRecords({
         );
     };
 
-    const handleUpdateScanned = (
-        borrowedCheckId: number,
-    ) => {
+    const handleUpdateScanned = (borrowedCheckId: number) => {
         setOpenInputDetails(true);
 
-        if(borrowedCheckId)
-        setCheckRecords(borrowedCheckId);
+        if (borrowedCheckId) setCheckRecords(borrowedCheckId);
     };
 
     const handleAssignment = (value: 'completed' | 'toAssign') => {
@@ -253,8 +254,13 @@ export default function RetrievedRecords({
         else router.visit(detailsCrf(id));
     };
 
+    const handleOnView = (id: number) => {
+        setPendingModal(true);
+        setPendingId(id);
+    };
+
     const chequeColumns = createChequeColumns(handleStatusChange);
-    const pendingColumns = createPendingChequeColumns();
+    const pendingColumns = createPendingChequeColumns(handleOnView);
     const manageCvColumns = createManageColumns(
         handleDetails,
         handleUpdateScanned,
@@ -289,22 +295,11 @@ export default function RetrievedRecords({
                             />
                         </TabPanel>
                         <TabPanel value="cheques">
-                            {/* {hasMissingFields && (
-                                <Alert variant="filled" severity="error">
-                                    NO CHECK NUMBERS
-                                </Alert>
-                            )} */}
                             <TableFilter
                                 handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}
                             >
-                                {/* <SelectItem
-                                    handleChange={handleAssignment}
-                                    value={assign}
-                                    title="Assignment"
-                                    items={assignment}
-                                /> */}
                                 <Button
                                     variant="outlined"
                                     onClick={() => handleAssignment('toAssign')}
@@ -425,12 +420,21 @@ export default function RetrievedRecords({
                 />
             )}
             {/* scannedDetailsModal */}
-             {scannedId && (
+            {scannedId && (
                 <ScanDetails
                     id={scannedId}
                     title="Scanned Check Details"
                     open={scannedDetailsModal}
                     onClose={() => setScannedDetailsModal(false)}
+                />
+            )}
+
+            {pendingId && (
+                <PendingDetails
+                    id={pendingId}
+                    title="Check Details"
+                    open={pendingModal}
+                    onClose={() => setPendingModal(false)}
                 />
             )}
 

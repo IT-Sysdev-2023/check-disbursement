@@ -1,7 +1,15 @@
 import { ActionType, ChequeType } from '@/types';
-import { Box, Chip, IconButton, MenuItem, Select, Stack } from '@mui/material';
+import {
+    Box,
+    Chip,
+    IconButton,
+    MenuItem,
+    Select,
+    Stack,
+    Tooltip,
+} from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { Edit2, Notebook, NotepadText } from 'lucide-react';
+import { Edit2, Eye, Notebook, NotepadText } from 'lucide-react';
 import { JSX } from 'react';
 
 const renderStatus = (
@@ -154,19 +162,21 @@ export const createChequeColumns = (
     },
 ];
 
-export const createPendingChequeColumns = (): GridColDef[] => [
+export const createPendingChequeColumns = (
+    onView: (id: number) => void,
+): GridColDef[] => [
     {
         field: 'checkNumber',
         headerName: 'Check Number',
         minWidth: 150,
-        renderCell: ({ row }) => row.checkable.checkNumber,
+        renderCell: ({ row }) => row.checkable?.checkNumber,
     },
     {
         field: 'checkDate',
         headerName: 'Check Date',
         headerAlign: 'right',
         align: 'right',
-        renderCell: ({ row }) => row.checkable.checkDate,
+        renderCell: ({ row }) => row.checkable?.checkDate,
     },
     {
         field: 'amount',
@@ -175,7 +185,7 @@ export const createPendingChequeColumns = (): GridColDef[] => [
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.amount,
+        renderCell: ({ row }) => row.checkable?.amount,
     },
     {
         field: 'payee',
@@ -183,7 +193,7 @@ export const createPendingChequeColumns = (): GridColDef[] => [
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        renderCell: ({ row }) => row.checkable.payee,
+        renderCell: ({ row }) => row.checkable?.payee,
     },
     {
         field: 'companyName',
@@ -191,7 +201,7 @@ export const createPendingChequeColumns = (): GridColDef[] => [
         headerAlign: 'center',
         align: 'center',
         flex: 1,
-        renderCell: ({ row }) => row.checkable.company,
+        renderCell: ({ row }) => row.checkable?.company,
     },
 
     {
@@ -200,6 +210,25 @@ export const createPendingChequeColumns = (): GridColDef[] => [
         minWidth: 120,
         renderCell: () => {
             return <Chip label="Pending" color="secondary" size="small" />;
+        },
+    },
+
+    {
+        field: 'actions',
+        headerName: 'View',
+        sortable: false,
+        filterable: false,
+        minWidth: 90,
+        align: 'center',
+        headerAlign: 'center',
+        renderCell: ({ row }) => {
+            return (
+                <Tooltip title="View details">
+                    <IconButton size="small" onClick={() => onView(row.id)}>
+                        <Eye fontSize="small" />
+                    </IconButton>
+                </Tooltip>
+            );
         },
     },
 ];
@@ -311,11 +340,7 @@ export const createManageColumns = (
                         <IconButton
                             size="small"
                             color="primary"
-                            onClick={() =>
-                                handleAction(
-                                    row.borrowedCheckId
-                                )
-                            }
+                            onClick={() => handleAction(row.borrowedCheckId)}
                         >
                             <Edit2 />
                         </IconButton>

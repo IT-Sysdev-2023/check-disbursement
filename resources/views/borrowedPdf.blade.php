@@ -96,7 +96,7 @@
     <div class="info-row">
         <div class="label-fixed">
             Purpose: 
-            <span class="value-bold">{{ $purpose ?? 'For Signature' }}</span>
+            <span class="value-bold">{{ $data['purpose'] }}</span>
         </div>
     </div>
 </div>

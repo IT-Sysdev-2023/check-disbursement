@@ -35,7 +35,7 @@ class CrfResource extends JsonResource
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
             'checkStatus' => new CheckStatusResource($this->whenLoaded('checkStatus')),
 
-            'tagLocation' => $this->whenLoaded('tagLocation'),
+            'tagLocation' => new TagLocationResource($this->whenLoaded('tagLocation')),
             'scannedId' => $this->scanned_id,
             'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
         ];

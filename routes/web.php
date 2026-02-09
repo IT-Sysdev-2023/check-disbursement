@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
             Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
 
+            Route::get('pending-details/{id}', [BorrowedCheckController::class, 'pendingDetails'])->name('pending-details');
             Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
             Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');
             Route::get('get-banks', [BankController::class, 'banks'])->name('banks');

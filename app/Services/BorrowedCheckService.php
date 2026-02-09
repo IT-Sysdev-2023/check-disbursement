@@ -62,7 +62,7 @@ class BorrowedCheckService
                     'updated_at' => now(),
                 ])->toArray()
             );
-            return $this->download($borrowerNo);
+            return $this->download($borrowerNo, $validated['reason']);
         });
 
         return redirect()->back()->with(['status' => true, 'stream' => $stream]);
@@ -75,7 +75,7 @@ class BorrowedCheckService
         return response()->json($transform);
     }
 
-    private function download(int $borrowerNo)
+    private function download(int $borrowerNo, string $reason)
     {
         $borrower = BorrowedCheck::with('borrower:id,name')
             ->with('checkable')
@@ -96,7 +96,7 @@ class BorrowedCheckService
             'company' => $companyNames,
             'borrowerNo' => NumberHelper::padLeft($borrowerNo),
             'noOfChecks' => $borrower->count(),
-            'purpose' => 'For Signature',
+            'purpose' => $reason,
             'borrowedBy' => $borrower->first()->borrower?->name,
             'chequeNumbers' => $chequeNumbers
         ];

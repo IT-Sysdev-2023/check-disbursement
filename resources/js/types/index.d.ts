@@ -146,6 +146,7 @@ export interface Cv {
     cvHeader?: CvHeader;
     borrowedCheck: BorrowedCheck;
     checkStatus: CheckStatus;
+    tagLocation: TagLocation;
     amount: string;
     bank: string;
     created_at: string;
@@ -170,9 +171,16 @@ export interface Borrower {
     reason: string;
     lastBorrowedAt: string;
     totalChecks: number;
-    borrower: string;
+    borrower: BorrowerDetails;
     check: string;
     borrowerNoClean: number;
+    checkable: Crf | Cv;
+}
+
+export interface BorrowerDetails {
+    id: number;
+    name: string;
+    status: number;
 }
 
 export interface ManageChecks {
@@ -232,13 +240,20 @@ export interface Crf {
     particulars: string;
     amount: number;
     bank: string;
+    checkDate?: string;
     checkNumber: number;
     preparedBy: string;
     created_at: string;
     updated_at: string;
     checkStatus: CheckStatus;
+    tagLocation: TagLocation;
 }
 
+export interface TagLocation {
+    id: number;
+    location: string;
+    createdAt: string;
+}
 export interface Links {
     first: string;
     last: string;
