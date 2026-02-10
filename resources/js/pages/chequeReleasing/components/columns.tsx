@@ -138,12 +138,12 @@ export const createReleasingColumns = (
                         Select action
                     </MenuItem>
 
-                    <MenuItem value={taggedLocation}>
+                    {!row.checkDateStatus && <MenuItem value={taggedLocation}>
                         <Chip
                             label={taggedLocation + ' Check'}
                             color="secondary"
                         />
-                    </MenuItem>
+                    </MenuItem>}
 
                     <MenuItem value="cancel">
                         <Chip label="Cancel Check" color="error" />

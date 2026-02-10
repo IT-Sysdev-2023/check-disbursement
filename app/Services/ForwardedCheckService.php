@@ -21,10 +21,11 @@ class ForwardedCheckService
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'checkStatus', 'company', 'tagLocation']])
-            ->whereHas('checkable.checkStatus', function ($query) {
-                $query->where(['status' => 'forward', 'received_by' => null]);
-            })
+            ->with(['checkable' => ['borrowedCheck', 'company', 'tagLocation']])
+            // ->whereHas('checkable.checkStatus', function ($query) {
+            //     $query->where(['status' => 'forwarded', 'received_by' => null]);
+            // })
+            ->where(['status' => 'forwarded', 'received_by' => null])
             ->paginate()
             ->withQueryString()
             ->toResourceCollection();

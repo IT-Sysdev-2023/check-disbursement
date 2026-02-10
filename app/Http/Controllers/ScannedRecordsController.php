@@ -65,7 +65,7 @@ class ScannedRecordsController extends Controller
         $dbCheckNo = $check->check_number ?: $check->resolved_check_number;
 
         $dbCheckDate = $check->check_date ?: $check->resolved_check_date;
-        $dbAmount = $check->check_amount;
+        $dbAmount = $id->checkable_type == 'crf' ? $check->amount : $check->check_amount;
 
         // Normalize before comparison
         if ((string) $dbCheckNo !== (string) $validated['checkNumber']) {

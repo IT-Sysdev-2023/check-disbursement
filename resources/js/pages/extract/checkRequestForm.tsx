@@ -17,6 +17,7 @@ import {
     Box,
     Button,
     Container,
+    IconButton,
     LinearProgress,
     List,
     ListItem,
@@ -30,6 +31,7 @@ import {
 import { styled } from '@mui/material/styles';
 import { useState } from 'react';
 import SelectBu from './components/selectBu';
+import { Trash } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -228,7 +230,26 @@ export default function CheckVoucher({
                                     sx={{ mt: 2, width: '100%', maxWidth: 360 }}
                                 >
                                     {files.map((file, index) => (
-                                        <ListItem key={index}>
+                                        <ListItem
+                                            key={index}
+                                            secondaryAction={
+                                                <IconButton
+                                                    edge="end"
+                                                    aria-label="delete"
+                                                    color="error"
+                                                    onClick={() =>
+                                                        setFiles((prev) =>
+                                                            prev.filter(
+                                                                (_, i) =>
+                                                                    i !== index,
+                                                            ),
+                                                        )
+                                                    }
+                                                >
+                                                    <Trash />
+                                                </IconButton>
+                                            }
+                                        >
                                             <ListItemIcon>
                                                 <InsertDriveFileIcon color="action" />
                                             </ListItemIcon>
@@ -239,6 +260,7 @@ export default function CheckVoucher({
                                         </ListItem>
                                     ))}
                                 </List>
+
                                 <Button
                                     variant="contained"
                                     size="large"
