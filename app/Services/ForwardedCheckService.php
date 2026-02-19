@@ -145,11 +145,11 @@ class ForwardedCheckService
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'checkStatus', 'company', 'tagLocation']])
-            ->whereHas('checkable.checkStatus', function ($query) {
-                $query->where(['status' => 'forward'])
-                    ->whereNotNull('received_by');
-            })
+            ->with(['checkable' => ['borrowedCheck', 'company', 'tagLocation']])
+            // ->whereHas('checkable.checkStatus', function ($query) {
+            ->where(['status' => 'forwarded'])
+            ->whereNotNull('received_by')
+            // })
             ->doesntHave('checkForwardedStatus')
             ->paginate()
             ->withQueryString()

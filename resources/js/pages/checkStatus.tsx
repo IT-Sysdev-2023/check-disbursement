@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { detailsCrf, signatureDetails } from '@/routes';
 import {
+    Auth,
     CheckScannedDetails,
     ChequeType,
     DateFilterType,
@@ -31,6 +32,7 @@ export default function CheckStatus({
     cheques,
     company,
     filter,
+    auth,
 }: {
     cheques: InertiaPagination<ChequeType>;
     company: SelectionType[];
@@ -40,6 +42,7 @@ export default function CheckStatus({
         date: DateFilterType;
         tab: string;
     };
+    auth: Auth;
 }) {
     const [openModal, setOpenModal] = useState(false);
     const [scannedRecord, setScannedRecord] = useState<CheckScannedDetails>();
@@ -65,6 +68,10 @@ export default function CheckStatus({
             },
         });
     };
+
+    const isRegional = auth.user.roles.some(
+        (role) => role.name === 'regional_officer',
+    );
     const chequeColumn = createStatusChequeColumns(handleStatusChange);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -77,8 +84,10 @@ export default function CheckStatus({
                                 onChange={handleChangeTab}
                                 aria-label="tabs"
                             >
-                                <Tab label="All" value="all" />
-                                {/* <Tab label="Forwarded" value="forward" /> */}
+                                <Tab label="For Releasing" value="all" />
+                                {!isRegional && (
+                                    <Tab label="Forwarded" value="forwarded" />
+                                )}
                                 <Tab label="Deposited" value="deposited" />
                                 <Tab label="Released" value="released" />
                                 <Tab label="Cancelled" value="cancelled" />

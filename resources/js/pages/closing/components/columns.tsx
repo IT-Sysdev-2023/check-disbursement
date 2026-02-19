@@ -52,7 +52,7 @@ export const createClosingCvColumns = (
         flex: 1,
         minWidth: 100,
         renderCell: ({ row }) => {
-            return row.checkable.tagLocation?.location;
+            return row.checkable?.tagLocation?.location;
         },
     },
     {

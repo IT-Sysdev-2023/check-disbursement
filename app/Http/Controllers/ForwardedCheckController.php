@@ -52,6 +52,4 @@ class ForwardedCheckController extends Controller
         return $this->service->forwardedReleasing($request);
     }
 
-
-
 }

@@ -344,10 +344,10 @@ export const createForwardedReleasingColumns = (
                         handleStatusChange(id, e.target.value);
                     }}
                 >
-                    <MenuItem value="release">
+                    <MenuItem value="released">
                         <Chip label="Release Check" color="primary" />
                     </MenuItem>
-                    <MenuItem value="cancel">
+                    <MenuItem value="cancelled">
                         <Chip label="Cancel Check" color="info" />
                     </MenuItem>
                 </Select>

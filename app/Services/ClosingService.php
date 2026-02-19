@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Models\CheckStatus;
 use App\Services\PermissionService;
@@ -11,11 +12,14 @@ use Inertia\Inertia;
 
 class ClosingService
 {
-     public function index(Request $request)
+    public function __construct(protected FileHandler $fileHandler)
+    {
+    }
+    public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
-        $cheques = CheckStatus::with('checkable.borrowedCheck')
+        $cheques = CheckStatus::with(['checkable' => ['borrowedCheck', 'tagLocation']])
             ->where('is_closed', false)
             ->whereNot('status', 'cancel')
             ->paginate(10)
@@ -55,11 +59,11 @@ class ClosingService
                     'transactionNo' => NumberHelper::padLeft($id->id),
                     'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
 
-                    'forwardedBy' => "",
+                    'forwardedBy' => auth()->user()->name,
 
-                    'dateReceived' => '',
+                    'dateReceived' => $id->created_at->format('M d, Y H:i A'),
 
-                    'receivedBy' => '',
+                    'receivedBy' => $id->receivers_name,
                 ];
 
                 return $this->fileHandler

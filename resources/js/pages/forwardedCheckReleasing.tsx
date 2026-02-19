@@ -128,7 +128,7 @@ export default function ForwardedCheckReleasing({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
-            <PageContainer title="Receiving">
+            <PageContainer title="Releasing">
                 <TableFilter
                     company={company}
                     filters={filter}

@@ -16,31 +16,44 @@ class StatusService
     public function checkStatus(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
+        $tab = $filters['tab'] ?? 'all';
 
+
+        // dd($tab);
+        //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MATE!
         $cheque = BorrowedCheck::query()
             ->filter($filters)
             ->with('checkable.checkStatus.checkForwardedStatus')
-            ->where(function (Builder $q) use ($filters) {
-                $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
-                    $q->whereNotNull('approver_id')
-                        ->whereHas(
-                            'checkable',
-                            fn(Builder $q) => $q->scanRecords()
-                        )
-                        ->whereDoesntHaveMorph(
-                            'checkable',
-                            [CvCheckPayment::class, Crf::class],
-                            fn($query) => $query->has('checkStatus')
-                        );
-                });
-                if (isset($filters['tab']) && $filters['tab'] !== 'all') {
-                    $q->orWhere(function (Builder $q) { // GET ALL THE CHEQUES STORED IN check_status table
+            ->where(function (Builder $q) use ($tab) {
+                if ($tab === 'all') {
+                    $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
+                        $q->whereNotNull('approver_id')
+                            ->whereHas(
+                                'checkable',
+                                fn(Builder $q) => $q->scanRecords()
+                            )
+                            ->whereDoesntHaveMorph(
+                                'checkable',
+                                [CvCheckPayment::class, Crf::class],
+                                fn($query) => $query->has('checkStatus')
+                            );
+                    });
+                } else {
+                    $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
                         $q->whereHasMorph(
                             'checkable',
                             [CvCheckPayment::class, Crf::class],
-                            fn(Builder $q) => $q->when(auth()->user()->hasRole('regional_officer'), function ($query) {
-                            $query->has('checkStatus.checkForwardedStatus');
-                        })->has('checkStatus')
+                            fn(Builder $q) => $q->when(
+                                auth()->user()->hasRole('regional_officer'),
+                                fn($query) =>
+                                $query->has('checkStatus.checkForwardedStatus') // if the user type is regional(CEBU & MANILA) re
+                                    ->when($tab === 'released', function ($q) {
+                                    $q->whereRelation('checkStatus.checkForwardedStatus', 'status', 'released');
+                                }, fn($q) => $q->whereRelation('checkStatus', 'status', $tab)),
+
+                            )
+
+                                ->has('checkStatus')
                         );
                     });
                 }
@@ -55,7 +68,7 @@ class StatusService
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
-                'tab' => $filters['tab'] ?? 'all',
+                'tab' => $tab,
                 'date' => $filters['date'] ?? (object) [
                     'start' => null,
                     'end' => null
