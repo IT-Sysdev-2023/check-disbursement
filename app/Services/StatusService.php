@@ -45,12 +45,16 @@ class StatusService
                             [CvCheckPayment::class, Crf::class],
                             fn(Builder $q) => $q->when(
                                 auth()->user()->hasRole('regional_officer'),
-                                fn($query) =>
-                                $query->has('checkStatus.checkForwardedStatus') // if the user type is regional(CEBU & MANILA) re
-                                    ->when($tab === 'released', function ($q) {
-                                    $q->whereRelation('checkStatus.checkForwardedStatus', 'status', 'released');
-                                }, fn($q) => $q->whereRelation('checkStatus', 'status', $tab)),
 
+                                function ($query, $tab) {
+                                $query->has('checkStatus.checkForwardedStatus')
+                                    ->when($tab === 'released', function ($q) {
+                                        $q->whereRelation('checkStatus.checkForwardedStatus', 'status', 'released');
+                                    });
+                            },
+                                function ($query) use ($tab) {
+                                $query->whereRelation('checkStatus', 'status', $tab);
+                            }
                             )
 
                                 ->has('checkStatus')
