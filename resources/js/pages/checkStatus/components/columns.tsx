@@ -49,7 +49,7 @@ export const createStatusChequeColumns = (
         flex: 1,
         minWidth: 100,
         renderCell: ({ row }) => row.checkable.checkDate,
-        },
+    },
     {
         field: 'check',
         headerName: 'Check Type',
@@ -65,9 +65,16 @@ export const createStatusChequeColumns = (
         flex: 1,
         renderCell: ({ row }) => {
             const { checkStatus } = row.checkable;
-            
-            let status = checkStatus?.status;
 
+            let status = null;
+
+            if (row.checkable?.status) {
+                status = row.checkable.status;
+            }
+            
+            if (checkStatus?.status) {
+                status = checkStatus.status;
+            }
             if (checkStatus?.forwardedStatus?.status) {
                 status = checkStatus.forwardedStatus.status;
             }
@@ -93,6 +100,7 @@ export const createStatusChequeColumns = (
                 forwarded: { label: 'Forwarded', color: 'warning' },
                 deposited: { label: 'Deposit', color: 'success' },
                 cancelled: { label: 'Cancelled', color: 'error' },
+                staled: { label: 'Staled', color: 'warning' },
             };
 
             return (
@@ -113,12 +121,12 @@ export const createStatusChequeColumns = (
         sortable: false,
         renderCell: ({ row }) => {
             const record = {
+                borrowedId: row.id,
                 id: row.checkable.id,
                 type: row.check,
                 amount: row.checkable.unformattedAmount,
                 checkNumber: row.checkable.checkNumber,
             };
-
             return (
                 <Box sx={{ width: '100%' }}>
                     <Select
@@ -134,6 +142,11 @@ export const createStatusChequeColumns = (
                         {row.checkable?.checkStatus?.status !== 'cancel' && (
                             <MenuItem value="scannedDetails">
                                 Scanned Check Details
+                            </MenuItem>
+                        )}
+                         {row.checkable?.status && (
+                            <MenuItem value="cancel">
+                                Cancelled Check
                             </MenuItem>
                         )}
                     </Select>

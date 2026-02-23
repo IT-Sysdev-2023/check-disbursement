@@ -38,4 +38,17 @@ class StatusController extends Controller
     {
         return $this->service->scannedRecords($id);
     }
+
+    public function cancelStale(BorrowedCheck $id, Request $request)
+    {
+        if(!$id) return Redirect::back()->withErrors(['message' => 'Check not found.']);
+        
+        $id->checkable?->checkStatus()->create([
+                        'status' => 'cancelled',
+                        'cancelled_reason' => $request->reason,
+                        'caused_by' => $request->user()->id,
+                    ]);
+                    
+        return Redirect::back()->with(['status' => 'success', 'message' => 'Check has been cancelled successfully.']);
+    }
 }

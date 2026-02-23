@@ -7,10 +7,11 @@ import {
     Button,
     FormControl,
     FormHelperText,
+    IconButton,
     TextField,
     Typography,
 } from '@mui/material';
-import { CloudUploadIcon } from 'lucide-react';
+import { CloudUploadIcon, DeleteIcon, Trash2 } from 'lucide-react';
 import { ChangeEvent, FormEvent, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 
@@ -46,7 +47,6 @@ export default function ReleaseCheck({
             file: null,
             signature: null,
         });
-
 
     const sigPadRef = useRef<SignatureCanvas>(null);
 
@@ -151,9 +151,26 @@ export default function ReleaseCheck({
 
                             {/* Show selected file name */}
                             {data.file && (
-                                <Typography sx={{ mt: 1 }}>
-                                    {data.file.name}
-                                </Typography>
+                                <Box
+                                    sx={{
+                                        mt: 1,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Typography variant="body2">
+                                        {data.file.name}
+                                    </Typography>
+
+                                    <IconButton
+                                        size="small"
+                                        color="error"
+                                        onClick={() => setData('file', null)}
+                                    >
+                                        <Trash2 fontSize="small" />
+                                    </IconButton>
+                                </Box>
                             )}
 
                             {/* Error message like TextField helperText */}
@@ -216,8 +233,6 @@ export default function ReleaseCheck({
                     </Button>
                 </Box>
             </Box>
-
-           
         </AppLayout>
     );
 }

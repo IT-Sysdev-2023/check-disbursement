@@ -59,7 +59,8 @@ createInertiaApp({
                 <CssBaseline />
                 <NotificationsProvider>
                     <DialogsProvider>
-                            <App {...props} />
+                        {/* <FlashBridge /> */}
+                        <App {...props} />
                     </DialogsProvider>
                 </NotificationsProvider>
             </AppTheme>,
@@ -71,4 +72,24 @@ createInertiaApp({
 });
 
 // This will set light / dark mode on load...
-initializeTheme();
+initializeTheme(); 
+
+// function FlashBridge() {
+//     const { flash } = usePage().props as {
+//         flash?: { status?: boolean; message?: string };
+//     };
+
+//     const notifications = useNotifications();
+
+//     React.useEffect(() => {
+//         if (!flash?.message) return;
+
+//         notifications.show(flash.message, {
+//             severity: flash.status ? 'success' : 'error',
+//             autoHideDuration: 3000,
+//             key: `flash-${Date.now()}`,
+//         });
+//     }, [flash?.message, flash?.status, notifications]);
+
+//     return null;
+// }

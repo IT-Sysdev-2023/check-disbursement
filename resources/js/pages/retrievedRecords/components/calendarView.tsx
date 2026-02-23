@@ -12,7 +12,7 @@ import dayjs, { Dayjs } from 'dayjs';
 const HighlightedDay = styled(PickersDay)(({ theme }) => ({
     backgroundColor: theme.palette.primary.main,
     color: theme.palette.common.white,
-    borderRadius: '50%',
+    borderRadius: '20%',
 }));
 
 export default function CalendarView({
@@ -47,13 +47,17 @@ export default function CalendarView({
                     sx={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(3, 1fr)',
-                        gap: 2,
+                        gap: 22,
                     }}
                 >
                     {Object.entries(distinctMonths).map(([key, monthGroup]) => {
                         const [year, month] = key.split('-');
                         return (
                             <DateCalendar
+                                sx={{
+                                    transform: 'scale(1.5)',
+                                    transformOrigin: 'top left',
+                                }}
                                 key={key}
                                 views={['day']}
                                 onChange={handleDate}
@@ -87,7 +91,7 @@ export default function CalendarView({
                                                     color="secondary"
                                                     sx={{
                                                         [`& .MuiBadge-badge`]: {
-                                                            fontSize: '0.65rem',
+                                                            fontSize: '0.60rem',
                                                             minWidth: 16,
                                                             height: 16,
                                                             transform:

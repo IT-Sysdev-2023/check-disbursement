@@ -10,6 +10,7 @@ use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -35,6 +36,9 @@ class ChecksService
 
         $manageCheques = self::manageChecks();
 
+        $calendar = self::calendar();
+        // dd(self::distinctMonths(), $calendar);
+        // dd($calendar);
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
             'pending' => $waitingForApproval,
@@ -57,7 +61,8 @@ class ChecksService
                 'completed' => self::countCompleted()
             ],
             // 'hasMissingFields' => $hasMissingField,
-            'distinctMonths' => self::distinctMonths()
+            'distinctMonths' => self::distinctMonths(), //Calendar Data
+            'calendar' => $calendar
         ]);
     }
 
@@ -107,7 +112,7 @@ class ChecksService
     private static function pendingRecords(array $filters)
     {
         return BorrowedCheck::with('checkable')
-        ->filter($filters)
+            ->filter($filters)
             ->whereDoesntHaveMorph(
                 'checkable',
                 [CvCheckPayment::class, Crf::class],
@@ -267,5 +272,50 @@ class ChecksService
                 fn($date) =>
                 Date::parse($date->cv_date)->format('Y-m')
             );
+    }
+
+    private static function calendar()
+    {
+        $data = self::distinctMonths();
+
+        $records = [];
+        foreach ($data as $key => $value) {
+            $date = Date::createFromFormat('Y-m', $key);
+            $records[] = self::transformCalendarData($date, $value);
+        }
+
+        return $records;
+    }
+
+    public static function transformCalendarData($date, $records)
+    {
+        $startDate = (clone $date)->startOfMonth();
+        $endDate = (clone $date)->endOfMonth();
+
+        $totalDay = CarbonPeriod::create($startDate, $endDate);
+
+        $transformers = collect($totalDay)->map(function ($val) use ($records) {
+
+            $findRecord = $records->first(function ($record) use ($val) {
+                return Date::parse($record['cv_date'])->format('Y-m-d') === $val->format('Y-m-d');
+            });
+
+            return ['day' => $val->day, 'totalRecord' => $findRecord ? $findRecord->total : 0, 'isCurrent' => $val->day === today()->day];
+
+        });
+
+        // dd($transformers);
+        $totalDay = $transformers->toArray();
+        $startWeek = $startDate->dayOfWeek;
+
+        for ($i = 0; $i < $startWeek; $i++) {
+            array_unshift($totalDay, ['day' => "", 'holiday' => null, 'isCurrent' => false]);
+        }
+
+        return [
+            'month' => (clone $date)->format('M Y'),
+            'days' => array_chunk($totalDay, 7),
+        ];
+
     }
 }

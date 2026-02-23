@@ -1,4 +1,4 @@
-import { details } from '@/routes';
+import { details, detailsCrf } from '@/routes';
 import { router } from '@inertiajs/react';
 import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
@@ -58,7 +58,8 @@ export const createReleasingColumns = (
                     variant="contained"
                     size="small"
                     onClick={() => {
-                        router.visit(details(row.chequeId));
+                           if (row.type === 'cv') router.visit(details(row.chequeId));
+                        else router.visit(detailsCrf(row.chequeId));
                     }}
                 >
                     View
@@ -97,7 +98,6 @@ export const createReleasingColumns = (
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => {
-            console.log(row);
             return row.checkDateStatus ? (
                 <Chip
                     label={row.checkDateStatus}

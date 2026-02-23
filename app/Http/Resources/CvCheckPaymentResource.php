@@ -17,6 +17,16 @@ class CvCheckPaymentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $checkDate = $this->check_date ? Date::parse($this->check_date) : null;
+        $staleThreshold = Date::today()->subMonths(6);
+
+        $status = null;
+        if ($checkDate) {
+            if ($checkDate->lt($staleThreshold)) {
+                $status = 'staled';
+            }
+        }
+
         return [
 
             'id' => $this->id,
@@ -24,11 +34,12 @@ class CvCheckPaymentResource extends JsonResource
             'cvHeaderId' => $this->cv_header_id,
 
             'checkNumber' => $this->check_number,
-            'checkDate' => $this->check_date ? $this->check_date->toFormattedDateString() : 'N/A',
+            'checkDate' => $checkDate ? $checkDate->toFormattedDateString() : 'N/A',
 
             'amount' => $this->check_amount ? NumberHelper::currency($this->check_amount) : 0,
             'unformattedAmount' => $this->check_amount,
 
+            'status' => $status,
             'taggedAt' => $this->tagged_at,
             'payee' => $this->payee,
             'bank' => $this->bank_name,

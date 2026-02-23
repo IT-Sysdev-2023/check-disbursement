@@ -19,10 +19,10 @@ import {
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { router, usePage } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { Badge, Box, Button, Tab } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
-import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
+import { FormEvent, SyntheticEvent, useState } from 'react';
 
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
@@ -31,7 +31,6 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import axios from 'axios';
 import { HandCoins } from 'lucide-react';
-import useNotifications from '../components/notifications/useNotifications';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
@@ -39,7 +38,6 @@ import TableDataGrid from './dashboard/components/TableDataGrid';
 import AssignCdModal from './retrievedRecords/components/assignCdModal';
 import AssignCnModal from './retrievedRecords/components/assignCnModal';
 import AssignScanDetailsModal from './retrievedRecords/components/assignScanDetailsModal';
-import CalendarView from './retrievedRecords/components/calendarView';
 import {
     createChequeColumns,
     createManageColumns,
@@ -48,6 +46,7 @@ import {
 import PendingDetails from './retrievedRecords/components/pendingDetails';
 import ProgressModal from './retrievedRecords/components/progressModal';
 import ScanDetails from './retrievedRecords/components/scanDetails';
+import Calendar from './retrievedRecords/components/calendar';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -64,6 +63,7 @@ export default function RetrievedRecords({
     company,
     distinctMonths,
     counts,
+    calendar,
     // hasMissingFields,
     auth,
 }: {
@@ -77,6 +77,7 @@ export default function RetrievedRecords({
         toAssign: string;
         completed: string;
     };
+    calendar: any,
     cheques: InertiaPagination<ChequeType>;
     distinctMonths: DistinctMonths;
     pending: InertiaPagination<Borrower>;
@@ -107,20 +108,6 @@ export default function RetrievedRecords({
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
-    const notifications = useNotifications();
-
-    const { flash } = usePage().props as {
-        flash?: { status?: boolean; message?: string };
-    };
-
-    useEffect(() => {
-        if (flash?.message) {
-            notifications.show(flash.message, {
-                severity: flash?.status ? 'success' : 'error',
-                autoHideDuration: 3000,
-            });
-        }
-    }, [flash, notifications]);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
@@ -151,7 +138,6 @@ export default function RetrievedRecords({
 
         setSelectedRows(selectedR);
     };
-
     const enableButton =
         selectedRows.length > 0 &&
         cheques.data
@@ -289,10 +275,11 @@ export default function RetrievedRecords({
                             </TabList>
                         </Box>
                         <TabPanel value="calendar">
-                            <CalendarView
+                            <Calendar data={calendar}></Calendar>
+                            {/* <CalendarView
                                 distinctMonths={distinctMonths}
                                 onChangeTab={() => setCurrentTab('cheques')}
-                            />
+                            /> */}
                         </TabPanel>
                         <TabPanel value="cheques">
                             <TableFilter

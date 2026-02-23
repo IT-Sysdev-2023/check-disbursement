@@ -27,6 +27,13 @@ class Crf extends Model
 
     }
 
+      protected function checkDate(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->check_date ?? $this->resolved_check_date,
+        );
+    }
+
     protected function checkNumber(): Attribute
     {
         return new Attribute(

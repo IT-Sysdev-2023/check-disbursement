@@ -6,6 +6,7 @@ use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Date;
 
 class CrfResource extends JsonResource
 {
@@ -16,12 +17,24 @@ class CrfResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+
+        $checkDate = $this->resolved_check_date ? Date::parse($this->resolved_check_date) : null;
+        $staleThreshold = Date::today()->subMonths(6);
+
+        $status = null;
+        if ($checkDate) {
+            if ($checkDate->lt($staleThreshold)) {
+                $status = 'staled';
+            }
+        }
+
         return [
             'id' => $this->id,
             'cvNo' => $this->crf,
             'no' => $this->no,
             'company' => $this->getCompany,
-            'checkDate' => $this->resolved_check_date ? $this->resolved_check_date->toFormattedDateString() : 'N/A',
+            'status' => $status,
+            'checkDate' => $checkDate ? $checkDate->toFormattedDateString() : 'N/A',
             'location' => $this->location,
             'date' => $this->date ? $this->date->toFormattedDateString() : 'N/A',
             'payee' => $this->paid_to,

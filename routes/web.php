@@ -84,7 +84,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
             Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');
 
-            Route::get('calendar', [CrfController::class, 'calendar'])->name('calendar');
+            Route::get('calendar', [RetrievedChecksController::class, 'calendar'])->name('calendar');
         });
     });
 
@@ -135,6 +135,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+    Route::post('cancel-stale-check/{id}', [StatusController::class, 'cancelStale'])->name('cancel-stale-check');
 
     Route::prefix('reports')->group(function () {
         Route::get('report', [ReportController::class, 'index'])->name('report');

@@ -1,8 +1,9 @@
+import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { detailsCrf, signatureDetails } from '@/routes';
+import { cancelStaleCheck, detailsCrf, signatureDetails } from '@/routes';
 import {
     Auth,
     CheckScannedDetails,
@@ -12,11 +13,11 @@ import {
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import { Box, Tab } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import { createStatusChequeColumns } from './checkStatus/components/columns';
 import ScannedDetails from './checkStatus/components/scannedDetails';
 import TableDataGrid from './dashboard/components/TableDataGrid';
@@ -47,8 +48,26 @@ export default function CheckStatus({
     const [openModal, setOpenModal] = useState(false);
     const [scannedRecord, setScannedRecord] = useState<CheckScannedDetails>();
 
+    const notifications = useNotifications();
+
+    const { flash } = usePage().props as {
+        flash?: { status?: boolean; message?: string };
+    };
+
+    useEffect(() => {
+        if (flash?.message) {
+            notifications.show(flash.message, {
+                severity: flash?.status ? 'success' : 'error',
+                autoHideDuration: 3000,
+            });
+        }
+    }, [flash, notifications]);
+
     const handleStatusChange = (value: string, record: CheckScannedDetails) => {
-        if (value === 'details') {
+        if (value === 'cancel') {
+            //borrowedId
+            router.post(cancelStaleCheck(record.borrowedId));
+        } else if (value === 'details') {
             if (record.type === 'cv') router.visit(signatureDetails(record.id));
             else router.visit(detailsCrf(record.id));
         } else {

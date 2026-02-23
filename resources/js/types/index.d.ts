@@ -332,6 +332,7 @@ export interface ScannedRecords {
 
 export interface CheckScannedDetails {
     id: number;
+    borrowedId: number;
     type: 'cv' | 'crf';
     amount: string;
     checkNumber: string;
