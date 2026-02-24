@@ -7,6 +7,7 @@ use App\Models\CompanyPermission;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 class AdminService
 {
@@ -40,7 +41,17 @@ class AdminService
                     'value' => $name->id,
                 ];
             });
-        return response()->json(['permissions' => $permissions, 'roles' => $roles]);
+
+        $accessPermission = Permission::select('id', 'name')
+            ->get()
+            ->map(function ($name) {
+                return [
+                    'label' => $name->name,
+                    'value' => $name->id,
+                ];
+            });
+
+        return response()->json(['permissions' => $permissions, 'roles' => $roles, 'accessPermission' => $accessPermission]);
     }
 
     public function assignPermissions(Request $request)
@@ -50,29 +61,36 @@ class AdminService
             'selectedPermission' => 'required|array|min:1',
             'id' => 'required|int'
         ]);
-        // Get all company IDs at once
-        $companyIds = Company::whereIn('name', $request->selectedPermission)->pluck('id', 'name');
 
-        $records = [];
+        $user = User::findOrFail($request->id);
 
-        foreach ($request->selectedPermission as $permissionName) {
-            if (!isset($companyIds[$permissionName]))
-                continue;
+        if (!empty($request->selectedPermission)) {
 
-            $records[] = [
-                'user_id' => $request->id,
-                'company_id' => $companyIds[$permissionName],
+            $companyIds = Company::whereIn('name', $request->selectedPermission)
+                ->pluck('id')
+                ->toArray();
+
+            $user->companyPermissions()->delete();
+
+            $records = collect($companyIds)->map(fn($companyId) => [
+                'user_id' => $user->id,
+                'company_id' => $companyId,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ];
+            ])->toArray();
+
+            CompanyPermission::insert($records);
         }
 
-        // Replace old permissions with new ones
-        CompanyPermission::where('user_id', $request->id)->delete();
+        // Sync Roles
+        if (!empty($request->selectedRole)) {
+            $user->syncRoles($request->selectedRole);
+        }
 
-        // Bulk insert
-        CompanyPermission::insert($records);
-
+        // Sync Direct Permissions
+        if (!empty($request->selectedAccessPermission)) {
+            $user->syncPermissions($request->selectedAccessPermission);
+        }
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 }

@@ -19,7 +19,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'username' => $this->username,
             'roles' => $this->whenLoaded('roles', $this->roles),
-            'permissons' => $this->whenLoaded('permissions', $this->permissions),
+            'permissions' => $this->whenLoaded('permissions', $this->permissions),
             'companyPermissions' => $this->whenLoaded('companyPermissions', $this->companyPermissions),
         ];
     }

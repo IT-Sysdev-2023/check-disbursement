@@ -1,4 +1,5 @@
 import useNotifications from '@/components/notifications/useNotifications';
+import { modalStyle } from '@/lib/modalStyle';
 import { assignPermissions, permissions } from '@/routes';
 import { FlashReponse, SelectionType, User } from '@/types';
 import { router } from '@inertiajs/react';
@@ -9,11 +10,11 @@ import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import PermissionSelection from './permissionSelection';
-import { modalStyle } from '@/lib/modalStyle';
 
 type PermissionRoleType = {
     roles: SelectionType[];
     permissions: SelectionType[];
+    accessPermission: SelectionType[];
 };
 
 export default function UserModal({
@@ -27,9 +28,13 @@ export default function UserModal({
 }) {
     const [selectedPermission, setSelectedPermission] = useState<string[]>([]);
     const [selectedRole, setSelectedRole] = useState<string[]>([]);
+    const [selectedAccessPermission, setSelectedAccessPermission] = useState<
+        string[]
+    >([]);
     const [permissionsList, setPermissionsList] = useState<PermissionRoleType>({
         roles: [],
         permissions: [],
+        accessPermission: [],
     });
 
     useEffect(() => {
@@ -44,16 +49,14 @@ export default function UserModal({
 
         fetchPermissions();
     }, []);
-    
     //Set Defaul User Permission to the UI
     useEffect(() => {
         setSelectedPermission(
             details?.companyPermissions.map((p) => p.company.name),
         );
-        setSelectedRole(
-            details?.roles.map((p) => p.name),
-        );
-    }, [details?.companyPermissions, details?.roles]);
+        setSelectedRole(details?.roles.map((p) => p.name));
+        setSelectedAccessPermission(details?.permissions.map((p) => p.name));
+    }, [details?.companyPermissions, details?.roles, details?.permissions]);
 
     const handleChange = (
         event: SelectChangeEvent<typeof selectedPermission>,
@@ -75,6 +78,18 @@ export default function UserModal({
         } = event;
         setSelectedRole(typeof value === 'string' ? value.split(',') : value);
     };
+
+    const handleChangeAccessPermission = (
+        event: SelectChangeEvent<typeof selectedAccessPermission>,
+    ) => {
+        const {
+            target: { value },
+        } = event;
+        setSelectedAccessPermission(
+            typeof value === 'string' ? value.split(',') : value,
+        );
+    };
+
     const notifications = useNotifications();
 
     const onSave = () => {
@@ -83,6 +98,7 @@ export default function UserModal({
             {
                 selectedPermission,
                 selectedRole,
+                selectedAccessPermission,
                 id: details?.id,
             },
             {
@@ -139,14 +155,21 @@ export default function UserModal({
                         handleChange={handleChangeRole}
                     />
 
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        Assign Region
-                    </Typography>
-                    <PermissionSelection
-                        permissions={permissionsList.roles}
-                        selectedPermission={selectedRole}
-                        handleChange={handleChangeRole}
-                    />
+                    {selectedRole.includes('regional_officer') && (
+                        <>
+                            <Typography
+                                id="modal-modal-description"
+                                sx={{ mt: 2 }}
+                            >
+                                Assign Region
+                            </Typography>
+                            <PermissionSelection
+                                permissions={permissionsList.accessPermission}
+                                selectedPermission={selectedAccessPermission}
+                                handleChange={handleChangeAccessPermission}
+                            />
+                        </>
+                    )}
 
                     <Button variant="contained" onClick={onSave} sx={{ mt: 3 }}>
                         Save
