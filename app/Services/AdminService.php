@@ -91,6 +91,11 @@ class AdminService
         if (!empty($request->selectedAccessPermission)) {
             $user->syncPermissions($request->selectedAccessPermission);
         }
-        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
+        return redirect()->back()->with(['status' => true, 'message' => 'Bank Created Successfully']);
+    }
+
+    public function setupBank()
+    {
+        return Inertia::render('admin/bankSetup');
     }
 }

@@ -8,6 +8,7 @@ import {
 
 import {
     about,
+    bankSetup,
     checkReleasing,
     checkRequestForm,
     checkStatus,
@@ -149,7 +150,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           submenu: [
                               {
                                   title: 'Bank & Bank Accounts',
-                                  href: checkVoucher(),
+                                  href: bankSetup(),
                                   icon: Tickets,
                               },
                           ],
