@@ -67,16 +67,9 @@ class ChequeRequestService
 
     public function approver()
     {
-        $names = Approver::select('id', 'name')->get();
+        $names = Approver::select('id as value', 'name as label')->get();
 
-        $transform = $names->map(function ($name) {
-            return [
-                'label' => $name->name,
-                'value' => $name->id,
-            ];
-        });
-
-        return response()->json($transform);
+        return response()->json($names);
     }
 
     public function borrowedNumberCheques(int $id)

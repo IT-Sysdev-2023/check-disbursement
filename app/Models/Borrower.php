@@ -8,11 +8,7 @@ class Borrower extends Model
 {
     public static function borrowerSelection()
     {
-        return self::select('id', 'name')
-            ->get()
-            ->map(fn($name) => [
-                'label' => $name->name,
-                'value' => $name->id,
-            ]);
+        return self::select('id as value', 'name as label')
+            ->get();
     }
 }

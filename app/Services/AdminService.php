@@ -25,32 +25,14 @@ class AdminService
 
     public function permissions()
     {
-        $permissions = Company::select('id', 'name')
-            ->get()
-            ->map(function ($name) {
-                return [
-                    'label' => $name->name,
-                    'value' => $name->id,
-                ];
-            });
+        $permissions = Company::select('id as value', 'name as label')
+            ->get();
 
-        $roles = Role::select('id', 'name')
-            ->get()
-            ->map(function ($name) {
-                return [
-                    'label' => $name->name,
-                    'value' => $name->id,
-                ];
-            });
+        $roles = Role::select('id as value', 'name as label')
+            ->get();
 
-        $accessPermission = Permission::select('id', 'name')
-            ->get()
-            ->map(function ($name) {
-                return [
-                    'label' => $name->name,
-                    'value' => $name->id,
-                ];
-            });
+        $accessPermission = Permission::select('id as value', 'name as label')
+            ->get();
 
         return response()->json(['permissions' => $permissions, 'roles' => $roles, 'accessPermission' => $accessPermission]);
     }
@@ -101,14 +83,8 @@ class AdminService
     }
     public function setupBankAccount()
     {
-       $banks = Bank::select('id', 'name')
-            ->get()
-            ->map(function ($name) {
-                return [
-                    'label' => $name->name,
-                    'value' => $name->id,
-                ];
-            });
+        $banks = Bank::select('id as value', 'name as label')
+            ->get();
         return Inertia::render('admin/bankAccountSetup', [
             'banks' => $banks
         ]);

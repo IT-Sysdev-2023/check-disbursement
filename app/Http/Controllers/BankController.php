@@ -10,9 +10,9 @@ class BankController extends Controller
     public function banks()
     {
 
-        $banks = Bank::select('id', 'acronym')
-         ->selectRaw('id as value, acronym as label')
-        ->where('is_active', true)
+        $banks = Bank::select('id', 'name')
+            ->selectRaw('id as value, name as label')
+            ->where('is_active', true)
             ->with('bankAccounts')
             ->get();
         return response()->json($banks);
