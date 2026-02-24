@@ -300,7 +300,7 @@ class ChecksService
                 return Date::parse($record['cv_date'])->format('Y-m-d') === $val->format('Y-m-d');
             });
 
-            return ['day' => $val->day, 'totalRecord' => $findRecord ? $findRecord->total : 0, 'isCurrent' => $val->day === today()->day];
+            return ['day' => $val->day, 'totalRecord' => $findRecord ? $findRecord->total : 0, 'isCurrent' => false]; //$val->day === today()->day
 
         });
 

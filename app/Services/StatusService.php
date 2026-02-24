@@ -20,33 +20,6 @@ class StatusService
         $tab = $filters['tab'] ?? 'all';
         $staleThreshold = Date::today()->subMonths(6);
 
-        // $updateToStale = BorrowedCheck::query()
-        //     ->with('checkable')
-        //     ->whereNotNull('approver_id')
-        //     ->whereHas(
-        //         'checkable',
-        //         fn(Builder $q) => $q->scanRecords()
-        //     )
-        // ->whereHasMorph(
-        //         'checkable',
-        //         [CvCheckPayment::class, Crf::class],
-        //         function (Builder $query, string $type) use ($staleThreshold) {
-        //             $column = $type === CvCheckPayment::class ? 'check_date' : 'resolved_check_date';
-
-        //             $query->where($column, '<', $staleThreshold);
-        //         }
-        //     )
-        //     ->whereDoesntHaveMorph(
-        //         'checkable',
-        //         [CvCheckPayment::class, Crf::class],
-        //         fn($query) => $query->has('checkStatus')
-        //     )->get();
-        // ->each(function ($check) {
-        //     $check->checkable->checkStatus->update(['status' => 'staled']);
-        // });
-
-        // dd($updateToStale);
-
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MATE!
         $cheque = BorrowedCheck::query()
             ->filter($filters)

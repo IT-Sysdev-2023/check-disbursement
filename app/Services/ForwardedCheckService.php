@@ -7,6 +7,8 @@ use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
 use App\Models\CheckForwardedStatus;
 use App\Models\CheckStatus;
+use App\Models\Crf;
+use App\Models\CvCheckPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -22,9 +24,7 @@ class ForwardedCheckService
 
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
             ->with(['checkable' => ['borrowedCheck', 'company', 'tagLocation']])
-            // ->whereHas('checkable.checkStatus', function ($query) {
-            //     $query->where(['status' => 'forwarded', 'received_by' => null]);
-            // })
+            ->regionalPermission()
             ->where(['status' => 'forwarded', 'received_by' => null])
             ->paginate()
             ->withQueryString()
@@ -143,13 +143,12 @@ class ForwardedCheckService
     public function forwardedReleasing(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
-
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
             ->with(['checkable' => ['borrowedCheck', 'company', 'tagLocation']])
             // ->whereHas('checkable.checkStatus', function ($query) {
             ->where(['status' => 'forwarded'])
             ->whereNotNull('received_by')
-            // })
+            ->regionalPermission()
             ->doesntHave('checkForwardedStatus')
             ->paginate()
             ->withQueryString()

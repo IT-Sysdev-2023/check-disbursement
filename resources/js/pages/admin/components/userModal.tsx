@@ -139,6 +139,15 @@ export default function UserModal({
                         handleChange={handleChangeRole}
                     />
 
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Assign Region
+                    </Typography>
+                    <PermissionSelection
+                        permissions={permissionsList.roles}
+                        selectedPermission={selectedRole}
+                        handleChange={handleChangeRole}
+                    />
+
                     <Button variant="contained" onClick={onSave} sx={{ mt: 3 }}>
                         Save
                     </Button>

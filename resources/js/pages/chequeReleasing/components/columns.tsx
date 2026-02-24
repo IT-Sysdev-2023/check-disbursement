@@ -168,7 +168,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 50,
-        renderCell: ({ row }) => row.checkable.checkNumber,
+        renderCell: ({ row }) => row.checkable?.checkNumber,
     },
     {
         field: 'checkDate',
@@ -177,7 +177,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable.checkDate,
+        renderCell: ({ row }) => row.checkable?.checkDate,
     },
     {
         field: 'type',
@@ -204,7 +204,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.amount,
+        renderCell: ({ row }) => row.checkable?.amount,
     },
     {
         field: 'location',
@@ -213,7 +213,7 @@ export const createForwardedCvColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.tagLocation?.location,
+        renderCell: ({ row }) => row.checkable?.tagLocation?.location,
     },
 
     {
