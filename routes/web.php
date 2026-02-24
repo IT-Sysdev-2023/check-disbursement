@@ -44,7 +44,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::prefix('setup')->group(function () {
             Route::get('bank-setup', [AdminController::class, 'setupBank'])->name('bank-setup');
+            Route::get('bank-accout-setup', [AdminController::class, 'setupBankAccount'])->name('bank-account-setup');
             Route::post('store-bank', [AdminController::class, 'storeBank'])->name('store-bank');
+             Route::post('store-bank-account', [AdminController::class, 'storeBankAccount'])->name('store-bank-account');
             });
     });
 

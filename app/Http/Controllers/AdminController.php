@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bank;
+use App\Models\BankAccount;
 use App\Models\Company;
 use App\Models\CompanyPermission;
 use App\Models\User;
@@ -38,6 +39,11 @@ class AdminController extends Controller
         return $this->service->setupBank();
     }
 
+    public function setupBankAccount()
+    {
+        return $this->service->setupBankAccount();
+    }
+
     public function storeBank(Request $request)
     {
         $request->validate([
@@ -51,5 +57,22 @@ class AdminController extends Controller
         ]);
 
         return redirect()->back()->with(['status' => true, 'message' => 'Bank added successfully']);
+    }
+
+    public function storeBankAccount(Request $request)
+    {
+        $request->validate([
+            'bank' => 'required|exists:banks,id',
+            'accountNumber' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+        ]);
+        
+        BankAccount::create([
+            'bank_id' => $request->bank,
+            'account_no' => $request->accountNumber,
+            'name' => $request->name,
+        ]);
+
+        return redirect()->back()->with(['status' => true, 'message' => 'Bank account added successfully']);
     }
 }

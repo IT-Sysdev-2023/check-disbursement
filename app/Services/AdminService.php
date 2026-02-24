@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Bank;
 use App\Models\Company;
 use App\Models\CompanyPermission;
 use App\Models\User;
@@ -97,5 +98,19 @@ class AdminService
     public function setupBank()
     {
         return Inertia::render('admin/bankSetup');
+    }
+    public function setupBankAccount()
+    {
+       $banks = Bank::select('id', 'name')
+            ->get()
+            ->map(function ($name) {
+                return [
+                    'label' => $name->name,
+                    'value' => $name->id,
+                ];
+            });
+        return Inertia::render('admin/bankAccountSetup', [
+            'banks' => $banks
+        ]);
     }
 }

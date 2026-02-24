@@ -8,6 +8,7 @@ import {
 
 import {
     about,
+    bankAccountSetup,
     bankSetup,
     checkReleasing,
     checkRequestForm,
@@ -34,6 +35,7 @@ import {
     FileSpreadsheet,
     FolderCheck,
     Forward,
+    Landmark,
     PackageOpen,
     Pen,
     Rocket,
@@ -149,8 +151,13 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           icon: Pen,
                           submenu: [
                               {
-                                  title: 'Bank & Bank Accounts',
+                                  title: 'Bank',
                                   href: bankSetup(),
+                                  icon: Landmark,
+                              },
+                                {
+                                  title: 'Bank Accounts',
+                                  href: bankAccountSetup(),
                                   icon: Tickets,
                               },
                           ],
