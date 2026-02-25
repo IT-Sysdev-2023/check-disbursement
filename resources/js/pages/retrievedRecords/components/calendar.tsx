@@ -1,9 +1,11 @@
 import { useAppearance } from '@/hooks/use-appearance';
+import { router } from '@inertiajs/react';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
+import dayjs, { Dayjs } from 'dayjs';
 import { useEffect, useState } from 'react';
 
-const Calendar = ({ data }: any) => {
+const Calendar = ({ data, onChangeTab  }: {  onChangeTab: () => void, data: any}) => {
     const { appearance } = useAppearance();
 
     const theme = useTheme(); // Get the MUI theme
@@ -18,6 +20,28 @@ const Calendar = ({ data }: any) => {
             setIsDarkMode(appearance === 'dark');
         }
     }, [appearance]);
+
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+    useEffect(() => {
+
+        if (!selectedDate) return;
+        
+        const formattedDate = selectedDate.format('YYYY-MM-DD');
+
+        router.reload({
+            data: {
+                date: {
+                    start: formattedDate,
+                    end: formattedDate,
+                },
+                tab: 'cheques',
+            },
+            replace: true,
+            onSuccess: () => {
+                onChangeTab();
+            },
+        });
+    }, [selectedDate]);
 
     // const [day, setDay] = useState<{
     //     month: string;
@@ -100,6 +124,18 @@ const Calendar = ({ data }: any) => {
                                         {week.map((dayObj, dayIndex) => (
                                             <td
                                                 key={`month-${monthIndex}-week-${weekIndex}-day-${dayIndex}`}
+                                                onClick={() => {
+                                                    if (!dayObj.day) return; // ignore empty cells
+
+                                                    const fullDate = dayjs(
+                                                        `${day.y}-${day.m}-${dayObj.day}`,
+                                                        'YYYY-M-D', 
+                                                    );
+
+                                                    setSelectedDate(fullDate);
+                                                    // const fullDate = `${day.y}-${day.m}-${day.days[weekIndex][dayIndex].day}`;
+                                                    // setSelectedDate(dayjs(fullDate));
+                                                }}
                                                 style={{
                                                     position: 'relative',
                                                     height: '5rem',
@@ -136,10 +172,12 @@ const Calendar = ({ data }: any) => {
                                                                 '0.25rem',
                                                             fontSize: '0.75rem',
                                                             fontWeight: 800,
-                                                            
+
                                                             textAlign: 'center',
                                                             color: isDarkMode
-                                                                ? theme.palette.warning.main
+                                                                ? theme.palette
+                                                                      .warning
+                                                                      .main
                                                                 : '#555',
                                                         }}
                                                     >

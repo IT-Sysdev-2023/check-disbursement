@@ -73,6 +73,9 @@ class Crf extends Model
                 'ck_no'
             ], 'LIKE', '%' . $search . '%');
         })
+        ->when($filters['date'] ?? null, function ($query, $date) {
+                $query->whereBetween('resolved_check_date', [$date['start'], $date['end']]);
+            })
             ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
                 $field = Str::snake($sort['field']);
                 $direction = $sort['sort'];

@@ -12,21 +12,13 @@ use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForwardedCheckController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\RetrieveDataController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
 use App\Http\Controllers\StatusController;
-use App\Models\BorrowedCheck;
 use App\Models\Company;
-use App\Models\CompanyPermission;
-use App\Models\Crf;
-use App\Models\CvLine;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 
 Route::get('/', function () {

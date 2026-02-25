@@ -37,8 +37,7 @@ class ChecksService
         $manageCheques = self::manageChecks();
 
         $calendar = self::calendar();
-        // dd(self::distinctMonths(), $calendar);
-        // dd($calendar);
+        
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
             'pending' => $waitingForApproval,
@@ -182,6 +181,7 @@ class ChecksService
             ->doesntHave('borrowedCheck');
 
         $crfQuery = Crf::baseColumns()
+            ->filter($filters)
             ->doesntHave('borrowedCheck');
 
         if ($hasMissingField) {
@@ -307,6 +307,8 @@ class ChecksService
 
         return [
             'month' => (clone $date)->format('M Y'),
+            'y' => (clone $date)->year,
+            'm' => (clone $date)->month,
             'days' => array_chunk($totalDay, 7),
         ];
 
