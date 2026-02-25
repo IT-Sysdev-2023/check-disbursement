@@ -46,33 +46,13 @@ class AdminController extends Controller
 
     public function storeBank(Request $request)
     {
-        $request->validate([
-            'bank' => 'required|string|max:255',
-            'acronym' => 'required|string|max:255',
-        ]);
-       Bank::create([
-            'name' => $request->bank,
-            'acronym' => $request->acronym,
-            'caused_by' => auth()->id(),
-        ]);
 
-        return redirect()->back()->with(['status' => true, 'message' => 'Bank added successfully']);
+        return $this->service->storeBank($request);
+      
     }
 
     public function storeBankAccount(Request $request)
     {
-        $request->validate([
-            'bank' => 'required|exists:banks,id',
-            'accountNumber' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
-        ]);
-        
-        BankAccount::create([
-            'bank_id' => $request->bank,
-            'account_no' => $request->accountNumber,
-            'name' => $request->name,
-        ]);
-
-        return redirect()->back()->with(['status' => true, 'message' => 'Bank account added successfully']);
+        return $this->service->storeBankAccount($request);
     }
 }
