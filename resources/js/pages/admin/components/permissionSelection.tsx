@@ -20,7 +20,7 @@ const MenuProps = {
 
 function getStyles(name: string, personName: readonly string[], theme: Theme) {
     return {
-        fontWeight: personName.includes(name)
+        fontWeight: personName?.includes(name)
             ? theme.typography.fontWeightMedium
             : theme.typography.fontWeightRegular,
     };
@@ -57,6 +57,7 @@ export default function PermissionSelection({
                             ))}
                         </Box>
                     )}
+                    
                     MenuProps={MenuProps}
                 >
                     {permissions.map((permission) => (

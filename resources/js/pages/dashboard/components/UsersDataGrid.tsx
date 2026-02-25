@@ -1,11 +1,9 @@
 import { handleSearch, handleSort } from '@/lib/utils';
-import UserModal from '@/pages/admin/components/userModal';
-import { users } from '@/routes';
+import { assign, users } from '@/routes';
 import { InertiaPagination, Permission, User } from '@/types';
 import { router } from '@inertiajs/react';
 import { Button, Stack } from '@mui/material';
 import { GridColDef, GridPaginationModel } from '@mui/x-data-grid';
-import { useState } from 'react';
 import TableDataGrid from './TableDataGrid';
 
 export default function UsersDataGrid({
@@ -13,8 +11,6 @@ export default function UsersDataGrid({
 }: {
     usersList: InertiaPagination<User>;
 }) {
-    const [openModal, setOpenModal] = useState(false);
-    const [userDetails, setUserDetails] = useState<User>();
     const handlePagination = (model: GridPaginationModel) => {
         const page = model.page + 1; // MUI DataGrid uses 0-based index
         const per_page = model.pageSize;
@@ -31,11 +27,9 @@ export default function UsersDataGrid({
     };
 
     const handleModal = (user: User) => {
-        setUserDetails(user);
-        setOpenModal(true);
+         router.get(assign(user.id))
     };
 
-    const handleClose = () => setOpenModal(false);
     const columns: GridColDef[] = [
         {
             field: 'id',
@@ -84,7 +78,6 @@ export default function UsersDataGrid({
                         <Button
                             variant="outlined"
                             size="small"
-                            // startIcon={<VisibilityIcon />}
                             onClick={() => handleModal(row)}
                         >
                             Assign
@@ -147,13 +140,6 @@ export default function UsersDataGrid({
                     },
                 }}
             /> */}
-            {userDetails && (
-                <UserModal
-                    open={openModal}
-                    details={userDetails}
-                    onClose={handleClose}
-                />
-            )}
         </>
     );
 }

@@ -1,15 +1,22 @@
 import useNotifications from '@/components/notifications/useNotifications';
+import AppLayout from '@/layouts/app-layout';
 import { modalStyle } from '@/lib/modalStyle';
 import { assignPermissions, permissions } from '@/routes';
-import { FlashReponse, SelectionType, User } from '@/types';
-import { router } from '@inertiajs/react';
+import { BreadcrumbItem, FlashReponse, SelectionType, User } from '@/types';
+import { Head, router } from '@inertiajs/react';
 import { Button, SelectChangeEvent } from '@mui/material';
 import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import PermissionSelection from './permissionSelection';
+import PermissionSelection from './components/permissionSelection';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Assign User',
+        href: '#',
+    },
+];
 
 type PermissionRoleType = {
     roles: SelectionType[];
@@ -17,15 +24,7 @@ type PermissionRoleType = {
     accessPermission: SelectionType[];
 };
 
-export default function UserModal({
-    open,
-    details,
-    onClose,
-}: {
-    open: boolean;
-    details: User;
-    onClose: () => void;
-}) {
+export default function AssignUser({ user }: { user: { data: User } }) {
     const [selectedPermission, setSelectedPermission] = useState<string[]>([]);
     const [selectedRole, setSelectedRole] = useState<string[]>([]);
     const [selectedAccessPermission, setSelectedAccessPermission] = useState<
@@ -37,6 +36,7 @@ export default function UserModal({
         accessPermission: [],
     });
 
+    const details = user.data;
     useEffect(() => {
         const fetchPermissions = async () => {
             const { url, method } = permissions();
@@ -49,6 +49,7 @@ export default function UserModal({
 
         fetchPermissions();
     }, []);
+    
     //Set Defaul User Permission to the UI
     useEffect(() => {
         setSelectedPermission(
@@ -111,71 +112,58 @@ export default function UserModal({
                             autoHideDuration: 3000,
                         });
                     }
-                    onClose();
                 },
             },
         );
     };
 
     return (
-        <div>
-            <Modal
-                open={open}
-                onClose={onClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={modalStyle}>
-                    <Typography
-                        id="modal-modal-title"
-                        variant="h6"
-                        component="h2"
-                    >
-                        Assign Role/ Permission
-                    </Typography>
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        Name: {details?.name}
-                    </Typography>
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Register" />
 
-                    <Typography id="modal-modal-description" sx={{ mt: 3 }}>
-                        Assign Business Unit
-                    </Typography>
-                    <PermissionSelection
-                        permissions={permissionsList.permissions}
-                        selectedPermission={selectedPermission}
-                        handleChange={handleChange}
-                    />
+            <Box sx={modalStyle}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                    Assign Role/ Permission
+                </Typography>
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    Name: {details?.name}
+                </Typography>
 
-                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        Assign Role
-                    </Typography>
-                    <PermissionSelection
-                        permissions={permissionsList.roles}
-                        selectedPermission={selectedRole}
-                        handleChange={handleChangeRole}
-                    />
+                <Typography id="modal-modal-description" sx={{ mt: 3 }}>
+                    Assign Business Unit
+                </Typography>
+                <PermissionSelection
+                    permissions={permissionsList.permissions}
+                    selectedPermission={selectedPermission}
+                    handleChange={handleChange}
+                />
 
-                    {selectedRole.includes('regional_officer') && (
-                        <>
-                            <Typography
-                                id="modal-modal-description"
-                                sx={{ mt: 2 }}
-                            >
-                                Assign Region
-                            </Typography>
-                            <PermissionSelection
-                                permissions={permissionsList.accessPermission}
-                                selectedPermission={selectedAccessPermission}
-                                handleChange={handleChangeAccessPermission}
-                            />
-                        </>
-                    )}
+                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                    Assign Role
+                </Typography>
+                <PermissionSelection
+                    permissions={permissionsList.roles}
+                    selectedPermission={selectedRole}
+                    handleChange={handleChangeRole}
+                />
 
-                    <Button variant="contained" onClick={onSave} sx={{ mt: 3 }}>
-                        Save
-                    </Button>
-                </Box>
-            </Modal>
-        </div>
+                {selectedRole?.includes('regional_officer') && (
+                    <>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            Assign Region
+                        </Typography>
+                        <PermissionSelection
+                            permissions={permissionsList.accessPermission}
+                            selectedPermission={selectedAccessPermission}
+                            handleChange={handleChangeAccessPermission}
+                        />
+                    </>
+                )}
+
+                <Button variant="contained" onClick={onSave} sx={{ mt: 3 }}>
+                    Save
+                </Button>
+            </Box>
+        </AppLayout>
     );
 }

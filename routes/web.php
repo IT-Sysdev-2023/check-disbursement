@@ -39,15 +39,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('users', [AdminController::class, 'users'])->name('users');
 
+        Route::get('assign/{id}', [AdminController::class, 'assign'])->name('assign');
         Route::get('permissions', [AdminController::class, 'permissions'])->name('permissions');
         Route::post('assign-permissions', [AdminController::class, 'assignPermissions'])->name('assignPermissions');
+        Route::post('store-user', [AdminController::class, 'storeUser'])->name('store-user');
 
         Route::prefix('setup')->group(function () {
             Route::get('bank-setup', [AdminController::class, 'setupBank'])->name('bank-setup');
             Route::get('bank-accout-setup', [AdminController::class, 'setupBankAccount'])->name('bank-account-setup');
             Route::post('store-bank', [AdminController::class, 'storeBank'])->name('store-bank');
-             Route::post('store-bank-account', [AdminController::class, 'storeBankAccount'])->name('store-bank-account');
-            });
+            Route::post('store-bank-account', [AdminController::class, 'storeBankAccount'])->name('store-bank-account');
+        });
     });
 
     Route::middleware('role:disbursement_officer|admin')->group(function () {
