@@ -38,16 +38,13 @@ export default function PermissionSelection({
     const theme = useTheme();
     return (
         <div>
-            <FormControl sx={{ width: 270 }}>
+            <FormControl fullWidth>
                 <Select
                     labelId="demo-multiple-chip-label"
                     id="demo-multiple-chip"
                     multiple
                     value={selectedPermission}
                     onChange={handleChange}
-                    input={
-                        <OutlinedInput id="select-multiple-chip" label="Chip" />
-                    }
                     renderValue={(selected) => (
                         <Box
                             sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}
@@ -57,7 +54,14 @@ export default function PermissionSelection({
                             ))}
                         </Box>
                     )}
-                    
+                    input={
+                        <OutlinedInput
+                            sx={{
+                                height: 60, // 👈 set your height here
+                                alignItems: 'flex-start', // align chips top
+                            }}
+                        />
+                    }
                     MenuProps={MenuProps}
                 >
                     {permissions.map((permission) => (

@@ -60,7 +60,7 @@ class AdminController extends Controller
     }
 
     public function assign(User $id){
-          return Inertia::render('admin/assignUser',['user' => new UserResource($id->load('companyPermissions'))]);
+          return Inertia::render('admin/assignUser',['user' => new UserResource($id->load('companyPermissions.company'))]);
     }
 
     public function storeUser(Request $request)

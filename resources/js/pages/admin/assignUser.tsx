@@ -1,7 +1,6 @@
 import useNotifications from '@/components/notifications/useNotifications';
 import AppLayout from '@/layouts/app-layout';
-import { modalStyle } from '@/lib/modalStyle';
-import { assignPermissions, permissions } from '@/routes';
+import { assignPermissions, permissions, users } from '@/routes';
 import { BreadcrumbItem, FlashReponse, SelectionType, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Button, SelectChangeEvent } from '@mui/material';
@@ -12,6 +11,10 @@ import { useEffect, useState } from 'react';
 import PermissionSelection from './components/permissionSelection';
 
 const breadcrumbs: BreadcrumbItem[] = [
+     {
+        title: 'Assign User',
+        href: users().url,
+    },
     {
         title: 'Assign User',
         href: '#',
@@ -65,7 +68,6 @@ export default function AssignUser({ user }: { user: { data: User } }) {
         const {
             target: { value },
         } = event;
-        console.log(event);
         setSelectedPermission(
             typeof value === 'string' ? value.split(',') : value,
         );
@@ -121,7 +123,7 @@ export default function AssignUser({ user }: { user: { data: User } }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Register" />
 
-            <Box sx={modalStyle}>
+            <Box sx={{ py: 6,px: 20}}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     Assign Role/ Permission
                 </Typography>

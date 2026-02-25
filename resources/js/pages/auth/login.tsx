@@ -124,12 +124,12 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
+                        {/* <div className="text-center text-sm text-muted-foreground">
                             Don't have an account?{' '}
                             <TextLink href={ipPhones()} tabIndex={5}>
                                 Contact Us
                             </TextLink>
-                        </div>
+                        </div> */}
                     </>
                 )}
             </Form>
