@@ -212,8 +212,9 @@ export interface BorrowedCheck {
 
 export interface CheckStatus {
     id: number;
-    status: 'release' | 'forward' | 'deposit' | 'cancel' | 'stale';
+    status: 'released' | 'forwarded' | 'deposited' | 'cancelled' | 'staled';
     checkableType: 'CRF' | 'CV';
+    cancelledReason: string,
     receiversName?: string | null;
     image: string | null;
     signature: string | null;

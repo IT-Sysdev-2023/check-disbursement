@@ -1,3 +1,4 @@
+import CheckStatusChip from '@/components/chip-status';
 import { Crf } from '@/types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
@@ -9,7 +10,6 @@ import {
     Stack,
     Typography,
 } from '@mui/material';
-import dayjs from 'dayjs';
 
 export default function CrfDetails({ details }: { details: Crf }) {
     return (
@@ -32,14 +32,14 @@ export default function CrfDetails({ details }: { details: Crf }) {
                     </Paper>
                 </Grid>
 
-                <Grid size={{ xs: 12, sm: 6 }}>
+                {/* <Grid size={{ xs: 12, sm: 6 }}>
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Date</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
                             {dayjs(details.date).format('MMMM D, YYYY')}
                         </Typography>
                     </Paper>
-                </Grid>
+                </Grid> */}
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Paid To</Typography>
@@ -81,13 +81,40 @@ export default function CrfDetails({ details }: { details: Crf }) {
                     </Paper>
                 </Grid>
                 {details.checkStatus && (
+                    <>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Released Date:
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {details.checkStatus?.createdAt ?? '-'}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Status:
+                                </Typography>
+
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    <CheckStatusChip
+                                        status={details?.checkStatus?.status}
+                                    />
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                    </>
+                )}
+                 {details?.checkStatus?.status === 'cancelled' && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">
-                                Released Date:
+                                Cancelled Reason
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 1 }}>
-                                {details.checkStatus?.createdAt ?? '-'}
+                                {details.checkStatus?.cancelledReason}
                             </Typography>
                         </Paper>
                     </Grid>

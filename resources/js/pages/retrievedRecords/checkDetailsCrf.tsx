@@ -8,7 +8,7 @@ import { retrievedRecords } from '@/routes';
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Retrieved CV/CRF',
-        href: retrievedRecords().url,
+        href: '#',
     },
     {
         title: 'CRF Details',

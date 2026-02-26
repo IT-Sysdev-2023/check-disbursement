@@ -42,7 +42,6 @@ export default function ScannedDetails({
                     checkNo: record.checkNumber
                 }
             });
-            console.log(data);
             setScannedRecord(data);
         };
 
@@ -63,7 +62,7 @@ export default function ScannedDetails({
 
                 <Box sx={{ flexGrow: 1, width: '100%', mt: 2 }}>
                     <Grid container spacing={1} sx={{ width: '100%' }}>
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        {/* <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
                                     Seq.:
@@ -72,7 +71,7 @@ export default function ScannedDetails({
                                     {scannedRecord?.seq}
                                 </Typography>
                             </Paper>
-                        </Grid>
+                        </Grid> */}
 
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
@@ -90,21 +89,21 @@ export default function ScannedDetails({
                                     Check Date
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {scannedRecord?.postedDate}
+                                    {scannedRecord?.checkDate}
                                 </Typography>
                             </Paper>
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
-                                    Account Number
+                                    Check No.
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {scannedRecord?.accountNo}
+                                    {scannedRecord?.checkNo}
                                 </Typography>
                             </Paper>
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        {/* <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
                                     Business Unit
@@ -123,7 +122,7 @@ export default function ScannedDetails({
                                     {scannedRecord?.branchName}
                                 </Typography>
                             </Paper>
-                        </Grid>
+                        </Grid> */}
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">

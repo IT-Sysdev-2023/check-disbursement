@@ -51,6 +51,7 @@ export default function ({
                                 value={selectedItem}
                                 title="Select"
                                 items={item}
+                                // isDisabled
                             />
                         </Grid>
                     </Grid>

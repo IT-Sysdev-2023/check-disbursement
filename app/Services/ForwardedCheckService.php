@@ -33,7 +33,7 @@ class ForwardedCheckService
         $receiver = [
             [
                 'value' => 0,
-                'label' => 'Accounting Dibursement CEBU'
+                'label' => $request->user()->name
             ],
         ];
 

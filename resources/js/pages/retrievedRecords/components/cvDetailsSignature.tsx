@@ -1,3 +1,4 @@
+import CheckStatusChip from '@/components/chip-status';
 import { Cv } from '@/types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
@@ -11,7 +12,7 @@ import {
 } from '@mui/material';
 
 export default function CvDetailsSignature({ details }: { details: Cv }) {
-
+    console.log(details);
     return (
         <Box sx={{ flexGrow: 1, width: '100%' }}>
             <Grid container spacing={2} sx={{ width: '100%' }}>
@@ -56,16 +57,31 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                     </Paper>
                 </Grid>
                 {details.checkStatus && (
-                    <Grid size={{ xs: 12, sm: 6 }}>
-                        <Paper sx={{ px: 2, py: 1 }}>
-                            <Typography variant="overline">
-                                Released Date:
-                            </Typography>
-                            <Typography variant="body1" sx={{ mb: 1 }}>
-                                {details.checkStatus?.createdAt ?? '-'}
-                            </Typography>
-                        </Paper>
-                    </Grid>
+                    <>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Released Date:
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {details.checkStatus?.createdAt ?? '-'}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 6 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Status:
+                                </Typography>
+
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    <CheckStatusChip
+                                        status={details?.checkStatus?.status}
+                                    />
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                    </>
                 )}
                 <Grid size={{ xs: 12, sm: 6 }}>
                     <Paper sx={{ px: 2, py: 1 }}>
@@ -87,6 +103,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         </Paper>
                     </Grid>
                 )}
+
                 {details?.checkStatus?.image && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
@@ -138,6 +155,18 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                     }}
                                 />
                             </Box>
+                        </Paper>
+                    </Grid>
+                )}
+                {details?.checkStatus?.status === 'cancelled' && (
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                        <Paper sx={{ px: 2, py: 1 }}>
+                            <Typography variant="overline">
+                                Cancelled Reason
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 1 }}>
+                                {details.checkStatus?.cancelledReason}
+                            </Typography>
                         </Paper>
                     </Grid>
                 )}
