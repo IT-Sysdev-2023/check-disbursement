@@ -37,7 +37,8 @@ class ChecksService
         $manageCheques = self::manageChecks();
 
         $calendar = self::calendar();
-        
+        // dd($calendar);
+
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
             'pending' => $waitingForApproval,
@@ -207,6 +208,31 @@ class ChecksService
             ->withQueryString();
     }
 
+    private static function distinctMonths()
+    {
+        // $crf = Crf::select('cv_headers.cv_date', DB::raw('count(*) as total'))
+        //         ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+        //         ->doesntHave('checkStatus')
+        //         ->groupBy('cv_headers.cv_date')
+        //         ->get()
+        //         ->groupBy(
+        //             fn($date) =>
+        //             Date::parse($date->cv_date)->format('Y-m')
+        //         );
+
+        $cv = CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
+                ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+                ->doesntHave('checkStatus')
+                ->groupBy('cv_headers.cv_date')
+                ->get()
+                ->groupBy(
+                    fn($date) =>
+                    Date::parse($date->cv_date)->format('Y-m')
+                );
+
+        return $cv;
+    }
+
     public function approver(Request $request)
     {
         $names = Approver::select('id as value', 'name as label')->get();
@@ -254,18 +280,7 @@ class ChecksService
     }
 
 
-    private static function distinctMonths()
-    {
-        return CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
-            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-            ->doesntHave('checkStatus')
-            ->groupBy('cv_headers.cv_date')
-            ->get()
-            ->groupBy(
-                fn($date) =>
-                Date::parse($date->cv_date)->format('Y-m')
-            );
-    }
+
 
     private static function calendar()
     {

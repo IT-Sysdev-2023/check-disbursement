@@ -10,7 +10,7 @@ class StringHelper
         $locations = [
             'Cebu' => 'Forward',
             'Manila' => 'Forward',
-            'Internal' => 'Internal',
+            'Internal' => 'Release',
             'Deposit' => 'Deposit',
             'Tagbilaran Pick-up' => 'Release',
         ];

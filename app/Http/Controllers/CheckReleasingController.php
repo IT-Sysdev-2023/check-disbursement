@@ -19,7 +19,6 @@ class CheckReleasingController extends Controller
         return $this->service->index($request);
     }
 
-
     public function show(string $checkId, string $status)
     {
         return $this->service->getReleaseCheck($checkId, $status);

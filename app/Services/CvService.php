@@ -29,7 +29,6 @@ class CvService extends NavConnection
     }
     public function index(User $user)
     {
-
         $bu = PermissionService::getCompanyPermissions($user);
         return Inertia::render('extract/checkVoucher', [
             'bu' => $bu
@@ -59,7 +58,7 @@ class CvService extends NavConnection
             })
             ->lazy();
         $id = $user->id;
-
+        
         $nav->each(function (NavServer $server) use ($id, $date) {
             $databases = $server->navDatabases; // dont Change this cause it will re-hydrates inside the job(no Filtering on Records will happen)
             CvServer::dispatch($server->id, $id, $date, $databases);

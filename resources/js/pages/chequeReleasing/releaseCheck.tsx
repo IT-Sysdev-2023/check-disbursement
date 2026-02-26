@@ -11,9 +11,10 @@ import {
     TextField,
     Typography,
 } from '@mui/material';
-import { CloudUploadIcon, DeleteIcon, Trash2 } from 'lucide-react';
+import { CloudUploadIcon, Trash2 } from 'lucide-react';
 import { ChangeEvent, FormEvent, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
+import CameraCapture from './components/camera';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -135,6 +136,16 @@ export default function ReleaseCheck({
 
                         {/* File Upload */}
                         <FormControl error={!!errors.file}>
+                            {/* <CameraCapture
+                                onCapture={(blob) => {
+                                    const file = new File(
+                                        [blob],
+                                        'profile.jpg',
+                                        { type: 'image/jpeg' },
+                                    );
+                                    setData('file', file); // Inertia form
+                                }}
+                            /> */}
                             <Button
                                 variant="contained"
                                 component="label"
@@ -208,7 +219,11 @@ export default function ReleaseCheck({
                         <FormHelperText>
                             {errors.signature ?? ' '}
                         </FormHelperText>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Typography>
+                            Please click ‘Save Signature’ after completing your
+                            signature.
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 1, mt: 3 }}>
                             <Button
                                 variant="outlined"
                                 onClick={handleClearSignature}

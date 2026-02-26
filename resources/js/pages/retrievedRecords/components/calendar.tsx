@@ -178,7 +178,9 @@ const Calendar = ({ data, onChangeTab  }: {  onChangeTab: () => void, data: any}
                                                                 ? theme.palette
                                                                       .warning
                                                                       .main
-                                                                : '#555',
+                                                                :  theme.palette
+                                                                      .info
+                                                                      .main
                                                         }}
                                                     >
                                                         {dayObj.totalRecord}
