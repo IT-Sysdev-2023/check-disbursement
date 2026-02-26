@@ -17,35 +17,37 @@ class StatusService
     public function checkStatus(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'tab']);
-        $tab = $filters['tab'] ?? 'all';
+        $tab = $filters['tab'] ?? 'deposited';
         $staleThreshold = Date::today()->subMonths(6);
 
-        //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MATE!
+        //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
         $cheque = BorrowedCheck::query()
             ->filter($filters)
             ->with('checkable.checkStatus.checkForwardedStatus')
             ->where(function (Builder $q) use ($tab) {
-                if ($tab === 'all') {
-                    $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
-                        $q->whereNotNull('approver_id')
-                            ->whereHasMorph(
-                                'checkable',
-                                [CvCheckPayment::class, Crf::class],
-                                function (Builder $q, string $type) {
-                                $column = $type === CvCheckPayment::class ? 'cv_check_payments.check_date' : 'resolved_check_date';
-                                $q->scanRecords()->where($column, '>', Date::today()->subMonths(6));
-                            }
-                            )
-                            ->whereDoesntHaveMorph(
-                                'checkable',
-                                [CvCheckPayment::class, Crf::class],
-                                fn($query) => $query->has('checkStatus')
-                            )
+                // if ($tab === 'all') { //Disable temporarily "For Releasing Tab"
+                //     $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
+                //         $q->whereNotNull('approver_id')
+                //             ->whereHasMorph(
+                //                 'checkable',
+                //                 [CvCheckPayment::class, Crf::class],
+                //                 function (Builder $q, string $type) {
+                //                 $column = $type === CvCheckPayment::class ? 'cv_check_payments.check_date' : 'resolved_check_date';
+                //                 $q->scanRecords()->where($column, '>', Date::today()->subMonths(6));
+                //             }
+                //             )
+                //             ->whereDoesntHaveMorph(
+                //                 'checkable',
+                //                 [CvCheckPayment::class, Crf::class],
+                //                 fn($query) => $query->has('checkStatus')
+                //             )
 
-                        ;
+                //         ;
 
-                    });
-                } else if ($tab === 'staled') {
+                //     });
+                // } else 
+                
+                if ($tab === 'staled') {
                     $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
                         $q->whereNotNull('approver_id')
                             ->whereHas(

@@ -103,13 +103,14 @@ export default function CheckStatus({
                                 onChange={handleChangeTab}
                                 aria-label="tabs"
                             >
-                                <Tab label="For Releasing" value="all" />
-                                {!isRegional && (
-                                    <Tab label="Forwarded" value="forwarded" />
-                                )}
+                                {/* <Tab label="For Releasing" value="all" /> */}
+                               
                                 <Tab label="Deposited" value="deposited" />
                                 <Tab label="Released" value="released" />
                                 <Tab label="Cancelled" value="cancelled" />
+                                 {!isRegional && (
+                                    <Tab label="Forwarded" value="forwarded" />
+                                )}
                                 <Tab label="Staled" value="staled" />
                             </TabList>
                         </Box>

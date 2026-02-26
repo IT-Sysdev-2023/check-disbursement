@@ -23,15 +23,7 @@ export const createStatusChequeColumns = (
         minWidth: 80,
         renderCell: ({ row }) => row.checkable.amount,
     },
-    {
-        field: 'stat',
-        headerName: 'Handling Status',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-        renderCell: ({ row }) => row.checkable.taggedLocation,
-    },
+    
     {
         field: 'bankName',
         headerName: 'Bank Name',
@@ -109,6 +101,17 @@ export const createStatusChequeColumns = (
                     color={statusMap[status]?.color || 'default'}
                 />
             );
+        },
+        },
+    {
+        field: 'stat',
+        headerName: 'Handling Status',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: ({ row }) => {
+            return row.checkable.location
         },
     },
     {

@@ -27,7 +27,6 @@ class CrfResource extends JsonResource
                 $status = 'staled';
             }
         }
-
         return [
             'id' => $this->id,
             'cvNo' => $this->crf,
@@ -35,7 +34,7 @@ class CrfResource extends JsonResource
             'company' => $this->getCompany,
             'status' => $status,
             'checkDate' => $checkDate ? $checkDate->toFormattedDateString() : 'N/A',
-            'location' => $this->location,
+            'location' => $this->tagLocation?->location,
             'date' => $this->date ? $this->date->toFormattedDateString() : 'N/A',
             'payee' => $this->paid_to,
             'bank' => $this->bank,

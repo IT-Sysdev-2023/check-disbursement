@@ -154,7 +154,7 @@ class CrfHelper
             'company_id' => $companyId,
             'company_office' => $this->company,
             'no' => $this->no,
-            'location' => $this->location,
+            'crf_location' => $this->location,
             'date' => $this->date,
             'bank' => $this->bank,
             'ck_no' => $this->ckNo,
@@ -172,7 +172,7 @@ class CrfHelper
     {
         return $records->every(function ($item) use ($bu) {
             return (!empty($item['company_office']) && !empty($item['no'])
-                && !empty($item['location']) && !empty($item['date'])
+                && !empty($item['crf_location']) && !empty($item['date'])
                 && !empty($item['bank']) && !empty($item['ck_no'])
                 && !empty($item['prepared_by']) && !empty($item['paid_to'])
                 && !empty($item['amount']) && !empty($item['particulars'])) &&

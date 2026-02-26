@@ -17,7 +17,7 @@ return new class extends Migration {
             $table->string('crf')->nullable();
             $table->string('company_office');
             $table->unsignedBigInteger('no');
-            $table->string('location');
+            $table->string('crf_location');
             $table->dateTime('date')->nullable();
             $table->string('paid_to');
             $table->string('particulars');
