@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             CompanySeeder::class,
             NavServerSeeder::class,
+            NavDatabaseSeeder::class,
+            BusinessUnitSeeder::class,
             NavCpSeeder::class,
             NavHeaderSeeder::class,
             NavLineSeeder::class,
