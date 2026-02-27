@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('cv_header_id')->unique()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             // $table->string('cv_no')->unique();
             $table->unsignedBigInteger('check_number');
             $table->decimal('check_amount', 20);

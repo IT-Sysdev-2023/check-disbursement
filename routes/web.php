@@ -47,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('role:disbursement_officer|admin')->group(function () {
         //! EXTRACT CHECKS
         Route::prefix('extract')->group(function () {
-
+            Route::get('business-units', [CvController::class, 'businessUnits'])->name('get-business-units');
             Route::prefix('check-voucher')->group(function () {
                 Route::get('index', [CvController::class, 'index'])->name('check-voucher');
                 Route::post('extract-cv', [CvController::class, 'extractCv'])->name('extract-cv');

@@ -37,7 +37,6 @@ class ChecksService
         $manageCheques = self::manageChecks();
 
         $calendar = self::calendar();
-        // dd($calendar);
 
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
@@ -61,7 +60,7 @@ class ChecksService
                 'completed' => self::countCompleted()
             ],
             // 'hasMissingFields' => $hasMissingField,
-            'distinctMonths' => self::distinctMonths(), //Calendar Data
+            // 'distinctMonths' => self::distinctMonths(), //Calendar Data
             'calendar' => $calendar
         ]);
     }

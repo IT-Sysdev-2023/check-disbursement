@@ -34,7 +34,7 @@ class CvDatabase implements ShouldQueue
      */
     public function handle(): void
     {
-        $tables = $this->database->load('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
+        $table = $this->database->load('navHeaderTable', 'navLineTable', 'navCheckPaymentTable', 'businessUnit');
 
         (new CvService())
             ->setConnection(
@@ -44,12 +44,11 @@ class CvDatabase implements ShouldQueue
             ->setDateFilter($this->date)
             ->setUser($this->userId)
             ->storeRecord(
-                $tables->navHeaderTable,
-                $tables->navLineTable?->name,
-                $tables->navCheckPaymentTable?->name,
-                $this->database->company_id
+                $table->navHeaderTable,
+                $table->navLineTable?->name,
+                $table->navCheckPaymentTable?->name,
+                $this->database->business_unit_id,
+                $table->businessUnit->name
             );
-
-
     }
 }

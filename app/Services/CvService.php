@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\CvProgress;
 use App\Http\Resources\CvCheckPaymentResource;
 use App\Jobs\CvServer;
+use App\Models\BusinessUnit;
 use App\Models\Company;
 use App\Models\CvCheckPayment;
 use App\Models\NavHeaderTable;
@@ -40,7 +41,8 @@ class CvService extends NavConnection
         $request->validate([
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
-            'bu' => ['required', 'array', 'min:1']
+            'company' => ['required', 'array', 'min:1'],
+            'bu' => ['required', 'array', 'min:1'],
         ]);
         $date = (object) [
             'start' => $request->start_date,
@@ -48,17 +50,18 @@ class CvService extends NavConnection
         ];
 
         $user = $request->user();
+
         // Get all the Navition Servers
-        $companiesId = Company::whereIn('name', $request->bu)->pluck('id', 'name')->values();
+        $buId = BusinessUnit::whereIn('name', $request->bu)->pluck('id', 'name')->values();
 
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
-            ->withWhereHas('navDatabases', function (Builder $query) use ($companiesId) {
-                $query->whereIn('company_id', $companiesId)
+            ->withWhereHas('navDatabases', function (Builder $query) use ($buId) {
+                $query->whereIn('business_unit_id', $buId)
                     ->with('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
             })
             ->lazy();
         $id = $user->id;
-        
+
         $nav->each(function (NavServer $server) use ($id, $date) {
             $databases = $server->navDatabases; // dont Change this cause it will re-hydrates inside the job(no Filtering on Records will happen)
             CvServer::dispatch($server->id, $id, $date, $databases);
@@ -76,7 +79,8 @@ class CvService extends NavConnection
         ?NavHeaderTable $navHeaderTable,
         ?string $navLineTable,
         ?string $navCheckPaymentTable,
-        int $companyId
+        int $buId,
+        ?string $buName
     ) {
         if (!$navHeaderTable) {
             return $this;
@@ -92,7 +96,11 @@ class CvService extends NavConnection
 
         $total = $headerQuery->count();
 
-        $headerQuery->chunkById(500, function ($chunk) use (&$start, $total, $tableName, $tableId, $lineQuery, $checkPaymentQuery, $companyId) {
+        if ($total === 0) {
+            CvProgress::dispatch("No records found for {$buName}...", $tableName, 0, 0, $this->userId, true);
+        }
+
+        $headerQuery->chunkById(500, function ($chunk) use (&$start, $total, $tableName, $tableId, $lineQuery, $checkPaymentQuery, $buId, $buName) {
 
             DB::beginTransaction();
             try {
@@ -103,9 +111,10 @@ class CvService extends NavConnection
 
                 foreach ($chunk as $item) {
 
-                    CvProgress::dispatch("Generating Cv Header " . $tableName . " in progress.. ", $start, $total, $this->userId);
+                    CvProgress::dispatch("Generating Cv Header " . $buName . " in progress.. ", $tableName, $start, $total, $this->userId);
                     $start++;
 
+                    // Collect CV Lines
                     $headerId = DB::table('cv_headers')->insertGetId([
                         'nav_header_table_id' => $tableId,
                         'cv_no' => $item->{'Check Voucher No_'},
@@ -162,7 +171,7 @@ class CvService extends NavConnection
                             ->map(fn($check) => [
                                 'cv_header_id' => $headerId,
                                 'causer_id' => $this->userId,
-                                'company_id' => $companyId,
+                                'business_unit_id' => $buId,
                                 'check_number' => $check->{'Check Number'},
                                 'check_amount' => $check->{'Check Amount'},
                                 'bank_account_no' => $check->{'Bank Account No_'},
@@ -212,14 +221,28 @@ class CvService extends NavConnection
     public function details(CvCheckPayment $cv)
     {
         return Inertia::render('retrievedRecords/checkDetailsCv', [
-            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks','checkStatus'))
+            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks', 'checkStatus'))
         ]);
     }
 
     public function signatureDetails(CvCheckPayment $cv)
     {
         return Inertia::render('retrievedRecords/checkDetailsCvSignature', [
-            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks','checkStatus'))
+            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks', 'checkStatus'))
         ]);
+    }
+
+    public function businessUnits(Request $request)
+    {
+        $bu = BusinessUnit::query()
+            ->whereHas(
+                'company',
+                fn($q) =>
+                $q->whereIn('name', $request->companies)
+            )
+            ->pluck('name', 'id')
+            ->map(fn($label, $value) => compact('label', 'value'))
+            ->values();
+        return response()->json($bu);
     }
 }

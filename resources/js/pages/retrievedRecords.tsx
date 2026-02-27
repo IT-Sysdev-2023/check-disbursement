@@ -61,7 +61,6 @@ export default function RetrievedRecords({
     pending,
     filter,
     company,
-    distinctMonths,
     counts,
     calendar,
     // hasMissingFields,
@@ -79,11 +78,9 @@ export default function RetrievedRecords({
     };
     calendar: any,
     cheques: InertiaPagination<ChequeType>;
-    distinctMonths: DistinctMonths;
     pending: InertiaPagination<Borrower>;
     company: SelectionType[];
     manageChecks: InertiaPagination<ManageChecks>;
-    // hasMissingFields: boolean;
     auth: Auth;
 }) {
     const [open, setOpen] = useState(false);
@@ -276,10 +273,6 @@ export default function RetrievedRecords({
                         </Box>
                         <TabPanel value="calendar">
                             <Calendar data={calendar} onChangeTab={() => setCurrentTab('cheques')}></Calendar>
-                            {/* <CalendarView
-                                distinctMonths={distinctMonths}
-                                onChangeTab={() => setCurrentTab('cheques')}
-                            /> */}
                         </TabPanel>
                         <TabPanel value="cheques">
                             <TableFilter

@@ -1,9 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
-import { checkVoucher, extractCv } from '@/routes';
-import { Auth, EventType, ProgressState, type BreadcrumbItem } from '@/types';
+import { checkVoucher, extractCv, getBusinessUnits } from '@/routes';
+import {
+    Auth,
+    EventType,
+    ProgressState,
+    SelectionType,
+    type BreadcrumbItem,
+} from '@/types';
 import { Head } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import {
+    Alert,
     Box,
     Button,
     Container,
@@ -39,11 +46,12 @@ export default function CheckVoucher({
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
     const [loading, setLoading] = useState(false);
+    const [businessUnits, setBusinessUnits] = useState<SelectionType[]>([]);
     const [permissionList, setPermissionList] = useState<string[]>([]);
+    const [selectedBu, setSelectedBu] = useState<string[]>([]);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
-        const { percentage, message } = e;
-
+        const { percentage, message, hasNoRecord } = e;
         setLoading(false);
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
@@ -53,6 +61,7 @@ export default function CheckVoucher({
                 progress: percentage,
                 buffer,
                 message,
+                hasNoRecord,
             },
         }));
     });
@@ -75,26 +84,37 @@ export default function CheckVoucher({
             params: {
                 start_date: startDate.format('YYYY-MM-DD'),
                 end_date: endDate.format('YYYY-MM-DD'),
-                bu: permissionList,
+                company: permissionList,
+                bu: selectedBu,
             },
         });
     };
 
-    // const permissions = auth.user?.company_permissions.map((r) => ({label: r.company.name, value: r.company.id}));
-
-    //if Admin show all Permissions
-    // const permissions = auth.user?.roles?.[0]?.name === 'admin' ? auth.user?.roles?.[0]?.permissions?.map((r) => r.name) : usersPermissions;
-    // console.log(role);
-
-    const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
+    const handleChange = async (
+        event: SelectChangeEvent<typeof permissionList>,
+    ) => {
         const {
             target: { value },
         } = event;
-        console.log(event);
-        setPermissionList(
-            // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
+        setPermissionList(typeof value === 'string' ? value.split(',') : value);
+
+        if (value.length < 1) return;
+        const response = await axios.get(getBusinessUnits().url, {
+            params: {
+                companies: value,
+            },
+        });
+
+        setBusinessUnits(response.data);
+    };
+
+    const handleChangeBu = async (
+        event: SelectChangeEvent<typeof permissionList>,
+    ) => {
+        const {
+            target: { value },
+        } = event;
+        setSelectedBu(typeof value === 'string' ? value.split(',') : value);
     };
 
     return (
@@ -166,11 +186,21 @@ export default function CheckVoucher({
                             organized, verified, and transparent with our Check
                             Voucher module
                         </Typography>
-                        <SelectBu
-                            permissions={bu}
-                            selectedPermission={permissionList}
-                            handleChange={handleChange}
-                        />
+                        <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                            <SelectBu
+                                label=" Select Company"
+                                permissions={bu}
+                                selectedPermission={permissionList}
+                                handleChange={handleChange}
+                            />
+                            <SelectBu
+                                isDisabled={permissionList.length < 1}
+                                label=" Select Business Unit"
+                                permissions={businessUnits}
+                                selectedPermission={selectedBu}
+                                handleChange={handleChangeBu}
+                            />
+                        </Box>
                         {Object.keys(progress).length === 0 && (
                             <>
                                 <LocalizationProvider
@@ -217,22 +247,33 @@ export default function CheckVoucher({
                         )}
 
                         {Object.entries(progress).map(([key, item]) => (
-                            <Box key={key} sx={{ mb: 3 }}>
-                                <Typography variant="body2" sx={{ mb: 1 }}>
-                                    {item.message}
-                                </Typography>
-                                <LinearProgress
-                                    variant="buffer"
-                                    value={item.progress}
-                                    valueBuffer={item.buffer}
-                                />
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                >
-                                    {item.progress}%
-                                </Typography>
-                            </Box>
+                            <>
+                                {item.hasNoRecord ? (
+                                    <Alert variant="filled" severity="warning" sx={{ mb: 2 }}>
+                                        {item.message}
+                                    </Alert>
+                                ) : (
+                                    <Box key={key} sx={{ mb: 3 }}>
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ mb: 1 }}
+                                        >
+                                            {item.message}
+                                        </Typography>
+                                        <LinearProgress
+                                            variant="buffer"
+                                            value={item.progress}
+                                            valueBuffer={item.buffer}
+                                        />
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                        >
+                                            {item.progress}%
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </>
                         ))}
                     </Box>
                 </Container>

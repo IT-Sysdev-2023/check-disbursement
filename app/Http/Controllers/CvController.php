@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\BusinessUnit;
+use App\Models\Company;
 use App\Models\CvCheckPayment;
 use App\Services\CvService;
 use Illuminate\Http\Request;
@@ -27,9 +29,14 @@ class CvController extends Controller
         return $this->service->details($id);
     }
 
-     public function signatureDetails(CvCheckPayment $id)
+    public function signatureDetails(CvCheckPayment $id)
     {
         return $this->service->signatureDetails($id);
+    }
+
+    public function businessUnits(Request $request)
+    {
+        return $this->service->businessUnits($request);
     }
 
 

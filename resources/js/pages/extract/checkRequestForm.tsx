@@ -202,6 +202,7 @@ export default function CheckVoucher({
                             services.
                         </Typography>
                         <SelectBu
+                            label='Select Business Unit'
                             permissions={bu}
                             selectedPermission={permissionList}
                             handleChange={handleChange}

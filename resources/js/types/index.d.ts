@@ -300,6 +300,7 @@ export interface ProgressState {
         progress: number;
         buffer: number;
         message: string;
+        hasNoRecord: boolean
     };
 }
 
@@ -345,6 +346,7 @@ export interface EventType {
     message: string;
     currentIndex: number;
     totalFiles: number;
+    hasNoRecord: boolean
 }
 
 export interface FlashReponse {
