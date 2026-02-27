@@ -72,9 +72,10 @@ class CvCheckPayment extends Model
                     });
             });
         })
-            ->when($filters['bu'] ?? null, function ($query, $bu) {
-                $query->where('company_id', $bu);
-            })
+            // ->when($filters['bu'] ?? null, function ($query, $bu) {
+            //     $query->whereHas( fn($q) => 'company_id', $bu);
+            //     // $query->where('company_id', $bu);
+            // })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('check_date', [$date['start'], $date['end']]);
             })
@@ -96,11 +97,11 @@ class CvCheckPayment extends Model
                 }
 
                 // company relationship
-                if (Schema::hasColumn('companies', $field)) {
-                    return $query->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
-                        ->orderBy("companies.$field", $direction)
-                        ->select('cv_check_payments.*');
-                }
+                // if (Schema::hasColumn('companies', $field)) {
+                //     return $query->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
+                //         ->orderBy("companies.$field", $direction)
+                //         ->select('cv_check_payments.*');
+                // }
 
             });
     }
@@ -111,7 +112,7 @@ class CvCheckPayment extends Model
             'cv_check_payments.id as cheque_id',
             DB::raw('CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END as check_number'),
             'cv_check_payments.check_date',
-            'companies.name as company_name',
+            'business_units.name as company_name',
             'check_amount as amount',
             'cv_check_payments.payee',
             'tagged_at',
@@ -119,7 +120,8 @@ class CvCheckPayment extends Model
             DB::raw("'cv' as type"),
             'cv_check_payments.created_at'
         )
-            ->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
+            ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
+            // ->join('companies', 'companies.id', '=', 'business_units.company_id')
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cv_check_payments.tag_location_id');
     }
@@ -185,9 +187,9 @@ class CvCheckPayment extends Model
     //     return $this->hasOne(AssignedCheckNumber::class);
     // }
 
-    public function company()
+    public function businessUnit()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(BusinessUnit::class);
     }
 
 

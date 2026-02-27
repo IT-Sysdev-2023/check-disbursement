@@ -179,7 +179,6 @@ class ChecksService
         $cvQuery = CvCheckPayment::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');
-
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');
@@ -220,14 +219,14 @@ class ChecksService
         //         );
 
         $cv = CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
-                ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-                ->doesntHave('checkStatus')
-                ->groupBy('cv_headers.cv_date')
-                ->get()
-                ->groupBy(
-                    fn($date) =>
-                    Date::parse($date->cv_date)->format('Y-m')
-                );
+            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+            ->doesntHave('checkStatus')
+            ->groupBy('cv_headers.cv_date')
+            ->get()
+            ->groupBy(
+                fn($date) =>
+                Date::parse($date->cv_date)->format('Y-m')
+            );
 
         return $cv;
     }

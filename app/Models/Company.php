@@ -11,4 +11,8 @@ class Company extends Model
     {
         return $this->hasMany(BusinessUnit::class);
     }
+
+    public function companyPermissions(){
+        return $this->hasMany(CompanyPermission::class);
+    }
 }

@@ -49,7 +49,7 @@ class Crf extends Model
     protected function getCompany(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->company?->name,
+            get: fn() => $this->businessUnit?->name,
         );
     }
 
@@ -97,7 +97,7 @@ class Crf extends Model
             'crfs.id as cheque_id',
             'ck_no as check_number',
             'resolved_check_date as check_date',
-            'companies.name as company_name',
+            'business_units.name as company_name',
             'crfs.amount',
             'paid_to as payee',
             'tagged_at',
@@ -105,7 +105,7 @@ class Crf extends Model
             DB::raw("'crf' as type"),
             'crfs.created_at'
         )
-            ->join('companies', 'companies.id', '=', 'crfs.company_id')
+              ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
             ->leftJoin('tag_locations', 'tag_locations.id', '=', 'crfs.tag_location_id');
     }
     public function scopeScanRecords(Builder $builder)
@@ -143,8 +143,8 @@ class Crf extends Model
         return $this->morphOne(CheckStatus::class, 'checkable');
     }
 
-    public function company()
+    public function businessUnit()
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(BusinessUnit::class);
     }
 }

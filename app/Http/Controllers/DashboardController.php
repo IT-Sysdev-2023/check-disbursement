@@ -16,7 +16,7 @@ class DashboardController extends Controller
     {
         $cvMax = Date::parse(CvCheckPayment::max('created_at'))->format('Y-m-d');
         $cv = CvCheckPayment::
-            with('cvHeader', 'company')
+            with('cvHeader', 'businessUnit')
             ->whereDate('created_at', $cvMax)
             ->paginate(5)
             ->withQueryString()

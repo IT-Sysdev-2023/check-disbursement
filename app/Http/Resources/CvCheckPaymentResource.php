@@ -51,7 +51,7 @@ class CvCheckPaymentResource extends JsonResource
             'location' => $this->tagLocation?->location,
             'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
             'cvNo' => $this->cvHeader?->cv_no,
-            'company' => $this->company->name,
+            'company' => $this->businessUnit->name,
 
             'cvHeader' => new CvHeaderResource($this->whenLoaded('cvHeader')),
             'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
