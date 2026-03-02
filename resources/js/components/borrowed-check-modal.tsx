@@ -3,13 +3,27 @@ import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { borrowCheck, borrowerNames } from '@/routes';
 import { FlashReponse, SelectionType } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { Grid, SelectChangeEvent, TextField, Typography } from '@mui/material';
+import { Grid, SelectChangeEvent, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 
+const reasons = [
+    {
+        value: 'Reason for borrowing 1',
+        label: 'Reason for borrowing 1',
+    },
+    {
+        value: 'Reason for borrowing 2',
+        label: 'Reason for borrowing 2',
+    },
+    {
+        value: 'Reason for borrowing 3',
+        label: 'Reason for borrowing 3',
+    },
+];
 export default function BorrowedCheckModal({
     cheque,
     open,
@@ -40,7 +54,7 @@ export default function BorrowedCheckModal({
 
         fetchBorrower();
     }, []);
-    
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -71,6 +85,10 @@ export default function BorrowedCheckModal({
 
     const handleChange = (event: SelectChangeEvent) => {
         setData('name', event.target.value);
+    };
+
+    const handleChangeReason = (event: SelectChangeEvent) => {
+        setData('reason', event.target.value);
     };
     return (
         <>
@@ -103,8 +121,16 @@ export default function BorrowedCheckModal({
                                     items={borrowerSelection}
                                 />
                             </Grid>
-
                             <Grid size={{ xs: 12, sm: 12 }}>
+                                <SelectItem
+                                    handleChange={handleChangeReason}
+                                    value={data.reason}
+                                    title="Reason for Borrowing"
+                                    items={reasons}
+                                />
+                            </Grid>
+
+                            {/* <Grid size={{ xs: 12, sm: 12 }}>
                                 <TextField
                                     id="outlined-multiline-static"
                                     label="Reason For Borrowing"
@@ -116,7 +142,7 @@ export default function BorrowedCheckModal({
                                     multiline
                                     fullWidth
                                 />
-                            </Grid>
+                            </Grid> */}
                         </Grid>
                         <Box sx={{ textAlign: 'right', mt: 2 }}>
                             <Button

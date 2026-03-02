@@ -13,7 +13,6 @@ import {
     Borrower,
     ChequeType,
     DateFilterType,
-    DistinctMonths,
     InertiaPagination,
     ManageChecks,
     SelectionType,
@@ -241,6 +240,7 @@ export default function RetrievedRecords({
         setPendingModal(true);
         setPendingId(id);
     };
+ 
 
     const chequeColumns = createChequeColumns(handleStatusChange);
     const pendingColumns = createPendingChequeColumns(handleOnView);
