@@ -43,10 +43,10 @@
         font-weight: bold;
     }
 
-  .form-group {
+    .form-group {
         display: flex;
         /* Aligns label to the top of the box as it grows */
-        align-items: flex-start; 
+        align-items: flex-start;
         margin-bottom: 15px;
     }
 
@@ -54,8 +54,9 @@
         width: 180px;
         font-size: 18px;
         /* Matches the padding of the box to keep text level */
-        padding-top: 12px; 
+        padding-top: 12px;
     }
+
     .form-box {
         flex: 1;
         border: 2px solid #ccc;
@@ -63,12 +64,16 @@
         text-align: center;
         font-size: 20px;
         font-weight: bold;
-        
+
         /* THE DYNAMIC FIXES: */
-        height: auto;           /* Allows the box to grow vertically */
-        min-height: 50px;       /* Minimum size if data is empty */
-        word-wrap: break-word;  /* Prevents long strings from breaking layout */
-        overflow: hidden;       /* Ensures no scrollbars appear on the printout */
+        height: auto;
+        /* Allows the box to grow vertically */
+        min-height: 30px;
+        /* Minimum size if data is empty */
+        word-wrap: break-word;
+        /* Prevents long strings from breaking layout */
+        overflow: hidden;
+        /* Ensures no scrollbars appear on the printout */
     }
 
     .check-list-item {
@@ -87,23 +92,23 @@
     </div>
 
     <div class="info-section">
-    <div class="info-row">
-        <div class="label-fixed">
-            Borrower Name: 
-            <span class="value-bold">{{ $data['borrowedBy'] ?? '-' }}</span>
+        <div class="info-row">
+            <div class="label-fixed">
+                Borrower Name:
+                <span class="value-bold">{{ $data['borrowedBy'] ?? '-' }}</span>
+            </div>
+        </div>
+        <div class="info-row">
+            <div class="label-fixed">
+                Purpose:
+                <span class="value-bold">{{ $data['purpose'] }}</span>
+            </div>
         </div>
     </div>
-    <div class="info-row">
-        <div class="label-fixed">
-            Purpose: 
-            <span class="value-bold">{{ $data['purpose'] }}</span>
-        </div>
-    </div>
-</div>
 
 
     <div class="form-content">
-        
+
         <div class="form-group">
             <div class="form-label">Borrower No. :</div>
             <div class="form-box" style="letter-spacing: 4px;">
@@ -125,21 +130,31 @@
             </div>
         </div>
 
-       <div class="form-group">
-    <div class="form-label">Check Number:</div>
-    <div class="form-box">
-        @if(isset($data['chequeNumbers']) && count($data['chequeNumbers']) > 0)
-            @foreach($data['chequeNumbers'] as $number)
-                <div class="check-list-item">{{ $number }}</div>
-            @endforeach
-        @else
-            {{-- Default placeholders if empty --}}
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
-        @endif
-    </div>
-</div>
+        <div class="form-group">
+            <div class="form-label">Check Number:</div>
+            <div class="form-box">
+                @if (isset($data['chequeNumbers']) && count($data['chequeNumbers']) > 0)
+                    @foreach ($data['chequeNumbers'] as $number)
+                        <div class="check-list-item">{{ $number }}</div>
+                    @endforeach
+                @else
+                    {{-- Default placeholders if empty --}}
+                    <div>-</div>
+                @endif
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-label">Received by:</div>
+            <div class="form-box">
+                {{ $data['borrowedBy'] ?? '-' }}
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-label">Released by:</div>
+            <div class="form-box">
+                {{ auth()->user()->name }}
+            </div>
+        </div>
 
     </div>
 </div>

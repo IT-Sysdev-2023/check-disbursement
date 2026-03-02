@@ -66,6 +66,7 @@ class ScannedRecordsController extends Controller
 
         $dbCheckDate = $check->check_date ?: $check->resolved_check_date;
         $dbAmount = $id->checkable_type == 'crf' ? $check->amount : $check->check_amount;
+        $payee = $id->checkable_type == 'crf' ? $check->paid_to : $check->payee;
 
         // Normalize before comparison
         if ((string) $dbCheckNo !== (string) $validated['checkNumber']) {
@@ -74,15 +75,21 @@ class ScannedRecordsController extends Controller
             ]);
         }
 
+        if (!$dbCheckDate->isSameDay(Date::parse($validated['checkDate']))) {
+            throw ValidationException::withMessages([
+                'checkDate' => 'Check Date mismatch.',
+            ]);
+        }
+
         if ((float) $dbAmount !== (float) $validated['amount']) {
             throw ValidationException::withMessages([
                 'amount' => 'Check amount mismatch.',
             ]);
         }
-
-        if (!$dbCheckDate->isSameDay(Date::parse($validated['checkDate']))) {
+        
+        if ( $payee !== $validated['payee']) {
             throw ValidationException::withMessages([
-                'checkDate' => 'Check Date mismatch.',
+                'payee' => 'Payee mismatch.',
             ]);
         }
 
