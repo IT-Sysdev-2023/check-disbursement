@@ -23,7 +23,7 @@ class ForwardedCheckService
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'company', 'tagLocation']])
+            ->with(['checkable' => ['borrowedCheck', 'businessUnit', 'tagLocation']])
             ->regionalPermission()
             ->where(['status' => 'forwarded', 'received_by' => null])
             ->paginate()
@@ -144,7 +144,7 @@ class ForwardedCheckService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
         $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'company', 'tagLocation']])
+            ->with(['checkable' => ['borrowedCheck', 'businessUnit', 'tagLocation']])
             // ->whereHas('checkable.checkStatus', function ($query) {
             ->where(['status' => 'forwarded'])
             ->whereNotNull('received_by')

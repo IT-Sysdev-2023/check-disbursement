@@ -41,12 +41,12 @@ class StatusService
                 //                 [CvCheckPayment::class, Crf::class],
                 //                 fn($query) => $query->has('checkStatus')
                 //             )
-
+    
                 //         ;
-
+    
                 //     });
                 // } else 
-                
+    
                 if ($tab === 'staled') {
                     $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
                         $q->whereNotNull('approver_id')
@@ -74,20 +74,22 @@ class StatusService
                         $q->whereHasMorph(
                             'checkable',
                             [CvCheckPayment::class, Crf::class],
-                            fn(Builder $q) => $q->when(
+                            fn(Builder $q) =>
+                            $q->when(
                                 auth()->user()->hasRole('regional_officer'),
 
-                                function ($query, $tab) {
+                                function ($query) use ($tab) {
                                 $query->has('checkStatus.checkForwardedStatus')
-                                    ->when($tab === 'released', function ($q) {
+                                    ->when($tab === 'released', function ($q) use ($tab) {
                                         $q->whereRelation('checkStatus.checkForwardedStatus', 'status', 'released');
+                                    }, function ($query) use ($tab) {
+                                        $query->whereRelation('checkStatus', 'status', $tab);
                                     });
                             },
                                 function ($query) use ($tab) {
                                 $query->whereRelation('checkStatus', 'status', $tab);
                             }
                             )
-
                                 ->has('checkStatus')
                         );
                     });
