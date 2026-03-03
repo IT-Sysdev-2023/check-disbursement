@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('nav_server_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('name')->unique();
+            $table->string('name');
             $table->string('module');
             $table->timestamps();
         });
