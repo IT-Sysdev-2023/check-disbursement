@@ -559,7 +559,7 @@ class BusinessUnitSeeder extends Seeder
                 'updated_at' => now(),
             ],
              [
-                'company_id' => 15,
+                'company_id' => 13,
                 'name' => "HEAD OFFICE",
                 'created_at' => now(),
                 'updated_at' => now(),
