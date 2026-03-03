@@ -104,6 +104,13 @@ class CompanySeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'code' => 25,
+                'name' => "AGC",
+                'company' => "Alturas Group of Company",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
         Company::insert($bu);

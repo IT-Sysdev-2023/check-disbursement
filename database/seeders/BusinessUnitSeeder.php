@@ -558,6 +558,12 @@ class BusinessUnitSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+             [
+                'company_id' => 15,
+                'name' => "HEAD OFFICE",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
          BusinessUnit::insert($bu);

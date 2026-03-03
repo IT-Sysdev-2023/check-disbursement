@@ -145,13 +145,13 @@ class CrfHelper
 
       
         $extractedCompany = explode(' ', $this->company);
-        $companyId = Company::whereIn('name', $extractedCompany)->first()->id;
-
+        // $companyId = Company::whereIn('name', $extractedCompany)->first()->id;
+        // $companyId = 
         return [
             'causer_id' => $userId,
             'filename' => $this->filename,
             'crf' => $this->crf,
-            'company_id' => $companyId,
+            'business_unit_id' => 91, // HO
             'company_office' => $this->company,
             'no' => $this->no,
             'crf_location' => $this->location,
@@ -175,8 +175,10 @@ class CrfHelper
                 && !empty($item['crf_location']) && !empty($item['date'])
                 && !empty($item['bank']) && !empty($item['ck_no'])
                 && !empty($item['prepared_by']) && !empty($item['paid_to'])
-                && !empty($item['amount']) && !empty($item['particulars'])) &&
-                (Str::contains($item['company_office'], $bu, ignoreCase: true)); // disable case sensitivity
+                && !empty($item['amount']) && !empty($item['particulars'])) 
+                // &&
+                // (Str::contains($item['company_office'], $bu, ignoreCase: true))
+                ; // disable case sensitivity
         });
     }
 
