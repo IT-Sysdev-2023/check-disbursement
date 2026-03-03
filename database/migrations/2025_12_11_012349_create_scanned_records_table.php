@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['check_no', 'account_no', 'amount']);
+            $table->unique(['check_no', 'payee', 'amount']);
         });
     }
 
