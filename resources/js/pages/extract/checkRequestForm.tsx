@@ -29,9 +29,9 @@ import {
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { Trash } from 'lucide-react';
 import { useState } from 'react';
 import SelectBu from './components/selectBu';
-import { Trash } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -60,7 +60,6 @@ export default function CheckVoucher({
     bu: { label: string; value: number }[];
 }) {
     const [progress, setProgress] = useState<ProgressState>({});
-    // const [loading, setLoading] = useState(false);
     const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
         status: false,
         message: '',
@@ -77,15 +76,14 @@ export default function CheckVoucher({
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
         const { percentage, message } = e;
 
-        // setLoading(false);
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
-
         setProgress((prev) => ({
             ...prev,
             [message]: {
                 progress: percentage,
                 buffer,
                 message,
+                hasNoRecord: false,
             },
         }));
     });
@@ -202,7 +200,7 @@ export default function CheckVoucher({
                             services.
                         </Typography>
                         <SelectBu
-                            label='Select Business Unit'
+                            label="Select Business Unit"
                             permissions={bu}
                             selectedPermission={permissionList}
                             handleChange={handleChange}

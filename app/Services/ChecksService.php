@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\Calendar;
 use App\Http\Controllers\CheckRequestController;
 use App\Http\Resources\ChequeCollection;
 use App\Http\Resources\ChequeResource;
@@ -36,7 +37,7 @@ class ChecksService
 
         $manageCheques = self::manageChecks();
 
-        $calendar = self::calendar();
+        $calendar = Calendar::calendar();
 
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
@@ -59,8 +60,6 @@ class ChecksService
                 'toAssign' => self::countToAssign(),
                 'completed' => self::countCompleted()
             ],
-            // 'hasMissingFields' => $hasMissingField,
-            // 'distinctMonths' => self::distinctMonths(), //Calendar Data
             'calendar' => $calendar
         ]);
     }
@@ -160,7 +159,8 @@ class ChecksService
     {
         $cvQuery = CvCheckPayment::baseColumns()
             ->doesntHave('borrowedCheck')
-            ->whereNotNull('resolved_check_number')->whereNot('check_number');
+            ->whereNotNull('resolved_check_number')
+            ->whereNot('check_number');
 
         $crfQuery = Crf::baseColumns()
             ->doesntHave('borrowedCheck')
@@ -176,6 +176,7 @@ class ChecksService
 
     private static function mergeRecords($filters, bool $hasMissingField)
     {
+        
         $cvQuery = CvCheckPayment::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');
@@ -183,14 +184,15 @@ class ChecksService
             ->filter($filters)
             ->doesntHave('borrowedCheck');
 
-        if ($hasMissingField) {
+        if ($hasMissingField) { //ASSIGNMENT
             $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
-
             $crfQuery->where('resolved_check_date', null);
-        } else {
+        } else { // COMPLETED
             $cvQuery->whereNotNull('resolved_check_number')->whereNot('check_number');
             $crfQuery->whereNotNull('resolved_check_date');
         }
+
+       
 
         $unionQuery = $cvQuery->unionAll($crfQuery);
 
@@ -206,30 +208,7 @@ class ChecksService
             ->withQueryString();
     }
 
-    private static function distinctMonths()
-    {
-        // $crf = Crf::select('cv_headers.cv_date', DB::raw('count(*) as total'))
-        //         ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-        //         ->doesntHave('checkStatus')
-        //         ->groupBy('cv_headers.cv_date')
-        //         ->get()
-        //         ->groupBy(
-        //             fn($date) =>
-        //             Date::parse($date->cv_date)->format('Y-m')
-        //         );
-
-        $cv = CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
-            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-            ->doesntHave('checkStatus')
-            ->groupBy('cv_headers.cv_date')
-            ->get()
-            ->groupBy(
-                fn($date) =>
-                Date::parse($date->cv_date)->format('Y-m')
-            );
-
-        return $cv;
-    }
+    
 
     public function approver(Request $request)
     {
@@ -277,53 +256,5 @@ class ChecksService
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
     }
 
-
-
-
-    private static function calendar()
-    {
-        $data = self::distinctMonths();
-
-        $records = [];
-        foreach ($data as $key => $value) {
-            $date = Date::createFromFormat('Y-m', $key);
-            $records[] = self::transformCalendarData($date, $value);
-        }
-
-        return $records;
-    }
-
-    public static function transformCalendarData($date, $records)
-    {
-        $startDate = (clone $date)->startOfMonth();
-        $endDate = (clone $date)->endOfMonth();
-
-        $totalDay = CarbonPeriod::create($startDate, $endDate);
-
-        $transformers = collect($totalDay)->map(function ($val) use ($records) {
-
-            $findRecord = $records->first(function ($record) use ($val) {
-                return Date::parse($record['cv_date'])->format('Y-m-d') === $val->format('Y-m-d');
-            });
-
-            return ['day' => $val->day, 'totalRecord' => $findRecord ? $findRecord->total : 0, 'isCurrent' => false]; //$val->day === today()->day
-
-        });
-
-        // dd($transformers);
-        $totalDay = $transformers->toArray();
-        $startWeek = $startDate->dayOfWeek;
-
-        for ($i = 0; $i < $startWeek; $i++) {
-            array_unshift($totalDay, ['day' => "", 'holiday' => null, 'isCurrent' => false]);
-        }
-
-        return [
-            'month' => (clone $date)->format('M Y'),
-            'y' => (clone $date)->year,
-            'm' => (clone $date)->month,
-            'days' => array_chunk($totalDay, 7),
-        ];
-
-    }
+    
 }
