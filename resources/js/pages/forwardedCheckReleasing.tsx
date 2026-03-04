@@ -1,4 +1,3 @@
-import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import PdfReader from '@/components/pdf-reader';
 import AppLayout from '@/layouts/app-layout';
@@ -7,7 +6,6 @@ import {
     Crf,
     Cv,
     DateFilterType,
-    FlashReponse,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
@@ -57,8 +55,6 @@ export default function ForwardedCheckReleasing({
     );
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
-
-    const notifications = useNotifications();
 
     const { setData, post, processing, errors, reset } = useForm({
         reason: '',
@@ -110,15 +106,11 @@ export default function ForwardedCheckReleasing({
             post(cancelForwarded(checkStatusId).url, {
                 preserveScroll: true,
                 preserveState: true,
-                onSuccess: ({ props }) => {
-                    const m = props.flash as FlashReponse;
+                onSuccess: () => {
                     reset();
                     setOpen(false);
 
-                    notifications.show(m.message, {
-                        severity: 'error',
-                        autoHideDuration: 3000,
-                    });
+                  
                 },
             });
     };

@@ -16,13 +16,12 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { generateReport } from '@/routes';
 import { BreadcrumbItem, SelectionType } from '@/types';
-import { Head, router, useForm, usePage } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { ChangeEvent, ReactNode, useEffect } from 'react';
 import PermissionSelection from '../admin/components/permissionSelection';
-import useNotifications from '@/components/notifications/useNotifications';
 
 const SectionCard = ({
     title,
@@ -87,7 +86,7 @@ export default function EmployeeReportFilters({
     location: SelectionType[];
     bu: SelectionType[];
 }) {
-    const { data, setData, post, processing, errors, transform, reset } =
+    const { data, setData, post, errors, reset } =
         useForm({
             bu: [] as string[],
             borrower: [] as string[],
@@ -119,22 +118,7 @@ export default function EmployeeReportFilters({
         if (CRF_COLUMNS.has(label)) return 'success.main';
         return 'text.primary';
     };
-
-     const notifications = useNotifications();
     
-        const { flash } = usePage().props as {
-            flash?: { status?: boolean; message?: string };
-        };
-    
-    useEffect(() => {
-        if (flash?.message) {
-            notifications.show(flash.message, {
-                severity: flash?.status ? 'success' : 'error',
-                autoHideDuration: 3000,
-            });
-        }
-    }, [flash, notifications]);
-
     useEffect(() => {
         router.reload({
             data: {
@@ -148,12 +132,7 @@ export default function EmployeeReportFilters({
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {
-                // const m = page.props.flash as FlashReponse;
-
                 reset();
-            },
-            onError: (e) => {
-                console.log(e);
             },
         });
     };

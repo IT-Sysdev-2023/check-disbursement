@@ -177,14 +177,9 @@ export default function RetrievedRecords({
     //             onStart: () => {
     //                 setOpenProgress(true);
     //             },
-    //             onSuccess: ({ props }) => {
-    //                 const m = props.flash as FlashReponse;
+    //             onSuccess: () => {
 
     //                 setOpenProgress(false);
-    //                 notifications.show(m.message, {
-    //                     severity: 'error',
-    //                     autoHideDuration: 3000,
-    //                 });
     //             },
     //         },
     //     );

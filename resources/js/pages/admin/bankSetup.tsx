@@ -1,11 +1,9 @@
-import useNotifications from '@/components/notifications/useNotifications';
 import AppLayout from '@/layouts/app-layout';
 import { modalStyle } from '@/lib/modalStyle';
 import { checkVoucher, storeBank } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
-import { useEffect } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -19,19 +17,6 @@ export default function BankSetup() {
         acronym: '',
         bank: '',
     });
-
-    const notifications = useNotifications();
-    const { flash } = usePage().props as {
-        flash?: { status?: boolean; message?: string };
-    };
-    useEffect(() => {
-        if (flash?.message) {
-            notifications.show(flash.message, {
-                severity: flash?.status ? 'success' : 'error',
-                autoHideDuration: 3000,
-            });
-        }
-    }, [flash, notifications]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

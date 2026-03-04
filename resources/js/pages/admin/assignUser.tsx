@@ -1,7 +1,6 @@
-import useNotifications from '@/components/notifications/useNotifications';
 import AppLayout from '@/layouts/app-layout';
 import { assignPermissions, permissions, users } from '@/routes';
-import { BreadcrumbItem, FlashReponse, SelectionType, User } from '@/types';
+import { BreadcrumbItem, SelectionType, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Button, SelectChangeEvent } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -93,8 +92,6 @@ export default function AssignUser({ user }: { user: { data: User } }) {
         );
     };
 
-    const notifications = useNotifications();
-
     const onSave = () => {
         router.post(
             assignPermissions(),
@@ -106,15 +103,6 @@ export default function AssignUser({ user }: { user: { data: User } }) {
             },
             {
                 preserveScroll: true,
-                onSuccess: (page) => {
-                    const m = page.props.flash as FlashReponse;
-                    if (m?.message) {
-                        notifications.show(m.message, {
-                            severity: m?.status ? 'success' : 'error',
-                            autoHideDuration: 3000,
-                        });
-                    }
-                },
             },
         );
     };

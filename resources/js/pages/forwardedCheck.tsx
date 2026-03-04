@@ -1,4 +1,3 @@
-import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
@@ -7,7 +6,6 @@ import {
     Crf,
     Cv,
     DateFilterType,
-    FlashReponse,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
@@ -44,7 +42,6 @@ export default function ForwardedCheck({
     const [openModal, setOpenModal] = useState(false);
     const [selectedReceiver, setselectedReceiver] = useState('0');
     const [checkStatusId, setCheckStatusId] = useState<number>();
-    const notifications = useNotifications();
 
     const handleStatusChange = (
         checkStatusId: number,
@@ -67,14 +64,9 @@ export default function ForwardedCheck({
                 {},
                 {
                     preserveScroll: true,
-                    onSuccess: ({ props }) => {
-                        const m = props.flash as FlashReponse;
-
+                    onSuccess: () => {
                         setOpenModal(false);
-                        notifications.show(m.message, {
-                            severity: 'error',
-                            autoHideDuration: 3000,
-                        });
+                        
                     },
                 },
             );

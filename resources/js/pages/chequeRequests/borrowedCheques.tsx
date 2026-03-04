@@ -1,4 +1,3 @@
-import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import AppLayout from '@/layouts/app-layout';
@@ -11,12 +10,12 @@ import {
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Box, Button } from '@mui/material';
 import { GridRowId, GridRowSelectionModel } from '@mui/x-data-grid';
 import axios from 'axios';
 import { Handshake, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import OnlySelectionModal from '../dashboard/components/onlySelectionModal';
 import TableDataGrid from '../dashboard/components/TableDataGrid';
 import { createRequestsChequeColumns } from './components/columns';
@@ -54,19 +53,6 @@ export default function BorrowedCheques({
         setOpen(true);
         setApprover(data);
     };
-
-    const notifications = useNotifications();
-    const { flash } = usePage().props as {
-        flash?: { status?: boolean; message?: string };
-    };
-    useEffect(() => {
-        if (flash?.message) {
-            notifications.show(flash.message, {
-                severity: flash?.status ? 'success' : 'error',
-                autoHideDuration: 3000,
-            });
-        }
-    }, [flash, notifications]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

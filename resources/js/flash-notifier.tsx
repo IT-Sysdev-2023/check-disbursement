@@ -14,7 +14,7 @@ export default function FlashNotifier() {
             severity: flash.status ? 'success' : 'error',
             autoHideDuration: 3000,
         });
-    }, [flash?.message, flash?.status]);
+    }, [flash?.message, flash?.status, notifications]);
 
     return null;
 }
