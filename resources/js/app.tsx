@@ -32,34 +32,16 @@ createInertiaApp({
         ),
     setup({ el, App, props }) {
         const root = createRoot(el);
-
-        // const defaultTheme = createTheme({
-        //     colorSchemes: { light: true, dark: true },
-        //     cssVariables: {
-        //         colorSchemeSelector: 'data-mui-color-scheme',
-        //     },
-        //     components: {
-        //         ...dataGridCustomizations,
-        //         ...formInputCustomizations,
-        //     },
-        //     typography: {
-        //       fontFamily: 'Roboto'
-        //     }
-        // });
-
         const themeComponents = {
             ...dataGridCustomizations,
             ...formInputCustomizations,
-            // ...datePickersCustomizations,
         };
 
         root.render(
-            // <ThemeProvider theme={defaultTheme}>
             <AppTheme themeComponents={themeComponents}>
                 <CssBaseline />
                 <NotificationsProvider>
                     <DialogsProvider>
-                        {/* <FlashBridge /> */}
                         <App {...props} />
                     </DialogsProvider>
                 </NotificationsProvider>
@@ -73,23 +55,3 @@ createInertiaApp({
 
 // This will set light / dark mode on load...
 initializeTheme(); 
-
-// function FlashBridge() {
-//     const { flash } = usePage().props as {
-//         flash?: { status?: boolean; message?: string };
-//     };
-
-//     const notifications = useNotifications();
-
-//     React.useEffect(() => {
-//         if (!flash?.message) return;
-
-//         notifications.show(flash.message, {
-//             severity: flash.status ? 'success' : 'error',
-//             autoHideDuration: 3000,
-//             key: `flash-${Date.now()}`,
-//         });
-//     }, [flash?.message, flash?.status, notifications]);
-
-//     return null;
-// }

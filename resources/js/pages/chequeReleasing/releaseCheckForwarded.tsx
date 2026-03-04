@@ -1,20 +1,17 @@
+import AutocompleteUser from '@/components/autocomplete-user';
 import AppLayout from '@/layouts/app-layout';
 import { checkReleasing, storeReleaseCheckForwarded } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import {
-    Autocomplete,
     Box,
     Button,
-    CircularProgress,
     FormControl,
     FormHelperText,
-    TextField,
     Typography,
 } from '@mui/material';
-import axios from 'axios';
 import { CloudUploadIcon } from 'lucide-react';
-import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, SyntheticEvent, useRef } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -55,7 +52,7 @@ export default function ReleaseCheckForwarded({
 
     const sigPadRef = useRef<SignatureCanvas>(null);
 
-    const handleTextChange = (_: any, name: { label: string; id: string }) => {
+    const handleTextChange = (_: SyntheticEvent, name: Option) => {
         setData('receiversName', name.label);
     };
 
@@ -97,50 +94,6 @@ export default function ReleaseCheckForwarded({
         });
     };
 
-    const [options, setOptions] = useState<Option[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [inputValue, setInputValue] = useState('');
-
-    useEffect(() => {
-        if (!inputValue) {
-            setOptions([]);
-            return;
-        }
-
-        const controller = new AbortController();
-        const debounce = setTimeout(async () => {
-            try {
-                setLoading(true);
-
-                const response = await axios.get(
-                    'http://172.16.161.34/api/brs/filter/hrms/employee/name',
-                    {
-                        params: { q: inputValue }, // use one param only
-                        signal: controller.signal,
-                    },
-                );
-
-                const employees = response.data?.data?.employee ?? [];
-                const formatted = employees.map((item: any) => ({
-                    id: item.employee_id,
-                    label: item.employee_name,
-                }));
-
-                setOptions(formatted);
-            } catch (error: any) {
-                if (error.name !== 'CanceledError') {
-                    console.error(error);
-                }
-            } finally {
-                setLoading(false);
-            }
-        }, 400); // debounce time
-
-        return () => {
-            controller.abort(); // cancel previous request
-            clearTimeout(debounce);
-        };
-    }, [inputValue]);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Release Check" />
@@ -172,48 +125,7 @@ export default function ReleaseCheckForwarded({
                             alignItems: 'center',
                         }}
                     >
-                        {/* Text Field */}
-
-                        {/* <TextField
-                            label="Receivers Name"
-                            variant="outlined"
-                            value={data.receiversName}
-                            onChange={handleTextChange}
-                            error={!!errors.receiversName}
-                            helperText={errors.receiversName ?? ' '}
-                        /> */}
-                        <Autocomplete
-                            disableClearable
-                            sx={{ width: 300 }}
-                            options={options}
-                            loading={loading}
-                            filterOptions={(x) => x} // disable local filtering
-                            getOptionLabel={(option) => option.label}
-                            isOptionEqualToValue={(option, value) =>
-                                option.id === value.id
-                            }
-                            onInputChange={(_, value) => setInputValue(value)}
-                            onChange={handleTextChange}
-                            renderInput={(params) => (
-                                <TextField
-                                    {...params}
-                                    label="Users"
-                                    InputProps={{
-                                        ...params.InputProps,
-                                        endAdornment: (
-                                            <>
-                                                {loading && (
-                                                    <CircularProgress
-                                                        size={20}
-                                                    />
-                                                )}
-                                                {params.InputProps.endAdornment}
-                                            </>
-                                        ),
-                                    }}
-                                />
-                            )}
-                        />
+                        <AutocompleteUser handleTextChange={handleTextChange} />
 
                         {/* File Upload */}
                         <FormControl error={!!errors.file}>

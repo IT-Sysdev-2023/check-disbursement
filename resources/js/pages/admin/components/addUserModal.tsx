@@ -1,12 +1,18 @@
-import useNotifications from '@/components/notifications/useNotifications';
+import AutocompleteUser from '@/components/autocomplete-user';
 import { modalStyle } from '@/lib/modalStyle';
 import { storeUser } from '@/routes';
-import { useForm, usePage } from '@inertiajs/react';
-import { Button, Grid, TextField } from '@mui/material';
+import { Option } from '@/types';
+import { useForm } from '@inertiajs/react';
+import {
+    Button,
+    Grid,
+    TextField,
+} from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import { useEffect } from 'react';
+import { SyntheticEvent } from 'react';
+
 
 export default function AddUserModal({
     open,
@@ -21,20 +27,7 @@ export default function AddUserModal({
         password: '',
         password_confirmation: '',
     });
-    const notifications = useNotifications();
 
-    const { flash } = usePage().props as {
-        flash?: { status?: boolean; message?: string };
-    };
-
-    useEffect(() => {
-        if (flash?.message) {
-            notifications.show(flash.message, {
-                severity: flash?.status ? 'success' : 'error',
-                autoHideDuration: 3000,
-            });
-        }
-    }, [flash, notifications]);
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (data.password !== data.password_confirmation) {
@@ -48,6 +41,10 @@ export default function AddUserModal({
                 onClose();
             },
         });
+    };
+
+    const handleTextChange = (_: SyntheticEvent, name: Option) => {
+        setData('name', name.label);
     };
     return (
         <div>
@@ -73,17 +70,7 @@ export default function AddUserModal({
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
                             <Grid size={{ xs: 12, sm: 12 }}>
-                                <TextField
-                                    id="outlined-multiline-static"
-                                    label="Name"
-                                    value={data.name}
-                                    onChange={(e) =>
-                                        setData('name', e.target.value)
-                                    }
-                                    error={!!errors.name}
-                                    helperText={errors.name}
-                                    fullWidth
-                                />
+                                <AutocompleteUser handleTextChange={handleTextChange}/>
                             </Grid>
 
                             <Grid size={{ xs: 12, sm: 12 }}>

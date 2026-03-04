@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('crfs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('filename');
             $table->string('crf')->nullable();
             $table->string('company_office');

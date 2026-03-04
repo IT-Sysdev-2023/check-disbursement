@@ -293,7 +293,12 @@ export type SelectionModelType = {
 export type DistinctMonths = Record<
     string,
     { cv_date: string; total: number }[]
->;
+    >;
+
+export interface Option {
+    id: number;
+    label: string;
+}
 
 export interface ProgressState {
     [message: string]: {
