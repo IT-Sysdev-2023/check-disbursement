@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\CvProgress;
 use App\Http\Resources\CvCheckPaymentResource;
+use App\Jobs\CvDatabase;
 use App\Jobs\CvServer;
 use App\Models\BusinessUnit;
 use App\Models\Company;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Bus;
 use Inertia\Inertia;
 class CvService extends NavConnection
 {
@@ -60,11 +62,22 @@ class CvService extends NavConnection
                     ->with('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
             })
             ->lazy();
+
         $id = $user->id;
 
         $nav->each(function (NavServer $server) use ($id, $date) {
-            $databases = $server->navDatabases; // dont Change this cause it will re-hydrates inside the job(no Filtering on Records will happen)
-            CvServer::dispatch($server->id, $id, $date, $databases);
+
+            $jobs = [];
+            foreach ($server->navDatabases as $db) {
+                $jobs[] = new CvDatabase($server->id, $id, $date, $db->id);
+            }
+
+            Bus::batch($jobs)
+                ->name("CV Import Server {$server->id}")
+                ->then(function () use ($id) {
+                    CvProgress::dispatch("Data Retrieval Completed", '', 0, 0, $id, false, true);
+                })
+                ->dispatch();
         });
 
     }

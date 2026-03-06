@@ -8,6 +8,7 @@ use App\Models\NavServer;
 use App\Models\User;
 use App\Services\CvService;
 use App\Services\NavConnection;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Date;
@@ -16,16 +17,16 @@ use Log;
 
 class CvDatabase implements ShouldQueue
 {
-    use Queueable;
+    use Batchable, Queueable;
 
     /**
      * Create a new job instance.
      */
     public function __construct(
-        public $server,
+        public int $serverId,
         public int $userId,
         public object $date,
-        public NavDatabase $database
+        public int $dbId
     ) {
     }
 
@@ -34,12 +35,18 @@ class CvDatabase implements ShouldQueue
      */
     public function handle(): void
     {
-        $table = $this->database->load('navHeaderTable', 'navLineTable', 'navCheckPaymentTable', 'businessUnit');
+
+        if ($this->batch()?->cancelled()) {
+            return;
+        }
+
+        $server = NavServer::findOrFail($this->serverId);
+        $table = NavDatabase::findOrFail($this->dbId)->load('navHeaderTable', 'navLineTable', 'navCheckPaymentTable', 'businessUnit');
 
         (new CvService())
             ->setConnection(
-                $this->server,
-                $this->database->name
+                $server,
+                $table->name
             )
             ->setDateFilter($this->date)
             ->setUser($this->userId)
@@ -47,7 +54,7 @@ class CvDatabase implements ShouldQueue
                 $table->navHeaderTable,
                 $table->navLineTable?->name,
                 $table->navCheckPaymentTable?->name,
-                $this->database->business_unit_id,
+                $table->business_unit_id,
                 $table->businessUnit->name
             );
     }

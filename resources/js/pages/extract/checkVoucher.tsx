@@ -51,7 +51,7 @@ export default function CheckVoucher({
     const [selectedBu, setSelectedBu] = useState<string[]>([]);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
-        const { percentage, message, hasNoRecord } = e;
+        const { percentage, message, hasNoRecord, isFinished } = e;
         setLoading(false);
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
@@ -62,6 +62,7 @@ export default function CheckVoucher({
                 buffer,
                 message,
                 hasNoRecord,
+                isFinished,
             },
         }));
     });
@@ -247,13 +248,25 @@ export default function CheckVoucher({
                         )}
 
                         {Object.entries(progress).map(([key, item]) => (
-                            <>
+                            <Box key={key} sx={{ mb: 3 }}>
                                 {item.hasNoRecord ? (
-                                    <Alert variant="filled" severity="warning" sx={{ mb: 2 }}>
+                                    <Alert
+                                        variant="filled"
+                                        severity="warning"
+                                        sx={{ mb: 2 }}
+                                    >
+                                        {item.message}
+                                    </Alert>
+                                ) : item.isFinished ? (
+                                    <Alert
+                                        variant="filled"
+                                        severity="success"
+                                        sx={{ mb: 2 }}
+                                    >
                                         {item.message}
                                     </Alert>
                                 ) : (
-                                    <Box key={key} sx={{ mb: 3 }}>
+                                    <>
                                         <Typography
                                             variant="body2"
                                             sx={{ mb: 1 }}
@@ -271,9 +284,9 @@ export default function CheckVoucher({
                                         >
                                             {item.progress}%
                                         </Typography>
-                                    </Box>
+                                    </>
                                 )}
-                            </>
+                            </Box>
                         ))}
                     </Box>
                 </Container>
