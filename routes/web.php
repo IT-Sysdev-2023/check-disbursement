@@ -161,7 +161,7 @@ Route::get('/test', function () {
     $start = "2025-11-03";
     $end = "2025-11-04";
     //     $tables = DB::connection('sqlsrvCaf')
-//     ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+    // ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
 
     // dd($tables);
 
@@ -169,7 +169,7 @@ Route::get('/test', function () {
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
         // ->table('SON-OK AGRI FARM$CV Check Payment')
-        ->table('PLANNING & CONSTRUCTION ACCTG$CV Check Payment')
+        ->table('ALTURAS GLASS SERVICE$CV Check Payment')
 
         // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
         // ->where('Check Class Location', '==',  '!=', '')

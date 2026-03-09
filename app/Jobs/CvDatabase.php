@@ -7,6 +7,7 @@ use App\Models\NavDatabase;
 use App\Models\NavServer;
 use App\Models\User;
 use App\Services\CvService;
+use App\Services\GenerateCvService;
 use App\Services\NavConnection;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -43,7 +44,7 @@ class CvDatabase implements ShouldQueue
         $server = NavServer::findOrFail($this->serverId);
         $table = NavDatabase::findOrFail($this->dbId)->load('navHeaderTable', 'navLineTable', 'navCheckPaymentTable', 'businessUnit');
 
-        (new CvService())
+        (new GenerateCvService())
             ->setConnection(
                 $server,
                 $table->name

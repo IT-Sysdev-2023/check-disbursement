@@ -61,7 +61,7 @@ export default function CheckVoucher({
                 progress: percentage,
                 buffer,
                 message,
-                status
+                status,
             },
         }));
     });
@@ -248,7 +248,7 @@ export default function CheckVoucher({
 
                         {Object.entries(progress).map(([key, item]) => (
                             <Box key={key} sx={{ mb: 3 }}>
-                                {item.status == 'no_record' ? (
+                                {item.status == 'no_record' || item.status == 'connection_error' ? (
                                     <Alert
                                         variant="filled"
                                         severity="warning"
