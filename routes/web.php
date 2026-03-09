@@ -160,10 +160,10 @@ Route::get('/test', function () {
 
     $start = "2025-11-03";
     $end = "2025-11-04";
-    //     $tables = DB::connection('sqlsrvCaf')
-    // ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+        $tables = DB::connection('sqlsrvCaf')
+    ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
 
-    // dd($tables);
+    dd($tables);
 
 
     $con = DB::connection('sqlsrvCaf')

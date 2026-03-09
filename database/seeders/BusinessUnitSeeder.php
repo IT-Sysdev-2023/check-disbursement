@@ -206,7 +206,7 @@ class BusinessUnitSeeder extends Seeder
             ],
              [
                 'company_id' => 1,
-                'name' => "PANGLAO FR",
+                'name' => "PANGLAO FIXRITE",
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -398,7 +398,7 @@ class BusinessUnitSeeder extends Seeder
             ],
              [
                 'company_id' => 1,
-                'name' => "HF",
+                'name' => "ASC HOME AND FASHION",
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -416,13 +416,13 @@ class BusinessUnitSeeder extends Seeder
             ],
              [
                 'company_id' => 2,
-                'name' => "COMMI COMPOUND",
+                'name' => "COMMISSARY COMPOUND",
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
              [
                 'company_id' => 2,
-                'name' => "COMM MAIN",
+                'name' => "COMMISSARY MAIN",
                 'created_at' => now(),
                 'updated_at' => now(),
             ],

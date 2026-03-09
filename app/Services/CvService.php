@@ -87,9 +87,6 @@ class CvService
 
     }
 
-   
-
-
     public function details(CvCheckPayment $cv)
     {
         return Inertia::render('retrievedRecords/checkDetailsCv', [
