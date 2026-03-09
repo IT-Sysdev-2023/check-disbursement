@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enums\ProgressStatus;
 use App\Helpers\NumberHelper;
 use App\Models\User;
 use Illuminate\Broadcasting\Channel;
@@ -19,7 +20,7 @@ class CvProgress implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(protected string $message, protected string $tableName,  protected int $currentRow, protected int $totalRows, protected int $userId, protected bool $hasNoRecord = false, protected bool $isFinished = false )
+    public function __construct(protected int $userId, protected string $message, protected ProgressStatus $status , protected string $tableName = '',  protected int $currentRow = 0, protected int $totalRows = 0)
     {
         //
         $this->percentage = NumberHelper::percentage($currentRow, $totalRows);
@@ -45,8 +46,9 @@ class CvProgress implements ShouldBroadcast
             'percentage' => $this->percentage,
             'currentRow' => $this->currentRow,
             'totalRows' => $this->totalRows,
-            'isFinished' => $this->isFinished,
-            'hasNoRecord' => $this->hasNoRecord
+            'status' => $this->status->value
+            // 'isFinished' => $this->isFinished,
+            // 'hasNoRecord' => $this->hasNoRecord
         ];
     }
 }

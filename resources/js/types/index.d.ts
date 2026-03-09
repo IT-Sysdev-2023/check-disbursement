@@ -214,7 +214,7 @@ export interface CheckStatus {
     id: number;
     status: 'released' | 'forwarded' | 'deposited' | 'cancelled' | 'staled';
     checkableType: 'CRF' | 'CV';
-    cancelledReason: string,
+    cancelledReason: string;
     receiversName?: string | null;
     image: string | null;
     signature: string | null;
@@ -293,7 +293,7 @@ export type SelectionModelType = {
 export type DistinctMonths = Record<
     string,
     { cv_date: string; total: number }[]
-    >;
+>;
 
 export interface Option {
     id: number;
@@ -305,8 +305,7 @@ export interface ProgressState {
         progress: number;
         buffer: number;
         message: string;
-        hasNoRecord: boolean;
-        isFinished: boolean
+        status: string;
     };
 }
 
@@ -352,8 +351,7 @@ export interface EventType {
     message: string;
     currentIndex: number;
     totalFiles: number;
-    hasNoRecord: boolean;
-    isFinished: boolean;
+    status: string;
 }
 
 export interface FlashReponse {

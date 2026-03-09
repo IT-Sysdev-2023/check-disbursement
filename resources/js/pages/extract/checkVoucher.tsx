@@ -51,7 +51,7 @@ export default function CheckVoucher({
     const [selectedBu, setSelectedBu] = useState<string[]>([]);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
-        const { percentage, message, hasNoRecord, isFinished } = e;
+        const { percentage, message, status } = e;
         setLoading(false);
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
@@ -61,8 +61,7 @@ export default function CheckVoucher({
                 progress: percentage,
                 buffer,
                 message,
-                hasNoRecord,
-                isFinished,
+                status
             },
         }));
     });
@@ -249,7 +248,7 @@ export default function CheckVoucher({
 
                         {Object.entries(progress).map(([key, item]) => (
                             <Box key={key} sx={{ mb: 3 }}>
-                                {item.hasNoRecord ? (
+                                {item.status == 'no_record' ? (
                                     <Alert
                                         variant="filled"
                                         severity="warning"
@@ -257,7 +256,7 @@ export default function CheckVoucher({
                                     >
                                         {item.message}
                                     </Alert>
-                                ) : item.isFinished ? (
+                                ) : item.status == 'finished' ? (
                                     <Alert
                                         variant="filled"
                                         severity="success"
