@@ -159,8 +159,12 @@ class ChecksService
     {
         $cvQuery = CvCheckPayment::baseColumns()
             ->doesntHave('borrowedCheck')
-            ->whereNotNull('resolved_check_number')
-            ->whereNot('check_number');
+            ->where(function ($q) {
+                $q->whereNotNull('resolved_check_number')
+                    ->orWhere('check_number', '!=', 0);
+            });
+        // ->whereNotNull('resolved_check_number')
+        // ->whereNot('check_number');
 
         $crfQuery = Crf::baseColumns()
             ->doesntHave('borrowedCheck')
@@ -176,7 +180,7 @@ class ChecksService
 
     private static function mergeRecords($filters, bool $hasMissingField)
     {
-        
+
         $cvQuery = CvCheckPayment::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');
@@ -188,11 +192,14 @@ class ChecksService
             $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
             $crfQuery->where('resolved_check_date', null);
         } else { // COMPLETED
-            $cvQuery->whereNotNull('resolved_check_number')->whereNot('check_number');
+            $cvQuery->where(function ($q) {
+                $q->whereNotNull('resolved_check_number')
+                    ->orWhere('check_number', '!=', 0);
+            });
             $crfQuery->whereNotNull('resolved_check_date');
         }
 
-       
+
 
         $unionQuery = $cvQuery->unionAll($crfQuery);
 
@@ -208,7 +215,7 @@ class ChecksService
             ->withQueryString();
     }
 
-    
+
 
     public function approver(Request $request)
     {
@@ -256,5 +263,5 @@ class ChecksService
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
     }
 
-    
+
 }

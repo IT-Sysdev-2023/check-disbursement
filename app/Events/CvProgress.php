@@ -46,7 +46,7 @@ class CvProgress implements ShouldBroadcast
             'percentage' => $this->percentage,
             'currentRow' => $this->currentRow,
             'totalRows' => $this->totalRows,
-            'status' => $this->status->value
+            'status' => $this->status
             // 'isFinished' => $this->isFinished,
             // 'hasNoRecord' => $this->hasNoRecord
         ];

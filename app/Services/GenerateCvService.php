@@ -16,13 +16,13 @@ class GenerateCvService extends NavConnection
 
     protected int $userId;
 
-     public function setUser(int $user)
+    public function setUser(int $user)
     {
         $this->userId = $user;
         return $this;
     }
 
-     public function setDateFilter(object $date)
+    public function setDateFilter(object $date)
     {
         $this->dateFilter = $date;
         return $this;
@@ -43,21 +43,9 @@ class GenerateCvService extends NavConnection
         $tableName = $navHeaderTable->name;
         $tableId = $navHeaderTable->id;
 
-        try {
-            $headerQuery = $this->headerConnection($tableName);
-            $lineQuery = $this->lineConnection($navLineTable);
-            $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable);
-        } catch (QueryException $e) {
-            CvProgress::dispatch(
-                $this->userId,
-                "Failed to connect to table {$tableName}: " . $e->getMessage(),
-                ProgressStatus::NoConnection,
-                $tableName,
-            );
-            Log::error("Connection failed for {$tableName}", ['exception' => $e]);
-            return $this;
-        }
-
+        $headerQuery = $this->headerConnection($tableName);
+        $lineQuery = $this->lineConnection($navLineTable);
+        $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable);
 
         $total = $headerQuery->count();
 
@@ -77,7 +65,7 @@ class GenerateCvService extends NavConnection
                 $headers = collect();
                 foreach ($chunk as $item) {
 
-                    CvProgress::dispatch($this->userId, "Generating Cv Header " . $buName . " in progress.. ", ProgressStatus::Processing, $tableName, $start, $total);
+                    CvProgress::dispatch($this->userId, "Generating " . $buName . " in progress.. ", ProgressStatus::Processing, $tableName, $start, $total);
                     $start++;
 
                     $headers->push([

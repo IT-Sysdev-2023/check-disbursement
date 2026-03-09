@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Bus\Batch;
 use Inertia\Inertia;
 use Throwable;
-class CvService 
+class CvService
 {
     /**
      * Create a new class instance.
@@ -57,7 +57,11 @@ class CvService
         $user = $request->user();
 
         // Get all the Navition Servers
-        $buId = BusinessUnit::whereIn('name', $request->bu)->pluck('id', 'name')->values();
+        $buId = BusinessUnit::
+            when(!in_array('All', $request->bu), function ($q) use ($request) {
+                $q->whereIn('name', $request->bu);
+            })
+            ->pluck('id', 'name')->values();
 
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) use ($buId) {
@@ -111,7 +115,11 @@ class CvService
             )
             ->pluck('name', 'id')
             ->map(fn($label, $value) => compact('label', 'value'))
-            ->values();
+            ->values()
+            ->prepend([
+                'label' => 'All',
+                'value' => 'all',
+            ]);
         return response()->json($bu);
     }
 }

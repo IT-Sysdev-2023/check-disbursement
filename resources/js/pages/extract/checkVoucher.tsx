@@ -248,10 +248,18 @@ export default function CheckVoucher({
 
                         {Object.entries(progress).map(([key, item]) => (
                             <Box key={key} sx={{ mb: 3 }}>
-                                {item.status == 'no_record' || item.status == 'connection_error' ? (
+                                {item.status == 'no_record' ? (
                                     <Alert
                                         variant="filled"
                                         severity="warning"
+                                        sx={{ mb: 2 }}
+                                    >
+                                        {item.message}
+                                    </Alert>
+                                ) : item.status == 'connection_error' ? (
+                                    <Alert
+                                        variant="filled"
+                                        severity="error"
                                         sx={{ mb: 2 }}
                                     >
                                         {item.message}
