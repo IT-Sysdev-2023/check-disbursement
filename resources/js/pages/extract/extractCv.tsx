@@ -228,15 +228,17 @@ export default function ExtractCv({
                                         />
                                     </Box>
                                 </LocalizationProvider>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    size="large"
-                                    sx={{ minWidth: 'fit-content' }}
-                                    onClick={simulateDataRetrieval}
-                                >
-                                    Get Data
-                                </Button>
+                                {!loading && (
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        size="large"
+                                        sx={{ minWidth: 'fit-content' }}
+                                        onClick={simulateDataRetrieval}
+                                    >
+                                        Get Data
+                                    </Button>
+                                )}
                             </>
                         )}
                     </Stack>

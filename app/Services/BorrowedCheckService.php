@@ -87,7 +87,8 @@ class BorrowedCheckService
             ->unique()
             ->implode(', ');
 
-        $chequeNumbers = $borrower->pluck('checkable.checkNumber')
+        $chequeNumbers = $borrower
+            ->map(fn($b) => $b->checkable?->checkNumber)
             ->filter()
             ->unique();
 
@@ -109,7 +110,8 @@ class BorrowedCheckService
 
     }
 
-    public function pendingDetails(BorrowedCheck $id){
-         return response()->json(new BorrowedCheckResource($id->load('checkable.tagLocation')));
+    public function pendingDetails(BorrowedCheck $id)
+    {
+        return response()->json(new BorrowedCheckResource($id->load('checkable.tagLocation')));
     }
 }

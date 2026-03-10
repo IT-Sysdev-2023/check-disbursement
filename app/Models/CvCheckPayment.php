@@ -32,7 +32,7 @@ class CvCheckPayment extends Model
     protected function checkNumber(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->check_number ?? $this->resolved_check_number,
+            get: fn($value, $attributes) => $attributes['check_number'] ?? $attributes['resolved_check_number'],
         );
     }
 
