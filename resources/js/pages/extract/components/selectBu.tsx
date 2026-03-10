@@ -1,5 +1,6 @@
 import { SelectionType } from '@/types';
-import { MenuItem } from '@mui/material';
+import CheckIcon from '@mui/icons-material/Check';
+import { ListItemText, MenuItem } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
@@ -31,9 +32,11 @@ export default function SelectBu({
     permissions,
     label,
     placeholder,
+    isAllSelected = false,
     isDisabled = false,
 }: {
     isDisabled?: boolean;
+    isAllSelected?: boolean;
     placeholder?: string;
     label: string;
     permissions: SelectionType[];
@@ -62,24 +65,31 @@ export default function SelectBu({
                     }}
                     MenuProps={MenuProps}
                     inputProps={{ 'aria-label': 'Without label' }}
-                
                 >
                     <MenuItem disabled value="">
                         <em>{placeholder}</em>
                     </MenuItem>
-                    {permissions.map((item) => (
-                        <MenuItem
-                            key={item.value}
-                            value={item.label}
-                            style={getStyles(
-                                item.label,
-                                selectedPermission,
-                                theme,
-                            )}
-                        >
-                            {item.label}
-                        </MenuItem>
-                    ))}
+                    {permissions.map((item) => {
+                        const isSelected =
+                            selectedPermission.indexOf(item.label) > -1;
+                        return (
+                            <MenuItem
+                                key={item.value}
+                                value={item.label}
+                                disabled={isAllSelected && item.label !== 'All'}
+                                style={getStyles(
+                                    item.label,
+                                    selectedPermission,
+                                    theme,
+                                )}
+                            >
+                                <ListItemText primary={item.label} />
+                                {isSelected && (
+                                    <CheckIcon sx={{ fontSize: 16 }} />
+                                )}
+                            </MenuItem>
+                        );
+                    })}
                 </Select>
             </FormControl>
         </div>

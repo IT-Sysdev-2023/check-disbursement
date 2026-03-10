@@ -35,7 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CheckVoucher({
+export default function ExtractCv({
     auth,
     bu,
 }: {
@@ -195,6 +195,7 @@ export default function CheckVoucher({
                             />
                             <SelectBu
                                 isDisabled={permissionList.length < 1}
+                                isAllSelected={selectedBu.includes('All')}
                                 label=" Select Business Unit"
                                 permissions={businessUnits}
                                 selectedPermission={selectedBu}

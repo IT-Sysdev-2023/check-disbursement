@@ -15,7 +15,7 @@ class CrfService
     public function index(Request $request)
     {
         $bu = PermissionService::getCompanyPermissions($request->user());
-        return Inertia::render('extract/checkRequestForm', [
+        return Inertia::render('extract/extractCrf', [
             'bu' => $bu
         ]);
     }

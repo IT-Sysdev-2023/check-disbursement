@@ -52,7 +52,7 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-export default function CheckVoucher({
+export default function ExtractCrf({
     auth,
     bu,
 }: {
@@ -74,7 +74,7 @@ export default function CheckVoucher({
     };
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
-        const { percentage, message } = e;
+        const { percentage, message, status } = e;
 
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
         setProgress((prev) => ({
@@ -83,7 +83,7 @@ export default function CheckVoucher({
                 progress: percentage,
                 buffer,
                 message,
-                hasNoRecord: false,
+                status
             },
         }));
     });

@@ -97,7 +97,6 @@ export default function RetrievedRecords({
         { label: string; value: string }[]
     >([]);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
-    // const [assign, setAssin] = useState(filter.assignment);
     const [pendingId, setPendingId] = useState<number>();
     const [pendingModal, setPendingModal] = useState(false);
 

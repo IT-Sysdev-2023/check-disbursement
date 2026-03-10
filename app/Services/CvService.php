@@ -36,7 +36,7 @@ class CvService
     public function index(User $user)
     {
         $bu = PermissionService::getCompanyPermissions($user);
-        return Inertia::render('extract/checkVoucher', [
+        return Inertia::render('extract/extractCv', [
             'bu' => $bu
         ]);
     }
