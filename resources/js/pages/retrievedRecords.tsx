@@ -62,10 +62,12 @@ export default function RetrievedRecords({
     company,
     counts,
     calendar,
+    businessUnits,
     // hasMissingFields,
     auth,
 }: {
     filter: {
+        selectedCompany: string;
         selectedBu: string;
         search: string;
         date: DateFilterType;
@@ -75,6 +77,7 @@ export default function RetrievedRecords({
         toAssign: string;
         completed: string;
     };
+    businessUnits: SelectionType[],
     calendar: any,
     cheques: InertiaPagination<ChequeType>;
     pending: InertiaPagination<Borrower>;
@@ -272,6 +275,7 @@ export default function RetrievedRecords({
                             <TableFilter
                                 handleChangeCheck={() => null}
                                 company={company}
+                                businessUnits={businessUnits}
                                 filters={filter}
                             >
                                 <Button

@@ -8,6 +8,7 @@ use App\Http\Resources\ChequeCollection;
 use App\Http\Resources\ChequeResource;
 use App\Models\Approver;
 use App\Models\BorrowedCheck;
+use App\Models\BusinessUnit;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
@@ -25,7 +26,7 @@ class ChecksService
 
     public function records(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'tab', 'assignment']);
+        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment']);
 
         $tab = $filters['tab'] ?? 'calendar';
 
@@ -44,7 +45,8 @@ class ChecksService
             'pending' => $waitingForApproval,
             'manageChecks' => new ChequeCollection($manageCheques),
             'filter' => (object) [
-                'selectedBu' => $filters['bu'] ?? '0',
+                'selectedCompany' => $filters['company'] ?? 'all',
+                'selectedBu' => $filters['bu'] ?? 'all',
                 'search' => $filters['search'] ?? '',
                 'date' => $filters['date'] ?? (object) [
                     'start' => null,
@@ -54,8 +56,9 @@ class ChecksService
             ],
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
-                'value' => '0'
+                'value' => 'all'
             ]),
+            'businessUnits' => isset($filters['bu']) ? self::businessUnits($filters['company']) : [],
             'counts' => (object) [
                 'toAssign' => self::countToAssign(),
                 'completed' => self::countCompleted()
@@ -242,6 +245,23 @@ class ChecksService
         $transform = TagLocation::locationSelection();
 
         return response()->json($transform);
+    }
+
+    public static function businessUnits($company)
+    {
+        return BusinessUnit::query()
+            ->whereHas(
+                'company',
+                fn($q) =>
+                $q->where('id', $company)
+            )
+            ->pluck('name', 'id')
+            ->map(fn($label, $value) => compact('label', 'value'))
+            ->values()
+            ->prepend([
+                'label' => 'All',
+                'value' => 'all',
+            ]);
     }
 
     public function setLocation(Request $request)

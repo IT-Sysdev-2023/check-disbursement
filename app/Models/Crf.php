@@ -27,7 +27,7 @@ class Crf extends Model
 
     }
 
-      protected function checkDate(): Attribute
+    protected function checkDate(): Attribute
     {
         return new Attribute(
             get: fn() => $this->check_date ?? $this->resolved_check_date,
@@ -73,7 +73,13 @@ class Crf extends Model
                 'ck_no'
             ], 'LIKE', '%' . $search . '%');
         })
-        ->when($filters['date'] ?? null, function ($query, $date) {
+            ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
+                $query->whereRelation('businessUnit.company', 'id', $filters['company']);
+            })
+            ->when($filters['bu'] ?? null, function ($query, $bu) {
+                $query->where('business_unit_id', $bu);
+            })
+            ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('resolved_check_date', [$date['start'], $date['end']]);
             })
             ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
@@ -105,7 +111,7 @@ class Crf extends Model
             DB::raw("'crf' as type"),
             'crfs.created_at'
         )
-              ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
+            ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
             ->leftJoin('tag_locations', 'tag_locations.id', '=', 'crfs.tag_location_id');
     }
     public function scopeScanRecords(Builder $builder)

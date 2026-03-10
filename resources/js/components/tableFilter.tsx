@@ -1,4 +1,5 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
+import { filterBusinessUnits } from '@/routes';
 import { DateFilterType, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -12,6 +13,7 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PickerValue } from '@mui/x-date-pickers/internals';
+import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
@@ -19,16 +21,23 @@ export default function ({
     company,
     filters,
     children,
+    businessUnits,
 }: {
     company: SelectionType[];
     filters: {
+        selectedCompany: string;
         selectedBu: string;
         date: DateFilterType;
     };
+    businessUnits: SelectionType[];
     children?: React.ReactNode;
     handleChangeCheck?: (value: SelectChangeEvent) => void;
 }) {
-    const [bu, setBu] = useState<string>(filters.selectedBu);
+    const [selectedCompany, setSelectedCompany] = useState<string>(
+        filters.selectedCompany,
+    );
+    const [selectedBu, setSelectedBu] = useState<string>(filters.selectedBu);
+    const [businesUnit, setBusinessUnit] = useState<SelectionType[]>(businessUnits);
     const [startDate, setStartDate] = useState<Dayjs | null>(
         filters.date.start ? dayjs(filters.date.start) : null,
     );
@@ -36,8 +45,28 @@ export default function ({
         filters.date.end ? dayjs(filters.date.end) : null,
     );
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setBu(event.target.value);
+    const handleChange = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedCompany(val);
+
+        const { data } = await axios.get(filterBusinessUnits().url, {
+            params: {
+                company: val,
+            },
+        });
+
+        router.reload({
+            data: {
+                company: event.target.value,
+            },
+        });
+
+        setBusinessUnit(data);
+    };
+
+    const handleChangeBu = (event: SelectChangeEvent) => {
+        setSelectedBu(event.target.value);
+
         router.reload({
             data: {
                 bu: event.target.value,
@@ -93,9 +122,15 @@ export default function ({
             <Stack direction="row" sx={{ gap: 1 }} alignItems="center">
                 <SelectItem
                     handleChange={handleChange}
-                    value={bu}
+                    value={selectedCompany}
                     title="Company"
                     items={company}
+                />
+                <SelectItem
+                    handleChange={handleChangeBu}
+                    value={selectedBu}
+                    title="Business Unit"
+                    items={businesUnit}
                 />
 
                 {children}

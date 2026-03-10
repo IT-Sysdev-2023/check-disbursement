@@ -72,10 +72,13 @@ class CvCheckPayment extends Model
                     });
             });
         })
-            // ->when($filters['bu'] ?? null, function ($query, $bu) {
-            //     $query->whereHas( fn($q) => 'company_id', $bu);
-            //     // $query->where('company_id', $bu);
-            // })
+            ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
+                $query->whereRelation('businessUnit.company', 'id', $filters['company']);
+            })
+            ->when($filters['bu'] ?? null, function ($query, $bu) {
+
+                $query->where('business_unit_id', $bu);
+            })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('check_date', [$date['start'], $date['end']]);
             })
@@ -102,7 +105,7 @@ class CvCheckPayment extends Model
                 //         ->orderBy("companies.$field", $direction)
                 //         ->select('cv_check_payments.*');
                 // }
-
+    
             });
     }
 
