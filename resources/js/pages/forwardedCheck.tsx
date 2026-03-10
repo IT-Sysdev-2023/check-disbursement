@@ -32,6 +32,7 @@ export default function ForwardedCheck({
 }: {
     cheques: InertiaPagination<Cv | Crf>;
     filter: {
+        selectedCompany: string;
         selectedBu: string;
         search: string;
         date: DateFilterType;

@@ -37,6 +37,7 @@ import TableDataGrid from './dashboard/components/TableDataGrid';
 import AssignCdModal from './retrievedRecords/components/assignCdModal';
 import AssignCnModal from './retrievedRecords/components/assignCnModal';
 import AssignScanDetailsModal from './retrievedRecords/components/assignScanDetailsModal';
+import Calendar from './retrievedRecords/components/calendar';
 import {
     createChequeColumns,
     createManageColumns,
@@ -45,7 +46,6 @@ import {
 import PendingDetails from './retrievedRecords/components/pendingDetails';
 import ProgressModal from './retrievedRecords/components/progressModal';
 import ScanDetails from './retrievedRecords/components/scanDetails';
-import Calendar from './retrievedRecords/components/calendar';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -77,8 +77,8 @@ export default function RetrievedRecords({
         toAssign: string;
         completed: string;
     };
-    businessUnits: SelectionType[],
-    calendar: any,
+    businessUnits: SelectionType[];
+    calendar: any;
     cheques: InertiaPagination<ChequeType>;
     pending: InertiaPagination<Borrower>;
     company: SelectionType[];
@@ -223,6 +223,18 @@ export default function RetrievedRecords({
         });
     };
 
+    const handleClickCalendar = () => {
+        router.reload({
+            only: ['cheques'],
+            data: {
+                assignment: 'completed',
+            },
+            onSuccess: () => {
+                setCurrentTab('cheques');
+            },
+        });
+    };
+
     const handleScanDetails = (id: number) => {
         setScannedDetailsModal(true);
         setScannedId(id);
@@ -237,7 +249,6 @@ export default function RetrievedRecords({
         setPendingModal(true);
         setPendingId(id);
     };
- 
 
     const chequeColumns = createChequeColumns(handleStatusChange);
     const pendingColumns = createPendingChequeColumns(handleOnView);
@@ -269,7 +280,10 @@ export default function RetrievedRecords({
                             </TabList>
                         </Box>
                         <TabPanel value="calendar">
-                            <Calendar data={calendar} onChangeTab={() => setCurrentTab('cheques')}></Calendar>
+                            <Calendar
+                                data={calendar}
+                                onChangeTab={handleClickCalendar}
+                            ></Calendar>
                         </TabPanel>
                         <TabPanel value="cheques">
                             <TableFilter

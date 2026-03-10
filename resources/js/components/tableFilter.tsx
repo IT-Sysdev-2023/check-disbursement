@@ -29,7 +29,7 @@ export default function ({
         selectedBu: string;
         date: DateFilterType;
     };
-    businessUnits: SelectionType[];
+    businessUnits?: SelectionType[];
     children?: React.ReactNode;
     handleChangeCheck?: (value: SelectChangeEvent) => void;
 }) {
@@ -37,7 +37,9 @@ export default function ({
         filters.selectedCompany,
     );
     const [selectedBu, setSelectedBu] = useState<string>(filters.selectedBu);
-    const [businesUnit, setBusinessUnit] = useState<SelectionType[]>(businessUnits);
+    const [businesUnit, setBusinessUnit] = useState<SelectionType[]>(
+        businessUnits ?? [],
+    );
     const [startDate, setStartDate] = useState<Dayjs | null>(
         filters.date.start ? dayjs(filters.date.start) : null,
     );

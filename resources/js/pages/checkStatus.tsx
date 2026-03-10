@@ -37,6 +37,7 @@ export default function CheckStatus({
     cheques: InertiaPagination<ChequeType>;
     company: SelectionType[];
     filter: {
+        selectedCompany: string;
         selectedBu: string;
         search: string;
         date: DateFilterType;

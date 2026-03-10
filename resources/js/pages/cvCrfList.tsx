@@ -43,6 +43,7 @@ export default function CvCrfList({
     cheques: InertiaPagination<CheckStatus>;
     company: SelectionType[];
     filter: {
+        selectedCompany: string;
         selectedBu: string;
         search: string;
         date: DateFilterType;
