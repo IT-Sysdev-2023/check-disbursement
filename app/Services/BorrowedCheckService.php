@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class BorrowedCheckService
 {
@@ -98,7 +99,8 @@ class BorrowedCheckService
             'borrowerNo' => NumberHelper::padLeft($borrowerNo),
             'noOfChecks' => $borrower->count(),
             'purpose' => $reason,
-            'borrowedBy' => $borrower->first()->borrower?->name,
+            'borrowedBy' => Str::upper($borrower->first()->borrower?->name),
+            'releasedBy' => Str::upper(auth()->user()->name),
             'chequeNumbers' => $chequeNumbers
         ];
 

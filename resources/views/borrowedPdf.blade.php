@@ -75,6 +75,23 @@
         overflow: hidden;
         /* Ensures no scrollbars appear on the printout */
     }
+    .form-box2 {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+
+        /* THE DYNAMIC FIXES: */
+        height: auto;
+        /* Allows the box to grow vertically */
+        min-height: 30px;
+        /* Minimum size if data is empty */
+        word-wrap: break-word;
+        /* Prevents long strings from breaking layout */
+        overflow: hidden;
+        /* Ensures no scrollbars appear on the printout */
+    }
 
     .check-list-item {
         margin-bottom: 4px;
@@ -145,14 +162,14 @@
         </div>
         <div class="form-group">
             <div class="form-label">Received by:</div>
-            <div class="form-box">
+            <div class="form-box2">
                 {{ $data['borrowedBy'] ?? '-' }}
             </div>
         </div>
         <div class="form-group">
             <div class="form-label">Released by:</div>
-            <div class="form-box">
-                {{ auth()->user()->name }}
+            <div class="form-box2">
+                {{ $data['releasedBy'] ?? '-' }}
             </div>
         </div>
 
