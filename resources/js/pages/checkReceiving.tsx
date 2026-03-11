@@ -11,7 +11,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CheckReleasing({
+export default function CheckReceiving({
     cheques,
 }: {
     cheques: InertiaPagination<Borrower>;

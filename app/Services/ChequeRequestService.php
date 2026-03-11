@@ -22,7 +22,7 @@ class ChequeRequestService
 
         $borrowedRecords = self::borrowedRecords($filters);
 
-        return Inertia::render('chequeRequests', [
+        return Inertia::render('checkReceiving', [
             'cheques' => $borrowedRecords,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',

@@ -1,14 +1,7 @@
 import AppLayout from '@/layouts/app-layout';
+import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
+import { details, detailsCrf, retrievedRecords } from '@/routes';
 import {
-    details,
-    detailsCrf,
-    getLocation,
-    retrievedRecords,
-    tagLocation,
-} from '@/routes';
-import {
-    ActionHandler,
-    ActionType,
     Auth,
     Borrower,
     ChequeType,
@@ -19,33 +12,24 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import { Badge, Box, Button, Tab } from '@mui/material';
-import { GridRowSelectionModel } from '@mui/x-data-grid';
-import { FormEvent, SyntheticEvent, useState } from 'react';
-
-import BorrowedCheckModal from '@/components/borrowed-check-modal';
-import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import TabContext from '@mui/lab/TabContext';
 import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
-import axios from 'axios';
-import { HandCoins } from 'lucide-react';
+import { Box, Tab } from '@mui/material';
+import { SyntheticEvent, useState } from 'react';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
-import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import AssignCdModal from './retrievedRecords/components/assignCdModal';
-import AssignCnModal from './retrievedRecords/components/assignCnModal';
 import AssignScanDetailsModal from './retrievedRecords/components/assignScanDetailsModal';
 import Calendar from './retrievedRecords/components/calendar';
 import {
-    createChequeColumns,
     createManageColumns,
     createPendingChequeColumns,
 } from './retrievedRecords/components/columns';
 import PendingDetails from './retrievedRecords/components/pendingDetails';
 import ProgressModal from './retrievedRecords/components/progressModal';
 import ScanDetails from './retrievedRecords/components/scanDetails';
+import TableView from './retrievedRecords/components/tableView';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -63,7 +47,6 @@ export default function RetrievedRecords({
     counts,
     calendar,
     businessUnits,
-    // hasMissingFields,
     auth,
 }: {
     filter: {
@@ -85,27 +68,14 @@ export default function RetrievedRecords({
     manageChecks: InertiaPagination<ManageChecks>;
     auth: Auth;
 }) {
-    const [open, setOpen] = useState(false);
     const [openProgress, setOpenProgress] = useState(false);
-    const [openTagModal, setOpenTagModal] = useState(false);
-    const [openAssignCnModal, setOpenAssignCnModal] = useState(false);
-    const [openAssignCdModal, setOpenAssignCdModal] = useState(false);
     const [openInputDetails, setOpenInputDetails] = useState(false);
     const [scannedDetailsModal, setScannedDetailsModal] = useState(false);
     const [scannedId, setScannedId] = useState<number>();
     const [checkRecords, setCheckRecords] = useState<number>();
     const [currentTab, setCurrentTab] = useState(filter.tab);
-    const [selectedLocation, setSelectedLocation] = useState('');
-    const [location, setLocation] = useState<
-        { label: string; value: string }[]
-    >([]);
-    const [chequeData, setChequeData] = useState<ChequeType | null>(null);
     const [pendingId, setPendingId] = useState<number>();
     const [pendingModal, setPendingModal] = useState(false);
-
-    const [selectedRows, setSelectedRows] = useState<
-        { chequeId: number; type: string; id: number }[]
-    >([]);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
@@ -124,51 +94,6 @@ export default function RetrievedRecords({
         }
         setCurrentTab(newValue);
     };
-
-    const handleSelectionChange = (model: GridRowSelectionModel) => {
-        const selectedR = cheques.data
-            .filter((row) => model.ids.has(row.id))
-            .map((row) => ({
-                id: row.id,
-                chequeId: row.chequeId,
-                type: row.type,
-            }));
-
-        setSelectedRows(selectedR);
-    };
-    const enableButton =
-        selectedRows.length > 0 &&
-        cheques.data
-            .filter((row) => selectedRows.some((r) => r.id === row.id))
-            .every((row) => row.taggedAt !== null);
-
-    const actionHandlers: Record<string, ActionHandler> = {
-        details: (record) => {
-            if (!record) return;
-            if (record.type === 'cv') router.visit(details(record.chequeId));
-            else router.visit(detailsCrf(record.chequeId));
-        },
-        assignCn: (record) => {
-            setChequeData(record || null);
-            setOpenAssignCnModal(true);
-        },
-        assignCd: (record) => {
-            setChequeData(record || null);
-            setOpenAssignCdModal(true);
-        },
-        tag: async (record) => {
-            setChequeData(record || null);
-            setOpenTagModal(true);
-            const { data } = await axios.get(getLocation().url);
-            setLocation(data);
-        },
-    };
-
-    const handleStatusChange = (value: ActionType, data: ChequeType) => {
-        const handler = actionHandlers[value];
-        if (handler) handler(data);
-    };
-
     // const handleSyncScanned = () => {
     //     router.get(
     //         scan(),
@@ -187,40 +112,10 @@ export default function RetrievedRecords({
     //     );
     // };
 
-    const handleTagSubmit = (e: FormEvent) => {
-        e.preventDefault();
-        if (!chequeData) return;
-
-        router.put(
-            tagLocation(),
-            {
-                id: chequeData.chequeId,
-                locationId: selectedLocation,
-                type: chequeData.type,
-            },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setSelectedLocation('');
-                    setOpenTagModal(false);
-                },
-            },
-        );
-    };
-
     const handleUpdateScanned = (borrowedCheckId: number) => {
         setOpenInputDetails(true);
 
         if (borrowedCheckId) setCheckRecords(borrowedCheckId);
-    };
-
-    const handleAssignment = (value: 'completed' | 'toAssign') => {
-        router.reload({
-            only: ['cheques'],
-            data: {
-                assignment: value,
-            },
-        });
     };
 
     const handleClickCalendar = () => {
@@ -250,7 +145,6 @@ export default function RetrievedRecords({
         setPendingId(id);
     };
 
-    const chequeColumns = createChequeColumns(handleStatusChange);
     const pendingColumns = createPendingChequeColumns(handleOnView);
     const manageCvColumns = createManageColumns(
         handleDetails,
@@ -286,62 +180,13 @@ export default function RetrievedRecords({
                             ></Calendar>
                         </TabPanel>
                         <TabPanel value="cheques">
-                            <TableFilter
-                                handleChangeCheck={() => null}
+                            <TableView
+                                cheques={cheques}
                                 company={company}
                                 businessUnits={businessUnits}
-                                filters={filter}
-                            >
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => handleAssignment('toAssign')}
-                                >
-                                    <Badge
-                                        badgeContent={counts.toAssign}
-                                        color="error"
-                                    >
-                                        Assignment
-                                    </Badge>
-                                </Button>
-
-                                <Button
-                                    variant="outlined"
-                                    onClick={() =>
-                                        handleAssignment('completed')
-                                    }
-                                >
-                                    <Badge
-                                        badgeContent={counts.completed}
-                                        color="error"
-                                    >
-                                        Completed
-                                    </Badge>
-                                </Button>
-                            </TableFilter>
-                            <TableDataGrid
-                                data={cheques}
-                                filter={filter.search}
-                                hasSelection
-                                handleSelectionChange={handleSelectionChange}
-                                pagination={handlePagination}
-                                handleSearchFilter={handleSearch}
-                                handleSortFilter={handleSort}
-                                columns={chequeColumns}
+                                filter={filter}
+                                counts={counts}
                             />
-                            <Box
-                                display="flex"
-                                justifyContent="flex-end"
-                                mt={3}
-                            >
-                                <Button
-                                    disabled={!enableButton}
-                                    variant="outlined"
-                                    startIcon={<HandCoins />}
-                                    onClick={() => setOpen(true)}
-                                >
-                                    Borrow
-                                </Button>
-                            </Box>
                         </TabPanel>
 
                         <TabPanel value="pending">
@@ -388,29 +233,6 @@ export default function RetrievedRecords({
                 </Box>
             </PageContainer>
 
-            <BorrowedCheckModal
-                cheque={selectedRows}
-                open={open}
-                handleClose={() => setOpen(false)}
-            />
-
-            {chequeData && (
-                <AssignCnModal
-                    title="Assign Check Number"
-                    open={openAssignCnModal}
-                    chequeData={chequeData}
-                    onClose={() => setOpenAssignCnModal(false)}
-                />
-            )}
-
-            {chequeData && (
-                <AssignCdModal
-                    title="Assign Check Date"
-                    open={openAssignCdModal}
-                    chequeData={chequeData}
-                    onClose={() => setOpenAssignCdModal(false)}
-                />
-            )}
             {/* scannedDetailsModal */}
             {scannedId && (
                 <ScanDetails
@@ -438,18 +260,6 @@ export default function RetrievedRecords({
                     onClose={() => setOpenInputDetails(false)}
                 />
             )}
-
-            <OnlySelectionModal
-                title="Tag Location"
-                open={openTagModal}
-                onClose={() => setOpenTagModal(false)}
-                handleSubmit={handleTagSubmit}
-                handleSelectedItem={(event) =>
-                    setSelectedLocation(event.target.value)
-                }
-                selectedItem={selectedLocation}
-                item={location}
-            />
 
             <ProgressModal
                 userId={auth.user.id}

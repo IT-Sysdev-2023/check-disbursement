@@ -168,6 +168,7 @@ export interface ChequeType {
 
 export interface Borrower {
     borrowerNo: number;
+    borrower: string;
     reason: string;
     lastBorrowedAt: string;
     totalChecks: number;

@@ -1,5 +1,4 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { filterBusinessUnits } from '@/routes';
 import { DateFilterType, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -13,7 +12,6 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PickerValue } from '@mui/x-date-pickers/internals';
-import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
 import { useState } from 'react';
 
@@ -37,9 +35,6 @@ export default function ({
         filters.selectedCompany,
     );
     const [selectedBu, setSelectedBu] = useState<string>(filters.selectedBu);
-    const [businesUnit, setBusinessUnit] = useState<SelectionType[]>(
-        businessUnits ?? [],
-    );
     const [startDate, setStartDate] = useState<Dayjs | null>(
         filters.date.start ? dayjs(filters.date.start) : null,
     );
@@ -51,19 +46,13 @@ export default function ({
         const val = event.target.value;
         setSelectedCompany(val);
 
-        const { data } = await axios.get(filterBusinessUnits().url, {
-            params: {
-                company: val,
-            },
-        });
-
         router.reload({
             data: {
                 company: event.target.value,
             },
         });
 
-        setBusinessUnit(data);
+        // setBusinessUnit(data);
     };
 
     const handleChangeBu = (event: SelectChangeEvent) => {
@@ -128,12 +117,14 @@ export default function ({
                     title="Company"
                     items={company}
                 />
-                <SelectItem
-                    handleChange={handleChangeBu}
-                    value={selectedBu}
-                    title="Business Unit"
-                    items={businesUnit}
-                />
+                {businessUnits && (
+                    <SelectItem
+                        handleChange={handleChangeBu}
+                        value={selectedBu}
+                        title="Business Unit"
+                        items={businessUnits}
+                    />
+                )}
 
                 {children}
                 {/* <SelectItem

@@ -37,7 +37,6 @@ class ChecksService
         $waitingForApproval = self::pendingRecords($filters);
 
         $manageCheques = self::manageChecks();
-
         $calendar = Calendar::calendar();
 
         return Inertia::render('retrievedRecords', [
@@ -58,7 +57,7 @@ class ChecksService
                 'label' => 'All',
                 'value' => 'all'
             ]),
-            'businessUnits' => isset($filters['bu']) ? self::businessUnits($filters['company']) : [],
+            'businessUnits' => isset($filters['company']) ? self::businessUnits($filters['company']) : [],
             'counts' => (object) [
                 'toAssign' => self::countToAssign(),
                 'completed' => self::countCompleted()
