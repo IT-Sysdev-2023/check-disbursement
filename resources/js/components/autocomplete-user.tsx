@@ -62,10 +62,10 @@ export default function AutocompleteUser({
             options={options}
             loading={loading}
             filterOptions={(x) => x} // disable local filtering
-            getOptionLabel={(option) => option.label}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            getOptionLabel={(option) => option?.label ?? ''}
+            isOptionEqualToValue={(option, value) => option?.id === value?.id}
             onInputChange={(_, value) => setInputValue(value)}
-            onChange={handleTextChange}
+            onChange={(event, value) => {  if (value) handleTextChange(event,value) } }
             renderInput={(params) => (
                 <TextField
                     {...params}
