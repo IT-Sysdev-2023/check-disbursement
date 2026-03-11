@@ -297,7 +297,7 @@ export type DistinctMonths = Record<
 >;
 
 export interface Option {
-    id: number;
+    id: number | string;
     label: string;
 }
 

@@ -57,15 +57,37 @@ export default function AutocompleteUser({
 
     return (
         <Autocomplete
+            freeSolo
             disableClearable
             sx={{ width: 300 }}
             options={options}
             loading={loading}
-            filterOptions={(x) => x} // disable local filtering
-            getOptionLabel={(option) => option?.label ?? ''}
+            filterOptions={(x) => x}
+            getOptionLabel={(option) =>
+                typeof option === 'string' ? option : (option?.label ?? '')
+            }
             isOptionEqualToValue={(option, value) => option?.id === value?.id}
-            onInputChange={(_, value) => setInputValue(value)}
-            onChange={(event, value) => {  if (value) handleTextChange(event,value) } }
+            // onInputChange={(_, value) => setInputValue(value)}
+            onInputChange={(event, value, reason) => {
+                if (reason === 'input') {
+                    setInputValue(value);
+
+                    handleTextChange(event as SyntheticEvent, {
+                        id: value,
+                        label: value,
+                    });
+                }
+            }}
+            onChange={(event, value) => {
+                if (!value) return;
+
+                const option =
+                    typeof value === 'string'
+                        ? { id: value, label: value }
+                        : value;
+
+                handleTextChange(event, option);
+            }}
             renderInput={(params) => (
                 <TextField
                     {...params}
