@@ -27,6 +27,7 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('viewing-dashboard', [DashboardController::class, 'accountingDashboard'])->name('accounting-dashboard');
 
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('users', [AdminController::class, 'users'])->name('users');

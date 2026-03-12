@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BorrowedCheck;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\CvHeader;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Database\Query\Builder;
 use Inertia\Inertia;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $cvMax = Date::parse(CvCheckPayment::max('created_at'))->format('Y-m-d');
         $cv = CvCheckPayment::
@@ -51,8 +53,10 @@ class DashboardController extends Controller
 
         $cvCount = CvCheckPayment::count();
         $crfCount = Crf::count();
+        $checks = self::checkStatus($request->tab ?? 'all');
 
-        return Inertia::render('dashboard', [
+        return Inertia::render($request->user()->hasRole('viewing') ? 'viewingDashboard' : 'dashboard', [
+            'checks' => $checks,
             'cv' => $cv,
             'crf' => $crf,
             'totals' => (object) [
@@ -69,4 +73,55 @@ class DashboardController extends Controller
 
         ]);
     }
+
+    private static function checkStatus($tab)
+    {
+
+        //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
+        return BorrowedCheck::query()
+            ->with('checkable.checkStatus.checkForwardedStatus')
+            ->where(function (Builder $q) use ($tab) {
+
+                if ($tab === 'staled') {
+                    $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
+                        $q->whereNotNull('approver_id')
+                            ->whereHas(
+                                'checkable',
+                                fn(Builder $q) => $q->scanRecords()
+                            )
+                            ->whereHasMorph(
+                                'checkable',
+                                [CvCheckPayment::class, Crf::class],
+                                function (Builder $query, string $type) {
+                                $column = $type === CvCheckPayment::class ? 'check_date' : 'resolved_check_date';
+                                $query->where($column, '<', Date::today()->subMonths(6))
+                                    ->whereDoesntHave('checkStatus', function ($q) {
+                                        $q->where('status', 'cancelled');
+                                    });
+                            }
+                            )
+                        ;
+
+                    });
+
+                } else {
+                    $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
+                        $q->whereHasMorph(
+                            'checkable',
+                            [CvCheckPayment::class, Crf::class],
+                            fn(Builder $q) =>
+                            $q->when($tab !== 'all', function ($q) use ($tab) {
+                            $q->whereRelation('checkStatus', 'status', $tab);
+                        })
+                                ->has('checkStatus')
+                        );
+                    });
+                }
+
+            })
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
+    }
+
 }

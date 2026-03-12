@@ -1,4 +1,3 @@
-
 <style>
     .document-container {
         max-width: 600px;
@@ -44,10 +43,10 @@
         font-weight: bold;
     }
 
-  .form-group {
+    .form-group {
         display: flex;
         /* Aligns label to the top of the box as it grows */
-        align-items: flex-start; 
+        align-items: flex-start;
         margin-bottom: 15px;
     }
 
@@ -55,8 +54,9 @@
         width: 180px;
         font-size: 18px;
         /* Matches the padding of the box to keep text level */
-        padding-top: 12px; 
+        padding-top: 12px;
     }
+
     .form-box {
         flex: 1;
         border: 2px solid #ccc;
@@ -64,12 +64,34 @@
         text-align: center;
         font-size: 20px;
         font-weight: bold;
-        
+
         /* THE DYNAMIC FIXES: */
-        height: auto;           /* Allows the box to grow vertically */
-        min-height: 50px;       /* Minimum size if data is empty */
-        word-wrap: break-word;  /* Prevents long strings from breaking layout */
-        overflow: hidden;       /* Ensures no scrollbars appear on the printout */
+        height: auto;
+        /* Allows the box to grow vertically */
+        min-height: 50px;
+        /* Minimum size if data is empty */
+        word-wrap: break-word;
+        /* Prevents long strings from breaking layout */
+        overflow: hidden;
+        /* Ensures no scrollbars appear on the printout */
+    }
+
+    .form-box2 {
+        flex: 1;
+        padding: 12px;
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+
+        /* THE DYNAMIC FIXES: */
+        height: auto;
+        /* Allows the box to grow vertically */
+        min-height: 30px;
+        /* Minimum size if data is empty */
+        word-wrap: break-word;
+        /* Prevents long strings from breaking layout */
+        overflow: hidden;
+        /* Ensures no scrollbars appear on the printout */
     }
 
     .check-list-item {
@@ -88,46 +110,46 @@
     </div>
 
     <div class="info-section">
-    <div class="info-row">
-        <div class="label-fixed">
-           Transaction No: 
-            <span class="value-bold">{{ $data['transactionNo'] ?? '-' }}</span>
+        <div class="info-row">
+            <div class="label-fixed">
+                Transaction No:
+                <span class="value-bold">{{ $data['transactionNo'] ?? '-' }}</span>
+            </div>
         </div>
     </div>
-</div>
 
 
     <div class="form-content">
-        
+
         <div class="form-group">
             <div class="form-label">{{ $data['dateLabel'] }}</div>
             <div class="form-box" style="letter-spacing: 4px;">
                 {{ $data['dateReleased'] ?? '-' }}
             </div>
         </div>
-
         <div class="form-group">
-            <div class="form-label">{{ $data['causedLabel'] }}</div>
-            <div class="form-box">
-                {{ $data['causedBy'] ?? '-' }}
-            </div>
-        </div>
-
-          @isset($data['receivedBy'])
-        <div class="form-group">
-            <div class="form-label">{{ $data['receivedLabel'] }}</div>
-            <div class="form-box">
-                {{ $data['receivedBy'] ?? '-' }}
-            </div>
-        </div>
-         @endisset
-
-         <div class="form-group">
             <div class="form-label">Location :</div>
             <div class="form-box">
                 {{ $data['location'] ?? '-' }}
             </div>
         </div>
+        <div class="form-group">
+            <div class="form-label">{{ $data['causedLabel'] }}</div>
+            <div class="form-box2">
+                {{ $data['causedBy'] ?? '-' }}
+            </div>
+        </div>
+
+        @isset($data['receivedBy'])
+            <div class="form-group">
+                <div class="form-label">{{ $data['receivedLabel'] }}</div>
+                <div class="form-box2">
+                    {{ $data['receivedBy'] ?? '-' }}
+                </div>
+            </div>
+        @endisset
+
+
 
     </div>
 </div>

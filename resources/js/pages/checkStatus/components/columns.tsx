@@ -23,7 +23,7 @@ export const createStatusChequeColumns = (
         minWidth: 80,
         renderCell: ({ row }) => row.checkable.amount,
     },
-    
+
     {
         field: 'bankName',
         headerName: 'Bank Name',
@@ -63,7 +63,7 @@ export const createStatusChequeColumns = (
             if (row.checkable?.status) {
                 status = row.checkable.status;
             }
-            
+
             if (checkStatus?.status) {
                 status = checkStatus.status;
             }
@@ -102,7 +102,7 @@ export const createStatusChequeColumns = (
                 />
             );
         },
-        },
+    },
     {
         field: 'stat',
         headerName: 'Handling Status',
@@ -111,7 +111,7 @@ export const createStatusChequeColumns = (
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => {
-            return row.checkable.location
+            return row.checkable.location;
         },
     },
     {
@@ -147,10 +147,8 @@ export const createStatusChequeColumns = (
                                 Scanned Check Details
                             </MenuItem>
                         )}
-                         {row.checkable?.status && (
-                            <MenuItem value="cancel">
-                                Cancelled Check
-                            </MenuItem>
+                        {row.checkable?.status && (
+                            <MenuItem value="cancel">Cancelled Check</MenuItem>
                         )}
                     </Select>
                 </Box>

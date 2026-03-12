@@ -68,11 +68,12 @@ class DatabaseSeeder extends Seeder
         Role::create(['name' => 'regional_officer']);
         Role::create(['name' => 'section_head']); //section head
         Role::create(['name' => 'admin']);
+        Role::create(['name' => 'viewing']);
 
         Permission::create(['name' => 'access cebu']);
         Permission::create(['name' => 'access manila']);
         // $admin->givePermissionTo(Permission::all());
-       
+
 
         $user = User::first();
         $user->assignRole('admin');

@@ -59,6 +59,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const regionalOfficer = roles.includes('regional_officer');
     const closingOfficer = roles.includes('closing_officer');
     const sectionHead = roles.includes('section_head');
+    const viewing = roles.includes('viewing');
 
     const [openItem, setOpenItem] = useState<string | null>(null);
 
@@ -134,7 +135,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             disbursementOfficer ||
             regionalOfficer ||
             sectionHead ||
-            closingOfficer
+            closingOfficer || viewing
                 ? [
                       {
                           title: 'Check Status',
