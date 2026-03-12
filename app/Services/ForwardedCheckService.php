@@ -122,8 +122,11 @@ class ForwardedCheckService
                 'dateLabel' => 'Date ' . $label . ':',
                 'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
 
-                'causedLabel' => $label . ' By:',
+                'causedLabel' => 'Received By:',
                 'causedBy' => $validated['receiversName'],
+                
+                'releasedLabel' => 'Released By:',
+                'releasedBy' => auth()->user()->name,
 
                 'company' => $checkCompany,
                 'location' => $location,

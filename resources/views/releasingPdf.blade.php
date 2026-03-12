@@ -136,7 +136,7 @@
         <div class="form-group">
             <div class="form-label">{{ $data['causedLabel'] }}</div>
             <div class="form-box2">
-                {{ $data['causedBy'] ?? '-' }}
+                {{ Str::upper($data['causedBy']) ?? '-' }}
             </div>
         </div>
 
@@ -144,7 +144,15 @@
             <div class="form-group">
                 <div class="form-label">{{ $data['receivedLabel'] }}</div>
                 <div class="form-box2">
-                    {{ $data['receivedBy'] ?? '-' }}
+                    {{ Str::upper($data['receivedBy']) ?? '-' }}
+                </div>
+            </div>
+        @endisset
+        @isset($data['releasedLabel'])
+            <div class="form-group">
+                <div class="form-label">{{ $data['releasedLabel'] }}</div>
+                <div class="form-box2">
+                    {{ Str::upper($data['releasedBy']) ?? '-' }}
                 </div>
             </div>
         @endisset

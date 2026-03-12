@@ -131,18 +131,18 @@
         </div>
 
         <div class="form-group">
-            <div class="form-label">Forwarded By :</div>
+            <div class="form-label">Closed By :</div>
             <div class="form-box2">
-                {{ $data['forwardedBy'] ?? '-' }}
+                {{ Str::upper($data['closedBy']) ?? '-' }}
             </div>
         </div>
 
-        <div class="form-group">
+        {{-- <div class="form-group">
             <div class="form-label">Received By :</div>
             <div class="form-box2">
                 {{ $data['receivedBy'] ?? '-' }}
             </div>
-        </div>
+        </div> --}}
 
 
 

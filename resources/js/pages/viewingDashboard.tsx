@@ -1,5 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
-import { dashboard } from '@/routes';
+import { dashboard, details, detailsCrf } from '@/routes';
 import { ChequeType, InertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
@@ -140,17 +140,15 @@ const crfColumns: GridColDef[] = [
         headerName: 'Action',
         headerAlign: 'right',
         align: 'right',
-        flex: 1,
-        minWidth: 100,
         renderCell: ({ row }) => {
             return (
                 <Button
                     variant="contained"
                     size="small"
                     onClick={() => {
-                        // if (row.type === 'cv')
-                        //     router.visit(details(row.chequeId));
-                        // else router.visit(detailsCrf(row.chequeId));
+                        if (row.check === 'cv')
+                            router.visit(details(row.checkable.id));
+                        else router.visit(detailsCrf(row.checkable.id));
                     }}
                 >
                     View

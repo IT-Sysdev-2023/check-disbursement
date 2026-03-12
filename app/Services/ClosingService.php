@@ -76,11 +76,11 @@ class ClosingService
                     'transactionNo' => NumberHelper::padLeft($id->id),
                     'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
 
-                    'forwardedBy' => auth()->user()->name,
+                    'closedBy' => auth()->user()->name,
 
                     'dateReceived' => $id->created_at->format('M d, Y H:i A'),
 
-                    'receivedBy' => $id->receivers_name,
+                    // 'receivedBy' => $id->receivers_name,
                 ];
 
                 return $this->fileHandler
