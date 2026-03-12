@@ -88,8 +88,9 @@ export default function TableItems(props: { row: Borrower }) {
                                         <TableCell>Check Number</TableCell>
                                         <TableCell>Check Date</TableCell>
                                         <TableCell>Check Amount</TableCell>
-                                        <TableCell>Company</TableCell>
+                                        <TableCell>Bu</TableCell>
                                         <TableCell>Payee</TableCell>
+                                        <TableCell>Tagged Location</TableCell>
                                         <TableCell>Check Type</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -129,6 +130,9 @@ export default function TableItems(props: { row: Borrower }) {
                                                 </TableCell>
                                                 <TableCell>
                                                     {historyRow.checkable.payee}
+                                                </TableCell>
+                                                <TableCell>
+                                                    {historyRow.checkable.location}
                                                 </TableCell>
                                                 <TableCell>
                                                     {historyRow.check}

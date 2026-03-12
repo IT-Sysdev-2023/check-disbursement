@@ -19,13 +19,30 @@ class ClosingService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
-        $cheques = CheckStatus::with(['checkable' => ['borrowedCheck', 'tagLocation']])
+
+        $cheques = CheckStatus::
+            with(['checkable' => ['borrowedCheck', 'tagLocation']])
             ->where('is_closed', false)
             ->whereNot('status', 'cancel')
+            ->has('checkForwardedStatus')
+            ->get();
+
+        $cheques = CheckStatus::
+            with(['checkable' => ['borrowedCheck', 'tagLocation']])
+            ->where('is_closed', false)
+            ->whereNot('status', 'cancel')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('status', 'forwarded')
+                        ->has('checkForwardedStatus');
+                })
+                    ->orWhere('status', '!=', 'forwarded');
+            })
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
 
+        // dd($cheques);
         return Inertia::render('cvCrfList', [
             'cheques' => $cheques,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
