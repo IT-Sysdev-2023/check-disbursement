@@ -101,7 +101,7 @@ class BorrowedCheckService
             'purpose' => $reason,
             'borrowedBy' => Str::upper($borrower->first()->borrower?->name),
             'releasedBy' => Str::upper(auth()->user()->name),
-            'chequeNumbers' => $chequeNumbers
+            'chequeNumbers' => $chequeNumbers->toArray()
         ];
 
         return $this->fileHandler

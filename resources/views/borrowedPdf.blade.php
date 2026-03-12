@@ -43,19 +43,18 @@
         font-weight: bold;
     }
 
-    .form-group {
-        display: flex;
-        /* Aligns label to the top of the box as it grows */
-        align-items: flex-start;
-        margin-bottom: 15px;
-    }
+  .form-group {
+    display: flex;
+    align-items: center;   /* vertical alignment */
+    flex-wrap: nowrap;     /* prevents breaking into another row */
+    margin-bottom: 15px;
+}
 
-    .form-label {
-        width: 180px;
-        font-size: 18px;
-        /* Matches the padding of the box to keep text level */
-        padding-top: 12px;
-    }
+  .form-label {
+    width: 180px;
+    font-size: 18px;
+    flex-shrink: 0; /* prevents label from shrinking */
+}
 
     .form-box {
         flex: 1;
@@ -75,6 +74,7 @@
         overflow: hidden;
         /* Ensures no scrollbars appear on the printout */
     }
+
     .form-box2 {
         flex: 1;
         padding: 12px;
@@ -150,14 +150,21 @@
         <div class="form-group">
             <div class="form-label">Check Number:</div>
             <div class="form-box">
-                @if (isset($data['chequeNumbers']) && count($data['chequeNumbers']) > 0)
-                    @foreach ($data['chequeNumbers'] as $number)
-                        <div class="check-list-item">{{ $number }}</div>
-                    @endforeach
-                @else
-                    {{-- Default placeholders if empty --}}
-                    <div>-</div>
-                @endif
+                @php
+                    $chunks = array_chunk($data['chequeNumbers'] ?? [], 4);
+                @endphp
+
+                <table style="width:100%; text-align:center;">
+                    <tr>
+                        @foreach ($chunks as $chunk)
+                            <td style="vertical-align:top;">
+                                @foreach ($chunk as $number)
+                                    <div class="check-list-item">{{ $number }}</div>
+                                @endforeach
+                            </td>
+                        @endforeach
+                    </tr>
+                </table>
             </div>
         </div>
         <div class="form-group">
