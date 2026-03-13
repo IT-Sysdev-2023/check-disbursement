@@ -31,7 +31,7 @@ class ChecksService
         $tab = $filters['tab'] ?? 'calendar';
 
         $assignment = $filters['assignment'] ?? 'toAssign';
-
+        // dd($filters);
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
         $waitingForApproval = self::pendingRecords($filters);
