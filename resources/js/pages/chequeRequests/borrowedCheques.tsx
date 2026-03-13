@@ -44,6 +44,7 @@ export default function BorrowedCheques({
 }) {
     const [approver, setApprover] = useState<SelectionType[]>([]);
     const [selectedApprover, setSelectedApprover] = useState('');
+    const [selectedRowType, setSelectedRowType] = useState('include');
     const [selectedRows, setSelectedRows] = useState<Set<GridRowId>>(new Set());
     const [open, setOpen] = useState(false);
     const [openCancel, setOpenCancel] = useState(false);
@@ -61,6 +62,7 @@ export default function BorrowedCheques({
         router.put(
             approveCheck(),
             {
+                type: selectedRowType,
                 approver: selectedApprover,
                 borrowedNo: Array.from(selectedRows),
             },
@@ -76,8 +78,11 @@ export default function BorrowedCheques({
     };
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
+
+        setSelectedRowType(model.type);
         setSelectedRows(model.ids);
     };
+    // console.log(selectedRowType);
     const columns = createRequestsChequeColumns();
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -96,7 +101,7 @@ export default function BorrowedCheques({
 
                 <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
                     <Button
-                        disabled={selectedRows.size === 0}
+                        disabled={selectedRows.size === 0 && selectedRowType === 'include'}
                         variant="outlined"
                         startIcon={<Handshake />}
                         onClick={handleApprove}
@@ -104,7 +109,7 @@ export default function BorrowedCheques({
                         Approve
                     </Button>
                     <Button
-                        disabled={selectedRows.size === 0}
+                        disabled={selectedRows.size === 0 && selectedRowType === 'include'}
                         color="error"
                         variant="outlined"
                         startIcon={<X />}

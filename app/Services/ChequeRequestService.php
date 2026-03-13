@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ChequeRequestService
@@ -55,11 +56,23 @@ class ChequeRequestService
     public function approveCheck(Request $request)
     {
         $request->validate([
-            'borrowedNo' => ['required', 'array'],
+            'type' => ['required', 'in:include,exclude'],
+            'borrowedNo' => [
+                'array',
+                Rule::requiredIf(fn() => $request->type === 'include'),
+            ],
             'approver' => ['required', 'integer'],
         ]);
 
-        $isSuccess = BorrowedCheck::whereIn('id', $request->borrowedNo)
+        $ids = $request->borrowedNo ?? [];
+        
+        $isSuccess = BorrowedCheck::
+            when(
+                $request->type == 'exclude',
+                fn($q) => $q->whereNotIn('id', $ids)
+                ,
+                fn($q) => $q->whereIn('id', $ids)
+            )
             ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
 
         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
@@ -131,7 +144,7 @@ class ChequeRequestService
                 $query->where(function ($q) use ($search) {
 
                     if (is_numeric($search)) { //FOR FILTERING BORROWER NUMBER
-                
+    
                         $clean = ltrim($search, '0');
 
                         $q->where('borrower_no', 'LIKE', "%{$clean}%");
