@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('reason');
             $table->timestamp('approved_at')->nullable();
             $table->morphs('checkable');
+            $table->unique(['checkable_id', 'checkable_type']);
             $table->timestamps();
         });
     }

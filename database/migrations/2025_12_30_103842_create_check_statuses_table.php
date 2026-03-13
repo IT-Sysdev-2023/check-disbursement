@@ -22,8 +22,11 @@ return new class extends Migration {
             $table->boolean('is_closed')->default(false);
 
             $table->morphs('checkable');
+            $table->unique(['checkable_id', 'checkable_type']);
+
             $table->timestamp('closed_at')->nullable();
             $table->timestamps();
+
         });
     }
 

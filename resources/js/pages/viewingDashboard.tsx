@@ -80,7 +80,6 @@ const crfColumns: GridColDef[] = [
         minWidth: 100,
         renderCell: ({ row }) => {
             const { checkStatus } = row.checkable;
-
             let status = null;
 
             if (row.checkable?.status) {
@@ -177,6 +176,12 @@ export default function ViewingDashboard({
     ) => {
         if (newValue !== null) {
             setValue(newValue);
+            router.reload({
+                only: ['checks'],
+                data: {
+                    tab: newValue,
+                },
+            });
         }
     };
     const data: StatCardProps[] = [
@@ -196,6 +201,7 @@ export default function ViewingDashboard({
             interval: 'Checks for Releasing',
         },
     ];
+
     const onSearch = (e: ChangeEvent<HTMLInputElement>) => {
         setSearch(e.target.value);
 
@@ -205,6 +211,7 @@ export default function ViewingDashboard({
             },
         });
     };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -266,10 +273,10 @@ export default function ViewingDashboard({
                                     <ToggleButton value="for_releasing">
                                         For Releasing
                                     </ToggleButton>
-                                    <ToggleButton value="stale">
+                                    <ToggleButton value="staled">
                                         Stale Check
                                     </ToggleButton>
-                                    <ToggleButton value="cancel">
+                                    <ToggleButton value="cancelled">
                                         Cancel
                                     </ToggleButton>
                                     <ToggleButton value="closed">

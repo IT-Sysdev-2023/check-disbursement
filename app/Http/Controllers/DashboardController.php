@@ -16,6 +16,8 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+
+        $filters = $request->only(['tab']);
         $cvMax = Date::parse(CvCheckPayment::max('created_at'))->format('Y-m-d');
         $cv = CvCheckPayment::
             with('cvHeader', 'businessUnit')
@@ -53,7 +55,7 @@ class DashboardController extends Controller
 
         $cvCount = CvCheckPayment::count();
         $crfCount = Crf::count();
-        $checks = self::checkStatus($request->tab ?? 'all');
+        $checks = self::checkStatus($filters['tab'] ?? 'all');
 
         return Inertia::render($request->user()->hasRole('viewing') ? 'viewingDashboard' : 'dashboard', [
             'checks' => $checks,
@@ -76,7 +78,6 @@ class DashboardController extends Controller
 
     private static function checkStatus($tab)
     {
-
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
         return BorrowedCheck::query()
             ->with('checkable.checkStatus.checkForwardedStatus')
@@ -111,7 +112,15 @@ class DashboardController extends Controller
                             [CvCheckPayment::class, Crf::class],
                             fn(Builder $q) =>
                             $q->when($tab !== 'all', function ($q) use ($tab) {
-                            $q->whereRelation('checkStatus', 'status', $tab);
+                            if ($tab === 'closed') {
+                                $q->whereRelation('checkStatus', 'is_closed', 1);
+                                // }else if ($tab === 'cancelled') {
+                            } else {
+                                $q->whereRelation('checkStatus', function ($query) use ($tab) {
+                                    $query->where('status', $tab)
+                                        ->where('is_closed', 0);
+                                });
+                            }
                         })
                                 ->has('checkStatus')
                         );
