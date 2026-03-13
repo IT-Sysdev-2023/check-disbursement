@@ -160,8 +160,10 @@ const crfColumns: GridColDef[] = [
 export default function ViewingDashboard({
     totals,
     checks,
+    checkIssued,
 }: {
     checks: InertiaPagination<ChequeType>;
+    checkIssued: string;
     totals: {
         cv: string;
         crf: string;
@@ -187,17 +189,17 @@ export default function ViewingDashboard({
     const data: StatCardProps[] = [
         {
             title: 'Total Cheques Amount',
-            value: totals.total,
-            interval: '20 Checks Issued',
+            value: totals.amount,
+            interval: checkIssued + ' Checks Issued',
         },
         {
             title: 'Released Checks',
-            value: totals.cv,
+            value: totals.releasedChecks,
             interval: 'Checks Released',
         },
         {
             title: 'Pending Checks',
-            value: totals.crf,
+            value: totals.pending,
             interval: 'Checks for Releasing',
         },
     ];
