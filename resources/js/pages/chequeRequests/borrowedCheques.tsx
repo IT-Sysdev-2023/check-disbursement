@@ -19,6 +19,7 @@ import { useState } from 'react';
 import OnlySelectionModal from '../dashboard/components/onlySelectionModal';
 import TableDataGrid from '../dashboard/components/TableDataGrid';
 import { createRequestsChequeColumns } from './components/columns';
+import CancellationBorrowedModal from '@/components/cancellation-borrowed-modal';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -118,8 +119,9 @@ export default function BorrowedCheques({
                         Cancel
                     </Button>
 
-                    <ReasonCancellationModal
+                    <CancellationBorrowedModal
                         id={Array.from(selectedRows)}
+                        type={selectedRowType}
                         open={openCancel}
                         handleClose={() => {
                             setOpenCancel(false);

@@ -65,7 +65,7 @@ class ChequeRequestService
         ]);
 
         $ids = $request->borrowedNo ?? [];
-        
+
         $isSuccess = BorrowedCheck::
             when(
                 $request->type == 'exclude',
@@ -115,9 +115,23 @@ class ChequeRequestService
     {
         $request->validate([
             'reason' => 'required|string|max:255',
-            'ids' => 'required|array',
+            // 'ids' => 'required|array',
+            'type' => ['required', 'in:include,exclude'],
+            'ids' => [
+                'array',
+                Rule::requiredIf(fn() => $request->type === 'include'),
+            ],
         ]);
-        BorrowedCheck::whereIn('id', $request->ids)
+
+        $ids = $request->ids ?? [];
+
+        BorrowedCheck::
+            when(
+                $request->type == 'exclude',
+                fn($q) => $q->whereNotIn('id', $ids)
+                ,
+                fn($q) => $q->whereIn('id', $ids)
+            )
             ->chunkById(100, function ($checks) use ($request) {
                 foreach ($checks as $check) {
                     $check->checkable?->checkStatus()->create([
@@ -127,6 +141,7 @@ class ChequeRequestService
                     ]);
                 }
             });
+            
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
