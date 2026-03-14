@@ -119,15 +119,7 @@ export default function RetrievedRecords({
     };
 
     const handleClickCalendar = () => {
-        router.reload({
-            only: ['cheques'],
-            data: {
-                assignment: 'completed',
-            },
-            onSuccess: () => {
-                setCurrentTab('cheques');
-            },
-        });
+        setCurrentTab('cheques');
     };
 
     const handleScanDetails = (id: number) => {

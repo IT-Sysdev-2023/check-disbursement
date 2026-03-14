@@ -54,17 +54,17 @@ class CvCheckPayment extends Model
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($q) use ($search) {
                 $q->whereAny([
-                    'check_amount',
-                    'payee'
+                    'cv_check_payments.check_amount',
+                    'cv_check_payments.payee'
                 ], 'LIKE', '%' . $search . '%')
                     ->orWhere(function ($q2) use ($search) {
                         $q2->where(function ($q3) use ($search) { // if check_number is not zero then filter
-                            $q3->where('check_number', '!=', 0)
-                                ->where('check_number', 'LIKE', "%{$search}%");
+                            $q3->where('cv_check_payments.check_number', '!=', 0)
+                                ->where('cv_check_payments.check_number', 'LIKE', "%{$search}%");
                         })
                             ->orWhere(function ($q3) use ($search) {
-                                $q3->where('check_number', 0)
-                                    ->where('resolved_check_number', 'LIKE', "%{$search}%");
+                                $q3->where('cv_check_payments.check_number', 0)
+                                    ->where('cv_check_payments.resolved_check_number', 'LIKE', "%{$search}%");
                             });
                     })
                     ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {
@@ -75,11 +75,13 @@ class CvCheckPayment extends Model
             ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
                 $query->whereRelation('businessUnit.company', 'id', $filters['company']);
             })
-            ->when(($filters['bu'] ?? null) && $filters['bu'] != 'all', function ($query) use ($filters)  {
-                $query->where('business_unit_id',  $filters['bu']);
+            ->when(($filters['bu'] ?? null) && $filters['bu'] != 'all', function ($query) use ($filters) {
+                $query->where('business_unit_id', $filters['bu']);
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereBetween('cv_check_payments.check_date', [$date['start'], $date['end']]);
+                $query->whereRelation('cvHeader', function ($q) use ($date) {
+                    $q->whereBetween('cv_date', [$date['start'], $date['end']]);
+                });
             })
             ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
 

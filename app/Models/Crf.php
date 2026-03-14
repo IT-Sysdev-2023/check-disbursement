@@ -64,13 +64,13 @@ class Crf extends Model
     {
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->whereAny([
-                'crf',
-                'company_office',
-                'no',
-                'paid_to',
-                'particulars',
-                'amount',
-                'ck_no'
+                'crfs.crf',
+                'crfs.company_office',
+                'crfs.no',
+                'crfs.paid_to',
+                'crfs.particulars',
+                'crfs.amount',
+                'crfs.ck_no'
             ], 'LIKE', '%' . $search . '%');
         })
             ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
@@ -80,7 +80,7 @@ class Crf extends Model
                 $query->where('business_unit_id', $filters['bu']);
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereBetween('crfs.resolved_check_date', [$date['start'], $date['end']]);
+                $query->whereBetween('crfs.date', [$date['start'], $date['end']]);
             })
             ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
                 $field = Str::snake($sort['field']);

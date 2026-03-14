@@ -5,7 +5,13 @@ import { useTheme } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
 import { useEffect, useState } from 'react';
 
-const Calendar = ({ data, onChangeTab  }: {  onChangeTab: () => void, data: any}) => {
+const Calendar = ({
+    data,
+    onChangeTab,
+}: {
+    onChangeTab: () => void;
+    data: any;
+}) => {
     const { appearance } = useAppearance();
 
     const theme = useTheme(); // Get the MUI theme
@@ -22,10 +28,10 @@ const Calendar = ({ data, onChangeTab  }: {  onChangeTab: () => void, data: any}
     }, [appearance]);
 
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+    
     useEffect(() => {
-
         if (!selectedDate) return;
-        
+
         const formattedDate = selectedDate.format('YYYY-MM-DD');
 
         router.reload({
@@ -129,7 +135,7 @@ const Calendar = ({ data, onChangeTab  }: {  onChangeTab: () => void, data: any}
 
                                                     const fullDate = dayjs(
                                                         `${day.y}-${day.m}-${dayObj.day}`,
-                                                        'YYYY-M-D', 
+                                                        'YYYY-M-D',
                                                     );
 
                                                     setSelectedDate(fullDate);
@@ -178,9 +184,9 @@ const Calendar = ({ data, onChangeTab  }: {  onChangeTab: () => void, data: any}
                                                                 ? theme.palette
                                                                       .warning
                                                                       .main
-                                                                :  theme.palette
+                                                                : theme.palette
                                                                       .info
-                                                                      .main
+                                                                      .main,
                                                         }}
                                                     >
                                                         {dayObj.totalRecord}

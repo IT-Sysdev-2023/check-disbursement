@@ -38,7 +38,7 @@ export const createChequeColumns = (
     {
         field: 'checkNumber',
         headerName: 'Check Number',
-        // minWidth: 150,
+         flex: 1,
     },
     {
         field: 'checkDate',
@@ -47,20 +47,20 @@ export const createChequeColumns = (
         align: 'right',
     },
     {
+        field: 'payee',
+        headerName: 'Payee',
+        headerAlign: 'left',
+        align: 'left',
+        flex: 1,
+    },
+    {
         field: 'amount',
         headerName: 'Check Amount',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        minWidth: 80,
     },
-    {
-        field: 'payee',
-        headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-    },
+
     {
         field: 'companyName',
         headerName: 'Business Unit',
@@ -72,7 +72,7 @@ export const createChequeColumns = (
     {
         field: 'status',
         headerName: 'Status',
-        minWidth: 200,
+        flex: 1,
         renderCell: ({ row }) => {
             if (!row.checkNumber) {
                 return (
@@ -105,7 +105,6 @@ export const createChequeColumns = (
     {
         field: 'actions',
         headerName: 'Action',
-        width: 130,
         align: 'center',
         headerAlign: 'center',
         sortable: false,
@@ -190,8 +189,8 @@ export const createPendingChequeColumns = (
     {
         field: 'payee',
         headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         flex: 1,
         renderCell: ({ row }) => row.checkable?.payee,
     },
@@ -253,8 +252,8 @@ export const createManageColumns = (
     {
         field: 'payee',
         headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         flex: 1,
     },
     {

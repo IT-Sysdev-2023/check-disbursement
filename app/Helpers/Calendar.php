@@ -44,6 +44,8 @@ class Calendar
                 Date::parse($date->cv_date)->format('Y-m')
             );
 
+        
+
         return $cv;
     }
 
