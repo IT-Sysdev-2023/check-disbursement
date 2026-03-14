@@ -75,8 +75,8 @@ class CvCheckPayment extends Model
             ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
                 $query->whereRelation('businessUnit.company', 'id', $filters['company']);
             })
-            ->when(($filters['bu'] ?? null) && $filters['bu'] != 'all', function ($query, $bu) {
-                $query->where('business_unit_id', $bu);
+            ->when(($filters['bu'] ?? null) && $filters['bu'] != 'all', function ($query) use ($filters)  {
+                $query->where('business_unit_id',  $filters['bu']);
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('check_date', [$date['start'], $date['end']]);

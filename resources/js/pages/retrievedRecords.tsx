@@ -205,6 +205,7 @@ export default function RetrievedRecords({
                                 handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}
+                                businessUnits={businessUnits}
                             />
                             <TableDataGrid
                                 data={manageChecks}

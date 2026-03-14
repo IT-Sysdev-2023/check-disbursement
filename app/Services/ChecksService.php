@@ -31,12 +31,12 @@ class ChecksService
         $tab = $filters['tab'] ?? 'calendar';
 
         $assignment = $filters['assignment'] ?? 'toAssign';
-        // dd($filters);
+
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
         $waitingForApproval = self::pendingRecords($filters);
 
-        $manageCheques = self::manageChecks();
+        $manageCheques = self::manageChecks($filters);
         $calendar = Calendar::calendar();
 
         return Inertia::render('retrievedRecords', [
@@ -66,7 +66,7 @@ class ChecksService
         ]);
     }
 
-    public static function manageChecks()
+    public static function manageChecks(array $filters)
     {
         // LAST OPTION : JOIN TYPE AND CHECKABLE
         // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
@@ -74,6 +74,7 @@ class ChecksService
             baseColumns()
             ->doesntHave('checkStatus')
             ->leftJoinScanRecords()
+            ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
                 'approvers.name as approver_name',
@@ -87,6 +88,7 @@ class ChecksService
             baseColumns()
             ->doesntHave('checkStatus')
             ->leftJoinScanRecords()
+            ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
                 'approvers.name as approver_name',
@@ -200,8 +202,6 @@ class ChecksService
             });
             $crfQuery->whereNotNull('resolved_check_date');
         }
-
-
 
         $unionQuery = $cvQuery->unionAll($crfQuery);
 

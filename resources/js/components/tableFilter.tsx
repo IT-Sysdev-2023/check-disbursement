@@ -51,8 +51,6 @@ export default function ({
                 company: event.target.value,
             },
         });
-
-        // setBusinessUnit(data);
     };
 
     const handleChangeBu = (event: SelectChangeEvent) => {
