@@ -69,7 +69,7 @@ class ChecksService
         ]);
     }
 
-    public static function manageChecks(array $filters)
+    public static function manageChecks(array $filters = [])
     {
         // LAST OPTION : JOIN TYPE AND CHECKABLE
         // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
