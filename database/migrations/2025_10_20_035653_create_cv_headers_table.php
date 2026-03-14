@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('nav_header_table_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('cv_no');
-            $table->dateTime('cv_date')->nullable();
+            $table->date('cv_date')->nullable();
             $table->string('cv_status');
             $table->string('collector_name');
             $table->string('vendor_no');
@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string('cv_type');
             $table->string('no_printed');
             $table->string('cancelled_by');
-            $table->dateTime('cancelled_date')->nullable();
+            $table->date('cancelled_date')->nullable();
             $table->string('checked_by'); 
             $table->string('approved_by'); 
             $table->timestamps();

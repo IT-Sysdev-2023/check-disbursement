@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->string('company_office');
             $table->unsignedBigInteger('no');
             $table->string('crf_location');
-            $table->dateTime('date')->nullable();
+            $table->date('date')->nullable();
             $table->string('paid_to');
             $table->string('particulars');
             $table->decimal('amount', 20);
@@ -27,7 +27,7 @@ return new class extends Migration {
             $table->string('prepared_by');
 
             $table->string('resolved_check_number')->nullable();
-            $table->timestamp('resolved_check_date')->nullable();
+            $table->date('resolved_check_date')->nullable();
             $table->foreignId('tag_location_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamp('tagged_at')->nullable();
             $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();

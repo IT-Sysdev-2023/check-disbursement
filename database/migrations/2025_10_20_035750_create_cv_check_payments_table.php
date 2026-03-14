@@ -20,11 +20,11 @@ return new class extends Migration {
             $table->decimal('check_amount', 20);
             $table->string('bank_account_no');
             $table->string('bank_name');
-            $table->dateTime('check_date')->nullable();
-            $table->dateTime('clearing_date')->nullable();
+            $table->date('check_date')->nullable();
+            $table->date('clearing_date')->nullable();
             $table->string('cleared_flag');
             $table->string('cancelled_flag');
-            $table->dateTime('cancelled_date')->nullable();
+            $table->date('cancelled_date')->nullable();
             $table->string('cancelled_by');
             $table->string('cancellation_reason');
             $table->string('cancelled_with_check_number');
@@ -33,7 +33,7 @@ return new class extends Migration {
             $table->string('payee');
 
             $table->string('resolved_check_number')->nullable();
-            $table->timestamp('resolved_check_date')->nullable();
+            $table->date('resolved_check_date')->nullable();
             $table->foreignId('tag_location_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamp('tagged_at')->nullable();
             $table->timestamps();
