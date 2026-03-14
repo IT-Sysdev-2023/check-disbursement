@@ -27,21 +27,19 @@ class ChecksService
     public function records(Request $request)
     {
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment']);
-
         $tab = $filters['tab'] ?? 'calendar';
-
         $assignment = $filters['assignment'] ?? 'toAssign';
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
-        $waitingForApproval = self::pendingRecords($filters);
+        $borrowedChecks = self::pendingRecords($filters);
 
         $manageCheques = self::manageChecks($filters);
         $calendar = Calendar::calendar();
 
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords,
-            'pending' => $waitingForApproval,
+            'pending' => $borrowedChecks,
             'manageChecks' => new ChequeCollection($manageCheques),
             'filter' => (object) [
                 'selectedCompany' => $filters['company'] ?? 'all',
@@ -206,13 +204,10 @@ class ChecksService
         $unionQuery = $cvQuery->unionAll($crfQuery);
 
         return DB::query()
-            ->fromSub(
-                DB::query()
-                    ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
-                    ->fromSub($unionQuery, 'merged'),
-                'final'
-            )
+            ->fromSub($unionQuery, 'merged')
             ->orderByDesc('created_at')
+            ->orderBy('type')
+            ->orderByDesc('cheque_id')
             ->paginate(10)
             ->withQueryString();
     }

@@ -111,6 +111,7 @@ export default function TableView({
             },
             {
                 preserveScroll: true,
+                preserveState: true,
                 onSuccess: () => {
                     setSelectedLocation('');
                     setOpenTagModal(false);
