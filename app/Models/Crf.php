@@ -80,7 +80,7 @@ class Crf extends Model
                 $query->where('business_unit_id', $filters['bu']);
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereBetween('resolved_check_date', [$date['start'], $date['end']]);
+                $query->whereBetween('crfs.resolved_check_date', [$date['start'], $date['end']]);
             })
             ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
                 $field = Str::snake($sort['field']);

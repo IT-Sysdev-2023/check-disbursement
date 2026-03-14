@@ -30,15 +30,20 @@ class ChecksService
         $tab = $filters['tab'] ?? 'calendar';
         $assignment = $filters['assignment'] ?? 'toAssign';
 
+
+
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
 
-        $borrowedChecks = self::pendingRecords($filters);
 
+        $borrowedChecks = self::pendingRecords($filters);
+        $manageCheques = [];
+        // if (isset($filters['tab']) && $filters['tab'] !== 'cheques') {
         $manageCheques = self::manageChecks($filters);
+
         $calendar = Calendar::calendar();
 
         return Inertia::render('retrievedRecords', [
-            'cheques' => $chequeRecords,
+            'cheques' => $chequeRecords ?? [],
             'pending' => $borrowedChecks,
             'manageChecks' => new ChequeCollection($manageCheques),
             'filter' => (object) [
@@ -210,6 +215,17 @@ class ChecksService
             ->orderByDesc('cheque_id')
             ->paginate(10)
             ->withQueryString();
+
+        // return DB::query()
+        //     ->fromSub(
+        //         DB::query()
+        //             ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
+        //             ->fromSub($unionQuery, 'merged'),
+        //         'final'
+        //     )
+        //     ->orderByDesc('created_at')
+        //     ->paginate(10)
+        //     ->withQueryString();
     }
 
 
