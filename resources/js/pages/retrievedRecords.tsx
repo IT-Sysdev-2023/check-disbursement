@@ -6,7 +6,7 @@ import {
     Borrower,
     CalendarTypes,
     ChequeType,
-    DateFilterType,
+    FilterType,
     InertiaPagination,
     ManageChecks,
     SelectionType,
@@ -50,14 +50,7 @@ export default function RetrievedRecords({
     businessUnits,
     auth,
 }: {
-    filter: {
-        selectedCompany: string;
-        selectedBu: string;
-        assignments: 'completed' | 'toAssign';
-        search: string;
-        date: DateFilterType;
-        tab: string;
-    };
+    filter: FilterType;
     counts: {
         toAssign: string;
         completed: string;

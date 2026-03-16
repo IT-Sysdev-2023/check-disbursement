@@ -108,6 +108,15 @@ export interface Company {
     updated_at: string;
 }
 
+export interface FilterType {
+    selectedCompany: string;
+    selectedBu: string;
+    assignments: 'completed' | 'toAssign';
+    search: string;
+    date: DateFilterType;
+    tab: string;
+}
+
 export interface Role {
     created_at: string;
     guard_name: string;

@@ -7,7 +7,7 @@ import { releaseCheck } from '@/routes';
 import {
     Crf,
     Cv,
-    DateFilterType,
+    FilterType,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
@@ -31,12 +31,7 @@ export default function CheckReleasing({
     filter,
 }: {
     cheques: InertiaPagination<Cv | Crf>;
-    filter: {
-        selectedCompany: string;
-        selectedBu: string;
-        search: string;
-        date: DateFilterType;
-    };
+    filter: FilterType;
     company: SelectionType[];
 }) {
     const [open, setOpen] = useState(false);

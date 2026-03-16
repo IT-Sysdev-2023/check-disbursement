@@ -1,5 +1,6 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { DateFilterType, SelectionType } from '@/types';
+import { FilterType, SelectionType } from '@/types';
+import { RouteDefinition } from '@/wayfinder';
 import { router } from '@inertiajs/react';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import {
@@ -19,14 +20,12 @@ export default function ({
     company,
     filters,
     children,
+    resetFilterRouter,
     businessUnits,
 }: {
     company: SelectionType[];
-    filters: {
-        selectedCompany: string;
-        selectedBu: string;
-        date: DateFilterType;
-    };
+    filters: FilterType;
+    resetFilterRouter?: RouteDefinition<"get">;
     businessUnits?: SelectionType[];
     children?: React.ReactNode;
     handleChangeCheck?: (value: SelectChangeEvent) => void;
@@ -87,14 +86,17 @@ export default function ({
     };
 
     const handleReset = () => {
-        router.reload({
-            data: {
-                date: null,
+        if (!resetFilterRouter) return;
+
+        router.get(
+            resetFilterRouter,
+            {},
+            {
+                replace: true,
+                preserveState: true,
+                preserveScroll: true,
             },
-            replace: true,
-        });
-        setStartDate(null);
-        setEndDate(null);
+        );
     };
 
     return (
@@ -158,10 +160,14 @@ export default function ({
                         minDate={startDate || undefined}
                     />
 
-                    <Tooltip title="Reset" placement="right" enterDelay={1000}>
+                    <Tooltip
+                        title="Reset Filters"
+                        placement="right"
+                        enterDelay={1000}
+                    >
                         <div>
                             <IconButton
-                                disabled={startDate == null || endDate == null}
+                                // disabled={startDate == null || endDate == null}
                                 size="small"
                                 aria-label="refresh"
                                 onClick={handleReset}

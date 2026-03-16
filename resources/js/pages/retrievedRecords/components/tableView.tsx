@@ -3,12 +3,12 @@ import TableFilter from '@/components/tableFilter';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
 import TableDataGrid from '@/pages/dashboard/components/TableDataGrid';
-import { details, detailsCrf, getLocation, tagLocation } from '@/routes';
+import { details, detailsCrf, getLocation, retrievedRecords, tagLocation } from '@/routes';
 import {
     ActionHandler,
     ActionType,
     ChequeType,
-    DateFilterType,
+    FilterType,
     InertiaPagination,
     SelectionType,
 } from '@/types';
@@ -42,14 +42,7 @@ export default function TableView({
         toAssign: string;
         completed: string;
     };
-    filter: {
-        selectedCompany: string;
-        selectedBu: string;
-        assignments: 'completed' | 'toAssign';
-        search: string;
-        date: DateFilterType;
-        tab: string;
-    };
+    filter: FilterType;
 }) {
     const [open, setOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -160,8 +153,9 @@ export default function TableView({
         <>
             <TableFilter
                 handleChangeCheck={() => null}
-                company={company}
+                company={company ?? []}
                 businessUnits={businessUnits}
+                resetFilterRouter={retrievedRecords()}
                 filters={filter}
             >
                 <ToggleButtonGroup
