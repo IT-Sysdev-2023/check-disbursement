@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Date;
@@ -24,29 +25,30 @@ class Calendar
     }
     private static function distinctMonths()
     {
-        // $crf = Crf::select('cv_headers.cv_date', DB::raw('count(*) as total'))
-        //         ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-        //         ->doesntHave('checkStatus')
-        //         ->groupBy('cv_headers.cv_date')
-        //         ->get()
-        //         ->groupBy(
-        //             fn($date) =>
-        //             Date::parse($date->cv_date)->format('Y-m')
-        //         );
+        $crf = Crf::select('date as date', DB::raw('count(*) as total'))
+            ->doesntHave('checkStatus')
+            ->groupBy('date');
 
-        $cv = CvCheckPayment::select('cv_headers.cv_date', DB::raw('count(*) as total'))
+        $cv = CvCheckPayment::select('cv_headers.cv_date as date', DB::raw('count(*) as total'))
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->doesntHave('checkStatus')
-            ->groupBy('cv_headers.cv_date')
+            ->groupBy('cv_headers.cv_date');
+
+        $result = DB::query()
+            ->fromSub(
+                $crf->unionAll($cv),
+                'combined'
+            )
+            ->selectRaw('date, SUM(total) as total')
+            ->groupBy('date')
+            ->orderBy('date')
             ->get()
             ->groupBy(
-                fn($date) =>
-                Date::parse($date->cv_date)->format('Y-m')
+                fn($q) =>
+                Date::parse($q->date)->format('Y-m')
             );
 
-        
-
-        return $cv;
+        return $result;
     }
 
 
@@ -58,9 +60,8 @@ class Calendar
         $totalDay = CarbonPeriod::create($startDate, $endDate);
 
         $transformers = collect($totalDay)->map(function ($val) use ($records) {
-
             $findRecord = $records->first(function ($record) use ($val) {
-                return Date::parse($record['cv_date'])->format('Y-m-d') === $val->format('Y-m-d');
+                return Date::parse($record->date)->format('Y-m-d') === $val->format('Y-m-d');
             });
 
             return ['day' => $val->day, 'totalRecord' => $findRecord ? $findRecord->total : 0, 'isCurrent' => false]; //$val->day === today()->day

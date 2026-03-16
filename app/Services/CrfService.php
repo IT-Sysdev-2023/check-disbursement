@@ -24,7 +24,7 @@ class CrfService
         $request->validate([
             'files' => 'required',
             'files.*' => 'file|max:5120|unique:crfs,filename',
-            'bu' => ['required', 'array', 'min:1']
+            // 'bu' => ['required', 'array', 'min:1']
         ]);
 
         $userId = $request->user()->id;
@@ -58,7 +58,7 @@ class CrfService
             $start++;
         });
 
-        $validated = CrfHelper::checkProperties($records, $request->bu);
+        $validated = CrfHelper::checkProperties($records, []);
 
         if (!$validated) {
             return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);

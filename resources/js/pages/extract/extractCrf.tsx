@@ -89,11 +89,6 @@ export default function ExtractCrf({
     });
 
     const simulateDataRetrieval = () => {
-        if (permissionList.length <= 0) {
-            alert('Please select Business Unit');
-            return;
-        }
-
         router.post(
             extractCrf(),
             {
@@ -199,12 +194,12 @@ export default function ExtractCrf({
                             Elevate your experience with top-tier features and
                             services.
                         </Typography>
-                        <SelectBu
+                        {/* <SelectBu //DISABLE BU SELECTION
                             label="Select Business Unit"
                             permissions={bu}
                             selectedPermission={permissionList}
                             handleChange={handleChange}
-                        />
+                        /> */}
                         <Button
                             sx={{
                                 mt: 5,

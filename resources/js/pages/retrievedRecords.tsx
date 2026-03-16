@@ -4,6 +4,7 @@ import { details, detailsCrf, retrievedRecords } from '@/routes';
 import {
     Auth,
     Borrower,
+    CalendarTypes,
     ChequeType,
     DateFilterType,
     InertiaPagination,
@@ -62,7 +63,7 @@ export default function RetrievedRecords({
         completed: string;
     };
     businessUnits: SelectionType[];
-    calendar: any;
+    calendar: CalendarTypes[];
     cheques: InertiaPagination<ChequeType>;
     pending: InertiaPagination<Borrower>;
     company: SelectionType[];

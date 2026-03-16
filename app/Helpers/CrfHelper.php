@@ -168,7 +168,7 @@ class CrfHelper
         ];
     }
 
-    public static function checkProperties(Collection $records, array $bu)
+    public static function checkProperties(Collection $records, ?array $bu = [])
     {
         return $records->every(function ($item) use ($bu) {
             return (!empty($item['company_office']) && !empty($item['no'])
