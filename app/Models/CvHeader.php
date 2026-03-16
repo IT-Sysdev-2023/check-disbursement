@@ -10,7 +10,7 @@ class CvHeader extends Model
       protected function casts(): array
     {
         return [
-            'cv_date' => 'datetime',
+            'cv_date' => 'date',
             'created_at' => 'datetime',
         ];
 

@@ -33,7 +33,7 @@ class ChecksService
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
         $borrowedChecks = self::pendingRecords($filters);
         $manageCheques = [];
-        
+
         $manageCheques = self::manageChecks($filters);
 
         $calendar = Calendar::calendar();
@@ -58,8 +58,8 @@ class ChecksService
             ]),
             'businessUnits' => isset($filters['company']) ? self::businessUnits($filters['company']) : [],
             'counts' => (object) [
-                'toAssign' => self::countToAssign(),
-                'completed' => self::countCompleted()
+                'toAssign' => self::countToAssign($filters),
+                'completed' => self::countCompleted($filters)
             ],
             'calendar' => $calendar
         ]);
@@ -139,16 +139,17 @@ class ChecksService
             ->exists();
     }
 
-    private function countToAssign()
+    private function countToAssign(array $filters)
     {
         $cvQuery = CvCheckPayment::baseColumns()
+            ->filter($filters)
             ->doesntHave('borrowedCheck')
             ->where([['check_number', 0], ['resolved_check_number', null]]);
 
         $crfQuery = Crf::baseColumns()
+            ->filter($filters)
             ->doesntHave('borrowedCheck')
             ->where('resolved_check_date', null);
-        ;
 
 
         return DB::query()
@@ -158,9 +159,10 @@ class ChecksService
             )
             ->count();
     }
-    private function countCompleted()
+    private function countCompleted(array $filters)
     {
         $cvQuery = CvCheckPayment::baseColumns()
+            ->filter($filters)
             ->doesntHave('borrowedCheck')
             ->where(function ($q) {
                 $q->whereNotNull('resolved_check_number')
@@ -170,6 +172,7 @@ class ChecksService
         // ->whereNot('check_number');
 
         $crfQuery = Crf::baseColumns()
+            ->filter($filters)
             ->doesntHave('borrowedCheck')
             ->whereNotNull('resolved_check_date');
 
@@ -181,9 +184,8 @@ class ChecksService
             ->count();
     }
 
-    private static function mergeRecords($filters, bool $hasMissingField)
+    private static function mergeRecords(array $filters, bool $hasMissingField)
     {
-
         $cvQuery = CvCheckPayment::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');

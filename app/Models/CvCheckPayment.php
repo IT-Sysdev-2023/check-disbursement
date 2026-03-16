@@ -23,8 +23,8 @@ class CvCheckPayment extends Model
     protected function casts(): array
     {
         return [
-            'check_date' => 'datetime',
-            'clearing_date' => 'datetime',
+            'check_date' => 'date',
+            'clearing_date' => 'date',
         ];
 
     }

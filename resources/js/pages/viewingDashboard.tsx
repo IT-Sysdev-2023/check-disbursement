@@ -165,9 +165,9 @@ export default function ViewingDashboard({
     checks: InertiaPagination<ChequeType>;
     checkIssued: string;
     totals: {
-        cv: string;
-        crf: string;
-        total: string;
+        amount: string;
+        releasedChecks: string;
+        pending: string;
     };
 }) {
     const [value, setValue] = useState('all');

@@ -21,8 +21,8 @@ class Crf extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'datetime',
-            'resolved_check_date' => 'datetime',
+            'date' => 'date',
+            'resolved_check_date' => 'date',
         ];
 
     }
