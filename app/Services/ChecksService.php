@@ -44,6 +44,7 @@ class ChecksService
             'manageChecks' => new ChequeCollection($manageCheques),
             'filter' => (object) [
                 'selectedCompany' => $filters['company'] ?? 'all',
+                'assignments' => $assignment,
                 'selectedBu' => $filters['bu'] ?? 'all',
                 'search' => $filters['search'] ?? '',
                 'date' => $filters['date'] ?? (object) [

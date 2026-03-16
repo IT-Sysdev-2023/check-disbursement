@@ -52,6 +52,7 @@ export default function RetrievedRecords({
     filter: {
         selectedCompany: string;
         selectedBu: string;
+        assignments: 'completed' | 'toAssign';
         search: string;
         date: DateFilterType;
         tab: string;

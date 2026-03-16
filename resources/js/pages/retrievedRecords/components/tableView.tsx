@@ -13,7 +13,13 @@ import {
     SelectionType,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import { Badge, Box, Button } from '@mui/material';
+import {
+    Badge,
+    Box,
+    Button,
+    ToggleButton,
+    ToggleButtonGroup,
+} from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import axios from 'axios';
 import { HandCoins } from 'lucide-react';
@@ -39,6 +45,7 @@ export default function TableView({
     filter: {
         selectedCompany: string;
         selectedBu: string;
+        assignments: 'completed' | 'toAssign';
         search: string;
         date: DateFilterType;
         tab: string;
@@ -57,6 +64,7 @@ export default function TableView({
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
+    const [alignment, setAlignment] = useState(filter.assignments);
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const selectedR = cheques.data
@@ -136,7 +144,18 @@ export default function TableView({
         if (handler) handler(data);
     };
 
+    const handleAlignment = (
+        _: React.MouseEvent<HTMLElement, MouseEvent>,
+        newAlignment: 'completed' | 'toAssign',
+    ) => {
+        if (newAlignment !== null) {
+            handleAssignment(newAlignment);
+            setAlignment(newAlignment);
+        }
+    };
+
     const chequeColumns = createChequeColumns(handleStatusChange);
+
     return (
         <>
             <TableFilter
@@ -145,7 +164,24 @@ export default function TableView({
                 businessUnits={businessUnits}
                 filters={filter}
             >
-                <Button
+                <ToggleButtonGroup
+                    value={alignment}
+                    exclusive
+                    onChange={handleAlignment}
+                    aria-label="text alignment"
+                >
+                    <ToggleButton value="toAssign" aria-label="left aligned">
+                        <Badge badgeContent={counts.toAssign} color="error">
+                            Assignment
+                        </Badge>
+                    </ToggleButton>
+                    <ToggleButton value="completed" aria-label="centered">
+                        <Badge badgeContent={counts.completed} color="error">
+                            Completed
+                        </Badge>
+                    </ToggleButton>
+                </ToggleButtonGroup>
+                {/* <Button
                     variant="outlined"
                     onClick={() => handleAssignment('toAssign')}
                 >
@@ -161,7 +197,7 @@ export default function TableView({
                     <Badge badgeContent={counts.completed} color="error">
                         Completed
                     </Badge>
-                </Button>
+                </Button> */}
             </TableFilter>
             <TableDataGrid
                 data={cheques}
