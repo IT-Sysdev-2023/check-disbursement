@@ -156,7 +156,7 @@ export default function RetrievedRecords({
                                 aria-label="tabs"
                             >
                                 <Tab
-                                    label="CV Calendar View"
+                                    label="Calendar View"
                                     value="calendar"
                                 />
                                 <Tab label="Table View" value="cheques" />

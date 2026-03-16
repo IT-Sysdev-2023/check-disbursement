@@ -34,6 +34,7 @@ class ChequeResource extends JsonResource
             'borrowedCheckId' => $this->borrowedCheckId ?? null,
             'checkDate' => $checkDate ? $checkDate->toFormattedDateString() : null,
             'companyName' => $this->company_name ?? null,
+            'statusOrder' => $this->status_order,
             'checkDateStatus' => $status,
             'amount' => NumberHelper::currency($this->amount),
             'amountUnformatted' => $this->amount,

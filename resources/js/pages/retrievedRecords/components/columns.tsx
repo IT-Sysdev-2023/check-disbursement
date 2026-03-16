@@ -38,13 +38,14 @@ export const createChequeColumns = (
     {
         field: 'checkNumber',
         headerName: 'Check Number',
-         flex: 1,
+        flex: 1,
     },
     {
         field: 'checkDate',
         headerName: 'Check Date',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
+        flex: 1,
     },
     {
         field: 'payee',
@@ -70,23 +71,16 @@ export const createChequeColumns = (
     },
 
     {
-        field: 'status',
+        field: 'statusOrder',
         headerName: 'Status',
         flex: 1,
         renderCell: ({ row }) => {
-            if (!row.checkNumber) {
+
+            //ASSIGNMENT STATUS
+            if (!row.checkNumber || !row.checkDate) {
                 return (
                     <Chip
-                        label="Assign Check Number"
-                        color="error"
-                        size="small"
-                    />
-                );
-            }
-            if (!row.checkDate) {
-                return (
-                    <Chip
-                        label="Assign Check Date"
+                        label={row.statusOrder}
                         color="error"
                         size="small"
                     />
@@ -95,10 +89,15 @@ export const createChequeColumns = (
 
             if (row.taggedAt) {
                 return (
-                    <Chip label="For Signature" color="success" size="small" />
+                    <Chip
+                        label={row.statusOrder}
+                        color="success"
+                        size="small"
+                    />
                 );
             }
 
+            //COMPLETED STATUS
             return renderStatus(row?.borrowedCheck ? 'Borrowed' : 'Tagging');
         },
     },

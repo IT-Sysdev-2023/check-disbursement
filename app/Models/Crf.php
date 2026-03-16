@@ -81,19 +81,19 @@ class Crf extends Model
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('crfs.date', [$date['start'], $date['end']]);
-            })
-            ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
-                $field = Str::snake($sort['field']);
-                $direction = $sort['sort'];
-
-                $table = $query->getModel()->getTable();
-
-                if (Schema::hasColumn($table, $field)) {
-                    return $query->orderBy($field, $direction);
-                }
-
-                return $query;
             });
+            // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
+            //     $field = Str::snake($sort['field']);
+            //     $direction = $sort['sort'];
+
+            //     $table = $query->getModel()->getTable();
+
+            //     if (Schema::hasColumn($table, $field)) {
+            //         return $query->orderBy($field, $direction);
+            //     }
+
+            //     return $query;
+            // });
         ;
     }
 
@@ -109,7 +109,16 @@ class Crf extends Model
             'tagged_at',
             'tag_locations.location',
             DB::raw("'crf' as type"),
-            'crfs.created_at'
+            'crfs.created_at',
+
+            DB::raw("
+                CASE
+                    WHEN ck_no is NULL THEN 'Assign Check Number'
+                    WHEN crfs.resolved_check_date IS NULL THEN 'Assign Check Date'
+                    WHEN tagged_at IS NOT NULL THEN 'For Signature'
+                    ELSE 'Tagging'
+                END as status_order
+            ")
         )
             ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
             ->leftJoin('tag_locations', 'tag_locations.id', '=', 'crfs.tag_location_id');

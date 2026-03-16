@@ -82,32 +82,32 @@ class CvCheckPayment extends Model
                 $query->whereRelation('cvHeader', function ($q) use ($date) {
                     $q->whereBetween('cv_date', [$date['start'], $date['end']]);
                 });
-            })
-            ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
-
-                $field = Str::snake($sort['field']);
-                $direction = $sort['sort'];
-
-                // Main table
-                if (Schema::hasColumn('cv_check_payments', $field)) {
-                    return $query->orderBy($field, $direction);
-                }
-
-                // cvHeader relationship
-                if (Schema::hasColumn('cv_headers', $field)) {
-                    return $query->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-                        ->orderBy("cv_headers.$field", $direction)
-                        ->select('cv_check_payments.*');
-                }
-
-                // company relationship
-                // if (Schema::hasColumn('companies', $field)) {
-                //     return $query->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
-                //         ->orderBy("companies.$field", $direction)
-                //         ->select('cv_check_payments.*');
-                // }
-    
             });
+        // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
+
+        //     $field = Str::snake($sort['field']);
+        //     $direction = $sort['sort'];
+
+        //     // Main table
+        //     if (Schema::hasColumn('cv_check_payments', $field)) {
+        //         return $query->orderBy($field, $direction);
+        //     }
+
+        //     // cvHeader relationship
+        //     if (Schema::hasColumn('cv_headers', $field)) {
+        //         return $query->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+        //             ->orderBy("cv_headers.$field", $direction)
+        //             ->select('cv_check_payments.*');
+        //     }
+
+        //     // company relationship
+        //     // if (Schema::hasColumn('companies', $field)) {
+        //     //     return $query->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
+        //     //         ->orderBy("companies.$field", $direction)
+        //     //         ->select('cv_check_payments.*');
+        //     // }
+
+        // });
     }
 
     public function scopeBaseColumns(Builder $builder)
@@ -122,7 +122,16 @@ class CvCheckPayment extends Model
             'tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),
-            'cv_check_payments.created_at'
+            'cv_check_payments.created_at',
+
+            DB::raw("
+                CASE
+                    WHEN (CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END) IS NULL THEN 'Assign Check Number'
+                    WHEN cv_check_payments.check_date IS NULL THEN 'Assign Check Date'
+                    WHEN tagged_at IS NOT NULL THEN 'For Signature'
+                    ELSE 'Tagging'
+                END as status_order
+            ")
         )
             ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
             // ->join('companies', 'companies.id', '=', 'business_units.company_id')

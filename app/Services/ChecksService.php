@@ -13,12 +13,13 @@ use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
 use Carbon\CarbonPeriod;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ChecksService
@@ -29,7 +30,7 @@ class ChecksService
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment']);
         $tab = $filters['tab'] ?? 'calendar';
         $assignment = $filters['assignment'] ?? 'toAssign';
-
+        // dd($filters);
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
         $borrowedChecks = self::pendingRecords($filters);
         $manageCheques = [];
@@ -190,6 +191,7 @@ class ChecksService
         $cvQuery = CvCheckPayment::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');
+
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');
@@ -209,9 +211,9 @@ class ChecksService
 
         return DB::query()
             ->fromSub($unionQuery, 'merged')
-            ->orderByDesc('created_at')
-            ->orderBy('type')
-            ->orderByDesc('cheque_id')
+            ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
+                $q->orderBy(Str::snake($sort['field']), $sort['sort']);
+            }, fn($q) => $q->orderByDesc('created_at'))
             ->paginate(10)
             ->withQueryString();
 
