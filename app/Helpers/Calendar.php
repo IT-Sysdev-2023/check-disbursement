@@ -25,11 +25,11 @@ class Calendar
     }
     private static function distinctMonths()
     {
-        $crf = Crf::select('date as date', DB::raw('count(*) as total'))
+        $crf = Crf::select('date as date', DB::raw('count(*) as total'), DB::raw("'CRF' as type"))
             ->doesntHave('checkStatus')
             ->groupBy('date');
 
-        $cv = CvCheckPayment::select('cv_headers.cv_date as date', DB::raw('count(*) as total'))
+        $cv = CvCheckPayment::select('cv_headers.cv_date as date', DB::raw('count(*) as total'), DB::raw("'CV' as type"))
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->doesntHave('checkStatus')
             ->groupBy('cv_headers.cv_date');
@@ -39,7 +39,13 @@ class Calendar
                 $crf->unionAll($cv),
                 'combined'
             )
-            ->selectRaw('date, SUM(total) as total')
+            // ->selectRaw('date, SUM(total) as total')
+            ->selectRaw("
+            date,
+            SUM(CASE WHEN type = 'crf' THEN total ELSE 0 END) as crf_total,
+            SUM(CASE WHEN type = 'cv' THEN total ELSE 0 END) as cv_total,
+            SUM(total) as total
+        ")
             ->groupBy('date')
             ->orderBy('date')
             ->get()
@@ -64,10 +70,16 @@ class Calendar
                 return Date::parse($record->date)->format('Y-m-d') === $val->format('Y-m-d');
             });
 
-            return ['day' => $val->day, 'totalRecord' => $findRecord ? $findRecord->total : 0, 'isCurrent' => false]; //$val->day === today()->day
+            return [
+                'day' => $val->day,
+                'totalRecord' => $findRecord ? $findRecord->total : 0,
+                'crf' => $findRecord ? $findRecord->crf_total : 0,
+                'cv' => $findRecord ? $findRecord->cv_total : 0,
+                'isCurrent' => false
+            ]; //$val->day === today()->day
 
         });
-
+        
         // dd($transformers);
         $totalDay = $transformers->toArray();
         $startWeek = $startDate->dayOfWeek;

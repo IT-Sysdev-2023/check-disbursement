@@ -1,9 +1,11 @@
 import { useAppearance } from '@/hooks/use-appearance';
 import { router } from '@inertiajs/react';
+import { Badge, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
 import { useEffect, useState } from 'react';
+import CalendarLegend from './calendarLegend';
 
 const Calendar = ({
     data,
@@ -28,7 +30,7 @@ const Calendar = ({
     }, [appearance]);
 
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-    
+
     useEffect(() => {
         if (!selectedDate) return;
 
@@ -56,9 +58,14 @@ const Calendar = ({
     //     month: data.month,
     //     days: data.days,
     // });
-
+    console.log(data);
     return (
         <Box>
+            <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ width: '100%' }}>
+                <CalendarLegend color='green' label='Total CRF' />
+                <CalendarLegend color='orange' label='Total CV' />
+                <CalendarLegend color='yellow' label='No. of Records' />
+            </Stack>
             {data.map((day, monthIndex) => (
                 <Box key={monthIndex} sx={{ mb: 4 }}>
                     <Box
@@ -169,6 +176,45 @@ const Calendar = ({
                                                 >
                                                     {dayObj.day}
                                                 </span>
+                                                {(dayObj.crf !== undefined ||
+                                                    dayObj.cv !==
+                                                        undefined) && (
+                                                    <div
+                                                        style={{
+                                                            position:
+                                                                'absolute',
+                                                            top: '4px',
+                                                            right: '6px',
+                                                            fontSize: '0.65rem',
+                                                            textAlign: 'right',
+                                                            lineHeight: '1.2',
+                                                        }}
+                                                    >
+                                                        {dayObj.crf !==
+                                                            undefined && (
+                                                            <div
+                                                                style={{
+                                                                    color: '#4caf50',
+                                                                    fontWeight: 600,
+                                                                }}
+                                                            >
+                                                                CRF:{' '}
+                                                                {dayObj.crf}
+                                                            </div>
+                                                        )}
+                                                        {dayObj.cv !==
+                                                            undefined && (
+                                                            <div
+                                                                style={{
+                                                                    color: '#ff9800',
+                                                                    fontWeight: 600,
+                                                                }}
+                                                            >
+                                                                CV: {dayObj.cv}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                                 {/* Total Record Below Date */}
                                                 {dayObj.totalRecord !==
                                                     undefined && (
@@ -180,13 +226,19 @@ const Calendar = ({
                                                             fontWeight: 800,
 
                                                             textAlign: 'center',
-                                                            color: isDarkMode
-                                                                ? theme.palette
-                                                                      .warning
-                                                                      .main
-                                                                : theme.palette
-                                                                      .info
-                                                                      .main,
+                                                            color:
+                                                                dayObj.totalRecord ===
+                                                                0
+                                                                    ? '#9e9e9e' // gray when zero
+                                                                    : isDarkMode
+                                                                      ? theme
+                                                                            .palette
+                                                                            .warning
+                                                                            .main
+                                                                      : theme
+                                                                            .palette
+                                                                            .info
+                                                                            .main,
                                                         }}
                                                     >
                                                         {dayObj.totalRecord}
