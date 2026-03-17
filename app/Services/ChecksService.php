@@ -30,7 +30,7 @@ class ChecksService
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment']);
         $tab = $filters['tab'] ?? 'calendar';
         $assignment = $filters['assignment'] ?? 'toAssign';
-        // dd($filters);
+
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
         $borrowedChecks = self::pendingRecords($filters);
         $manageCheques = [];
@@ -101,13 +101,10 @@ class ChecksService
         $unionQuery = $cv->unionAll($crf);
 
         return DB::query()
-            ->fromSub(
-                DB::query()
-                    ->selectRaw('ROW_NUMBER() OVER (ORDER BY created_at DESC) as id, merged.*') //Create unique ID
-                    ->fromSub($unionQuery, 'merged'),
-                'final'
-            )
-            ->orderByDesc('created_at')
+            ->fromSub($unionQuery, 'merged')
+            ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
+                $q->orderBy(Str::snake($sort['field']), $sort['sort']);
+            }, fn($q) => $q->orderByDesc('created_at'))
             ->paginate(10)
             ->withQueryString();
     }

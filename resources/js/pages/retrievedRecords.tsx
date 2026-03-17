@@ -67,7 +67,7 @@ export default function RetrievedRecords({
     const [openInputDetails, setOpenInputDetails] = useState(false);
     const [scannedDetailsModal, setScannedDetailsModal] = useState(false);
     const [scannedId, setScannedId] = useState<number>();
-    const [checkRecords, setCheckRecords] = useState<number>();
+    const [checkRecords, setCheckRecords] = useState({});
     const [currentTab, setCurrentTab] = useState(filter.tab);
     const [pendingId, setPendingId] = useState<number>();
     const [pendingModal, setPendingModal] = useState(false);
@@ -107,10 +107,10 @@ export default function RetrievedRecords({
     //     );
     // };
 
-    const handleUpdateScanned = (borrowedCheckId: number) => {
+    const handleUpdateScanned = (details) => {
         setOpenInputDetails(true);
 
-        if (borrowedCheckId) setCheckRecords(borrowedCheckId);
+        if (details) setCheckRecords(details);
     };
 
     const handleClickCalendar = () => {
@@ -148,10 +148,7 @@ export default function RetrievedRecords({
                                 onChange={handleChangeTab}
                                 aria-label="tabs"
                             >
-                                <Tab
-                                    label="Calendar View"
-                                    value="calendar"
-                                />
+                                <Tab label="Calendar View" value="calendar" />
                                 <Tab label="Table View" value="cheques" />
                                 <Tab label="Borrowed Checks" value="pending" />
                                 <Tab
@@ -192,6 +189,7 @@ export default function RetrievedRecords({
                                 handleChangeCheck={() => null}
                                 company={company}
                                 filters={filter}
+                                resetFilterRouter={retrievedRecords()}
                                 businessUnits={businessUnits}
                             />
                             <TableDataGrid

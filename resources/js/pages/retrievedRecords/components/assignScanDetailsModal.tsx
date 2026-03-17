@@ -40,9 +40,10 @@ export default function AssignScanDetailsModal({
 }: {
     title: string;
     open: boolean;
-    borrowedCheckId: number;
+    borrowedCheckId: any;
     onClose: () => void;
-}) {
+    }) {
+    console.log(borrowedCheckId);
     const [bank, setBank] = useState('');
     const [bankRecords, setBankRecords] = useState<SelectionType[]>([]);
     const { data, setData, errors, post, reset, transform } = useForm({
@@ -52,6 +53,17 @@ export default function AssignScanDetailsModal({
         payee: '',
         amount: 0,
     });
+    useEffect(() => {
+        if (borrowedCheckId) {
+            setData({
+                ...data,
+                checkDate: dayjs(borrowedCheckId.checkDate),
+                checkNumber: borrowedCheckId.checkNumber,
+                amount: borrowedCheckId.amount,
+                payee: borrowedCheckId.payee,
+            });
+        }
+    }, [borrowedCheckId]);
 
     useEffect(() => {
         const getRecord = async () => {
@@ -69,7 +81,7 @@ export default function AssignScanDetailsModal({
             checkDate: dayjs(data.checkDate).format('YYYY-MM-DD'),
         }));
 
-        post(storeScanRecord(borrowedCheckId).url, {
+        post(storeScanRecord(borrowedCheckId.id).url, {
             preserveScroll: true,
             onSuccess: () => {
                 reset();
@@ -117,7 +129,6 @@ export default function AssignScanDetailsModal({
                                     title=""
                                     items={bankRecords}
                                 />
-                                
                             </Paper>
                         </Grid>
 
@@ -214,7 +225,7 @@ export default function AssignScanDetailsModal({
                                 <Typography variant="overline">
                                     Amount
                                 </Typography>
-                                 <NumberFormatInput
+                                <NumberFormatInput
                                     fullWidth
                                     size="small"
                                     value={data.amount}

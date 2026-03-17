@@ -75,15 +75,10 @@ export const createChequeColumns = (
         headerName: 'Status',
         flex: 1,
         renderCell: ({ row }) => {
-
             //ASSIGNMENT STATUS
             if (!row.checkNumber || !row.checkDate) {
                 return (
-                    <Chip
-                        label={row.statusOrder}
-                        color="error"
-                        size="small"
-                    />
+                    <Chip label={row.statusOrder} color="error" size="small" />
                 );
             }
 
@@ -172,9 +167,18 @@ export const createPendingChequeColumns = (
     {
         field: 'checkDate',
         headerName: 'Check Date',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
+        flex: 1,
         renderCell: ({ row }) => row.checkable?.checkDate,
+    },
+    {
+        field: 'payee',
+        headerName: 'Payee',
+        headerAlign: 'left',
+        align: 'left',
+        flex: 1,
+        renderCell: ({ row }) => row.checkable?.payee,
     },
     {
         field: 'amount',
@@ -185,14 +189,7 @@ export const createPendingChequeColumns = (
         minWidth: 80,
         renderCell: ({ row }) => row.checkable?.amount,
     },
-    {
-        field: 'payee',
-        headerName: 'Payee',
-        headerAlign: 'left',
-        align: 'left',
-        flex: 1,
-        renderCell: ({ row }) => row.checkable?.payee,
-    },
+
     {
         field: 'companyName',
         headerName: 'Business Unit',
@@ -233,7 +230,7 @@ export const createPendingChequeColumns = (
 
 export const createManageColumns = (
     handleDetails: (id: number, type: 'cv' | 'crf') => void,
-    handleAction: (id: number) => void,
+    handleAction: (details: any) => void,
     handleScanDetails: (id: number) => void,
 ): GridColDef[] => [
     {
@@ -244,9 +241,10 @@ export const createManageColumns = (
     {
         field: 'checkDate',
         headerName: 'Check Date',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         minWidth: 80,
+        flex: 1,
     },
     {
         field: 'payee',
@@ -273,8 +271,8 @@ export const createManageColumns = (
     {
         field: 'approversName',
         headerName: 'Approved By',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         flex: 1,
     },
     {
@@ -314,6 +312,14 @@ export const createManageColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
+
+            const details = {
+                'id': row.borrowedCheckId,
+                'amount': row.amountUnformatted,
+                'payee': row.payee,
+                'checkDate': row.checkDateUnformatted,
+                'checkNumber': row.checkNumber,
+            }
             return (
                 <Stack direction="row" sx={{ gap: 1 }}>
                     <IconButton
@@ -338,7 +344,7 @@ export const createManageColumns = (
                         <IconButton
                             size="small"
                             color="primary"
-                            onClick={() => handleAction(row.borrowedCheckId)}
+                            onClick={() => handleAction(details)}
                         >
                             <Edit2 />
                         </IconButton>
