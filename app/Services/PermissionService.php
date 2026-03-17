@@ -29,4 +29,12 @@ class PermissionService
 
         return $transform;
     }
+
+    public static function userAssignedCompany(User $user)
+    {
+        return self::getCompanyPermissions($user)->prepend([
+            'label' => 'All',
+            'value' => '0'
+        ]);
+    }
 }

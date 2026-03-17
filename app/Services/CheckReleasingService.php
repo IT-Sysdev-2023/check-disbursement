@@ -25,9 +25,9 @@ class CheckReleasingService
     }
     public function index(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
 
-        $chequeRecords = ChecksService::manageChecks();
+        $chequeRecords = ChecksService::manageChecks($filters);
 
         return Inertia::render('checkReleasing', [
             'cheques' => new ChequeCollection($chequeRecords),
@@ -39,10 +39,8 @@ class CheckReleasingService
                     'end' => null
                 ]
             ],
-            'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
-                'label' => 'All',
-                'value' => '0'
-            ]),
+             'businessUnits' => isset($filters['company']) ? ChecksService::businessUnits($filters['company']) : [],
+            'company' => PermissionService::userAssignedCompany($request->user())
         ]);
     }
 
@@ -79,7 +77,7 @@ class CheckReleasingService
 
             $checkCompany = $checkStatus->load('checkable')->checkable->getCompany;
 
-            
+
 
             $data = [
                 'transactionNo' => NumberHelper::padLeft($checkStatus->id),

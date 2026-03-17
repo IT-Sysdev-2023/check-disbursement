@@ -3,7 +3,13 @@ import TableFilter from '@/components/tableFilter';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
 import TableDataGrid from '@/pages/dashboard/components/TableDataGrid';
-import { details, detailsCrf, getLocation, retrievedRecords, tagLocation } from '@/routes';
+import {
+    details,
+    detailsCrf,
+    getLocation,
+    retrievedRecords,
+    tagLocation,
+} from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -57,7 +63,10 @@ export default function TableView({
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
-    const [alignment, setAlignment] = useState(filter.assignments);
+    // const [alignment, setAlignment] = useState();
+    const [alignment, setAlignment] = useState(
+        () => localStorage.getItem('selectedTab') || filter.assignments,
+    );
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const selectedR = cheques.data
@@ -144,6 +153,7 @@ export default function TableView({
         if (newAlignment !== null) {
             handleAssignment(newAlignment);
             setAlignment(newAlignment);
+            localStorage.setItem('selectedTab', newAlignment);
         }
     };
 
@@ -175,23 +185,6 @@ export default function TableView({
                         </Badge>
                     </ToggleButton>
                 </ToggleButtonGroup>
-                {/* <Button
-                    variant="outlined"
-                    onClick={() => handleAssignment('toAssign')}
-                >
-                    <Badge badgeContent={counts.toAssign} color="error">
-                        Assignment
-                    </Badge>
-                </Button>
-
-                <Button
-                    variant="outlined"
-                    onClick={() => handleAssignment('completed')}
-                >
-                    <Badge badgeContent={counts.completed} color="error">
-                        Completed
-                    </Badge>
-                </Button> */}
             </TableFilter>
             <TableDataGrid
                 data={cheques}

@@ -25,7 +25,7 @@ export default function ({
 }: {
     company: SelectionType[];
     filters: FilterType;
-    resetFilterRouter?: RouteDefinition<"get">;
+    resetFilterRouter?: RouteDefinition<'get'>;
     businessUnits?: SelectionType[];
     children?: React.ReactNode;
     handleChangeCheck?: (value: SelectChangeEvent) => void;
@@ -94,7 +94,6 @@ export default function ({
             {
                 replace: true,
                 preserveState: true,
-                preserveScroll: true,
             },
         );
     };

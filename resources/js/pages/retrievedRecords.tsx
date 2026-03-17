@@ -74,18 +74,13 @@ export default function RetrievedRecords({
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
-            router.get(
-                retrievedRecords(),
-                {
+            router.reload({
+                data: {
                     tab: newValue,
                     page: 1,
                 },
-                {
-                    preserveState: true,
-                    preserveScroll: true,
-                    replace: false,
-                },
-            );
+                replace: false,
+            });
         }
         setCurrentTab(newValue);
     };

@@ -33,8 +33,8 @@ export const createReleasingColumns = (
     {
         field: 'payee',
         headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => row.cvNo,
@@ -52,6 +52,7 @@ export const createReleasingColumns = (
         field: 'details',
         headerName: 'Check Details',
         minWidth: 120,
+        sortable: false,
         renderCell: ({ row }) => {
             return (
                 <Button

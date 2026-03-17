@@ -3,7 +3,7 @@ import PdfReader from '@/components/pdf-reader';
 import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { releaseCheck } from '@/routes';
+import { checkReleasing, releaseCheck } from '@/routes';
 import {
     Crf,
     Cv,
@@ -29,10 +29,12 @@ export default function CheckReleasing({
     cheques,
     company,
     filter,
+    businessUnits
 }: {
     cheques: InertiaPagination<Cv | Crf>;
     filter: FilterType;
-    company: SelectionType[];
+        company: SelectionType[];
+    businessUnits: SelectionType[];
 }) {
     const [open, setOpen] = useState(false);
     const [id, setId] = useState<number | undefined>(undefined);
@@ -68,7 +70,6 @@ export default function CheckReleasing({
             }),
         });
     };
-;
     const columns = createReleasingColumns(handleStatusChange);
 
     return (
@@ -78,6 +79,9 @@ export default function CheckReleasing({
                 <TableFilter
                     company={company}
                     filters={filter}
+                    handleChangeCheck={() => null}
+                    businessUnits={businessUnits}
+                    resetFilterRouter={checkReleasing()}
                 />
 
                 <TableDataGrid

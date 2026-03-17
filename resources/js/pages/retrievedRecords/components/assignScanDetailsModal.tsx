@@ -43,7 +43,6 @@ export default function AssignScanDetailsModal({
     borrowedCheckId: any;
     onClose: () => void;
     }) {
-    console.log(borrowedCheckId);
     const [bank, setBank] = useState('');
     const [bankRecords, setBankRecords] = useState<SelectionType[]>([]);
     const { data, setData, errors, post, reset, transform } = useForm({

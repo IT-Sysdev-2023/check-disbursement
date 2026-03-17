@@ -54,10 +54,7 @@ class ChecksService
                 ],
                 'tab' => $tab
             ],
-            'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
-                'label' => 'All',
-                'value' => 'all'
-            ]),
+            'company' => PermissionService::userAssignedCompany($request->user()),
             'businessUnits' => isset($filters['company']) ? self::businessUnits($filters['company']) : [],
             'counts' => (object) [
                 'toAssign' => self::countToAssign($filters),
