@@ -99,7 +99,6 @@ class ChecksService
             );
 
         $unionQuery = $cv->unionAll($crf);
-
         return DB::query()
             ->fromSub($unionQuery, 'merged')
             ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
@@ -209,7 +208,9 @@ class ChecksService
         return DB::query()
             ->fromSub($unionQuery, 'merged')
             ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
-                $q->orderBy(Str::snake($sort['field']), $sort['sort']);
+                if ($sort['field'] !== 'scannedId') { // Manage Check Column Sorting
+                    $q->orderBy(Str::snake($sort['field']), $sort['sort']);
+                }
             }, fn($q) => $q->orderByDesc('created_at'))
             ->paginate(10)
             ->withQueryString();

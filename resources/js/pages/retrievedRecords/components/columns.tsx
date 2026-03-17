@@ -276,12 +276,11 @@ export const createManageColumns = (
         flex: 1,
     },
     {
-        field: 'syncStatus',
+        field: 'scannedId',
         headerName: 'Sync Status',
         width: 130,
         align: 'center',
         headerAlign: 'center',
-        sortable: false,
         renderCell: ({ row }) => {
             return row.scannedId ? (
                 <Chip label="Scanned" color="success" size="small" />
