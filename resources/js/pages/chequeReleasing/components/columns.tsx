@@ -13,7 +13,6 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 50,
-        renderCell: ({ row }) => row.checkNumber,
     },
     {
         field: 'checkDate',
@@ -22,14 +21,7 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkDate,
     },
-    // {
-    //     field: 'cvNo',
-    //     headerName: 'CV Number',
-    //     minWidth: 150,
-    //     renderCell: ({ row }) => row.cvNo,
-    // },
     {
         field: 'payee',
         headerName: 'Payee',
@@ -37,16 +29,14 @@ export const createReleasingColumns = (
         align: 'left',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.cvNo,
     },
     {
-        field: 'checkAmount',
+        field: 'amount',
         headerName: 'Check Amount',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.amount,
     },
     {
         field: 'details',
@@ -59,7 +49,8 @@ export const createReleasingColumns = (
                     variant="contained"
                     size="small"
                     onClick={() => {
-                           if (row.type === 'cv') router.visit(details(row.chequeId));
+                        if (row.type === 'cv')
+                            router.visit(details(row.chequeId));
                         else router.visit(detailsCrf(row.chequeId));
                     }}
                 >
@@ -75,21 +66,15 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => {
-            return row.location;
-        },
     },
 
     {
-        field: 'businessUnit',
+        field: 'companyName',
         headerName: 'Business Unit',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => {
-            return row.companyName || '—';
-        },
     },
     {
         field: 'checkDateStatus',
@@ -98,6 +83,7 @@ export const createReleasingColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
+        sortable: false,
         renderCell: ({ row }) => {
             return row.checkDateStatus ? (
                 <Chip
@@ -139,12 +125,14 @@ export const createReleasingColumns = (
                         Select action
                     </MenuItem>
 
-                    {!row.checkDateStatus && <MenuItem value={taggedLocation}>
-                        <Chip
-                            label={taggedLocation + ' Check'}
-                            color="secondary"
-                        />
-                    </MenuItem>}
+                    {!row.checkDateStatus && (
+                        <MenuItem value={taggedLocation}>
+                            <Chip
+                                label={taggedLocation + ' Check'}
+                                color="secondary"
+                            />
+                        </MenuItem>
+                    )}
 
                     <MenuItem value="cancel">
                         <Chip label="Cancel Check" color="error" />
