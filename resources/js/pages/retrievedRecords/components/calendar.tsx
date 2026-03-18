@@ -1,6 +1,7 @@
 import { useAppearance } from '@/hooks/use-appearance';
+import { MonthType } from '@/types';
 import { router } from '@inertiajs/react';
-import { Badge, Stack } from '@mui/material';
+import { Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
@@ -12,7 +13,7 @@ const Calendar = ({
     onChangeTab,
 }: {
     onChangeTab: () => void;
-    data: any;
+    data: MonthType[];
 }) => {
     const { appearance } = useAppearance();
 
@@ -51,28 +52,30 @@ const Calendar = ({
         });
     }, [selectedDate]);
 
-    // const [day, setDay] = useState<{
-    //     month: string;
-    //     days: { day: number; holiday?: string; isCurrent?: boolean }[][];
-    // }>({
-    //     month: data.month,
-    //     days: data.days,
-    // });
-    console.log(data);
     return (
         <Box>
-            <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ width: '100%' }}>
-                <CalendarLegend color='green' label='Total CRF' />
-                <CalendarLegend color='orange' label='Total CV' />
-                <CalendarLegend color='yellow' label='No. of Records' />
+            {/* LEGENDS */}
+            <Stack
+                direction="row"
+                spacing={2}
+                justifyContent="flex-end"
+                sx={{ width: '100%' }}
+            >
+                <CalendarLegend color="blue" label="With Records" />
+                <CalendarLegend color="darkRed" label="No Records" />
+                <CalendarLegend color="darkGreen" label="Weekend" />
+                <CalendarLegend color="green" label="Total CRF" />
+                <CalendarLegend color="orange" label="Total CV" />
             </Stack>
-            {data.map((day, monthIndex) => (
+
+            {/* CALENDAR */}
+            {data.map((month, monthIndex) => (
                 <Box key={monthIndex} sx={{ mb: 4 }}>
                     <Box
                         component="span"
                         sx={{ fontSize: '3rem', fontWeight: 'bold' }}
                     >
-                        {day.month}
+                        {month.month}
                     </Box>
 
                     <Box
@@ -125,7 +128,7 @@ const Calendar = ({
                                 </tr>
                             </thead>
                             <tbody>
-                                {day.days.map((week, weekIndex) => (
+                                {month.days.map((week, weekIndex) => (
                                     <tr
                                         key={`month-${monthIndex}-week-${weekIndex}`}
                                         style={{
@@ -141,13 +144,11 @@ const Calendar = ({
                                                     if (!dayObj.day) return; // ignore empty cells
 
                                                     const fullDate = dayjs(
-                                                        `${day.y}-${day.m}-${dayObj.day}`,
+                                                        `${month.y}-${month.m}-${dayObj.day}`,
                                                         'YYYY-M-D',
                                                     );
 
                                                     setSelectedDate(fullDate);
-                                                    // const fullDate = `${day.y}-${day.m}-${day.days[weekIndex][dayIndex].day}`;
-                                                    // setSelectedDate(dayjs(fullDate));
                                                 }}
                                                 style={{
                                                     position: 'relative',
@@ -156,11 +157,18 @@ const Calendar = ({
                                                     border: `1px solid ${isDarkMode ? '#444' : '#eee'}`,
                                                     cursor: 'pointer',
                                                     backgroundColor:
-                                                        dayObj.isCurrent
-                                                            ? isDarkMode
-                                                                ? '#333'
-                                                                : '#cfe3ff'
-                                                            : 'transparent',
+                                                        dayObj.totalRecord
+                                                            ? '#052770'
+                                                            : dayObj.isWeekend
+                                                              ? '#014421'
+                                                              : dayObj.totalRecord ==
+                                                                  0
+                                                                ? '#440E03'
+                                                                : dayObj.isCurrent
+                                                                  ? isDarkMode
+                                                                      ? '#333'
+                                                                      : '#cfe3ff'
+                                                                  : 'transparent',
                                                     color: isDarkMode
                                                         ? '#fff'
                                                         : '#000',
@@ -176,6 +184,8 @@ const Calendar = ({
                                                 >
                                                     {dayObj.day}
                                                 </span>
+
+                                                {/* LABEL */}
                                                 {(dayObj.crf !== undefined ||
                                                     dayObj.cv !==
                                                         undefined) && (

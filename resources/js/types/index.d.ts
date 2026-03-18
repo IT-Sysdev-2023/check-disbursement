@@ -381,3 +381,19 @@ export interface FlashReponse {
     duplicates: string[];
     stream?: string;
 }
+
+export interface MonthType{
+    days: DayType[][]
+    m: number,
+    month: string,
+    y: number,
+}
+interface DayType{
+    crf: number,
+    cv: number,
+    day: number,
+    isCurrent: boolean,
+    isWeekend: boolean,
+    totalRecord: number,
+    holiday?: boolean
+}

@@ -69,9 +69,10 @@ class Calendar
             $findRecord = $records->first(function ($record) use ($val) {
                 return Date::parse($record->date)->format('Y-m-d') === $val->format('Y-m-d');
             });
-
+            
             return [
                 'day' => $val->day,
+                'isWeekend' => $val->isWeekend(),
                 'totalRecord' => $findRecord ? $findRecord->total : 0,
                 'crf' => $findRecord ? $findRecord->crf_total : 0,
                 'cv' => $findRecord ? $findRecord->cv_total : 0,
