@@ -28,7 +28,8 @@ class DatabaseSeeder extends Seeder
             NavCpSeeder::class,
             NavHeaderSeeder::class,
             NavLineSeeder::class,
-            BorrowerNameSeeder::class
+            BorrowerNameSeeder::class,
+            BankSeeder::class
         ]);
 
         User::firstOrCreate(
@@ -49,6 +50,13 @@ class DatabaseSeeder extends Seeder
             ['username' => 'releasing'],
             [
                 'name' => 'renan',
+                'password' => Hash::make('12341234'),
+            ]
+        );
+        User::firstOrCreate(
+            ['username' => 'kent'],
+            [
+                'name' => 'Kent Abarquez',
                 'password' => Hash::make('12341234'),
             ]
         );

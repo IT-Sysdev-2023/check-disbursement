@@ -134,10 +134,10 @@ class Crf extends Model
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'crfs.id')
-            ->join('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
+            ->join('approvers', 'approvers.id', '=', 'borrowed_checks.secondary_approver_id')
 
             ->where('borrowed_checks.checkable_type', 'crf')
-            ->whereNotNull('borrowed_checks.approver_id')
+            ->whereNotNull('borrowed_checks.secondary_approver_id')
             ->leftJoin('scanned_records', function ($join) {
                 $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
                     ->on('scanned_records.amount', '=', 'crfs.amount');

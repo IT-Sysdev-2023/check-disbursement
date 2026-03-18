@@ -36,9 +36,6 @@ class ChecksService
         $manageCheques = [];
 
         $manageCheques = self::manageChecks($filters);
-
-        $calendar = Calendar::calendar();
-
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords ?? [],
             'pending' => $borrowedChecks,
@@ -60,7 +57,7 @@ class ChecksService
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
             ],
-            'calendar' => $calendar
+            'calendar' => Inertia::once(fn () => Calendar::calendar()),
         ]);
     }
 
@@ -114,7 +111,7 @@ class ChecksService
                 [CvCheckPayment::class, Crf::class],
                 fn($query) => $query->has('checkStatus')
             )
-            ->whereNull('approver_id')
+            ->whereNull('secondary_approver_id')
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
@@ -218,7 +215,7 @@ class ChecksService
 
     public function approver(Request $request)
     {
-        $names = Approver::select('id as value', 'name as label')->get();
+        $names = Approver::approverSelection();
 
         return response()->json($names);
     }
@@ -231,7 +228,7 @@ class ChecksService
         ]);
 
         $isSuccess = BorrowedCheck::whereIn('id', $request->borrowedNo)
-            ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
+            ->update(['approved_at' => Date::now(), 'primary_approver_id' => $request->approver]);
 
         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
     }

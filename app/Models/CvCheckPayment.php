@@ -167,9 +167,9 @@ class CvCheckPayment extends Model
     {
         return $builder
             ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
-            ->join('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
+            ->join('approvers', 'approvers.id', '=', 'borrowed_checks.secondary_approver_id')
             ->where('borrowed_checks.checkable_type', 'cv')
-            ->whereNotNull('borrowed_checks.approver_id')
+            ->whereNotNull('borrowed_checks.secondary_approver_id')
             ->leftJoin('scanned_records', function ($join) {
                 $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
                     ->where(function ($q) {

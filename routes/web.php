@@ -106,12 +106,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('approver', [CheckRequestController::class, 'approver'])->name('approverNames');
         Route::put('approve-check', [CheckRequestController::class, 'approveCheck'])->name('approveCheck');
 
+        Route::put('change-approver', [CheckRequestController::class, 'changeApprover'])->name('change-approver');
         Route::prefix('check-releasing')->group(function () {
             Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
 
             Route::get('release-check/{checkId}/{status}', [CheckReleasingController::class, 'show'])->name('release-check');
             Route::post('store-release-check/{id}', [CheckReleasingController::class, 'store'])->name('store-release-check');
-
         });
     });
 

@@ -57,6 +57,7 @@ export default function TableItems(props: { row: Borrower }) {
                 <TableCell align="right">{row.lastBorrowedAt}</TableCell>
                 <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
+                <TableCell align="right">{row.primaryApproverName}</TableCell>
                 <TableCell align="center">
                     <IconButton
                         size="small"

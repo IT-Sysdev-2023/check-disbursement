@@ -20,6 +20,7 @@ class BorrowedCheckResource extends JsonResource
         return [
             'id' => $this->id,
             'borrowerNoClean' => $this->borrower_no,
+            'primaryApproverName' => $this->primaryApproverName,
             'borrowerNo' => NumberHelper::padLeft($this->borrower_no),
             'borrower' => $this->borrower,
             'reason' => $this->reason,

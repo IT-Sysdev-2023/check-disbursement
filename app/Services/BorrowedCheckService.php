@@ -6,6 +6,7 @@ use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Http\Requests\BorrowedCheckRequest;
 use App\Http\Resources\BorrowedCheckResource;
+use App\Models\Approver;
 use App\Models\BorrowedCheck;
 use App\Models\Borrower;
 use App\Models\Crf;
@@ -26,7 +27,8 @@ class BorrowedCheckService
     {
 
         $validated = $request->validate([
-            'name' => 'required|exists:borrowers,id',
+            'approver' => 'required|exists:approvers,id',
+            'borrower' => 'required|exists:borrowers,id',
             'reason' => 'required|string|max:255',
             'cheques' => 'required|array',
         ]);
@@ -56,7 +58,8 @@ class BorrowedCheckService
                     'checkable_id' => $c['chequeId'],
                     'checkable_type' => $c['type'],
                     'borrower_no' => $borrowerNo,
-                    'borrower_id' => $validated['name'],
+                    'primary_approver_id' => $validated['approver'],
+                    'borrower_id' => $validated['borrower'],
                     'reason' => $validated['reason'],
                     'user_id' => auth()->user()->id,
                     'created_at' => now(),
@@ -72,8 +75,9 @@ class BorrowedCheckService
     public function borrower()
     {
         $transform = Borrower::borrowerSelection();
+        $names = Approver::approverSelection();
 
-        return response()->json($transform);
+        return response()->json(['borrower' => $transform, 'approver' => $names]);
     }
 
     private function download(int $borrowerNo, string $reason)

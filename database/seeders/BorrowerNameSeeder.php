@@ -22,9 +22,11 @@ class BorrowerNameSeeder extends Seeder
         ]);
 
         Approver::insert([
-            ['name' => 'Incorporator A', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Incorporator B', 'created_at' => now(), 'updated_at' => now()],
-            ['name' => 'Incorporator C', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Nelita U. Fuertes', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Marlito C. Uy', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Lolito C. Uy', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Leonardo C. Uy', 'created_at' => now(), 'updated_at' => now()],
+            ['name' => 'Ellen Rose Alturas', 'created_at' => now(), 'updated_at' => now()],
         ]);
 
         TagLocation::insert([

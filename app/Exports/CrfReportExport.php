@@ -71,7 +71,7 @@ class CrfReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoS
             ->join('companies', 'crfs.company_id', '=', 'companies.id')
             ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
             ->join('tag_locations', 'crfs.tag_location_id', '=', 'tag_locations.id')
-            ->leftJoin('approvers', 'borrowed_checks.approver_id', '=', 'approvers.id')
+            ->leftJoin('approvers', 'borrowed_checks.secondary_approver_id', '=', 'approvers.id')
             ->leftJoin('check_forwarded_statuses', 'check_forwarded_statuses.check_status_id', '=', 'check_statuses.id')
             ->where('check_statuses.checkable_type', 'crf')
             ->when(

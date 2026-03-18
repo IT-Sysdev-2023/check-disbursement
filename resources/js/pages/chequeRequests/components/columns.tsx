@@ -4,8 +4,8 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
     {
         field: 'checkNumber',
         headerName: 'Check Number',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         flex: 1,
         minWidth: 50,
         renderCell: ({ row }) => row.checkable?.checkNumber,
@@ -13,8 +13,8 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
     {
         field: 'checkDate',
         headerName: 'Check Date',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         flex: 1,
         minWidth: 100,
         renderCell: ({ row }) => row.checkable?.checkDate,
@@ -28,8 +28,8 @@ export const createRequestsChequeColumns = (): GridColDef[] => [
     {
         field: 'payee',
         headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'left',
+        align: 'left',
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => row.checkable?.payee,

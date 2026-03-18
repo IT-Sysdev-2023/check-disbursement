@@ -51,4 +51,7 @@ class CheckRequestController extends Controller
         return $this->service->cancelCheck($request);
     }
 
+    public function changeApprover(Request $request) {
+        return $this->service->changeApprover($request);
+    }
 }

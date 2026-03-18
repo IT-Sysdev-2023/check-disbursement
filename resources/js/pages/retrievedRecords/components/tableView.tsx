@@ -64,8 +64,7 @@ export default function TableView({
         { chequeId: number; type: string; id: number }[]
     >([]);
     // const [alignment, setAlignment] = useState();
-    const [alignment, setAlignment] = useState(
-        () => localStorage.getItem('selectedTab') || filter.assignments,
+    const [alignment, setAlignment] = useState(filter.assignments,
     );
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
@@ -153,7 +152,7 @@ export default function TableView({
         if (newAlignment !== null) {
             handleAssignment(newAlignment);
             setAlignment(newAlignment);
-            localStorage.setItem('selectedTab', newAlignment);
+            // localStorage.setItem('selectedTab', newAlignment);
         }
     };
 

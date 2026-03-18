@@ -194,6 +194,7 @@ export interface Borrower {
     totalChecks: number;
     borrower: BorrowerDetails;
     check: string;
+    primaryApproverName?: string;
     borrowerNoClean: number;
     checkable: Crf | Cv;
 }
@@ -382,18 +383,18 @@ export interface FlashReponse {
     stream?: string;
 }
 
-export interface MonthType{
-    days: DayType[][]
-    m: number,
-    month: string,
-    y: number,
+export interface MonthType {
+    days: DayType[][];
+    m: number;
+    month: string;
+    y: number;
 }
-interface DayType{
-    crf: number,
-    cv: number,
-    day: number,
-    isCurrent: boolean,
-    isWeekend: boolean,
-    totalRecord: number,
-    holiday?: boolean
+interface DayType {
+    crf: number;
+    cv: number;
+    day: number;
+    isCurrent: boolean;
+    isWeekend: boolean;
+    totalRecord: number;
+    holiday?: boolean;
 }

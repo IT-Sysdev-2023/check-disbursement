@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class BorrowedCheck extends Model
 {
@@ -15,6 +16,13 @@ class BorrowedCheck extends Model
             'created_at' => 'datetime',
         ];
 
+    }
+
+     protected function getApprover(): Attribute
+    {
+        return new Attribute(
+            get: fn() => $this->secondary_approver_id ? $this->secondaryApprover->name : $this->primaryApprover->name,
+        );
     }
 
     public function scopeFilter(Builder $builder, array $filters): Builder
@@ -45,9 +53,13 @@ class BorrowedCheck extends Model
         return $this->belongsTo(Borrower::class);
     }
 
-    public function approver()
+    public function primaryApprover()
     {
-        return $this->belongsTo(Approver::class);
+        return $this->belongsTo(Approver::class, 'primary_approver_id');
+    }
+    public function secondaryApprover()
+    {
+        return $this->belongsTo(Approver::class, 'secondary_approver_id');
     }
 
     public function checkable()

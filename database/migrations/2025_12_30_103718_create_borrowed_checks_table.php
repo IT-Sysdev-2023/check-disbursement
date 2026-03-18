@@ -11,9 +11,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('borrowed_checks', function (Blueprint $table) {
+            // $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->foreignId('approver_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('primary_approver_id')->constrained('approvers')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->foreignId('secondary_approver_id')->constrained('approvers')->cascadeOnUpdate()->cascadeOnDelete()->nullable();
             $table->foreignId('borrower_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->unsignedBigInteger('borrower_no');
             $table->string('reason');

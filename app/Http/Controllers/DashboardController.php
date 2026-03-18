@@ -111,7 +111,7 @@ class DashboardController extends Controller
 
                 if ($tab === 'fo_releasing') { //Disable temporarily "For Releasing Tab"
                     $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
-                        $q->whereNotNull('approver_id')
+                        $q->whereNotNull('secondary_approver_id')
                             ->whereHasMorph(
                                 'checkable',
                                 [CvCheckPayment::class, Crf::class],
@@ -132,7 +132,7 @@ class DashboardController extends Controller
                 } else
                     if ($tab === 'staled') {
                         $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
-                            $q->whereNotNull('approver_id')
+                            $q->whereNotNull('secondary_approver_id')
                                 ->whereHas(
                                     'checkable',
                                     fn(Builder $q) => $q->scanRecords()
@@ -184,7 +184,7 @@ class DashboardController extends Controller
     {
         return BorrowedCheck::query()
             ->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
-                $q->whereNotNull('approver_id')
+                $q->whereNotNull('secondary_approver_id')
                     ->whereHasMorph(
                         'checkable',
                         [CvCheckPayment::class, Crf::class],

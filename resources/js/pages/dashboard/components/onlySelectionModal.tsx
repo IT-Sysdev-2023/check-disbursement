@@ -1,3 +1,4 @@
+import { modalMediumStyle } from '@/lib/modalStyle';
 import { SelectionType } from '@/types';
 import {
     Box,
@@ -8,7 +9,6 @@ import {
     Typography,
 } from '@mui/material';
 import SelectItem from './SelectItem';
-import { modalMediumStyle } from '@/lib/modalStyle';
 
 export default function ({
     title,
@@ -17,6 +17,7 @@ export default function ({
     handleSubmit,
     handleSelectedItem,
     selectedItem,
+    children,
     item,
 }: {
     title: string;
@@ -25,6 +26,7 @@ export default function ({
     handleSubmit: (e: React.FormEvent) => void;
     handleSelectedItem: (value: SelectChangeEvent) => void;
     selectedItem: string;
+    children?: React.ReactNode;
     item: SelectionType[];
 }) {
     return (
@@ -54,6 +56,8 @@ export default function ({
                                 // isDisabled
                             />
                         </Grid>
+
+                        {children}
                     </Grid>
                     <Box sx={{ textAlign: 'right', mt: 2 }}>
                         <Button
