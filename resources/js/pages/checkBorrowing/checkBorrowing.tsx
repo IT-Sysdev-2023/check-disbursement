@@ -11,7 +11,7 @@ import {
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { Box, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { HandCoins } from 'lucide-react';
@@ -41,8 +41,9 @@ export default function CheckBorrowing({
     filter: FilterType;
     company: SelectionType[];
     businessUnits: SelectionType[];
+
 }) {
-    const [alignment, setAlignment] = useState('web');
+    const [alignment, setAlignment] = useState(filter.tab);
     const [borrowModal, setBorrowModal] = useState(false);
     const { data, setData, put } = useForm<FormData>({
         type: 'include',
@@ -53,6 +54,12 @@ export default function CheckBorrowing({
         newAlignment: string,
     ) => {
         setAlignment(newAlignment);
+
+        router.reload({
+            data: {
+                tab: newAlignment,
+            },
+        });
     };
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const id = Array.from(model.ids);
@@ -75,10 +82,10 @@ export default function CheckBorrowing({
                         onChange={handleChange}
                         aria-label="Platform"
                     >
-                        <ToggleButton value="web">
+                        <ToggleButton value="checks">
                             Checks/ Documents
                         </ToggleButton>
-                        <ToggleButton value="android">
+                        <ToggleButton value="borrowed">
                             Borrowed Checks/ Documents
                         </ToggleButton>
                     </ToggleButtonGroup>
@@ -93,6 +100,7 @@ export default function CheckBorrowing({
 
                 <TableDataGrid
                     hasSelection
+                    rowId={(row) => row.borrowedCheckId}
                     data={cheques}
                     filter={filter.search}
                     pagination={handlePagination}
@@ -117,6 +125,7 @@ export default function CheckBorrowing({
 
                 <BorrowCheckModal
                     cheque={data.checks}
+                    type={data.type}
                     open={borrowModal}
                     handleClose={() => setBorrowModal(false)}
                 />

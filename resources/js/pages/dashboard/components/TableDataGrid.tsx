@@ -15,6 +15,7 @@ import {
     GridDensity,
     GridFilterModel,
     GridPaginationModel,
+    GridRowIdGetter,
     GridRowSelectionModel,
     GridSortModel,
 } from '@mui/x-data-grid';
@@ -30,6 +31,7 @@ export default function TableDataGrid({
     handleSortFilter,
     density,
     hasSelection = false,
+    rowId,
     handleSelectionChange,
 }: {
     data: InertiaPagination<
@@ -39,6 +41,7 @@ export default function TableDataGrid({
     isLoading?: boolean;
     hasSelection?: boolean;
     filter?: string;
+    rowId?: GridRowIdGetter<any>,
     density?: GridDensity;
     handleSelectionChange?: (model: GridRowSelectionModel) => void;
     pagination: (model: GridPaginationModel) => void;
@@ -81,6 +84,7 @@ export default function TableDataGrid({
     return (
         <DataGrid
             rows={data.data}
+            getRowId={rowId}
             rowCount={data.meta.total}
             columns={columns}
             pagination

@@ -114,6 +114,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::prefix('check-borrowing')->group(function () {
             Route::get('index', [CheckBorrowingController::class, 'index'])->name('check-borrowing');
+            Route::put('secondary-borrow', [CheckBorrowingController::class, 'borrow'])->name('secondary-borrow-check');
         });
 
         Route::prefix('check-releasing')->group(function () {

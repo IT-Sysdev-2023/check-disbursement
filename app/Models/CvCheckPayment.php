@@ -83,31 +83,6 @@ class CvCheckPayment extends Model
                     $q->whereBetween('cv_date', [$date['start'], $date['end']]);
                 });
             });
-        // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
-
-        //     $field = Str::snake($sort['field']);
-        //     $direction = $sort['sort'];
-
-        //     // Main table
-        //     if (Schema::hasColumn('cv_check_payments', $field)) {
-        //         return $query->orderBy($field, $direction);
-        //     }
-
-        //     // cvHeader relationship
-        //     if (Schema::hasColumn('cv_headers', $field)) {
-        //         return $query->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-        //             ->orderBy("cv_headers.$field", $direction)
-        //             ->select('cv_check_payments.*');
-        //     }
-
-        //     // company relationship
-        //     // if (Schema::hasColumn('companies', $field)) {
-        //     //     return $query->join('companies', 'companies.id', '=', 'cv_check_payments.company_id')
-        //     //         ->orderBy("companies.$field", $direction)
-        //     //         ->select('cv_check_payments.*');
-        //     // }
-
-        // });
     }
 
     public function scopeBaseColumns(Builder $builder)
@@ -134,7 +109,6 @@ class CvCheckPayment extends Model
             ")
         )
             ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
-            // ->join('companies', 'companies.id', '=', 'business_units.company_id')
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cv_check_payments.tag_location_id');
     }

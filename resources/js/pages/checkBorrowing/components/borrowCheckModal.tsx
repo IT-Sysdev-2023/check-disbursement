@@ -1,15 +1,14 @@
 import AutocompleteUser from '@/components/autocomplete-user';
 import { modalStyle } from '@/lib/modalStyle';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { borrowerNames } from '@/routes';
-import { Option, SelectionType } from '@/types';
+import { secondaryBorrowCheck } from '@/routes';
+import { Option } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Grid, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import axios from 'axios';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { SyntheticEvent } from 'react';
 
 const itemBorrowed = [
     {
@@ -29,31 +28,19 @@ export default function BorrowCheckModal({
     cheque,
     open,
     handleClose,
+    type,
 }: {
     cheque: (string | number)[];
+    type: 'include' | 'exclude';
     open: boolean;
     handleClose: () => void;
 }) {
-    const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
-        [],
-    );
-
-    const { data, setData, post, processing, transform, reset, errors } =
+    const { data, setData, put, processing, transform, errors, reset } =
         useForm({
             borrower: '',
             item: '',
             reason: '',
         });
-
-    useEffect(() => {
-        const fetchBorrower = async () => {
-            const { data } = await axios.get(borrowerNames().url);
-
-            setBorrowerSelection(data.borrower);
-        };
-
-        fetchBorrower();
-    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,26 +48,19 @@ export default function BorrowCheckModal({
         transform((data) => ({
             ...data,
             cheques: cheque,
+            type: type,
         }));
-        console.log(data);
-        // post(borrowCheck().url, {
-        //     preserveScroll: true,
-        //     preserveState: true,
-        //     onSuccess: (page) => {
-        //         const m = page.props.flash as FlashReponse;
-
-        //         reset();
-        //         handleClose();
-
-        //         if (m.status && m.stream) {
-        //             setStream(m.stream);
-        //             setOpenModalPdf(true);
-        //         }
-        //     },
-        //     onError: (e) => {
-        //         console.log(e);
-        //     },
-        // });
+        put(secondaryBorrowCheck().url, {
+            preserveScroll: true,
+            preserveState: true,
+            onError: (e) => {
+                console.log(e);
+            },
+            onSuccess: () => {
+                reset();
+                handleClose();
+            }
+        });
     };
 
     const handleChangeItem = (event: SelectChangeEvent) => {
@@ -112,16 +92,8 @@ export default function BorrowCheckModal({
                             spacing={2}
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
-                            {/* <Grid size={{ xs: 12, sm: 12 }}>
-                                <SelectItem
-                                    handleChange={handleChange}
-                                    value={data.borrower}
-                                    title="Borrower Name"
-                                    items={borrowerSelection}
-                                />
-                            </Grid> */}
-
                             <AutocompleteUser
+                                label='Boroowers Name'
                                 handleTextChange={handleTextChange}
                             />
 

@@ -57,7 +57,7 @@ class ChecksService
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
             ],
-            'calendar' => Inertia::once(fn() => Calendar::calendar()),
+            'calendar' => Inertia::once(fn () => Calendar::calendar()),
         ]);
     }
 

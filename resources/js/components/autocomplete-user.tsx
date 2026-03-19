@@ -10,7 +10,9 @@ interface Employee {
 
 export default function AutocompleteUser({
     handleTextChange,
+    label = "Users",
 }: {
+    label?: string,
     handleTextChange: (_: SyntheticEvent, item: Option) => void;
 }) {
     const [options, setOptions] = useState<Option[]>([]);
@@ -91,7 +93,7 @@ export default function AutocompleteUser({
             renderInput={(params) => (
                 <TextField
                     {...params}
-                    label="Users"
+                    label={label}
                     InputProps={{
                         ...params.InputProps,
                         endAdornment: (
