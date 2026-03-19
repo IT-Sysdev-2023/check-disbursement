@@ -10,6 +10,7 @@ import {
     about,
     bankAccountSetup,
     bankSetup,
+    checkBorrowing,
     checkReleasing,
     checkRequestForm,
     checkStatus,
@@ -99,6 +100,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Check Receiving',
                           href: chequeRequests(),
+                          icon: FolderCheck,
+                      },
+                      {
+                          title: 'Check/Docs Borrowing',
+                          href: checkBorrowing(),
                           icon: FolderCheck,
                       },
                       {
@@ -204,6 +210,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         closingOfficer,
         regionalOfficer,
         sectionHead,
+        viewing
     ]);
 
     // Automatically open submenu if current page belongs to it

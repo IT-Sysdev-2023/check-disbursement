@@ -62,7 +62,7 @@ class ChequeRequestService
                 'array',
                 Rule::requiredIf(fn() => $request->type === 'include'),
             ],
-            'approver' => ['required', 'integer'],
+            // 'approver' => ['required', 'integer'],
         ]);
         $ids = $request->borrowedNo ?? [];
 
@@ -73,7 +73,7 @@ class ChequeRequestService
                 ,
                 fn($q) => $q->whereIn('id', $ids)
             )
-            ->update(['approved_at' => Date::now(), 'secondary_approver_id' => $request->approver]);
+            ->update(['approved_at' => Date::now()]);
 
         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
     }

@@ -1,60 +1,55 @@
+import AutocompleteUser from '@/components/autocomplete-user';
 import { modalStyle } from '@/lib/modalStyle';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { borrowCheck, borrowerNames } from '@/routes';
-import { FlashReponse, SelectionType } from '@/types';
+import { borrowerNames } from '@/routes';
+import { Option, SelectionType } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { Grid, SelectChangeEvent, Typography } from '@mui/material';
+import { Grid, SelectChangeEvent, TextField, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 
-const reasons = [
+const itemBorrowed = [
     {
-        value: 'Reason for borrowing 1',
-        label: 'Reason for borrowing 1',
+        value: 'Checks & Docs',
+        label: 'Checks & Docs',
     },
     {
-        value: 'Reason for borrowing 2',
-        label: 'Reason for borrowing 2',
+        value: 'Check',
+        label: 'Check',
     },
     {
-        value: 'Reason for borrowing 3',
-        label: 'Reason for borrowing 3',
+        value: 'Docs',
+        label: 'Docs',
     },
 ];
-export default function BorrowedCheckModal({
+export default function BorrowCheckModal({
     cheque,
     open,
     handleClose,
 }: {
-    cheque: { id: number; chequeId: number; type: string }[];
+    cheque: (string | number)[];
     open: boolean;
     handleClose: () => void;
 }) {
     const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
         [],
     );
-    const [approverSelection, setApproverSelection] = useState<SelectionType[]>(
-        [],
-    );
 
-    const { data, setData, post, processing, transform, reset } = useForm({
-        approver: '',
-        borrower: '',
-        reason: '',
-    });
-
-    const [stream, setStream] = useState('');
-    const [openModalPdf, setOpenModalPdf] = useState(false);
+    const { data, setData, post, processing, transform, reset, errors } =
+        useForm({
+            borrower: '',
+            item: '',
+            reason: '',
+        });
 
     useEffect(() => {
         const fetchBorrower = async () => {
             const { data } = await axios.get(borrowerNames().url);
 
             setBorrowerSelection(data.borrower);
-            setApproverSelection(data.approver);
         };
 
         fetchBorrower();
@@ -67,37 +62,32 @@ export default function BorrowedCheckModal({
             ...data,
             cheques: cheque,
         }));
+        console.log(data);
+        // post(borrowCheck().url, {
+        //     preserveScroll: true,
+        //     preserveState: true,
+        //     onSuccess: (page) => {
+        //         const m = page.props.flash as FlashReponse;
 
-        post(borrowCheck().url, {
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: (page) => {
-                const m = page.props.flash as FlashReponse;
+        //         reset();
+        //         handleClose();
 
-                reset();
-                handleClose();
-
-                if (m.status && m.stream) {
-                    setStream(m.stream);
-                    setOpenModalPdf(true);
-                }
-            },
-            onError: (e) => {
-                console.log(e);
-            },
-        });
+        //         if (m.status && m.stream) {
+        //             setStream(m.stream);
+        //             setOpenModalPdf(true);
+        //         }
+        //     },
+        //     onError: (e) => {
+        //         console.log(e);
+        //     },
+        // });
     };
 
-    const handleChange = (event: SelectChangeEvent) => {
-        setData('borrower', event.target.value);
+    const handleChangeItem = (event: SelectChangeEvent) => {
+        setData('item', event.target.value);
     };
-
-    const handleChangeApprover = (event: SelectChangeEvent) => {
-        setData('approver', event.target.value);
-    };
-
-    const handleChangeReason = (event: SelectChangeEvent) => {
-        setData('reason', event.target.value);
+    const handleTextChange = (_: SyntheticEvent, name: Option) => {
+        setData('borrower', name.label);
     };
     return (
         <>
@@ -122,32 +112,29 @@ export default function BorrowedCheckModal({
                             spacing={2}
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
-                            <Grid size={{ xs: 12, sm: 12 }}>
-                                <SelectItem
-                                    handleChange={handleChangeApprover}
-                                    value={data.approver}
-                                    title="Approver Name"
-                                    items={approverSelection}
-                                />
-                            </Grid>
-                            <Grid size={{ xs: 12, sm: 12 }}>
+                            {/* <Grid size={{ xs: 12, sm: 12 }}>
                                 <SelectItem
                                     handleChange={handleChange}
                                     value={data.borrower}
                                     title="Borrower Name"
                                     items={borrowerSelection}
                                 />
-                            </Grid>
+                            </Grid> */}
+
+                            <AutocompleteUser
+                                handleTextChange={handleTextChange}
+                            />
+
                             <Grid size={{ xs: 12, sm: 12 }}>
                                 <SelectItem
-                                    handleChange={handleChangeReason}
-                                    value={data.reason}
-                                    title="Reason for Borrowing"
-                                    items={reasons}
+                                    handleChange={handleChangeItem}
+                                    value={data.item}
+                                    title="Item Borrowed"
+                                    items={itemBorrowed}
                                 />
                             </Grid>
 
-                            {/* <Grid size={{ xs: 12, sm: 12 }}>
+                            <Grid size={{ xs: 12, sm: 12 }}>
                                 <TextField
                                     id="outlined-multiline-static"
                                     label="Reason For Borrowing"
@@ -159,7 +146,7 @@ export default function BorrowedCheckModal({
                                     multiline
                                     fullWidth
                                 />
-                            </Grid> */}
+                            </Grid>
                         </Grid>
                         <Box sx={{ textAlign: 'right', mt: 2 }}>
                             <Button
@@ -172,18 +159,6 @@ export default function BorrowedCheckModal({
                             </Button>
                         </Box>
                     </form>
-                </Box>
-            </Modal>
-
-            <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
-                <Box sx={{ ...modalStyle, width: '70%' }}>
-                    {stream && (
-                        <iframe
-                            src={stream}
-                            style={{ width: '100%', height: '500px' }}
-                            frameBorder={0}
-                        />
-                    )}
                 </Box>
             </Modal>
             {/* <a-modal v-model:open="openModalReprint" style="width: 70%;">

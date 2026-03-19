@@ -2,12 +2,7 @@ import CancellationBorrowedModal from '@/components/cancellation-borrowed-modal'
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import {
-    approveCheck,
-    approverNames,
-    changeApprover,
-    chequeRequests,
-} from '@/routes';
+import { approveCheck, changeApprover, chequeRequests } from '@/routes';
 import {
     Borrower,
     DateFilterType,
@@ -18,7 +13,6 @@ import {
 import { Head, router, useForm } from '@inertiajs/react';
 import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
-import axios from 'axios';
 import { CheckCircle, Edit2Icon, Handshake, X } from 'lucide-react';
 import { useState } from 'react';
 import OnlySelectionModal from '../dashboard/components/onlySelectionModal';
@@ -37,7 +31,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 type FormData = {
     borrowedNo: (string | number)[];
-    approver: string;
     type: 'include' | 'exclude';
 };
 
@@ -58,25 +51,17 @@ export default function BorrowedCheques({
         date: DateFilterType;
     };
 }) {
-    const [approverList, setApproverList] = useState<SelectionType[]>([]);
     const [selectedSignatory, setSelectedSignatory] = useState('');
     const [managersKey, setManagersKey] = useState('');
     const [confirmCheckSignatory, setConfirmCheckSignatory] = useState(false);
     const [openManagersKey, setOpenManagersKey] = useState(false);
     const [changeSignatoryModal, setChangeSignatoryModal] = useState(false);
-    const [open, setOpen] = useState(false);
     const [openCancel, setOpenCancel] = useState(false);
 
     const { data, setData, put } = useForm<FormData>({
-        approver: '',
         type: 'include',
         borrowedNo: [],
     });
-    const handleApprove = async () => {
-        const { data } = await axios.get(approverNames().url);
-        setOpen(true);
-        setApproverList(data);
-    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -84,9 +69,6 @@ export default function BorrowedCheques({
         put(approveCheck().url, {
             onError: (e) => {
                 console.log(e);
-            },
-            onSuccess: () => {
-                setOpen(false);
             },
         });
     };
@@ -119,9 +101,9 @@ export default function BorrowedCheques({
                         alert(e.key);
                     },
                     onSuccess: () => {
-                        setChangeSignatoryModal(false)
-                        setConfirmCheckSignatory(true)
-                    }
+                        setChangeSignatoryModal(false);
+                        setConfirmCheckSignatory(true);
+                    },
                 },
             );
         }
@@ -185,7 +167,7 @@ export default function BorrowedCheques({
                             }
                             variant="outlined"
                             startIcon={<Handshake />}
-                            onClick={handleApprove}
+                            onClick={handleSubmit}
                         >
                             Approve
                         </Button>
@@ -212,18 +194,6 @@ export default function BorrowedCheques({
                         />
                     </Box>
                 )}
-
-                <OnlySelectionModal
-                    title="Approver Name"
-                    open={open}
-                    onClose={() => setOpen(false)}
-                    handleSubmit={handleSubmit}
-                    handleSelectedItem={(event) =>
-                        setData('approver', event.target.value)
-                    }
-                    selectedItem={data.approver}
-                    item={approverList}
-                />
 
                 <OnlySelectionModal
                     title="Change Signatory Name"

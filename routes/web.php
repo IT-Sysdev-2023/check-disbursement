@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssignedCheckNumberController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\BorrowedCheckController;
+use App\Http\Controllers\CheckBorrowingController;
 use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CheckRequestController;
 use App\Http\Controllers\ClosingController;
@@ -97,16 +98,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     //! SECTION HEAD
-    Route::prefix('check-receiving')->middleware('role:section_head|admin')->group(function () {
-        Route::get('index', [CheckRequestController::class, 'index'])->name('cheque-requests');
-        Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->name('borrowedChecks'); // display cheques from dropdown
-        Route::get('borrowed-number-cheques/{id}', [CheckRequestController::class, 'borrowedNumberCheques'])->name('borrowed-number-cheques'); // display number of cheques borrowed
-        Route::post('cancel-check', [CheckRequestController::class, 'cancelCheck'])->name('cancel-check');
+    Route::prefix('section-head')->middleware('role:section_head|admin')->group(function () {
 
-        Route::get('approver', [CheckRequestController::class, 'approver'])->name('approverNames');
-        Route::put('approve-check', [CheckRequestController::class, 'approveCheck'])->name('approveCheck');
+        Route::prefix('check-receiving')->group(function () {
+            Route::get('index', [CheckRequestController::class, 'index'])->name('cheque-requests');
+            Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->name('borrowed-checks'); // display cheques from dropdown
+            Route::get('borrowed-number-cheques/{id}', [CheckRequestController::class, 'borrowedNumberCheques'])->name('borrowed-number-cheques'); // display number of cheques borrowed
+            Route::post('cancel-check', [CheckRequestController::class, 'cancelCheck'])->name('cancel-check');
 
-        Route::put('change-approver', [CheckRequestController::class, 'changeApprover'])->name('change-approver');
+            Route::get('approver', [CheckRequestController::class, 'approver'])->name('approver-names');
+            Route::put('approve-check', [CheckRequestController::class, 'approveCheck'])->name('approve-check');
+
+            Route::put('change-approver', [CheckRequestController::class, 'changeApprover'])->name('change-approver');
+        });
+
+        Route::prefix('check-borrowing')->group(function () {
+            Route::get('index', [CheckBorrowingController::class, 'index'])->name('check-borrowing');
+        });
+
         Route::prefix('check-releasing')->group(function () {
             Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
 
@@ -161,8 +170,8 @@ Route::get('/test', function () {
 
     $start = "2025-11-03";
     $end = "2025-11-04";
-        $tables = DB::connection('sqlsrvCaf')
-    ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+    $tables = DB::connection('sqlsrvCaf')
+        ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
 
     dd($tables);
 

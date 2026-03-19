@@ -3,7 +3,6 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Crf } from '@/types';
 import { Head } from '@inertiajs/react';
 import CrfDetails from './components/crfDetails';
-import { retrievedRecords } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
