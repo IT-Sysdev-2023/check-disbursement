@@ -67,7 +67,7 @@ export default function BorrowedCheques({
     const [open, setOpen] = useState(false);
     const [openCancel, setOpenCancel] = useState(false);
 
-    const { data, setData, put, errors } = useForm<FormData>({
+    const { data, setData, put } = useForm<FormData>({
         approver: '',
         type: 'include',
         borrowedNo: [],
@@ -120,6 +120,7 @@ export default function BorrowedCheques({
                     },
                     onSuccess: () => {
                         setChangeSignatoryModal(false)
+                        setConfirmCheckSignatory(true)
                     }
                 },
             );

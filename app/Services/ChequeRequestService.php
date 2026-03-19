@@ -98,11 +98,7 @@ class ChequeRequestService
             ->withQueryString()
             ->toResourceCollection();
 
-        $approver = Approver::whereHas(
-            'primaryBorrowedCheck',
-            fn($q) =>
-            $q->where('borrower_no', $id)
-        )->value('name');
+        $approver = BorrowedCheck::with(['primaryApprover', 'secondaryApprover'])->where('borrower_no', $id)->first()?->approver;
 
         $selection = Approver::approverSelection();
         return Inertia::render('chequeRequests/borrowedCheques', [

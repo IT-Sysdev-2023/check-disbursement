@@ -18,10 +18,10 @@ class BorrowedCheck extends Model
 
     }
 
-     protected function getApprover(): Attribute
+     protected function approver(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->secondary_approver_id ? $this->secondaryApprover->name : $this->primaryApprover->name,
+            get: fn() => $this->secondary_approver_id ? $this->secondaryApprover?->name : $this->primaryApprover?->name,
         );
     }
 
