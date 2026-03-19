@@ -82,18 +82,18 @@ class Crf extends Model
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('crfs.date', [$date['start'], $date['end']]);
             });
-            // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
-            //     $field = Str::snake($sort['field']);
-            //     $direction = $sort['sort'];
+        // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
+        //     $field = Str::snake($sort['field']);
+        //     $direction = $sort['sort'];
 
-            //     $table = $query->getModel()->getTable();
+        //     $table = $query->getModel()->getTable();
 
-            //     if (Schema::hasColumn($table, $field)) {
-            //         return $query->orderBy($field, $direction);
-            //     }
+        //     if (Schema::hasColumn($table, $field)) {
+        //         return $query->orderBy($field, $direction);
+        //     }
 
-            //     return $query;
-            // });
+        //     return $query;
+        // });
         ;
     }
 
@@ -134,10 +134,10 @@ class Crf extends Model
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'crfs.id')
-            ->join('approvers', 'approvers.id', '=', 'borrowed_checks.secondary_approver_id')
-
+            ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_checks.primary_approver_id')
+            ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_checks.secondary_approver_id')
             ->where('borrowed_checks.checkable_type', 'crf')
-            ->whereNotNull('borrowed_checks.secondary_approver_id')
+            ->whereNotNull('borrowed_checks.approved_at')
             ->leftJoin('scanned_records', function ($join) {
                 $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
                     ->on('scanned_records.amount', '=', 'crfs.amount');

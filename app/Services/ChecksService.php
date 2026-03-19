@@ -57,7 +57,7 @@ class ChecksService
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
             ],
-            'calendar' => Inertia::once(fn () => Calendar::calendar()),
+            'calendar' => Inertia::once(fn() => Calendar::calendar()),
         ]);
     }
 
@@ -72,7 +72,7 @@ class ChecksService
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
-                'approvers.name as approver_name',
+                DB::raw('COALESCE(secondary_approver.name, primary_approver.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'
@@ -86,7 +86,7 @@ class ChecksService
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
-                'approvers.name as approver_name',
+                DB::raw('COALESCE(secondary_approver.name, primary_approver.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'
@@ -111,7 +111,7 @@ class ChecksService
                 [CvCheckPayment::class, Crf::class],
                 fn($query) => $query->has('checkStatus')
             )
-            ->whereNull('secondary_approver_id')
+            ->whereNull('approved_at')
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
