@@ -175,17 +175,6 @@ export interface ChequeType {
     createdAt: string;
 }
 
-export interface CalendarTypes {
-    days: {
-        day: string;
-        holiday?: string;
-        isCurrent: boolean;
-    }[];
-    m: number;
-    month: string;
-    y: number;
-}
-
 export interface Borrower {
     borrowerNo: number;
     borrower: string;
@@ -388,6 +377,7 @@ export interface MonthType {
     m: number;
     month: string;
     y: number;
+    totalMonthly: number;
 }
 interface DayType {
     crf: number;

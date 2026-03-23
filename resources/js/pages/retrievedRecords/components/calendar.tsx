@@ -72,10 +72,28 @@ const Calendar = ({
             {data.map((month, monthIndex) => (
                 <Box key={monthIndex} sx={{ mb: 4 }}>
                     <Box
-                        component="span"
-                        sx={{ fontSize: '3rem', fontWeight: 'bold' }}
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'end',
+                        }}
                     >
-                        {month.month}
+                        <Box
+                            component="span"
+                            sx={{ fontSize: '3rem', fontWeight: 'bold' }}
+                        >
+                            {month.month}
+                        </Box>
+                        <Box
+                            component="span"
+                            sx={{
+                                fontSize: '1rem',
+                                fontWeight: 500,
+                                opacity: 0.7,
+                            }}
+                        >
+                            {month.totalMonthly} TOTAL
+                        </Box>
                     </Box>
 
                     <Box

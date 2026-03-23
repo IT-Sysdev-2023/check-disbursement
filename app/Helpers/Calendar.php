@@ -4,7 +4,9 @@ namespace App\Helpers;
 
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
+use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -58,7 +60,7 @@ class Calendar
     }
 
 
-    public static function transformCalendarData($date, $records)
+    public static function transformCalendarData(Carbon $date, Collection $records)
     {
         $startDate = (clone $date)->startOfMonth();
         $endDate = (clone $date)->endOfMonth();
@@ -94,6 +96,7 @@ class Calendar
             'y' => (clone $date)->year,
             'm' => (clone $date)->month,
             'days' => array_chunk($totalDay, 7),
+            'totalMonthly' => $records->sum('total')
         ];
 
     }
