@@ -26,7 +26,6 @@ class CheckReleasingService
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
-
         $chequeRecords = ChecksService::manageChecks($filters);
 
         return Inertia::render('checkReleasing', [

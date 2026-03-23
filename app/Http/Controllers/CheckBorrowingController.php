@@ -20,7 +20,7 @@ class CheckBorrowingController extends Controller
     {
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab']);
         $currentTab = $filters['tab'] ?? 'checks';
-        
+
         $checks = new ChequeCollection(self::scannedChecks($filters, $currentTab === 'borrowed'));
 
         return Inertia::render('checkBorrowing/checkBorrowing', [
@@ -73,8 +73,10 @@ class CheckBorrowingController extends Controller
     public static function scannedChecks(array $filters = [], bool $isBorrowed = false)
     {
         $callback = function (Builder $q) use ($isBorrowed) {
+
             if ($isBorrowed) {
-                $q->whereNotNull(['approved_at', 'item_borrowed', 'secondary_reason', 'secondary_borrower']);
+                $q->whereNotNull(['approved_at', 'item_borrowed', 'secondary_reason', 'secondary_borrower'])
+                    ->where('is_returned', 0);
 
             } else {
                 $q->whereNotNull('approved_at')
@@ -105,6 +107,7 @@ class CheckBorrowingController extends Controller
             );
 
         $unionQuery = $cv->unionAll($crf);
+        // dd($unionQuery->get());
         return DB::query()
             ->fromSub($unionQuery, 'merged')
             ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
@@ -112,5 +115,30 @@ class CheckBorrowingController extends Controller
             }, fn($q) => $q->orderByDesc('created_at'))
             ->paginate(10)
             ->withQueryString();
+    }
+
+    public function returnCheck(Request $request)
+    {
+        $request->validate([
+            'type' => ['required', 'in:include,exclude'],
+            'checks' => [
+                'array',
+                Rule::requiredIf(fn() => $request->type === 'include'),
+            ],
+        ]);
+
+        $ids = $request->checks ?? [];
+        $isSuccess = BorrowedCheck::
+            when(
+                $request->type == 'exclude',
+                fn($q) => $q->whereNotIn('id', $ids)
+                ,
+                fn($q) => $q->whereIn('id', $ids)
+            )
+            ->update([
+                'is_returned' => 1,
+            ]);
+
+        return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Updated' : 'Failed to Update']);
     }
 }

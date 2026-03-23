@@ -92,7 +92,6 @@ export default function CheckReleasing({
                     handleSortFilter={handleSort}
                     columns={columns}
                 />
-                {/* <Copyright sx={{ my: 4 }} /> */}
 
                 {id && (
                     <ReasonCancellationModal

@@ -57,7 +57,7 @@ class ChecksService
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
             ],
-            'calendar' => Inertia::once(fn () => Calendar::calendar()),
+            'calendar' => Inertia::once(fn() => Calendar::calendar()),
         ]);
     }
 
@@ -72,6 +72,9 @@ class ChecksService
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
+                'borrowed_checks.is_returned',
+                'borrowed_checks.secondary_borrower',
+                'borrowed_checks.approved_at',
                 DB::raw('COALESCE(secondary_approver.name, primary_approver.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
@@ -86,6 +89,9 @@ class ChecksService
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
+                'borrowed_checks.is_returned',
+                'borrowed_checks.secondary_borrower',
+                'borrowed_checks.approved_at',
                 DB::raw('COALESCE(secondary_approver.name, primary_approver.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',

@@ -85,15 +85,26 @@ export const createReleasingColumns = (
         minWidth: 80,
         sortable: false,
         renderCell: ({ row }) => {
+            
             return row.checkDateStatus ? (
                 <Chip
                     label={row.checkDateStatus}
                     color="primary"
                     variant="outlined"
                 />
-            ) : (
-                ''
-            );
+            ) : row.isReturned && row.approvedAt ? (
+                 <Chip
+                    label='For Releasing'
+                    color="primary"
+                    variant="outlined"
+                />
+            ) : !row.isReturned && row.approvedAt && row.secondaryBorrower  ? (
+                 <Chip
+                    label='Borrowed'
+                    color="primary"
+                    variant="outlined"
+                />
+            ): '';
         },
     },
 
@@ -106,11 +117,12 @@ export const createReleasingColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            const { taggedLocation, scannedId, borrowedCheckId } = row;
+            const { taggedLocation, scannedId, borrowedCheckId, isReturned } = row;
 
-            if (!scannedId) {
+            if (!scannedId || !isReturned) {
                 return null;
             }
+
             return (
                 <Select
                     size="small"

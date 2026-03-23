@@ -2,7 +2,7 @@ import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { checkBorrowing } from '@/routes';
+import { checkBorrowing, returnChecks } from '@/routes';
 import {
     Crf,
     Cv,
@@ -41,7 +41,6 @@ export default function CheckBorrowing({
     filter: FilterType;
     company: SelectionType[];
     businessUnits: SelectionType[];
-
 }) {
     const [alignment, setAlignment] = useState(filter.tab);
     const [borrowModal, setBorrowModal] = useState(false);
@@ -68,6 +67,18 @@ export default function CheckBorrowing({
             checks: id,
             type: model.type,
         });
+    };
+
+    const handleReturnChecks = () => {
+        put(returnChecks().url, {
+            preserveScroll: true,
+            preserveState: true,
+            onError: (e) => {
+                console.log(e);
+            },
+            onSuccess: () => {},
+        });
+        console.log(data);
     };
     const column = createBorrowingChequeColumns();
     return (
@@ -110,18 +121,46 @@ export default function CheckBorrowing({
                     columns={column}
                 />
 
-                <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
-                    <Button
-                        disabled={
-                            data.checks.length === 0 && data.type === 'include'
-                        }
-                        variant="outlined"
-                        startIcon={<HandCoins />}
-                        onClick={() => setBorrowModal(true)}
+                {alignment === 'checks' && (
+                    <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        mt={3}
+                        gap={2}
                     >
-                        Borrow
-                    </Button>
-                </Box>
+                        <Button
+                            disabled={
+                                data.checks.length === 0 &&
+                                data.type === 'include'
+                            }
+                            variant="outlined"
+                            startIcon={<HandCoins />}
+                            onClick={() => setBorrowModal(true)}
+                        >
+                            Borrow
+                        </Button>
+                    </Box>
+                )}
+                {alignment === 'borrowed' && (
+                    <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        mt={3}
+                        gap={2}
+                    >
+                        <Button
+                            disabled={
+                                data.checks.length === 0 &&
+                                data.type === 'include'
+                            }
+                            variant="outlined"
+                            startIcon={<HandCoins />}
+                            onClick={handleReturnChecks}
+                        >
+                            Return Checks/Docs
+                        </Button>
+                    </Box>
+                )}
 
                 <BorrowCheckModal
                     cheque={data.checks}
