@@ -40,6 +40,15 @@ class NavConnection
         return $this;
     }
 
+    public function countNavRecords(string $tableName, string $monthYear): int
+    {
+        [$year, $month] = explode('-', $monthYear);
+
+        return $this->connection->table($tableName)
+            ->whereYear('CV Date', $year)
+            ->whereMonth('CV Date', $month)
+            ->distinct()->count('Check Voucher No_');
+    }
     public function headerConnection(string $name): mixed
     {
         $record = $this->connection->table($name)

@@ -155,6 +155,7 @@ export default function RetrievedRecords({
                         <TabPanel value="calendar">
                             <Calendar
                                 data={calendar}
+                                company={company}
                                 onChangeTab={handleClickCalendar}
                             ></Calendar>
                         </TabPanel>

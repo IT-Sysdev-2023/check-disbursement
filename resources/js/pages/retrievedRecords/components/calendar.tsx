@@ -1,7 +1,8 @@
 import { useAppearance } from '@/hooks/use-appearance';
-import { MonthType } from '@/types';
+import SelectItem from '@/pages/dashboard/components/SelectItem';
+import { MonthType, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
-import { Stack } from '@mui/material';
+import { SelectChangeEvent, Stack, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
@@ -11,10 +12,15 @@ import CalendarLegend from './calendarLegend';
 const Calendar = ({
     data,
     onChangeTab,
+    company,
 }: {
     onChangeTab: () => void;
     data: MonthType[];
+    company: SelectionType[];
 }) => {
+    const [selectedCompany, setSelectedCompany] = useState<string>('all');
+    const [checked, setChecked] = useState(false);
+    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
     const { appearance } = useAppearance();
 
     const theme = useTheme(); // Get the MUI theme
@@ -29,8 +35,6 @@ const Calendar = ({
             setIsDarkMode(appearance === 'dark');
         }
     }, [appearance]);
-
-    const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
     useEffect(() => {
         if (!selectedDate) return;
@@ -51,21 +55,43 @@ const Calendar = ({
             },
         });
     }, [selectedDate]);
+    const handleChange = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedCompany(val);
 
+        router.reload({
+            data: {
+                company: event.target.value,
+            },
+        });
+    };
+
+    const handleCheckChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setChecked(event.target.checked);
+    };
     return (
         <Box>
             {/* LEGENDS */}
             <Stack
                 direction="row"
                 spacing={2}
-                justifyContent="flex-end"
+                justifyContent="space-between"
                 sx={{ width: '100%' }}
             >
-                <CalendarLegend color="blue" label="With Records" />
-                <CalendarLegend color="darkRed" label="No Records" />
-                <CalendarLegend color="darkGreen" label="Weekend" />
-                <CalendarLegend color="green" label="Total CRF" />
-                <CalendarLegend color="orange" label="Total CV" />
+                <SelectItem
+                    handleChange={handleChange}
+                    value={selectedCompany}
+                    title="Company"
+                    items={company}
+                />
+
+                <Stack direction="row" spacing={1}>
+                    <CalendarLegend color="blue" label="With Records" />
+                    <CalendarLegend color="darkRed" label="No Records" />
+                    <CalendarLegend color="darkGreen" label="Weekend" />
+                    <CalendarLegend color="green" label="Total CRF" />
+                    <CalendarLegend color="orange" label="Total CV" />
+                </Stack>
             </Stack>
 
             {/* CALENDAR */}
@@ -82,7 +108,17 @@ const Calendar = ({
                             component="span"
                             sx={{ fontSize: '3rem', fontWeight: 'bold' }}
                         >
-                            {month.month}
+                            {month.month}{' '}
+                            <Box
+                                component="span"
+                                sx={{
+                                    fontSize: '1.5rem',
+                                    fontWeight: 'normal',
+                                }}
+                            >
+                                {month.businessUnit} - {month.totalMonthly}{' '}
+                                Records
+                            </Box>
                         </Box>
                         <Box
                             component="span"
@@ -92,7 +128,11 @@ const Calendar = ({
                                 opacity: 0.7,
                             }}
                         >
-                            {month.totalMonthly} TOTAL
+                            {month.totalNavRecords} in Nav
+                            <Switch
+                                checked={checked}
+                                onChange={handleCheckChange}
+                            />
                         </Box>
                     </Box>
 

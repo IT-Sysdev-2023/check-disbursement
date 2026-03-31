@@ -2,8 +2,11 @@
 
 namespace App\Helpers;
 
+use App\Models\BusinessUnit;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
+use App\Models\NavDatabase;
+use App\Services\GenerateCvService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Support\Collection;
@@ -16,25 +19,38 @@ class Calendar
     public static function calendar()
     {
         $data = self::distinctMonths();
+        $navDetails = self::getNavConnectionDetails($data);
 
         $records = [];
         foreach ($data as $key => $value) {
-            $date = Date::createFromFormat('Y-m', $key);
-            $records[] = self::transformCalendarData($date, $value);
+
+            $nav = $navDetails[$value->first()->buId];
+
+            $totalNavRecords = (new GenerateCvService())
+                ->setConnection(
+                    $nav->navServer,
+                    $nav->name
+                )
+                ->countNavRecords($nav->navHeaderTable->name, $key);
+
+            $date = Date::createFromFormat('!Y-m', $key);
+            $records[] = self::transformCalendarData($date, $value, $totalNavRecords);
         }
 
         return $records;
     }
     private static function distinctMonths()
     {
-        $crf = Crf::select('date as date', DB::raw('count(*) as total'), DB::raw("'CRF' as type"))
+        $crf = Crf::select('date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"))
+            ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
             ->doesntHave('checkStatus')
-            ->groupBy('date');
+            ->groupBy('date', 'business_units.name', 'business_units.id');
 
-        $cv = CvCheckPayment::select('cv_headers.cv_date as date', DB::raw('count(*) as total'), DB::raw("'CV' as type"))
+        $cv = CvCheckPayment::select('cv_headers.cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"))
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
+            ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
             ->doesntHave('checkStatus')
-            ->groupBy('cv_headers.cv_date');
+            ->groupBy('cv_headers.cv_date', 'business_units.name', 'business_units.id');
 
         $result = DB::query()
             ->fromSub(
@@ -44,11 +60,13 @@ class Calendar
             // ->selectRaw('date, SUM(total) as total')
             ->selectRaw("
             date,
+            business_unit,
+            buId,
             SUM(CASE WHEN type = 'crf' THEN total ELSE 0 END) as crf_total,
             SUM(CASE WHEN type = 'cv' THEN total ELSE 0 END) as cv_total,
             SUM(total) as total
         ")
-            ->groupBy('date')
+            ->groupBy('date', 'business_unit', 'buId')
             ->orderBy('date')
             ->get()
             ->groupBy(
@@ -59,8 +77,20 @@ class Calendar
         return $result;
     }
 
+    private static function getNavConnectionDetails($data)
+    {
+        $buIds = $data->map(fn($item) => $item->first()->buId)->unique();
 
-    public static function transformCalendarData(Carbon $date, Collection $records)
+        return NavDatabase::with('navServer', 'navHeaderTable')
+            ->whereHas('businessUnit', function ($q) use ($buIds) {
+                $q->whereIn('id', $buIds);
+            })
+            ->get()
+            ->keyBy('business_unit_id');
+    }
+
+
+    public static function transformCalendarData(Carbon $date, Collection $records, int $navRecords)
     {
         $startDate = (clone $date)->startOfMonth();
         $endDate = (clone $date)->endOfMonth();
@@ -71,7 +101,6 @@ class Calendar
             $findRecord = $records->first(function ($record) use ($val) {
                 return Date::parse($record->date)->format('Y-m-d') === $val->format('Y-m-d');
             });
-            
             return [
                 'day' => $val->day,
                 'isWeekend' => $val->isWeekend(),
@@ -82,8 +111,7 @@ class Calendar
             ]; //$val->day === today()->day
 
         });
-        
-        // dd($transformers);
+
         $totalDay = $transformers->toArray();
         $startWeek = $startDate->dayOfWeek;
 
@@ -96,7 +124,10 @@ class Calendar
             'y' => (clone $date)->year,
             'm' => (clone $date)->month,
             'days' => array_chunk($totalDay, 7),
-            'totalMonthly' => $records->sum('total')
+            'totalMonthly' => $records->sum('total'),
+            'businessUnit' => $records->first()->business_unit ?? null,
+            'totalNavRecords' => $navRecords
+
         ];
 
     }

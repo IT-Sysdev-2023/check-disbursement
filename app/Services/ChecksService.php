@@ -28,18 +28,16 @@ class ChecksService
     public function records(Request $request)
     {
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment']);
-        $tab = $filters['tab'] ?? 'calendar';
         $assignment = $filters['assignment'] ?? 'toAssign';
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
         $borrowedChecks = self::pendingRecords($filters);
-        $manageCheques = [];
-
+  
         $manageCheques = self::manageChecks($filters);
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords ?? [],
             'pending' => $borrowedChecks,
-            'manageChecks' => new ChequeCollection($manageCheques),
+            'manageChecks' => new ChequeCollection($manageCheques ?? []),
             'filter' => (object) [
                 'selectedCompany' => $filters['company'] ?? 'all',
                 'assignments' => $assignment,
@@ -49,7 +47,7 @@ class ChecksService
                     'start' => null,
                     'end' => null
                 ],
-                'tab' => $tab
+                'tab' => $filters['tab'] ?? 'calendar'
             ],
             'company' => PermissionService::userAssignedCompany($request->user()),
             'businessUnits' => isset($filters['company']) ? self::businessUnits($filters['company']) : [],
@@ -211,7 +209,7 @@ class ChecksService
                 if ($sort['field'] !== 'scannedId') { // Manage Check Column Sorting
                     $q->orderBy(Str::snake($sort['field']), $sort['sort']);
                 }
-            }, fn($q) => $q->orderByDesc('created_at'))
+            })
             ->paginate(10)
             ->withQueryString();
 

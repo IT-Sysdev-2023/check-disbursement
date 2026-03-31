@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\FileHandler;
 use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheck;
 use App\Models\Crf;
@@ -16,6 +17,11 @@ use Inertia\Inertia;
 
 class CheckBorrowingController extends Controller
 {
+      public function __construct(protected FileHandler $fileHandler)
+    {
+    }
+
+    
     public function index(Request $request)
     {
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab']);
@@ -59,12 +65,25 @@ class CheckBorrowingController extends Controller
                 fn($q) => $q->whereNotIn('id', $ids)
                 ,
                 fn($q) => $q->whereIn('id', $ids)
-            )
-            ->update([
+            )->update([
                 'item_borrowed' => $request->item,
                 'secondary_reason' => $request->reason,
                 'secondary_borrower' => $request->borrower,
             ]);
+
+
+        //  $data = [
+        //     'controlerNumber' => '',
+        //     'borrowerName' => $request->borrower,
+        //     'dateBorrowed' => now()->toFormattedDayDateString(),
+        //     'company' => $companyNames,
+        //     'businessUnit' => $companyNames,
+        // ];
+
+        // return $this->fileHandler
+        //     ->inFolder('pdfs/borrowed/')
+        //     ->createFileName($borrowerNo, auth()->user()->id, '.pdf')
+        //     ->handlePdf($data, 'borrowedPdf');
 
         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Updated' : 'Failed to Update']);
 

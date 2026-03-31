@@ -378,6 +378,8 @@ export interface MonthType {
     month: string;
     y: number;
     totalMonthly: number;
+    businessUnit?: string;    
+    totalNavRecords?: number;
 }
 interface DayType {
     crf: number;
