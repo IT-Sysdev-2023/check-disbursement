@@ -27,7 +27,7 @@ class ChecksService
 
     public function records(Request $request)
     {
-        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment']);
+        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails']);
         $assignment = $filters['assignment'] ?? 'toAssign';
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
@@ -55,7 +55,7 @@ class ChecksService
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
             ],
-            'calendar' => Inertia::once(fn() => Calendar::calendar()),
+            'calendar' => Inertia::once(fn() => Calendar::calendar($filters)),
         ]);
     }
 

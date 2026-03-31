@@ -16,9 +16,9 @@ use Illuminate\Support\Facades\DB;
 class Calendar
 {
 
-    public static function calendar()
+    public static function calendar(array $filters)
     {
-        $data = self::distinctMonths();
+        $data = isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true' ? self::distinctMonthsNav($filters['monthDetails']) : self::distinctMonths();
         $navDetails = self::getNavConnectionDetails($data);
 
         $records = [];
@@ -36,8 +36,31 @@ class Calendar
             $date = Date::createFromFormat('!Y-m', $key);
             $records[] = self::transformCalendarData($date, $value, $totalNavRecords);
         }
-
         return $records;
+    }
+
+    private static function distinctMonthsNav(array $details)
+    {
+        $bu = $details['businessUnit'] ?? null;
+        $nav = NavDatabase::with('navServer', 'navHeaderTable')
+            ->whereHas('businessUnit', function ($q) use ($bu) {
+                $q->where('name', $bu);
+            })
+            ->first();
+
+        $totalNavRecords = (new GenerateCvService())
+            ->setConnection(
+                $nav->navServer,
+                $nav->name
+            )
+            ->navRecords(
+                $nav->business_unit_id,
+                $bu,
+                $nav->navHeaderTable->name,
+                $details['month'],
+                $details['year']
+            );
+        return $totalNavRecords;
     }
     private static function distinctMonths()
     {
@@ -73,7 +96,7 @@ class Calendar
                 fn($q) =>
                 Date::parse($q->date)->format('Y-m')
             );
-
+// dd($result);
         return $result;
     }
 

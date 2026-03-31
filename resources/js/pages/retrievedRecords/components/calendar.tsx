@@ -66,8 +66,22 @@ const Calendar = ({
         });
     };
 
-    const handleCheckChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCheckChange = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        monthData: {
+            month: number;
+            year: number;
+            businessUnit: string | undefined;
+        },
+    ) => {
         setChecked(event.target.checked);
+        console.log(monthData);
+        router.reload({
+            data: {
+                isNavSelected: event.target.checked,
+                monthDetails: monthData
+            },
+        });
     };
     return (
         <Box>
@@ -128,10 +142,16 @@ const Calendar = ({
                                 opacity: 0.7,
                             }}
                         >
-                            {month.totalNavRecords} in Nav
+                            {month.totalNavRecords} in Navision
                             <Switch
                                 checked={checked}
-                                onChange={handleCheckChange}
+                                onChange={(e) =>
+                                    handleCheckChange(e, {
+                                        month: month.m,
+                                        year: month.y,
+                                        businessUnit: month.businessUnit,
+                                    })
+                                }
                             />
                         </Box>
                     </Box>
