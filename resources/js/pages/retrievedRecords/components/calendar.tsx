@@ -19,7 +19,7 @@ const Calendar = ({
     company: SelectionType[];
 }) => {
     const [selectedCompany, setSelectedCompany] = useState<string>('all');
-    const [checked, setChecked] = useState(false);
+    const [checked, setChecked] = useState<Record<string, boolean>>({});
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
     const { appearance } = useAppearance();
 
@@ -67,19 +67,25 @@ const Calendar = ({
     };
 
     const handleCheckChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        monthData: {
+        e: React.ChangeEvent<HTMLInputElement>,
+        month: {
             month: number;
             year: number;
             businessUnit: string | undefined;
         },
     ) => {
-        setChecked(event.target.checked);
-        console.log(monthData);
+        const key = `${month.businessUnit}-${month.year}-${month.month}`;
+        const value = e.target.checked;
+
+        setChecked((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+
         router.reload({
             data: {
-                isNavSelected: event.target.checked,
-                monthDetails: monthData
+                isNavSelected: e.target.checked,
+                monthDetails: month,
             },
         });
     };
@@ -144,7 +150,12 @@ const Calendar = ({
                         >
                             {month.totalNavRecords} in Navision
                             <Switch
-                                checked={checked}
+                                // checked={checked}
+                                checked={
+                                    checked[
+                                        `${month.businessUnit}-${month.y}-${month.m}`
+                                    ] || false
+                                }
                                 onChange={(e) =>
                                     handleCheckChange(e, {
                                         month: month.m,

@@ -18,10 +18,14 @@ class Calendar
 
     public static function calendar(array $filters)
     {
-        $data = isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true' ? self::distinctMonthsNav($filters['monthDetails']) : self::distinctMonths();
-        $navDetails = self::getNavConnectionDetails($data);
+        $data = self::distinctMonths();
+        if(isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true'){
+            $navRecords = self::distinctMonthsNav($filters['monthDetails']);
+            $data = $data->merge($navRecords);
+        }
 
         $records = [];
+        $navDetails = self::getNavConnectionDetails($data); //FOR Counting total nav records per month
         foreach ($data as $key => $value) {
 
             $nav = $navDetails[$value->first()->buId];
