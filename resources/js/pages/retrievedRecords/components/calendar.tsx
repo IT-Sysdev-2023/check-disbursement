@@ -89,6 +89,7 @@ const Calendar = ({
             },
         });
     };
+    console.log(checked);
     return (
         <Box>
             {/* LEGENDS */}
@@ -126,7 +127,7 @@ const Calendar = ({
                     >
                         <Box
                             component="span"
-                            sx={{ fontSize: '3rem', fontWeight: 'bold' }}
+                            sx={{ fontSize: '3rem', fontWeight: 'bold', color: month.totalMonthly !== month.totalNavRecords ? 'red' : 'inherit' }}
                         >
                             {month.month}{' '}
                             <Box
@@ -190,7 +191,7 @@ const Calendar = ({
                                     style={{
                                         display: 'grid',
                                         gridTemplateColumns: 'repeat(7, 1fr)',
-                                        background: theme.palette.primary.main,
+                                        background: checked[`${month.businessUnit}-${month.y}-${month.m}`] ? theme.palette.secondary.main : theme.palette.primary.main,
                                         color: '#fff',
                                     }}
                                 >
