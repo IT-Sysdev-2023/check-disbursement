@@ -55,7 +55,7 @@ const Calendar = ({
             },
         });
     }, [selectedDate, onChangeTab]);
-    
+
     const handleChange = async (event: SelectChangeEvent) => {
         const val = event.target.value;
         setSelectedCompany(val);
@@ -78,19 +78,27 @@ const Calendar = ({
         const key = `${month.businessUnit}-${month.year}-${month.month}`;
         const value = e.target.checked;
 
-        setChecked((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
+        setChecked(() => {
+            let updated;
 
-        router.reload({
-            data: {
-                isNavSelected: e.target.checked,
-                monthDetails: month,
-            },
+            if (value) { //CHECK CURRENT ITEM
+                updated = {
+                    [key]: true,
+                };
+            } else { // UNCHECK PREVIOUS ITEM
+                updated = {};
+            }
+
+            router.reload({
+                data: {
+                    isNavSelected: value,
+                    monthDetails: value ? month : null,
+                },
+            });
+
+            return updated;
         });
     };
-    console.log(checked);
     return (
         <Box>
             {/* LEGENDS */}
@@ -103,7 +111,7 @@ const Calendar = ({
                 <SelectItem
                     handleChange={handleChange}
                     value={selectedCompany}
-                    title="Company"
+                    title="Filter Company"
                     items={company}
                 />
 
@@ -128,7 +136,14 @@ const Calendar = ({
                     >
                         <Box
                             component="span"
-                            sx={{ fontSize: '3rem', fontWeight: 'bold', color: month.totalMonthly !== month.totalNavRecords ? 'red' : 'inherit' }}
+                            sx={{
+                                fontSize: '3rem',
+                                fontWeight: 'bold',
+                                color:
+                                    month.totalMonthly !== month.totalNavRecords
+                                        ? 'red'
+                                        : 'inherit',
+                            }}
                         >
                             {month.month}{' '}
                             <Box
@@ -192,7 +207,11 @@ const Calendar = ({
                                     style={{
                                         display: 'grid',
                                         gridTemplateColumns: 'repeat(7, 1fr)',
-                                        background: checked[`${month.businessUnit}-${month.y}-${month.m}`] ? theme.palette.secondary.main : theme.palette.primary.main,
+                                        background: checked[
+                                            `${month.businessUnit}-${month.y}-${month.m}`
+                                        ]
+                                            ? theme.palette.secondary.main
+                                            : theme.palette.primary.main,
                                         color: '#fff',
                                     }}
                                 >
@@ -271,6 +290,7 @@ const Calendar = ({
                                                             dayObj.isCurrent
                                                                 ? 600
                                                                 : 500,
+                                                        color: '#fff',
                                                     }}
                                                 >
                                                     {dayObj.day}

@@ -18,12 +18,12 @@ class Calendar
 
     public static function calendar(array $filters)
     {
-        $data = self::distinctMonths();
+        $data = self::distinctMonths($filters['company'] ?? null);
         if(isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true'){
             $navRecords = self::distinctMonthsNav($filters['monthDetails']);
             // dd($data, $navRecords);
-            // $data = $data->merge($navRecords);
-            $data = $navRecords;
+            $data = $data->merge($navRecords);
+            // $data = $navRecords;
         }
 
         $records = [];
@@ -69,16 +69,27 @@ class Calendar
 
         return $totalNavRecords;
     }
-    private static function distinctMonths()
+    private static function distinctMonths($company)
     {
+        // dd($company);
         $crf = Crf::select('date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"))
             ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
+            ->when($company && $company != 'all', function ($q) use ($company) {
+                $q->whereHas('businessUnit', function ($q) use ($company) {
+                    $q->where('company_id', $company);
+                });
+            })
             ->doesntHave('checkStatus')
             ->groupBy('date', 'business_units.name', 'business_units.id');
 
         $cv = CvCheckPayment::select('cv_headers.cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"))
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
+             ->when($company && $company != 'all', function ($q) use ($company) {
+                $q->whereHas('businessUnit', function ($q) use ($company) {
+                    $q->where('company_id', $company);
+                });
+            })
             ->doesntHave('checkStatus')
             ->groupBy('cv_headers.cv_date', 'business_units.name', 'business_units.id');
 
