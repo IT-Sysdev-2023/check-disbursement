@@ -81,11 +81,13 @@ const Calendar = ({
         setChecked(() => {
             let updated;
 
-            if (value) { //CHECK CURRENT ITEM
+            if (value) {
+                //CHECK CURRENT ITEM
                 updated = {
                     [key]: true,
                 };
-            } else { // UNCHECK PREVIOUS ITEM
+            } else {
+                // UNCHECK PREVIOUS ITEM
                 updated = {};
             }
 
@@ -125,255 +127,280 @@ const Calendar = ({
             </Stack>
 
             {/* CALENDAR */}
-            {data.map((month, monthIndex) => (
-                <Box key={monthIndex} sx={{ mb: 4 }}>
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'end',
-                        }}
-                    >
+            {data.length === 0 ? (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%',
+                        minHeight: 200,
+                    }}
+                >
+                    NO DATA{' '}
+                </Box>
+            ) : (
+                data.map((month, monthIndex) => (
+                    <Box key={monthIndex} sx={{ mb: 4 }}>
                         <Box
-                            component="span"
                             sx={{
-                                fontSize: '3rem',
-                                fontWeight: 'bold',
-                                color:
-                                    month.totalMonthly !== month.totalNavRecords
-                                        ? 'red'
-                                        : 'inherit',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'end',
                             }}
                         >
-                            {month.month}{' '}
                             <Box
                                 component="span"
                                 sx={{
-                                    fontSize: '1.5rem',
-                                    fontWeight: 'normal',
+                                    fontSize: '3rem',
+                                    fontWeight: 'bold',
+                                    color:
+                                        month.totalMonthly !==
+                                        month.totalNavRecords
+                                            ? 'red'
+                                            : 'inherit',
                                 }}
                             >
-                                {month.businessUnit} - {month.totalMonthly}{' '}
-                                Records
-                            </Box>
-                        </Box>
-                        <Box
-                            component="span"
-                            sx={{
-                                fontSize: '1rem',
-                                fontWeight: 500,
-                                opacity: 0.7,
-                            }}
-                        >
-                            {month.totalNavRecords} in Navision
-                            <Switch
-                                // checked={checked}
-                                checked={
-                                    checked[
-                                        `${month.businessUnit}-${month.y}-${month.m}`
-                                    ] || false
-                                }
-                                onChange={(e) =>
-                                    handleCheckChange(e, {
-                                        month: month.m,
-                                        year: month.y,
-                                        businessUnit: month.businessUnit,
-                                    })
-                                }
-                            />
-                        </Box>
-                    </Box>
-
-                    <Box
-                        sx={{
-                            width: '100%',
-                            maxWidth: '100%',
-                            mt: 4,
-                            borderRadius: 1,
-                            border: `1px solid ${isDarkMode ? '#444' : '#ccc'}`,
-                            bgcolor: isDarkMode ? '#121212' : '#fff',
-                            boxShadow: 1,
-                            overflow: 'hidden',
-                        }}
-                    >
-                        <table
-                            style={{
-                                width: '100%',
-                                borderCollapse: 'collapse',
-                            }}
-                        >
-                            <thead>
-                                <tr
-                                    style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(7, 1fr)',
-                                        background: checked[
-                                            `${month.businessUnit}-${month.y}-${month.m}`
-                                        ]
-                                            ? theme.palette.secondary.main
-                                            : theme.palette.primary.main,
-                                        color: '#fff',
+                                {month.month}{' '}
+                                <Box
+                                    component="span"
+                                    sx={{
+                                        fontSize: '1.5rem',
+                                        fontWeight: 'normal',
                                     }}
                                 >
-                                    {[
-                                        'Sun',
-                                        'Mon',
-                                        'Tue',
-                                        'Wed',
-                                        'Thu',
-                                        'Fri',
-                                        'Sat',
-                                    ].map((d) => (
-                                        <th
-                                            key={d}
-                                            style={{
-                                                textAlign: 'center',
-                                                padding: '0.75rem',
-                                                fontWeight: 600,
-                                            }}
-                                        >
-                                            {d}
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {month.days.map((week, weekIndex) => (
+                                    {month.businessUnit} - {month.totalMonthly}{' '}
+                                    Records
+                                </Box>
+                            </Box>
+                            <Box
+                                component="span"
+                                sx={{
+                                    fontSize: '1rem',
+                                    fontWeight: 500,
+                                    opacity: 0.7,
+                                }}
+                            >
+                                {month.totalNavRecords} in Navision
+                                <Switch
+                                    // checked={checked}
+                                    checked={
+                                        checked[
+                                            `${month.businessUnit}-${month.y}-${month.m}`
+                                        ] || false
+                                    }
+                                    onChange={(e) =>
+                                        handleCheckChange(e, {
+                                            month: month.m,
+                                            year: month.y,
+                                            businessUnit: month.businessUnit,
+                                        })
+                                    }
+                                />
+                            </Box>
+                        </Box>
+
+                        <Box
+                            sx={{
+                                width: '100%',
+                                maxWidth: '100%',
+                                mt: 4,
+                                borderRadius: 1,
+                                border: `1px solid ${isDarkMode ? '#444' : '#ccc'}`,
+                                bgcolor: isDarkMode ? '#121212' : '#fff',
+                                boxShadow: 1,
+                                overflow: 'hidden',
+                            }}
+                        >
+                            <table
+                                style={{
+                                    width: '100%',
+                                    borderCollapse: 'collapse',
+                                }}
+                            >
+                                <thead>
                                     <tr
-                                        key={`month-${monthIndex}-week-${weekIndex}`}
                                         style={{
                                             display: 'grid',
                                             gridTemplateColumns:
                                                 'repeat(7, 1fr)',
+                                            background: checked[
+                                                `${month.businessUnit}-${month.y}-${month.m}`
+                                            ]
+                                                ? theme.palette.secondary.main
+                                                : theme.palette.primary.main,
+                                            color: '#fff',
                                         }}
                                     >
-                                        {week.map((dayObj, dayIndex) => (
-                                            <td
-                                                key={`month-${monthIndex}-week-${weekIndex}-day-${dayIndex}`}
-                                                onClick={() => {
-                                                    if (!dayObj.day) return; // ignore empty cells
-
-                                                    const fullDate = dayjs(
-                                                        `${month.y}-${month.m}-${dayObj.day}`,
-                                                        'YYYY-M-D',
-                                                    );
-
-                                                    setSelectedDate(fullDate);
-                                                }}
+                                        {[
+                                            'Sun',
+                                            'Mon',
+                                            'Tue',
+                                            'Wed',
+                                            'Thu',
+                                            'Fri',
+                                            'Sat',
+                                        ].map((d) => (
+                                            <th
+                                                key={d}
                                                 style={{
-                                                    position: 'relative',
-                                                    height: '5rem',
-                                                    padding: '0.5rem',
-                                                    border: `1px solid ${isDarkMode ? '#444' : '#eee'}`,
-                                                    cursor: 'pointer',
-                                                    backgroundColor:
-                                                        dayObj.totalRecord
-                                                            ? '#052770'
-                                                            : dayObj.isWeekend
-                                                              ? '#014421'
-                                                              : dayObj.totalRecord ==
-                                                                  0
-                                                                ? '#440E03'
-                                                                : dayObj.isCurrent
-                                                                  ? isDarkMode
-                                                                      ? '#333'
-                                                                      : '#cfe3ff'
-                                                                  : 'transparent',
-                                                    color: isDarkMode
-                                                        ? '#fff'
-                                                        : '#000',
+                                                    textAlign: 'center',
+                                                    padding: '0.75rem',
+                                                    fontWeight: 600,
                                                 }}
                                             >
-                                                <span
-                                                    style={{
-                                                        fontWeight:
-                                                            dayObj.isCurrent
-                                                                ? 600
-                                                                : 500,
-                                                        color: '#fff',
-                                                    }}
-                                                >
-                                                    {dayObj.day}
-                                                </span>
-
-                                                {/* LABEL */}
-                                                {(dayObj.crf !== undefined ||
-                                                    dayObj.cv !==
-                                                        undefined) && (
-                                                    <div
-                                                        style={{
-                                                            position:
-                                                                'absolute',
-                                                            top: '4px',
-                                                            right: '6px',
-                                                            fontSize: '0.65rem',
-                                                            textAlign: 'right',
-                                                            lineHeight: '1.2',
-                                                        }}
-                                                    >
-                                                        {dayObj.crf !==
-                                                            undefined && (
-                                                            <div
-                                                                style={{
-                                                                    color: '#4caf50',
-                                                                    fontWeight: 600,
-                                                                }}
-                                                            >
-                                                                CRF:{' '}
-                                                                {dayObj.crf}
-                                                            </div>
-                                                        )}
-                                                        {dayObj.cv !==
-                                                            undefined && (
-                                                            <div
-                                                                style={{
-                                                                    color: '#ff9800',
-                                                                    fontWeight: 600,
-                                                                }}
-                                                            >
-                                                                CV: {dayObj.cv}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                {/* Total Record Below Date */}
-                                                {dayObj.totalRecord !==
-                                                    undefined && (
-                                                    <div
-                                                        style={{
-                                                            marginTop:
-                                                                '0.25rem',
-                                                            fontSize: '0.75rem',
-                                                            fontWeight: 800,
-
-                                                            textAlign: 'center',
-                                                            color:
-                                                                dayObj.totalRecord ===
-                                                                0
-                                                                    ? '#9e9e9e' // gray when zero
-                                                                    : isDarkMode
-                                                                      ? theme
-                                                                            .palette
-                                                                            .warning
-                                                                            .main
-                                                                      : theme
-                                                                            .palette
-                                                                            .info
-                                                                            .main,
-                                                        }}
-                                                    >
-                                                        {dayObj.totalRecord}
-                                                    </div>
-                                                )}
-                                            </td>
+                                                {d}
+                                            </th>
                                         ))}
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {month.days.map((week, weekIndex) => (
+                                        <tr
+                                            key={`month-${monthIndex}-week-${weekIndex}`}
+                                            style={{
+                                                display: 'grid',
+                                                gridTemplateColumns:
+                                                    'repeat(7, 1fr)',
+                                            }}
+                                        >
+                                            {week.map((dayObj, dayIndex) => (
+                                                <td
+                                                    key={`month-${monthIndex}-week-${weekIndex}-day-${dayIndex}`}
+                                                    onClick={() => {
+                                                        if (!dayObj.day) return; // ignore empty cells
+
+                                                        const fullDate = dayjs(
+                                                            `${month.y}-${month.m}-${dayObj.day}`,
+                                                            'YYYY-M-D',
+                                                        );
+
+                                                        setSelectedDate(
+                                                            fullDate,
+                                                        );
+                                                    }}
+                                                    style={{
+                                                        position: 'relative',
+                                                        height: '5rem',
+                                                        padding: '0.5rem',
+                                                        border: `1px solid ${isDarkMode ? '#444' : '#eee'}`,
+                                                        cursor: 'pointer',
+                                                        backgroundColor:
+                                                            dayObj.totalRecord
+                                                                ? '#052770'
+                                                                : dayObj.isWeekend
+                                                                  ? '#014421'
+                                                                  : dayObj.totalRecord ==
+                                                                      0
+                                                                    ? '#440E03'
+                                                                    : dayObj.isCurrent
+                                                                      ? isDarkMode
+                                                                          ? '#333'
+                                                                          : '#cfe3ff'
+                                                                      : 'transparent',
+                                                        color: isDarkMode
+                                                            ? '#fff'
+                                                            : '#000',
+                                                    }}
+                                                >
+                                                    <span
+                                                        style={{
+                                                            fontWeight:
+                                                                dayObj.isCurrent
+                                                                    ? 600
+                                                                    : 500,
+                                                            color: '#fff',
+                                                        }}
+                                                    >
+                                                        {dayObj.day}
+                                                    </span>
+
+                                                    {/* LABEL */}
+                                                    {(dayObj.crf !==
+                                                        undefined ||
+                                                        dayObj.cv !==
+                                                            undefined) && (
+                                                        <div
+                                                            style={{
+                                                                position:
+                                                                    'absolute',
+                                                                top: '4px',
+                                                                right: '6px',
+                                                                fontSize:
+                                                                    '0.65rem',
+                                                                textAlign:
+                                                                    'right',
+                                                                lineHeight:
+                                                                    '1.2',
+                                                            }}
+                                                        >
+                                                            {dayObj.crf !==
+                                                                undefined && (
+                                                                <div
+                                                                    style={{
+                                                                        color: '#4caf50',
+                                                                        fontWeight: 600,
+                                                                    }}
+                                                                >
+                                                                    CRF:{' '}
+                                                                    {dayObj.crf}
+                                                                </div>
+                                                            )}
+                                                            {dayObj.cv !==
+                                                                undefined && (
+                                                                <div
+                                                                    style={{
+                                                                        color: '#ff9800',
+                                                                        fontWeight: 600,
+                                                                    }}
+                                                                >
+                                                                    CV:{' '}
+                                                                    {dayObj.cv}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    {/* Total Record Below Date */}
+                                                    {dayObj.totalRecord !==
+                                                        undefined && (
+                                                        <div
+                                                            style={{
+                                                                marginTop:
+                                                                    '0.25rem',
+                                                                fontSize:
+                                                                    '0.75rem',
+                                                                fontWeight: 800,
+
+                                                                textAlign:
+                                                                    'center',
+                                                                color:
+                                                                    dayObj.totalRecord ===
+                                                                    0
+                                                                        ? '#9e9e9e' // gray when zero
+                                                                        : isDarkMode
+                                                                          ? theme
+                                                                                .palette
+                                                                                .warning
+                                                                                .main
+                                                                          : theme
+                                                                                .palette
+                                                                                .info
+                                                                                .main,
+                                                            }}
+                                                        >
+                                                            {dayObj.totalRecord}
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </Box>
                     </Box>
-                </Box>
-            ))}
+                ))
+            )}
         </Box>
     );
 };
