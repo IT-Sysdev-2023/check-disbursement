@@ -54,7 +54,8 @@ const Calendar = ({
                 onChangeTab();
             },
         });
-    }, [selectedDate]);
+    }, [selectedDate, onChangeTab]);
+    
     const handleChange = async (event: SelectChangeEvent) => {
         const val = event.target.value;
         setSelectedCompany(val);

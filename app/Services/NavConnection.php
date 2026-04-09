@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Models\CvHeader;
 use App\Models\NavServer;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Date;
@@ -43,24 +44,45 @@ class NavConnection
 
     public function navRecords(int $buId, string $bu, string $tableName, string $month, string $year)
     {
-        return $this->connection->table($tableName)
-            ->selectRaw("[CV Date] as date, count(*) as total")
+        $existingDates = CvHeader::
+            selectRaw("cv_date as date, cv_no")
+            ->whereYear('cv_date', $year)
+            ->whereMonth('cv_date', $month)
+            ->get();
+
+        $existingKeys = $existingDates->map(function ($item) {
+            return $item->cv_no . '-' . $item->date;
+        })->toArray();
+
+        $data = $this->connection->table($tableName)
+            ->selectRaw("DISTINCT [CV Date] as date, [Check Voucher No_] as cv_no")
             ->whereYear('CV Date', $year)
             ->whereMonth('CV Date', $month)
-            ->groupBy('CV Date')
             ->get()
-            ->map(function ($item) use ($bu, $buId) {
-                $item->date = Date::parse($item->date)->format('Y-m-d');
-                $item->business_unit = $bu;
-                $item->buId = $buId;
-                $item->crf_total = 0;
-                $item->cv_total = $item->total;
-                return $item;
+            ->reject(function ($item) use ($existingKeys) { // EXCLUDE EXISTING RECORDS IN DATABASE
+                $formattedDate = Date::parse($item->date)->format('Y-m-d');
+                return in_array($item->cv_no . '-' . $formattedDate, $existingKeys);
             })
-            ->groupBy(
-                fn($q) =>
-                Date::parse($q->date)->format('Y-m')
-            );
+            ->groupBy(function ($item) { // GROUP BY MONTH AND YEAR
+                return Date::parse($item->date)->format('Y-m-d');
+            })
+            ->map(function ($items) use ($bu, $buId) {
+                return (object) [
+                    'date' => Date::parse($items->first()->date)->format('Y-m-d'),
+                    'business_unit' => $bu,
+                    'buId' => $buId,
+                    'crf_total' => 0,
+                    'cv_total' => $items->count(),
+                    'total' => $items->count(),
+                ];
+            })
+            ->groupBy(function ($item, $date) {
+                return substr($date, 0, 7); // "YYYY-MM"
+            });
+        // ;
+        // dd($data);
+        return $data;
+
     }
     public function countNavRecords(string $tableName, string $monthYear): int
     {

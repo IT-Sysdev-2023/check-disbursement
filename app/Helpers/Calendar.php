@@ -21,7 +21,9 @@ class Calendar
         $data = self::distinctMonths();
         if(isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true'){
             $navRecords = self::distinctMonthsNav($filters['monthDetails']);
-            $data = $data->merge($navRecords);
+            // dd($data, $navRecords);
+            // $data = $data->merge($navRecords);
+            $data = $navRecords;
         }
 
         $records = [];
@@ -64,6 +66,7 @@ class Calendar
                 $details['month'],
                 $details['year']
             );
+
         return $totalNavRecords;
     }
     private static function distinctMonths()
@@ -106,6 +109,7 @@ class Calendar
 
     private static function getNavConnectionDetails($data)
     {
+        // dd($data);
         $buIds = $data->map(fn($item) => $item->first()->buId)->unique();
 
         return NavDatabase::with('navServer', 'navHeaderTable')
