@@ -2,7 +2,7 @@ import { useAppearance } from '@/hooks/use-appearance';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { MonthType, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
-import { SelectChangeEvent, Stack, Switch } from '@mui/material';
+import { Alert, SelectChangeEvent, Stack, Switch } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 import dayjs, { Dayjs } from 'dayjs';
@@ -181,22 +181,32 @@ const Calendar = ({
                                     opacity: 0.7,
                                 }}
                             >
-                                {month.totalNavRecords} in Navision
-                                <Switch
-                                    // checked={checked}
-                                    checked={
-                                        checked[
-                                            `${month.businessUnit}-${month.y}-${month.m}`
-                                        ] || false
-                                    }
-                                    onChange={(e) =>
-                                        handleCheckChange(e, {
-                                            month: month.m,
-                                            year: month.y,
-                                            businessUnit: month.businessUnit,
-                                        })
-                                    }
-                                />
+                                {month.totalNavRecords !==
+                                month.totalMonthly ? (
+                                    <>
+                                        {month.totalNavRecords} in Navision
+                                        <Switch
+                                            // checked={checked}
+                                            checked={
+                                                checked[
+                                                    `${month.businessUnit}-${month.y}-${month.m}`
+                                                ] || false
+                                            }
+                                            onChange={(e) =>
+                                                handleCheckChange(e, {
+                                                    month: month.m,
+                                                    year: month.y,
+                                                    businessUnit:
+                                                        month.businessUnit,
+                                                })
+                                            }
+                                        />
+                                    </>
+                                ) : (
+                                    <Alert severity="success">
+                                        Navision Data Matches
+                                    </Alert>
+                                )}
                             </Box>
                         </Box>
 

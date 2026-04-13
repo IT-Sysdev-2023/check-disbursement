@@ -79,7 +79,7 @@ class Calendar
                     $q->where('company_id', $company);
                 });
             })
-            ->doesntHave('checkStatus')
+            // ->doesntHave('checkStatus')
             ->groupBy('date', 'business_units.name', 'business_units.id');
 
         $cv = CvCheckPayment::select('cv_headers.cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"))
@@ -90,7 +90,7 @@ class Calendar
                     $q->where('company_id', $company);
                 });
             })
-            ->doesntHave('checkStatus')
+            // ->doesntHave('checkStatus')
             ->groupBy('cv_headers.cv_date', 'business_units.name', 'business_units.id');
 
         $result = DB::query()
