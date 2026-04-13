@@ -31,12 +31,13 @@ class ChecksService
         $assignment = $filters['assignment'] ?? 'toAssign';
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
-        $borrowedChecks = self::pendingRecords($filters);
+        // $borrowedChecks = self::pendingRecords($filters);
+        $borrowedRecords = ChequeRequestService::borrowedRecords($filters);
   
         $manageCheques = self::manageChecks($filters);
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords ?? [],
-            'pending' => $borrowedChecks,
+            'pending' => $borrowedRecords,
             'manageChecks' => new ChequeCollection($manageCheques ?? []),
             'filter' => (object) [
                 'selectedCompany' => $filters['company'] ?? 'all',

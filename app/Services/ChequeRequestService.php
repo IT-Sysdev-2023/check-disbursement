@@ -151,7 +151,7 @@ class ChequeRequestService
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
-    private static function borrowedRecords(array $filters)
+    public static function borrowedRecords(array $filters)
     {
         return BorrowedCheck::select(
             'borrower_no',

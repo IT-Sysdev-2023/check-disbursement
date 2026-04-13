@@ -31,6 +31,7 @@ import PendingDetails from './retrievedRecords/components/pendingDetails';
 import ProgressModal from './retrievedRecords/components/progressModal';
 import ScanDetails from './retrievedRecords/components/scanDetails';
 import TableView from './retrievedRecords/components/tableView';
+import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -170,14 +171,15 @@ export default function RetrievedRecords({
                         </TabPanel>
 
                         <TabPanel value="pending">
-                            <TableDataGrid
+                             <BorrowedTableGrid data={pending} />
+                            {/* <TableDataGrid
                                 data={pending}
                                 filter={filter.search}
                                 pagination={handlePagination}
                                 handleSearchFilter={handleSearch}
                                 handleSortFilter={handleSort}
                                 columns={pendingColumns}
-                            />
+                            /> */}
                         </TabPanel>
 
                         <TabPanel value="manageChecks">

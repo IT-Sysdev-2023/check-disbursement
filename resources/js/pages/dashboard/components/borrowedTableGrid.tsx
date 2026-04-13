@@ -1,6 +1,6 @@
 import TableItems from '@/pages/chequeRequests/components/tableItems';
 import { Borrower, InertiaPagination } from '@/types';
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { InputAdornment, TablePagination, TextField } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import Table from '@mui/material/Table';
@@ -34,7 +34,8 @@ export default function BorrowedTableGrid({
             },
         });
     };
-
+    const { component } = usePage();
+    const isCheckReceiving = component === 'checkReceiving'; // maong naa ni ky gigamit ni nga component sa Check Recieving(SH) og Borrowed Checks(Disbursing Clerk)
     const handleChangeRowsPerPage = (event) => {
         // setRowsPerPage(parseInt(event.target.value, 10));
         // setPage(0);
@@ -76,15 +77,21 @@ export default function BorrowedTableGrid({
                             <TableCell align="right">Borrower Name</TableCell>
                             <TableCell align="right">Reason</TableCell>
                             <TableCell align="right">Approver</TableCell>
-                            <TableCell align="right">
-                                Borrower Details
-                            </TableCell>
+                            {isCheckReceiving && (
+                                <TableCell align="right">
+                                    Borrower Details
+                                </TableCell>
+                            )}
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {data?.data?.length ? (
                             data.data.map((row) => (
-                                <TableItems key={row.borrowerNo} row={row} />
+                                <TableItems
+                                    key={row.borrowerNo}
+                                    row={row}
+                                    isVisible={isCheckReceiving}
+                                />
                             ))
                         ) : (
                             <TableRow>

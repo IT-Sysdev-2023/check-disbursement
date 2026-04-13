@@ -1,6 +1,6 @@
 import { borrowedChecks, borrowedNumberCheques } from "@/routes";
 import { Borrower } from "@/types";
-import { router } from "@inertiajs/react";
+import { router, usePage } from "@inertiajs/react";
 import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -8,8 +8,9 @@ import { ArrowBigRightDash } from 'lucide-react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 
-export default function TableItems(props: { row: Borrower }) {
-    const { row } = props;
+export default function TableItems(props: { row: Borrower, isVisible: boolean}) {
+    const { row, isVisible } = props;
+    
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
 
@@ -58,7 +59,7 @@ export default function TableItems(props: { row: Borrower }) {
                 <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
                 <TableCell align="right">{row.primaryApproverName}</TableCell>
-                <TableCell align="center">
+                {isVisible && <TableCell align="center">
                     <IconButton
                         size="small"
                         color="primary"
@@ -66,7 +67,7 @@ export default function TableItems(props: { row: Borrower }) {
                     >
                         <ArrowBigRightDash />
                     </IconButton>
-                </TableCell>
+                </TableCell>}
             </TableRow>
             <TableRow>
                 <TableCell

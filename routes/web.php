@@ -97,12 +97,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('scanned-records/{id}', [StatusController::class, 'scannedRecords'])->name('scanned-records');
     });
 
-    //! SECTION HEAD
+     Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->middleware('role:disbursement_officer|section_head|admin')->name('borrowed-checks');
+    
+     //! SECTION HEAD
     Route::prefix('section-head')->middleware('role:section_head|admin')->group(function () {
 
         Route::prefix('check-receiving')->group(function () {
             Route::get('index', [CheckRequestController::class, 'index'])->name('cheque-requests');
-            Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->name('borrowed-checks'); // display cheques from dropdown
+            // display cheques from dropdown
             Route::get('borrowed-number-cheques/{id}', [CheckRequestController::class, 'borrowedNumberCheques'])->name('borrowed-number-cheques'); // display number of cheques borrowed
             Route::post('cancel-check', [CheckRequestController::class, 'cancelCheck'])->name('cancel-check');
 
