@@ -20,8 +20,15 @@ class CvProgress implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(protected int $userId, protected string $message, protected ProgressStatus $status , protected string $tableName = '',  protected int $currentRow = 0, protected int $totalRows = 0)
-    {
+    public function __construct(
+        protected int $userId,
+        protected string $message,
+        protected ProgressStatus $status,
+        protected string $tableName = '',
+        protected int $currentRow = 0,
+        protected int $totalRows = 0,
+        protected string $key = ''
+    ) {
         //
         $this->percentage = NumberHelper::percentage($currentRow, $totalRows);
     }
@@ -38,7 +45,7 @@ class CvProgress implements ShouldBroadcast
         ];
     }
 
-    public function broadcastWith() 
+    public function broadcastWith()
     {
         return [
             'message' => $this->message,
@@ -46,7 +53,8 @@ class CvProgress implements ShouldBroadcast
             'percentage' => $this->percentage,
             'currentRow' => $this->currentRow,
             'totalRows' => $this->totalRows,
-            'status' => $this->status
+            'status' => $this->status,
+            'key' => $this->key,
             // 'isFinished' => $this->isFinished,
             // 'hasNoRecord' => $this->hasNoRecord
         ];

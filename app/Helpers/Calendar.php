@@ -19,7 +19,7 @@ class Calendar
     public static function calendar(array $filters)
     {
         $data = self::distinctMonths($filters['company'] ?? null);
-        if(isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true'){
+        if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
             $navRecords = self::distinctMonthsNav($filters['monthDetails']);
             // dd($data, $navRecords);
             $data = $data->merge($navRecords);
@@ -69,6 +69,31 @@ class Calendar
 
         return $totalNavRecords;
     }
+
+    public static function getMissingRecordsNav(array $details)
+    {
+        $bu = $details['bu'] ?? null;
+        $nav = NavDatabase::with('navServer', 'navHeaderTable')
+            ->whereHas('businessUnit', function ($q) use ($bu) {
+                $q->where('name', $bu);
+            })
+            ->first();
+
+        $totalNavRecords = (new GenerateCvService())
+            ->setConnection(
+                $nav->navServer,
+                $nav->name
+            )
+            ->getNavMissingRecords(
+                $nav->business_unit_id,
+                $bu,
+                $nav->navHeaderTable->name,
+                $details['month'],
+                $details['year']
+            );
+
+        return $totalNavRecords;
+    }
     private static function distinctMonths($company)
     {
         // dd($company);
@@ -85,7 +110,7 @@ class Calendar
         $cv = CvCheckPayment::select('cv_headers.cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"))
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
-             ->when($company && $company != 'all', function ($q) use ($company) {
+            ->when($company && $company != 'all', function ($q) use ($company) {
                 $q->whereHas('businessUnit', function ($q) use ($company) {
                     $q->where('company_id', $company);
                 });
@@ -114,7 +139,7 @@ class Calendar
                 fn($q) =>
                 Date::parse($q->date)->format('Y-m')
             );
-// dd($result);
+        // dd($result);
         return $result;
     }
 

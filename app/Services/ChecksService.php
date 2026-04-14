@@ -2,16 +2,22 @@
 
 namespace App\Services;
 
+use App\Enums\ProgressStatus;
+use App\Events\CalendarProgress;
+use App\Events\CvProgress;
 use App\Helpers\Calendar;
 use App\Http\Controllers\CheckRequestController;
 use App\Http\Resources\ChequeCollection;
 use App\Http\Resources\ChequeResource;
+use App\Jobs\CvDatabase;
 use App\Models\Approver;
 use App\Models\BorrowedCheck;
 use App\Models\BusinessUnit;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
+use App\Models\NavServer;
 use App\Models\TagLocation;
+use Illuminate\Bus\Batch;
 use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -20,7 +26,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Bus;
 use Inertia\Inertia;
+use Throwable;
 
 class ChecksService
 {
@@ -33,7 +41,7 @@ class ChecksService
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
         // $borrowedChecks = self::pendingRecords($filters);
         $borrowedRecords = ChequeRequestService::borrowedRecords($filters);
-  
+
         $manageCheques = self::manageChecks($filters);
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords ?? [],
@@ -58,6 +66,58 @@ class ChecksService
             ],
             'calendar' => Inertia::once(fn() => Calendar::calendar($filters)),
         ]);
+    }
+
+    public function syncData(Request $request)
+    {
+        $validated = $request->validate(
+            [
+                'month' => 'required |integer',
+                'year' => 'required |integer',
+                'bu' => 'required|string'
+            ]
+        );
+
+        $missingCheques = Calendar::getMissingRecordsNav($validated);
+
+        $user = $request->user();
+
+        // Get all the Navition Servers
+        $buId = BusinessUnit::
+            where('name', $validated['bu'])
+            ->pluck('id', 'name')->values();
+
+        $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
+            ->withWhereHas('navDatabases', function ($query) use ($buId) {
+                $query->whereIn('business_unit_id', $buId)
+                    ->with('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
+            })
+            ->lazy();
+
+        $id = $user->id;
+        $allJobs = [];
+
+        $date = (object) [
+            'month' => $validated['month'],
+            'year' => $validated['year']
+        ];
+
+        $nav->each(function (NavServer $server) use ($id, $date, &$allJobs, $missingCheques) {
+            foreach ($server->navDatabases as $db) {
+                $allJobs[] = new CvDatabase($server->id, $id, $date, $db->id, $missingCheques);
+            }
+        });
+        $key = $validated['bu'] . '-' . $validated['year'] . '-' . $validated['month'];
+        Bus::batch($allJobs)
+            ->name("CV Import All Servers")
+            ->then(function (Batch $batch) use ($id, $key) {
+                CvProgress::dispatch($id, "Data Retrieval Completed", ProgressStatus::Finished, '', 0, 0, $key);
+            })
+            ->catch(function (Batch $batch, Throwable $e) use ($id) {
+                CvProgress::dispatch($id, "Data Retrieval Failed: " . $e->getMessage(), ProgressStatus::NoConnection);
+            })
+            ->dispatch();
+        // $navRecords = Calendar::distinctMonthsNav($filters['monthDetails']);
     }
 
     public static function manageChecks(array $filters = [])

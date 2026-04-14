@@ -14,6 +14,8 @@ class NavConnection
     protected $connection;
 
     protected object $dateFilter;
+
+    protected array $missingCheques = [];
     protected static array $cache = [];
     public function setConnection(NavServer $server, string $database)
     {
@@ -79,11 +81,28 @@ class NavConnection
             ->groupBy(function ($item, $date) {
                 return substr($date, 0, 7); // "YYYY-MM"
             });
-        // ;
-        // dd($data);
         return $data;
-
     }
+
+    public function getNavMissingRecords(int $buId, string $bu, string $tableName, string $month, string $year)
+    {
+        $existingCv = CvHeader::query()
+            ->whereYear('cv_date', $year)
+            ->whereMonth('cv_date', $month)
+            ->pluck('cv_no')
+            ->flip();
+
+        $data = $this->connection->table($tableName)
+            ->selectRaw("[Check Voucher No_] as cv_no")
+            ->whereYear('CV Date', $year)
+            ->whereMonth('CV Date', $month)
+            ->get()
+            ->reject(fn($row) => isset($existingCv[$row->cv_no]))
+            ->pluck('cv_no');
+
+        return $data->toArray();
+    }
+
     public function countNavRecords(string $tableName, string $monthYear): int
     {
         [$year, $month] = explode('-', $monthYear);
@@ -97,7 +116,15 @@ class NavConnection
     public function headerConnection(string $name): mixed
     {
         $record = $this->connection->table($name)
-            ->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end])
+            ->when(!empty($this->missingCheques), function ($query) {
+                $query->whereIn('Check Voucher No_', $this->missingCheques);
+            })
+            ->when(isset($this->dateFilter->month, $this->dateFilter->year), function ($query) { // DATA SYNC BY MONTH AND YEAR
+                $query->whereYear('CV Date', $this->dateFilter->year)
+                    ->whereMonth('CV Date', $this->dateFilter->month);
+            }, function ($query) { //EXTRACT DATA BY DATE RANGE
+                $query->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
+            })
             ->orderBy('Check Voucher No_');
         return $record;
     }

@@ -22,6 +22,11 @@ class GenerateCvService extends NavConnection
         return $this;
     }
 
+    public function setMissingCheques(array $missingCheques){
+        $this->missingCheques = $missingCheques;
+        return $this;
+    }
+
     public function setDateFilter(object $date)
     {
         $this->dateFilter = $date;
@@ -48,12 +53,13 @@ class GenerateCvService extends NavConnection
         $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable);
 
         $total = $headerQuery->count();
+        $key = $buName . '-' . $this->dateFilter->year . '-' . $this->dateFilter->month;
 
         if ($total === 0) {
             CvProgress::dispatch($this->userId, "No records found for {$buName}...", ProgressStatus::NoRecord, $tableName);
         }
 
-        $headerQuery->chunkById(500, function ($chunk) use (&$start, $total, $tableName, $tableId, $lineQuery, $checkPaymentQuery, $buId, $buName) {
+        $headerQuery->chunkById(500, function ($chunk) use (&$start, $total, $tableName, $tableId, $lineQuery, $checkPaymentQuery, $buId, $buName, $key) {
 
             DB::beginTransaction();
             try {
@@ -65,7 +71,7 @@ class GenerateCvService extends NavConnection
                 $headers = collect();
                 foreach ($chunk as $item) {
 
-                    CvProgress::dispatch($this->userId, "Generating " . $buName . " in progress.. ", ProgressStatus::Processing, $tableName, $start, $total);
+                    CvProgress::dispatch($this->userId, "Generating " . $buName . " in progress.. ", ProgressStatus::Processing, $tableName, $start, $total, $key);
                     $start++;
 
                     $headers->push([

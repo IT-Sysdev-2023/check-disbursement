@@ -27,7 +27,8 @@ class CvDatabase implements ShouldQueue
         public int $serverId,
         public int $userId,
         public object $date,
-        public int $dbId
+        public int $dbId,
+        public array $missingCheques = []
     ) {
     }
 
@@ -50,6 +51,7 @@ class CvDatabase implements ShouldQueue
                 $table->name
             )
             ->setDateFilter($this->date)
+            ->setMissingCheques($this->missingCheques)
             ->setUser($this->userId)
             ->storeRecord(
                 $table->navHeaderTable,

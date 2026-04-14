@@ -58,4 +58,9 @@ class RetrievedChecksController extends Controller
             ]);
         return response()->json($bu);
     }
+
+    public function syncMissingData(Request $request)
+    {
+        return $this->service->syncData($request);
+    }
 }

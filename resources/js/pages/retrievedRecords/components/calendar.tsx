@@ -1,19 +1,32 @@
 import { useAppearance } from '@/hooks/use-appearance';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { MonthType, SelectionType } from '@/types';
+import { syncMissingData } from '@/routes';
+import { EventType, MonthType, ProgressState, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
-import { Alert, SelectChangeEvent, Stack, Switch } from '@mui/material';
+import { useEcho } from '@laravel/echo-react';
+import {
+    Alert,
+    Button,
+    CircularProgress,
+    SelectChangeEvent,
+    Stack,
+    Switch,
+} from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
+import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
+import { RefreshCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import CalendarLegend from './calendarLegend';
 
 const Calendar = ({
+    userId,
     data,
     onChangeTab,
     company,
 }: {
+    userId: number;
     onChangeTab: () => void;
     data: MonthType[];
     company: SelectionType[];
@@ -21,6 +34,9 @@ const Calendar = ({
     const [selectedCompany, setSelectedCompany] = useState<string>('all');
     const [checked, setChecked] = useState<Record<string, boolean>>({});
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+    const [progress, setProgress] = useState<ProgressState>({});
+    const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
+    const [loading, setLoading] = useState(false);
     const { appearance } = useAppearance();
 
     const theme = useTheme(); // Get the MUI theme
@@ -55,6 +71,28 @@ const Calendar = ({
             },
         });
     }, [selectedDate, onChangeTab]);
+
+    useEcho(`cv-progress.${userId}`, 'CvProgress', (e: EventType) => {
+        const { percentage, message, status, key } = e;
+
+        setLoadingMap((prev) => ({ ...prev, [key]: true }));
+
+        const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
+        setProgress((prev) => ({
+            ...prev,
+            [key]: {
+                progress: percentage,
+                buffer,
+                message,
+                status,
+            },
+        }));
+
+        if (e.status === 'finished') {
+            setLoadingMap((prev) => ({ ...prev, [key]: false }));
+            router.reload();
+        }
+    });
 
     const handleChange = async (event: SelectChangeEvent) => {
         const val = event.target.value;
@@ -96,9 +134,27 @@ const Calendar = ({
                     isNavSelected: value,
                     monthDetails: value ? month : null,
                 },
+                onBefore: () => {
+                    setLoadingMap((prev) => ({ ...prev, [key]: true }));
+                },
+                onFinish: () => {
+                    setLoadingMap((prev) => ({ ...prev, [key]: false }));
+                },
             });
 
             return updated;
+        });
+    };
+    const onSyncData = async (month: {
+        year: number;
+        month: number;
+        businessUnit: string | undefined;
+    }) => {
+         setLoading(true);
+        await axios.post(syncMissingData().url, {
+            month: month.month,
+            year: month.year,
+            bu: month.businessUnit,
         });
     };
     return (
@@ -141,7 +197,7 @@ const Calendar = ({
                 </Box>
             ) : (
                 data.map((month, monthIndex) => (
-                    <Box key={monthIndex} sx={{ mb: 4 }}>
+                    <Box key={monthIndex} sx={{ mb: 4, position: 'relative' }}>
                         <Box
                             sx={{
                                 display: 'flex',
@@ -186,7 +242,6 @@ const Calendar = ({
                                     <>
                                         {month.totalNavRecords} in Navision
                                         <Switch
-                                            // checked={checked}
                                             checked={
                                                 checked[
                                                     `${month.businessUnit}-${month.y}-${month.m}`
@@ -201,6 +256,22 @@ const Calendar = ({
                                                 })
                                             }
                                         />
+                                        <Button
+                                            loading={loading
+                                            }
+                                            variant="outlined"
+                                            startIcon={<RefreshCcw />}
+                                            onClick={() =>
+                                                onSyncData({
+                                                    month: month.m,
+                                                    year: month.y,
+                                                    businessUnit:
+                                                        month.businessUnit,
+                                                })
+                                            }
+                                        >
+                                            Sync Data
+                                        </Button>
                                     </>
                                 ) : (
                                     <Alert severity="success">
@@ -219,9 +290,46 @@ const Calendar = ({
                                 border: `1px solid ${isDarkMode ? '#444' : '#ccc'}`,
                                 bgcolor: isDarkMode ? '#121212' : '#fff',
                                 boxShadow: 1,
+                                position: 'relative',
                                 overflow: 'hidden',
                             }}
                         >
+                            {loadingMap[
+                                `${month.businessUnit}-${month.y}-${month.m}`
+                            ] && (
+                                <Box
+                                    sx={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexDirection: 'column',
+                                        gap: 2,
+                                        bgcolor: 'rgba(0,0,0,0.6)',
+                                        zIndex: 10,
+                                    }}
+                                >
+                                    <CircularProgress />
+
+                                    <Box
+                                        component="span"
+                                        sx={{
+                                            color: '#fff',
+                                            fontSize: '0.95rem',
+                                            fontWeight: 500,
+                                        }}
+                                    >
+                                        Loading{' '}
+                                        {
+                                            progress[
+                                                `${month.businessUnit}-${month.y}-${month.m}`
+                                            ].progress
+                                        }
+                                        %
+                                    </Box>
+                                </Box>
+                            )}
                             <table
                                 style={{
                                     width: '100%',

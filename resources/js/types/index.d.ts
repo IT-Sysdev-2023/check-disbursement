@@ -363,6 +363,7 @@ export interface EventType {
     currentIndex: number;
     totalFiles: number;
     status: string;
+    key: string;
 }
 
 export interface FlashReponse {

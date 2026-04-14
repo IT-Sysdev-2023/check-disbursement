@@ -83,7 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
             Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');
 
-            Route::get('calendar', [RetrievedChecksController::class, 'calendar'])->name('calendar');
+            Route::post('sync-missing-data', [RetrievedChecksController::class, 'syncMissingData'])->name('sync-missing-data');
         });
     });
 
