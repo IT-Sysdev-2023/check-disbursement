@@ -8,14 +8,18 @@ import {
     CheckScannedDetails,
     ChequeType,
     DateFilterType,
+    FilterType,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import { Box, Tab } from '@mui/material';
+import AccessAlarmsOutlinedIcon from '@mui/icons-material/AccessAlarmsOutlined';
+import CancelPresentationOutlinedIcon from '@mui/icons-material/CancelPresentationOutlined';
+import CreditScoreOutlinedIcon from '@mui/icons-material/CreditScoreOutlined';
+import DownloadDoneOutlinedIcon from '@mui/icons-material/DownloadDoneOutlined';
+import SwipeRightOutlinedIcon from '@mui/icons-material/SwipeRightOutlined';
+import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import { createStatusChequeColumns } from './checkStatus/components/columns';
 import ScannedDetails from './checkStatus/components/scannedDetails';
@@ -36,13 +40,7 @@ export default function CheckStatus({
 }: {
     cheques: InertiaPagination<ChequeType>;
     company: SelectionType[];
-    filter: {
-        selectedCompany: string;
-        selectedBu: string;
-        search: string;
-        date: DateFilterType;
-        tab: string;
-    };
+    filter: FilterType;
     auth: Auth;
 }) {
     const [openModal, setOpenModal] = useState(false);
@@ -82,43 +80,65 @@ export default function CheckStatus({
             <Head title="CV" />
             <PageContainer title="Check Status">
                 <Box sx={{ width: '100%', typography: 'body1' }}>
-                    <TabContext value={tab}>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <TabList
-                                onChange={handleChangeTab}
-                                aria-label="tabs"
-                            >
-                                {/* <Tab label="For Releasing" value="all" /> */}
-                               
-                                <Tab label="Deposited" value="deposited" />
-                                <Tab label="Released" value="released" />
-                                <Tab label="Cancelled" value="cancelled" />
-                                 {!isRegional && (
-                                    <Tab label="Forwarded" value="forwarded" />
-                                )}
-                                <Tab label="Staled" value="staled" />
-                            </TabList>
-                        </Box>
-                        <TableFilter company={company} filters={filter} />
-
-                        <TableDataGrid
-                            data={cheques}
-                            filter={filter.search}
-                            pagination={handlePagination}
-                            handleSearchFilter={handleSearch}
-                            handleSortFilter={handleSort}
-                            columns={chequeColumn}
-                        />
-
-                        {scannedRecord && (
-                            <ScannedDetails
-                                record={scannedRecord}
-                                title="Check Details"
-                                open={openModal}
-                                onClose={() => setOpenModal(false)}
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={tab}
+                        exclusive
+                        onChange={handleChangeTab}
+                        aria-label="Platform"
+                    >
+                        <ToggleButton value="deposited">
+                            <CreditScoreOutlinedIcon
+                                sx={{ mr: 1, fontSize: 18 }}
                             />
+                            Deposited
+                        </ToggleButton>
+                        <ToggleButton value="released">
+                            <DownloadDoneOutlinedIcon
+                                sx={{ mr: 1, fontSize: 18 }}
+                            />
+                            Released
+                        </ToggleButton>
+                        <ToggleButton value="cancelled">
+                            <CancelPresentationOutlinedIcon
+                                sx={{ mr: 1, fontSize: 18 }}
+                            />
+                            Cancelled
+                        </ToggleButton>
+                        {!isRegional && (
+                            <ToggleButton value="forwarded">
+                                <SwipeRightOutlinedIcon
+                                    sx={{ mr: 1, fontSize: 18 }}
+                                />
+                                Forwarded
+                            </ToggleButton>
                         )}
-                    </TabContext>
+                        <ToggleButton value="staled">
+                            <AccessAlarmsOutlinedIcon
+                                sx={{ mr: 1, fontSize: 18 }}
+                            />
+                            Staled
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+                    <TableFilter company={company} filters={filter} />
+
+                    <TableDataGrid
+                        data={cheques}
+                        filter={filter.search}
+                        pagination={handlePagination}
+                        handleSearchFilter={handleSearch}
+                        handleSortFilter={handleSort}
+                        columns={chequeColumn}
+                    />
+
+                    {scannedRecord && (
+                        <ScannedDetails
+                            record={scannedRecord}
+                            title="Check Details"
+                            open={openModal}
+                            onClose={() => setOpenModal(false)}
+                        />
+                    )}
                 </Box>
             </PageContainer>
         </AppLayout>
