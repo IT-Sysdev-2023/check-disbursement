@@ -150,7 +150,7 @@ const Calendar = ({
         month: number;
         businessUnit: string | undefined;
     }) => {
-         setLoading(true);
+        setLoading(true);
         await axios.post(syncMissingData().url, {
             month: month.month,
             year: month.year,
@@ -257,8 +257,7 @@ const Calendar = ({
                                             }
                                         />
                                         <Button
-                                            loading={loading
-                                            }
+                                            loading={loading}
                                             variant="outlined"
                                             startIcon={<RefreshCcw />}
                                             onClick={() =>
@@ -312,22 +311,26 @@ const Calendar = ({
                                 >
                                     <CircularProgress />
 
-                                    <Box
-                                        component="span"
-                                        sx={{
-                                            color: '#fff',
-                                            fontSize: '0.95rem',
-                                            fontWeight: 500,
-                                        }}
-                                    >
-                                        Loading{' '}
-                                        {
-                                            progress[
-                                                `${month.businessUnit}-${month.y}-${month.m}`
-                                            ].progress
-                                        }
-                                        %
-                                    </Box>
+                                    {progress[
+                                        `${month.businessUnit}-${month.y}-${month.m}`
+                                    ] && (
+                                        <Box
+                                            component="span"
+                                            sx={{
+                                                color: '#fff',
+                                                fontSize: '0.95rem',
+                                                fontWeight: 500,
+                                            }}
+                                        >
+                                            Loading{' '}
+                                            {
+                                                progress[
+                                                    `${month.businessUnit}-${month.y}-${month.m}`
+                                                ].progress
+                                            }
+                                            %
+                                        </Box>
+                                    )}
                                 </Box>
                             )}
                             <table

@@ -22,7 +22,8 @@ class GenerateCvService extends NavConnection
         return $this;
     }
 
-    public function setMissingCheques(array $missingCheques){
+    public function setMissingCheques(array $missingCheques)
+    {
         $this->missingCheques = $missingCheques;
         return $this;
     }
@@ -31,6 +32,14 @@ class GenerateCvService extends NavConnection
     {
         $this->dateFilter = $date;
         return $this;
+    }
+
+    private function generateKey($buName)
+    {
+        $year = isset($this->dateFilter->year) ? $this->dateFilter->year : '00';
+        $month = isset($this->dateFilter->month) ? $this->dateFilter->month : '00';
+
+        return $buName . '-' . $year . '-' . $month;
     }
 
     public function storeRecord(
@@ -53,7 +62,8 @@ class GenerateCvService extends NavConnection
         $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable);
 
         $total = $headerQuery->count();
-        $key = $buName . '-' . $this->dateFilter->year . '-' . $this->dateFilter->month;
+
+        $key = $this->generateKey($buName);
 
         if ($total === 0) {
             CvProgress::dispatch($this->userId, "No records found for {$buName}...", ProgressStatus::NoRecord, $tableName);
