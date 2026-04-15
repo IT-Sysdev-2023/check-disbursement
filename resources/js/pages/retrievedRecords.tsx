@@ -13,25 +13,22 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import { Box, Tab } from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import ViewCompactIcon from '@mui/icons-material/ViewCompact';
+import SwipeVerticalIcon from '@mui/icons-material/SwipeVertical';
+import AdfScannerOutlinedIcon from '@mui/icons-material/AdfScannerOutlined';
+import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
+import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import AssignScanDetailsModal from './retrievedRecords/components/assignScanDetailsModal';
 import Calendar from './retrievedRecords/components/calendar';
-import {
-    createManageColumns,
-    createPendingChequeColumns,
-} from './retrievedRecords/components/columns';
-import PendingDetails from './retrievedRecords/components/pendingDetails';
+import { createManageColumns } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
 import ScanDetails from './retrievedRecords/components/scanDetails';
 import TableView from './retrievedRecords/components/tableView';
-import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -70,8 +67,8 @@ export default function RetrievedRecords({
     const [scannedId, setScannedId] = useState<number>();
     const [checkRecords, setCheckRecords] = useState({});
     const [currentTab, setCurrentTab] = useState(filter.tab);
-    const [pendingId, setPendingId] = useState<number>();
-    const [pendingModal, setPendingModal] = useState(false);
+    // const [pendingId, setPendingId] = useState<number>();
+    // const [pendingModal, setPendingModal] = useState(false);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue !== 'calendar') {
@@ -123,12 +120,12 @@ export default function RetrievedRecords({
         else router.visit(detailsCrf(id));
     };
 
-    const handleOnView = (id: number) => {
-        setPendingModal(true);
-        setPendingId(id);
-    };
+    // const handleOnView = (id: number) => {
+    //     setPendingModal(true);
+    //     setPendingId(id);
+    // };
 
-    const pendingColumns = createPendingChequeColumns(handleOnView);
+    // const pendingColumns = createPendingChequeColumns(handleOnView);
     const manageCvColumns = createManageColumns(
         handleDetails,
         handleUpdateScanned,
@@ -138,30 +135,41 @@ export default function RetrievedRecords({
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">
                 <Box sx={{ width: '100%', typography: 'body1' }}>
-                    <TabContext value={currentTab}>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <TabList
-                                onChange={handleChangeTab}
-                                aria-label="tabs"
-                            >
-                                <Tab label="Calendar View" value="calendar" />
-                                <Tab label="Table View" value="cheques" />
-                                <Tab label="Borrowed Checks" value="pending" />
-                                <Tab
-                                    label="Manage Checks"
-                                    value="manageChecks"
-                                />
-                            </TabList>
-                        </Box>
-                        <TabPanel value="calendar">
+                    <ToggleButtonGroup
+                        color="primary"
+                        value={currentTab}
+                        exclusive
+                        onChange={handleChangeTab}
+                        aria-label="Platform"
+                    >
+                        <ToggleButton value="calendar">
+                            <CalendarTodayIcon sx={{ mr: 1, fontSize: 18 }} />
+                            Calendar View
+                        </ToggleButton>
+                        <ToggleButton value="tableView">
+                            <ViewCompactIcon sx={{ mr: 1, fontSize: 18 }} />
+                            Table View
+                        </ToggleButton>
+                        <ToggleButton value="borrowed">
+                            <SwipeVerticalIcon sx={{ mr: 1, fontSize: 18 }} />
+                            Borrowed Checks
+                        </ToggleButton>
+                        <ToggleButton value="manageChecks">
+                            <AdfScannerOutlinedIcon sx={{ mr: 1, fontSize: 18 }} />
+                            Manage Checks
+                        </ToggleButton>
+                    </ToggleButtonGroup>
+
+                    <Box sx={{ mt: 5 }}>
+                        {currentTab === 'calendar' && (
                             <Calendar
                                 userId={auth.user.id}
                                 data={calendar}
                                 company={company}
                                 onChangeTab={handleClickCalendar}
                             ></Calendar>
-                        </TabPanel>
-                        <TabPanel value="cheques">
+                        )}
+                        {currentTab === 'tableView' && (
                             <TableView
                                 cheques={cheques}
                                 company={company}
@@ -169,11 +177,11 @@ export default function RetrievedRecords({
                                 filter={filter}
                                 counts={counts}
                             />
-                        </TabPanel>
-
-                        <TabPanel value="pending">
-                             <BorrowedTableGrid data={pending} />
-                            {/* <TableDataGrid
+                        )}
+                        {currentTab === 'borrowed' && (
+                            <>
+                                <BorrowedTableGrid data={pending} />
+                                {/* <TableDataGrid
                                 data={pending}
                                 filter={filter.search}
                                 pagination={handlePagination}
@@ -181,26 +189,27 @@ export default function RetrievedRecords({
                                 handleSortFilter={handleSort}
                                 columns={pendingColumns}
                             /> */}
-                        </TabPanel>
+                            </>
+                        )}
+                        {currentTab === 'manageChecks' && (
+                            <>
+                                <TableFilter
+                                    handleChangeCheck={() => null}
+                                    company={company}
+                                    filters={filter}
+                                    resetFilterRouter={retrievedRecords()}
+                                    businessUnits={businessUnits}
+                                />
+                                <TableDataGrid
+                                    data={manageChecks}
+                                    filter={filter.search}
+                                    pagination={handlePagination}
+                                    handleSearchFilter={handleSearch}
+                                    handleSortFilter={handleSort}
+                                    columns={manageCvColumns}
+                                />
 
-                        <TabPanel value="manageChecks">
-                            <TableFilter
-                                handleChangeCheck={() => null}
-                                company={company}
-                                filters={filter}
-                                resetFilterRouter={retrievedRecords()}
-                                businessUnits={businessUnits}
-                            />
-                            <TableDataGrid
-                                data={manageChecks}
-                                filter={filter.search}
-                                pagination={handlePagination}
-                                handleSearchFilter={handleSearch}
-                                handleSortFilter={handleSort}
-                                columns={manageCvColumns}
-                            />
-
-                            {/* <Box
+                                {/* <Box
                                 display="flex"
                                 justifyContent="flex-end"
                                 mt={3}
@@ -213,8 +222,9 @@ export default function RetrievedRecords({
                                     Sync Check Scanned
                                 </Button>
                             </Box> */}
-                        </TabPanel>
-                    </TabContext>
+                            </>
+                        )}
+                    </Box>
                 </Box>
             </PageContainer>
 
@@ -227,7 +237,7 @@ export default function RetrievedRecords({
                     onClose={() => setScannedDetailsModal(false)}
                 />
             )}
-
+            {/* 
             {pendingId && (
                 <PendingDetails
                     id={pendingId}
@@ -235,7 +245,7 @@ export default function RetrievedRecords({
                     open={pendingModal}
                     onClose={() => setPendingModal(false)}
                 />
-            )}
+            )} */}
 
             {checkRecords && (
                 <AssignScanDetailsModal

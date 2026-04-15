@@ -158,20 +158,22 @@ const Calendar = ({
         });
     };
     return (
-        <Box>
+        <Box sx={{ mt: 2 }}>
             {/* LEGENDS */}
             <Stack
                 direction="row"
                 spacing={2}
                 justifyContent="space-between"
-                sx={{ width: '100%' }}
+                sx={{ width: '100%', mb: 2 }}
             >
-                <SelectItem
-                    handleChange={handleChange}
-                    value={selectedCompany}
-                    title="Filter Company"
-                    items={company}
-                />
+                <Box sx={{ flex: 1 }}>
+                    <SelectItem
+                        handleChange={handleChange}
+                        value={selectedCompany}
+                        title="Filter Company"
+                        items={company}
+                    />
+                </Box>
 
                 <Stack direction="row" spacing={1}>
                     <CalendarLegend color="blue" label="With Records" />
