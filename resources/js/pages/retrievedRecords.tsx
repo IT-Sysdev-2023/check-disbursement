@@ -71,6 +71,7 @@ export default function RetrievedRecords({
     // const [pendingModal, setPendingModal] = useState(false);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
+        if(newValue === null) return;
         if (newValue !== 'calendar') {
             router.reload({
                 data: {
@@ -80,6 +81,7 @@ export default function RetrievedRecords({
                 replace: false,
             });
         }
+        
         setCurrentTab(newValue);
     };
     // const handleSyncScanned = () => {
@@ -146,17 +148,17 @@ export default function RetrievedRecords({
                             <CalendarTodayIcon sx={{ mr: 1, fontSize: 18 }} />
                             Calendar View
                         </ToggleButton>
-                        <ToggleButton value="tableView">
+                        <ToggleButton value="cheques">
                             <ViewCompactIcon sx={{ mr: 1, fontSize: 18 }} />
                             Table View
                         </ToggleButton>
                         <ToggleButton value="borrowed">
                             <SwipeVerticalIcon sx={{ mr: 1, fontSize: 18 }} />
-                            Borrowed Checks
+                            Borrowed Cheques
                         </ToggleButton>
                         <ToggleButton value="manageChecks">
                             <AdfScannerOutlinedIcon sx={{ mr: 1, fontSize: 18 }} />
-                            Manage Checks
+                            Manage Cheques
                         </ToggleButton>
                     </ToggleButtonGroup>
 
@@ -169,7 +171,7 @@ export default function RetrievedRecords({
                                 onChangeTab={handleClickCalendar}
                             ></Calendar>
                         )}
-                        {currentTab === 'tableView' && (
+                        {currentTab === 'cheques' && (
                             <TableView
                                 cheques={cheques}
                                 company={company}

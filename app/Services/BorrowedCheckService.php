@@ -27,7 +27,7 @@ class BorrowedCheckService
     {
 
         $validated = $request->validate([
-            'approver' => 'required|exists:approvers,id',
+            // 'approver' => 'required|exists:approvers,id',
             'borrower' => 'required|exists:borrowers,id',
             'reason' => 'required|string|max:255',
             'cheques' => 'required|array',

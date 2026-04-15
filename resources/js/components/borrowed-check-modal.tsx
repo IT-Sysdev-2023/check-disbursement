@@ -36,12 +36,12 @@ export default function BorrowedCheckModal({
     const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
         [],
     );
-    const [approverSelection, setApproverSelection] = useState<SelectionType[]>(
-        [],
-    );
+    // const [approverSelection, setApproverSelection] = useState<SelectionType[]>(
+    //     [],
+    // );
 
     const { data, setData, post, processing, transform, reset } = useForm({
-        approver: '',
+        // approver: '',
         borrower: '',
         reason: '',
     });
@@ -54,7 +54,7 @@ export default function BorrowedCheckModal({
             const { data } = await axios.get(borrowerNames().url);
 
             setBorrowerSelection(data.borrower);
-            setApproverSelection(data.approver);
+            // setApproverSelection(data.approver);
         };
 
         fetchBorrower();
@@ -92,9 +92,9 @@ export default function BorrowedCheckModal({
         setData('borrower', event.target.value);
     };
 
-    const handleChangeApprover = (event: SelectChangeEvent) => {
-        setData('approver', event.target.value);
-    };
+    // const handleChangeApprover = (event: SelectChangeEvent) => {
+    //     setData('approver', event.target.value);
+    // };
 
     const handleChangeReason = (event: SelectChangeEvent) => {
         setData('reason', event.target.value);
@@ -122,19 +122,19 @@ export default function BorrowedCheckModal({
                             spacing={2}
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
-                            <Grid size={{ xs: 12, sm: 12 }}>
+                            {/* <Grid size={{ xs: 12, sm: 12 }}>
                                 <SelectItem
                                     handleChange={handleChangeApprover}
                                     value={data.approver}
                                     title="Approver Name"
                                     items={approverSelection}
                                 />
-                            </Grid>
+                            </Grid> */}
                             <Grid size={{ xs: 12, sm: 12 }}>
                                 <SelectItem
                                     handleChange={handleChange}
                                     value={data.borrower}
-                                    title="Borrower Name"
+                                    title="Assign Laison"
                                     items={borrowerSelection}
                                 />
                             </Grid>
