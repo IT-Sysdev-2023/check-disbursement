@@ -7,7 +7,6 @@ import {
     Auth,
     CheckScannedDetails,
     ChequeType,
-    DateFilterType,
     FilterType,
     InertiaPagination,
     SelectionType,

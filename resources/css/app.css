@@ -137,6 +137,11 @@
         @apply border-border;
     }
 
+    /* REMOVE SCROLLABLE IN LOGIN */
+     html, body, #app { 
+        height: 100%;
+    }
+
     body {
         @apply bg-background text-foreground;
     }
