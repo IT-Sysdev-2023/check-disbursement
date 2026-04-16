@@ -20,8 +20,8 @@ export default function CheckDetailsCvSignature({ cv }: { cv: { data: Cv } }) {
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Check Details" />
-            <PageContainer title="Check Details">
+            <Head title="Cheque Details" />
+            <PageContainer title="Cheque Details">
                 <CvDetailsSignature details={cv.data} />
             </PageContainer>
         </AppLayout>

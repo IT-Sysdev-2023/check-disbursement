@@ -133,7 +133,7 @@ export default function CheckStatus({
                     {scannedRecord && (
                         <ScannedDetails
                             record={scannedRecord}
-                            title="Check Details"
+                            title="Cheque Details"
                             open={openModal}
                             onClose={() => setOpenModal(false)}
                         />

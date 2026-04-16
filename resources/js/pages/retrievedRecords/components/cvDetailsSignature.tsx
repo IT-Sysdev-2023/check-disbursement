@@ -109,7 +109,19 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">Image</Typography>
 
-                            <Box
+                            <Box sx={{ mt: 2 }}>
+                                <Button
+                                    variant="contained"
+                                    component="a"
+                                    href={details.checkStatus.image}
+                                    download
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Download Image
+                                </Button>
+                            </Box>
+                            {/* <Box
                                 component="img"
                                 src={details.checkStatus.image}
                                 alt="Check preview"
@@ -121,7 +133,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                     borderRadius: 1,
                                     border: '1px solid #e0e0e0',
                                 }}
-                            />
+                            /> */}
                         </Paper>
                     </Grid>
                 )}
@@ -132,7 +144,19 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                 Signature
                             </Typography>
 
-                            <Box
+                            <Box sx={{ mt: 2 }}>
+                                <Button
+                                    variant="contained"
+                                    component="a"
+                                    href={details.checkStatus.signature}
+                                    download
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    Download Signature
+                                </Button>
+                            </Box>
+                            {/* <Box
                                 sx={{
                                     mt: 1,
                                     backgroundColor: '#fff', // force white bg
@@ -154,7 +178,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                         objectFit: 'contain',
                                     }}
                                 />
-                            </Box>
+                            </Box> */}
                         </Paper>
                     </Grid>
                 )}

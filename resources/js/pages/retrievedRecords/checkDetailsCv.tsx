@@ -11,7 +11,7 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: retrievedRecords().url,
     },
     {
-        title: 'Check Details',
+        title: 'Cheque Details',
         href: '#',
     },
 ];
@@ -20,8 +20,8 @@ export default function CheckDetailsCv({ cv }: { cv: { data: Cv } }) {
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Check Details" />
-            <PageContainer title="Check Details">
+            <Head title="Cheque Details" />
+            <PageContainer title="Cheque Details">
                 <CvDetails details={cv.data} />
             </PageContainer>
         </AppLayout>

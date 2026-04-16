@@ -113,16 +113,16 @@ export default function ExtractCrf({
         );
     };
 
-    const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
-        const {
-            target: { value },
-        } = event;
+    // const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
+    //     const {
+    //         target: { value },
+    //     } = event;
 
-        setPermissionList(
-            // On autofill we get a stringified value.
-            typeof value === 'string' ? value.split(',') : value,
-        );
-    };
+    //     setPermissionList(
+    //         // On autofill we get a stringified value.
+    //         typeof value === 'string' ? value.split(',') : value,
+    //     );
+    // };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
