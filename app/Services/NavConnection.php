@@ -78,9 +78,10 @@ class NavConnection
                     'total' => $items->count(),
                 ];
             })
-            ->groupBy(function ($item, $date) {
-                return substr($date, 0, 7); // "YYYY-MM"
-            });
+            ->groupBy('business_unit');
+            // ->groupBy(function ($item, $date) {
+            //     return substr($date, 0, 7); // "YYYY-MM"
+            // });
         return $data;
     }
 

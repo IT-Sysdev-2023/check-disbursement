@@ -19,30 +19,46 @@ class Calendar
     public static function calendar(array $filters)
     {
         $data = self::distinctMonths($filters['company'] ?? null);
+        // dd($data);
         if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
             $navRecords = self::distinctMonthsNav($filters['monthDetails']);
-            // dd($data, $navRecords);
             $data = $data->merge($navRecords);
             // $data = $navRecords;
         }
 
-        $records = [];
-        $navDetails = self::getNavConnectionDetails($data); //FOR Counting total nav records per month
-        foreach ($data as $key => $value) {
+        $records = collect();
+        $navDetails = self::getNavConnectionDetails($data);
 
-            $nav = $navDetails[$value->first()->buId];
+        foreach ($data as $bu => $cheques) {
 
-            $totalNavRecords = (new GenerateCvService())
-                ->setConnection(
-                    $nav->navServer,
-                    $nav->name
-                )
-                ->countNavRecords($nav->navHeaderTable->name, $key);
+            $groupdByDate = $cheques->groupBy(
+                fn($q) => Date::parse($q->date)->format('Y-m')
+            );
 
-            $date = Date::createFromFormat('!Y-m', $key);
-            $records[] = self::transformCalendarData($date, $value, $totalNavRecords);
+            $monthlyData = collect();
+
+            foreach ($groupdByDate as $groupedMonthYear => $value) {
+
+                $nav = $navDetails[$value->first()->buId];
+
+                $totalNavRecords = (new GenerateCvService())
+                    ->setConnection($nav->navServer, $nav->name)
+                    ->countNavRecords($nav->navHeaderTable->name, $groupedMonthYear);
+
+                $date = Date::createFromFormat('!Y-m', $groupedMonthYear);
+
+                $monthlyData->put(
+                    $groupedMonthYear,
+                    self::transformCalendarData($date, $value, $totalNavRecords)
+                );
+            }
+
+            $records->push([
+                'business_unit' => $bu,
+                'months' => $monthlyData->toArray(),
+            ]);
         }
-        return $records;
+        return $records->toArray();
     }
 
     private static function distinctMonthsNav(array $details)
@@ -118,6 +134,7 @@ class Calendar
             // ->doesntHave('checkStatus')
             ->groupBy('cv_headers.cv_date', 'business_units.name', 'business_units.id');
 
+
         $result = DB::query()
             ->fromSub(
                 $crf->unionAll($cv),
@@ -135,10 +152,11 @@ class Calendar
             ->groupBy('date', 'business_unit', 'buId')
             ->orderBy('date')
             ->get()
-            ->groupBy(
-                fn($q) =>
-                Date::parse($q->date)->format('Y-m')
-            );
+            ->groupBy('business_unit');
+        // ->groupBy(
+        //     fn($q) =>
+        //     Date::parse($q->date)->format('Y-m')
+        // );
         // dd($result);
         return $result;
     }

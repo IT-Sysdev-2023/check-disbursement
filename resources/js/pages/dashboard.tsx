@@ -2,18 +2,14 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { Crf, Cv, InertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import TabContext from '@mui/lab/TabContext';
-import TabList from '@mui/lab/TabList';
-import TabPanel from '@mui/lab/TabPanel';
-import { Tab } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { GridColDef } from '@mui/x-data-grid';
 import { useState } from 'react';
 import PageViewsBarChart from './dashboard/components/PageViewsBarChart';
+import SessionsChart from './dashboard/components/SessionsChart';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
-import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -193,11 +189,18 @@ export default function Dashboard({
                         {/* <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
                         <HighlightedCard />
                         </Grid> */}
-                        <Grid size={{ xs: 12, md: 12 }}>
-                            {/* <SessionsChart />
-                             */}
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <SessionsChart />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                            <PageViewsBarChart
+                                data={chart}
+                                label="Cheque Voucher"
+                                count={chart.countCv}
+                            />
+                        </Grid>
 
-                            <TabContext value={value}>
+                        {/* <TabContext value={value}>
                                 <Box
                                     sx={{
                                         borderBottom: 1,
@@ -258,8 +261,7 @@ export default function Dashboard({
                                         </Grid>
                                     </Grid>
                                 </TabPanel>
-                            </TabContext>
-                        </Grid>
+                            </TabContext> */}
                     </Grid>
                 </Box>
             </div>

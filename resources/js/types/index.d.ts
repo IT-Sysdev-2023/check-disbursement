@@ -382,6 +382,12 @@ export interface MonthType {
     businessUnit?: string;    
     totalNavRecords?: number;
 }
+
+export interface BuType {
+    business_unit: string;
+    months: Record<string, MonthType>;
+}
+
 interface DayType {
     crf: number;
     cv: number;
