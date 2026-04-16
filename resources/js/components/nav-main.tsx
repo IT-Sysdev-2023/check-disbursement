@@ -102,11 +102,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           href: chequeRequests(),
                           icon: FolderCheck,
                       },
-                      {
-                          title: 'Check/Docs Borrowing',
-                          href: checkBorrowing(),
-                          icon: FolderCheck,
-                      },
+                    //   {
+                    //       title: 'Check/Docs Borrowing',
+                    //       href: checkBorrowing(),
+                    //       icon: FolderCheck,
+                    //   },
                       {
                           title: 'Check Releasing',
                           href: checkReleasing(),

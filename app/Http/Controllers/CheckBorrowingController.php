@@ -71,20 +71,6 @@ class CheckBorrowingController extends Controller
                 'secondary_borrower' => $request->borrower,
             ]);
 
-
-        //  $data = [
-        //     'controlerNumber' => '',
-        //     'borrowerName' => $request->borrower,
-        //     'dateBorrowed' => now()->toFormattedDayDateString(),
-        //     'company' => $companyNames,
-        //     'businessUnit' => $companyNames,
-        // ];
-
-        // return $this->fileHandler
-        //     ->inFolder('pdfs/borrowed/')
-        //     ->createFileName($borrowerNo, auth()->user()->id, '.pdf')
-        //     ->handlePdf($data, 'borrowedPdf');
-
         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Updated' : 'Failed to Update']);
 
     }

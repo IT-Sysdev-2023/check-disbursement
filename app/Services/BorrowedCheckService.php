@@ -55,12 +55,11 @@ class BorrowedCheckService
 
             BorrowedCheck::insert(
                 collect($validated['cheques'])->map(fn($c) => [
-                    'checkable_id' => $c['chequeId'],
-                    'checkable_type' => $c['type'],
                     'borrower_no' => $borrowerNo,
-                    'primary_approver_id' => $validated['approver'],
                     'borrower_id' => $validated['borrower'],
                     'reason' => $validated['reason'],
+                    'checkable_id' => $c['chequeId'],
+                    'checkable_type' => $c['type'],
                     'user_id' => auth()->user()->id,
                     'created_at' => now(),
                     'updated_at' => now(),

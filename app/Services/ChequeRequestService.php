@@ -62,7 +62,7 @@ class ChequeRequestService
                 'array',
                 Rule::requiredIf(fn() => $request->type === 'include'),
             ],
-            // 'approver' => ['required', 'integer'],
+            'approver' => ['required', 'integer'],
         ]);
         $ids = $request->borrowedNo ?? [];
 
@@ -73,7 +73,7 @@ class ChequeRequestService
                 ,
                 fn($q) => $q->whereIn('id', $ids)
             )
-            ->update(['approved_at' => Date::now()]);
+            ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
 
         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
     }
@@ -98,13 +98,9 @@ class ChequeRequestService
             ->withQueryString()
             ->toResourceCollection();
 
-        $approver = BorrowedCheck::with(['primaryApprover', 'secondaryApprover'])->where('borrower_no', $id)->first()?->approver;
-
         $selection = Approver::approverSelection();
         return Inertia::render('chequeRequests/borrowedCheques', [
             'cheques' => $record,
-            'borrowerId' => $id,
-            'primaryApprover' => Str::upper($approver),
             'approvers' => $selection,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
@@ -157,12 +153,10 @@ class ChequeRequestService
             'borrower_no',
             'reason',
             'borrowers.name as borrower',
-            'approvers.name as primaryApproverName',
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
             ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
-            ->join('approvers', 'approvers.id', '=', 'borrowed_checks.primary_approver_id')
             ->when($filters['search'] ?? null, function (Builder $query, $search) {
                 $query->where(function ($q) use ($search) {
 
@@ -182,7 +176,7 @@ class ChequeRequestService
                 fn($query) => $query->has('checkStatus')
             )
             ->whereNull('approved_at')
-            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrowers.name', 'approvers.name')
+            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrowers.name')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()

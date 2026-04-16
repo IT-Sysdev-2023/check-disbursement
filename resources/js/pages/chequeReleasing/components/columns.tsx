@@ -8,7 +8,7 @@ export const createReleasingColumns = (
 ): GridColDef[] => [
     {
         field: 'checkNumber',
-        headerName: 'Check Number',
+        headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -16,7 +16,7 @@ export const createReleasingColumns = (
     },
     {
         field: 'checkDate',
-        headerName: 'Check Date',
+        headerName: 'Cheque Date',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -32,7 +32,7 @@ export const createReleasingColumns = (
     },
     {
         field: 'amount',
-        headerName: 'Check Amount',
+        headerName: 'Cheque Amount',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -40,7 +40,7 @@ export const createReleasingColumns = (
     },
     {
         field: 'details',
-        headerName: 'Check Details',
+        headerName: 'Cheque Details',
         minWidth: 120,
         sortable: false,
         renderCell: ({ row }) => {
@@ -117,9 +117,9 @@ export const createReleasingColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            const { taggedLocation, scannedId, borrowedCheckId, isReturned } = row;
+            const { taggedLocation, scannedId, borrowedCheckId } = row;
 
-            if (!scannedId || !isReturned) {
+            if (!scannedId) {
                 return null;
             }
 

@@ -10,7 +10,6 @@ import BankController from './BankController'
 import AssignedCheckNumberController from './AssignedCheckNumberController'
 import StatusController from './StatusController'
 import CheckRequestController from './CheckRequestController'
-import CheckBorrowingController from './CheckBorrowingController'
 import CheckReleasingController from './CheckReleasingController'
 import ForwardedCheckController from './ForwardedCheckController'
 import ClosingController from './ClosingController'
@@ -29,7 +28,6 @@ BankController: Object.assign(BankController, BankController),
 AssignedCheckNumberController: Object.assign(AssignedCheckNumberController, AssignedCheckNumberController),
 StatusController: Object.assign(StatusController, StatusController),
 CheckRequestController: Object.assign(CheckRequestController, CheckRequestController),
-CheckBorrowingController: Object.assign(CheckBorrowingController, CheckBorrowingController),
 CheckReleasingController: Object.assign(CheckReleasingController, CheckReleasingController),
 ForwardedCheckController: Object.assign(ForwardedCheckController, ForwardedCheckController),
 ClosingController: Object.assign(ClosingController, ClosingController),

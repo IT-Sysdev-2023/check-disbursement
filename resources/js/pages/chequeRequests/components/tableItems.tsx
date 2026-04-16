@@ -1,6 +1,6 @@
 import { borrowedChecks, borrowedNumberCheques } from "@/routes";
 import { Borrower } from "@/types";
-import { router, usePage } from "@inertiajs/react";
+import { router } from "@inertiajs/react";
 import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -58,7 +58,6 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
                 <TableCell align="right">{row.lastBorrowedAt}</TableCell>
                 <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
-                <TableCell align="right">{row.primaryApproverName}</TableCell>
                 {isVisible && <TableCell align="center">
                     <IconButton
                         size="small"

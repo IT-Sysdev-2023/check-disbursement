@@ -131,10 +131,10 @@ class ChecksService
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
-                'borrowed_checks.is_returned',
-                'borrowed_checks.secondary_borrower',
+                // 'borrowed_checks.is_returned',
+                // 'borrowed_checks.secondary_borrower',
                 'borrowed_checks.approved_at',
-                DB::raw('COALESCE(secondary_approver.name, primary_approver.name) as approver_name'),
+                DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'
@@ -148,10 +148,10 @@ class ChecksService
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
-                'borrowed_checks.is_returned',
-                'borrowed_checks.secondary_borrower',
+                // 'borrowed_checks.is_returned',
+                // 'borrowed_checks.secondary_borrower',
                 'borrowed_checks.approved_at',
-                DB::raw('COALESCE(secondary_approver.name, primary_approver.name) as approver_name'),
+                DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'
