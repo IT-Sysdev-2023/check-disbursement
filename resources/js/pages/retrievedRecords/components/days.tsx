@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 export default function Days({ checked, month, onChangeTab, isDarkMode }: {checked: Record<string, boolean>, month: MonthType, onChangeTab: () => void, isDarkMode: boolean}) {
     const theme = useTheme(); // Get the MUI theme
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-    
+    console.log(month);
     useEffect(() => {
             if (!selectedDate) return;
     
@@ -20,13 +20,14 @@ export default function Days({ checked, month, onChangeTab, isDarkMode }: {check
                         end: formattedDate,
                     },
                     tab: 'cheques',
+                    bu: month.businessUnit
                 },
                 replace: true,
                 onSuccess: () => {
                     onChangeTab();
                 },
             });
-        }, [selectedDate, onChangeTab]);
+        }, [selectedDate, onChangeTab, month.businessUnit]);
     return (
         <table
             style={{

@@ -76,7 +76,11 @@ class CvCheckPayment extends Model
                 $query->whereRelation('businessUnit.company', 'id', $filters['company']);
             })
             ->when(($filters['bu'] ?? null) && $filters['bu'] != 'all', function ($query) use ($filters) {
-                $query->where('business_unit_id', $filters['bu']);
+                if (is_numeric($filters['bu'])) {
+                    $query->where('business_unit_id', $filters['bu']);
+                }else{
+                    $query->whereRelation('businessUnit', 'name', $filters['bu']);
+                }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereRelation('cvHeader', function ($q) use ($date) {

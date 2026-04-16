@@ -83,7 +83,7 @@ export default function TableDataGrid({
         );
     }
     return (
-        <Box sx={{ height: 400, width: '100%' }}>
+        <Box sx={{ width: '100%' }}>
             <DataGrid
                 rows={data.data}
                 getRowId={rowId}
