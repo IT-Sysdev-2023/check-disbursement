@@ -83,8 +83,8 @@ const Calendar = ({
                         <Box
                             component="span"
                             sx={{
-                                fontSize: '1.5rem',
-                                fontWeight: 'normal',
+                                 fontSize: '3rem',
+                                fontWeight: 'bold',
                             }}
                         >
                             {buMonths.business_unit}

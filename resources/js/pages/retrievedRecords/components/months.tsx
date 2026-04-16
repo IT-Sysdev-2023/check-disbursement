@@ -9,17 +9,22 @@ import { RefreshCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Days from './days';
 
-export default function Months({userId, months,  onChangeTab,}: {months:Record<string, MonthType>, onChangeTab: () => void, userId: number}) {
-
+export default function Months({
+    userId,
+    months,
+    onChangeTab,
+}: {
+    months: Record<string, MonthType>;
+    onChangeTab: () => void;
+    userId: number;
+}) {
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState<ProgressState>({});
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
     const [checked, setChecked] = useState<Record<string, boolean>>({});
-  
 
     const { appearance } = useAppearance();
 
-  
     const [isDarkMode, setIsDarkMode] = useState(false);
 
     useEffect(() => {
@@ -31,8 +36,6 @@ export default function Months({userId, months,  onChangeTab,}: {months:Record<s
             setIsDarkMode(appearance === 'dark');
         }
     }, [appearance]);
-
-    
 
     useEcho(`cv-progress.${userId}`, 'CvProgress', (e: EventType) => {
         const { percentage, message, status, key } = e;
@@ -123,7 +126,7 @@ export default function Months({userId, months,  onChangeTab,}: {months:Record<s
                         <Box
                             component="span"
                             sx={{
-                                fontSize: '3rem',
+                                fontSize: '2rem',
                                 fontWeight: 'bold',
                                 color:
                                     month.totalMonthly !== month.totalNavRecords
@@ -245,7 +248,12 @@ export default function Months({userId, months,  onChangeTab,}: {months:Record<s
                                 )}
                             </Box>
                         )}
-                        <Days checked={checked} month={month} onChangeTab={onChangeTab} isDarkMode={isDarkMode} />
+                        <Days
+                            checked={checked}
+                            month={month}
+                            onChangeTab={onChangeTab}
+                            isDarkMode={isDarkMode}
+                        />
                     </Box>
                 </Box>
             ))}
