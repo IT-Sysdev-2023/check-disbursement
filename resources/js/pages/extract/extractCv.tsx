@@ -160,7 +160,7 @@ export default function ExtractCv({
                                 fontSize: 'clamp(3rem, 10vw, 3.5rem)',
                             }}
                         >
-                            Retrieve&nbsp;Check&nbsp;
+                            Retrieve&nbsp;Cheque&nbsp;
                             <Typography
                                 component="span"
                                 variant="h1"

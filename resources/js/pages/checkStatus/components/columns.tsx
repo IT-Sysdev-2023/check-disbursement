@@ -7,16 +7,15 @@ export const createStatusChequeColumns = (
 ): GridColDef[] => [
     {
         field: 'checkNumber',
-        headerName: 'Check Number',
+        headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
-        flex: 0.5,
-        minWidth: 50,
+        flex: 1,
         renderCell: ({ row }) => row.checkable.checkNumber,
     },
     {
         field: 'checkAmount',
-        headerName: 'Check Amount',
+        headerName: 'Cheque Amount',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -35,7 +34,7 @@ export const createStatusChequeColumns = (
     },
     {
         field: 'checkDate',
-        headerName: 'Check Date',
+        headerName: 'Cheque Date',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -44,7 +43,7 @@ export const createStatusChequeColumns = (
     },
     {
         field: 'check',
-        headerName: 'Check Type',
+        headerName: 'Cheque Type',
         headerAlign: 'right',
         align: 'right',
         flex: 1,

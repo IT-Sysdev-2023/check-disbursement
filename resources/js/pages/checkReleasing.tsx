@@ -20,7 +20,7 @@ import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Releasing',
+        title: 'Cheque Releasing',
         href: '#',
     },
 ];
@@ -66,7 +66,7 @@ export default function CheckReleasing({
                 ...curr,
                 id: id,
                 status: value,
-                label: value + ' Check',
+                label: value + ' Cheque',
             }),
         });
     };
@@ -75,7 +75,7 @@ export default function CheckReleasing({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
-            <PageContainer title="Check Releasing">
+            <PageContainer title="Cheque Releasing">
                 <TableFilter
                     company={company}
                     filters={filter}

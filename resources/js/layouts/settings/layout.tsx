@@ -11,11 +11,11 @@ import { Link } from '@inertiajs/react';
 import { type PropsWithChildren } from 'react';
 
 const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: edit(),
-        icon: null,
-    },
+    // {
+    //     title: 'Profile',
+    //     href: edit(),
+    //     icon: null,
+    // },
     {
         title: 'Password',
         href: editPassword(),

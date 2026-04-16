@@ -89,7 +89,7 @@ export default function Profile({
                                     />
                                 </div>
 
-                                {mustVerifyEmail &&
+                                {/* {mustVerifyEmail &&
                                     auth.user.email_verified_at === null && (
                                         <div>
                                             <p className="-mt-4 text-sm text-muted-foreground">
@@ -135,13 +135,13 @@ export default function Profile({
                                             Saved
                                         </p>
                                     </Transition>
-                                </div>
+                                </div> */}
                             </>
                         )}
                     </Form>
                 </div>
 
-                <DeleteUser />
+                {/* <DeleteUser /> */}
             </SettingsLayout>
         </AppLayout>
     );

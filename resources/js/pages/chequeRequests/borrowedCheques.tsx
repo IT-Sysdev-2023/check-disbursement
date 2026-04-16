@@ -21,11 +21,11 @@ import { createRequestsChequeColumns } from './components/columns';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Receiving',
+        title: 'Cheque Receiving',
         href: chequeRequests().url,
     },
     {
-        title: 'Borrowed Checks',
+        title: 'Borrowed Cheques',
         href: '#',
     },
 ];

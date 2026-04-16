@@ -8,6 +8,7 @@ import {
     ManageChecks,
     User,
 } from '@/types';
+import { Box } from '@mui/material';
 import {
     DataGrid,
     gridClasses,
@@ -41,7 +42,7 @@ export default function TableDataGrid({
     isLoading?: boolean;
     hasSelection?: boolean;
     filter?: string;
-    rowId?: GridRowIdGetter<any>,
+    rowId?: GridRowIdGetter<any>;
     density?: GridDensity;
     handleSelectionChange?: (model: GridRowSelectionModel) => void;
     pagination: (model: GridPaginationModel) => void;
@@ -82,51 +83,54 @@ export default function TableDataGrid({
         );
     }
     return (
-        <DataGrid
-            rows={data.data}
-            getRowId={rowId}
-            rowCount={data.meta.total}
-            columns={columns}
-            pagination
-            sortingMode="server"
-            filterMode="server"
-            paginationMode="server"
-            checkboxSelection={hasSelection}
-            onRowSelectionModelChange={handleSelectionChange}
-            disableRowSelectionOnClick={false}
-            density={density}
-            paginationModel={{
-                page: data.meta.current_page - 1,
-                pageSize: data.meta.per_page,
-            }}
-            onPaginationModelChange={pagination}
-            onSortModelChange={handleSortModelChange}
-            filterModel={filterModel}
-            onFilterModelChange={handleFilterModelChange}
-            loading={isLoading}
-            showToolbar
-            pageSizeOptions={[5, 10, 15, 25]}
-            sx={{
-                [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]: {
-                    outline: 'transparent',
-                },
-                [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
-                    {
-                        outline: 'none',
+        <Box sx={{ height: 400, width: '100%' }}>
+            <DataGrid
+                rows={data.data}
+                getRowId={rowId}
+                rowCount={data.meta.total}
+                columns={columns}
+                pagination
+                sortingMode="server"
+                filterMode="server"
+                paginationMode="server"
+                checkboxSelection={hasSelection}
+                onRowSelectionModelChange={handleSelectionChange}
+                disableRowSelectionOnClick={false}
+                density={density}
+                paginationModel={{
+                    page: data.meta.current_page - 1,
+                    pageSize: data.meta.per_page,
+                }}
+                onPaginationModelChange={pagination}
+                onSortModelChange={handleSortModelChange}
+                filterModel={filterModel}
+                onFilterModelChange={handleFilterModelChange}
+                loading={isLoading}
+                showToolbar
+                pageSizeOptions={[5, 10, 15, 25]}
+                sx={{
+                    [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]:
+                        {
+                            outline: 'transparent',
+                        },
+                    [`& .${gridClasses.columnHeader}:focus-within, & .${gridClasses.cell}:focus-within`]:
+                        {
+                            outline: 'none',
+                        },
+                    [`& .${gridClasses.row}:hover`]: {
+                        cursor: 'pointer',
                     },
-                [`& .${gridClasses.row}:hover`]: {
-                    cursor: 'pointer',
-                },
-            }}
-            slotProps={{
-                loadingOverlay: {
-                    variant: 'circular-progress',
-                    noRowsVariant: 'circular-progress',
-                },
-                baseIconButton: {
-                    size: 'small',
-                },
-            }}
-        />
+                }}
+                slotProps={{
+                    loadingOverlay: {
+                        variant: 'circular-progress',
+                        noRowsVariant: 'circular-progress',
+                    },
+                    baseIconButton: {
+                        size: 'small',
+                    },
+                }}
+            />
+        </Box>
     );
 }

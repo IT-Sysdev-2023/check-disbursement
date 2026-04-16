@@ -7,7 +7,7 @@ import { Box, Button, Grid, TextField, Typography } from '@mui/material';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Voucher',
+        title: 'Cheque Voucher',
         href: checkVoucher().url,
     },
 ];

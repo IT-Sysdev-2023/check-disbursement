@@ -167,7 +167,7 @@ export default function ExtractCrf({
                                 fontSize: 'clamp(3rem, 10vw, 3.5rem)',
                             }}
                         >
-                            Retrieve&nbsp;Check&nbsp;Request&nbsp;
+                            Retrieve&nbsp;Cheque&nbsp;Request&nbsp;
                             <Typography
                                 component="span"
                                 variant="h1"

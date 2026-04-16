@@ -6,7 +6,7 @@ import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Receiving',
+        title: 'Cheque Receiving',
         href: '#',
     },
 ];

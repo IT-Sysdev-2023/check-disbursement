@@ -77,7 +77,7 @@ export default function CheckStatus({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
-            <PageContainer title="Check Status">
+            <PageContainer title="Cheque Status">
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <ToggleButtonGroup
                         color="primary"

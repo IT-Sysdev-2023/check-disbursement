@@ -76,12 +76,12 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           icon: Database,
                           submenu: [
                               {
-                                  title: 'Check Voucher',
+                                  title: 'Cheque Voucher',
                                   href: checkVoucher(),
                                   icon: Tickets,
                               },
                               {
-                                  title: 'Check Request Form',
+                                  title: 'Cheque Request Form',
                                   href: checkRequestForm(),
                                   icon: BookOpen,
                               },
@@ -98,7 +98,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             ...(isAdmin || sectionHead
                 ? [
                       {
-                          title: 'Check Receiving',
+                          title: 'Cheque Receiving',
                           href: chequeRequests(),
                           icon: FolderCheck,
                       },
@@ -108,7 +108,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                     //       icon: FolderCheck,
                     //   },
                       {
-                          title: 'Check Releasing',
+                          title: 'Cheque Releasing',
                           href: checkReleasing(),
                           icon: Check,
                       },
@@ -131,7 +131,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           icon: Forward,
                       },
                       {
-                          title: 'Check Releasing(Forwarded)',
+                          title: 'Cheque Releasing(Forwarded)',
                           href: forwardedReleasing(),
                           icon: Rocket,
                       },
@@ -144,7 +144,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             closingOfficer || viewing
                 ? [
                       {
-                          title: 'Check Status',
+                          title: 'Cheque Status',
                           href: checkStatus(),
                           icon: Activity,
                       },

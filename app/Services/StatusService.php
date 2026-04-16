@@ -50,7 +50,7 @@ class StatusService
     
                 if ($tab === 'staled') {
                     $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
-                        $q->whereNotNull('primary_approver_id')
+                        $q->whereNotNull('approver_id')
                             ->whereHas(
                                 'checkable',
                                 fn(Builder $q) => $q->scanRecords()

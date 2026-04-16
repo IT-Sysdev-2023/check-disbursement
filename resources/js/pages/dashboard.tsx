@@ -217,7 +217,7 @@ export default function Dashboard({
                                         <Grid size={{ xs: 12, md: 6 }}>
                                             <PageViewsBarChart
                                                 data={chart}
-                                                label="Check Voucher"
+                                                label="Cheque Voucher"
                                                 count={chart.countCv}
                                             />
                                         </Grid>
