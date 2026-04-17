@@ -2,7 +2,7 @@ import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { checkBorrowing, returnChecks } from '@/routes';
+// import { checkBorrowing, returnChecks } from '@/routes';
 import {
     Crf,
     Cv,
@@ -70,14 +70,14 @@ export default function CheckBorrowing({
     };
 
     const handleReturnChecks = () => {
-        put(returnChecks().url, {
-            preserveScroll: true,
-            preserveState: true,
-            onError: (e) => {
-                console.log(e);
-            },
-            onSuccess: () => {},
-        });
+        // put(returnChecks().url, {
+        //     preserveScroll: true,
+        //     preserveState: true,
+        //     onError: (e) => {
+        //         console.log(e);
+        //     },
+        //     onSuccess: () => {},
+        // });
         console.log(data);
     };
     const column = createBorrowingChequeColumns();
@@ -106,7 +106,7 @@ export default function CheckBorrowing({
                     filters={filter}
                     handleChangeCheck={() => null}
                     businessUnits={businessUnits}
-                    resetFilterRouter={checkBorrowing()}
+                    // resetFilterRouter={checkBorrowing()}
                 />
 
                 <TableDataGrid
