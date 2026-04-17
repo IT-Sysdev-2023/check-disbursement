@@ -1,7 +1,7 @@
 import AutocompleteUser from '@/components/autocomplete-user';
 import { modalStyle } from '@/lib/modalStyle';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { secondaryBorrowCheck } from '@/routes';
+// import { secondaryBorrowCheck } from '@/routes';
 import { Option } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Grid, SelectChangeEvent, TextField, Typography } from '@mui/material';
@@ -45,22 +45,22 @@ export default function BorrowCheckModal({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        transform((data) => ({
-            ...data,
-            cheques: cheque,
-            type: type,
-        }));
-        put(secondaryBorrowCheck().url, {
-            preserveScroll: true,
-            preserveState: true,
-            onError: (e) => {
-                console.log(e);
-            },
-            onSuccess: () => {
-                reset();
-                handleClose();
-            }
-        });
+        // transform((data) => ({
+        //     ...data,
+        //     cheques: cheque,
+        //     type: type,
+        // }));
+        // put(secondaryBorrowCheck().url, {
+        //     preserveScroll: true,
+        //     preserveState: true,
+        //     onError: (e) => {
+        //         console.log(e);
+        //     },
+        //     onSuccess: () => {
+        //         reset();
+        //         handleClose();
+        //     }
+        // });
     };
 
     const handleChangeItem = (event: SelectChangeEvent) => {
