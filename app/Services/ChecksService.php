@@ -35,13 +35,12 @@ class ChecksService
 
     public function records(Request $request)
     {
-        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails']);
+        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page']);
         $assignment = $filters['assignment'] ?? 'toAssign';
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
         // $borrowedChecks = self::pendingRecords($filters);
         $borrowedRecords = ChequeRequestService::borrowedRecords($filters);
-
         $manageCheques = self::manageChecks($filters);
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords ?? [],
@@ -64,7 +63,7 @@ class ChecksService
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
             ],
-            'calendar' => Inertia::once(fn() => Calendar::calendar($filters)),
+            'calendar' => Calendar::calendar($filters),
         ]);
     }
 

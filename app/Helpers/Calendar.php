@@ -9,6 +9,8 @@ use App\Models\NavDatabase;
 use App\Services\GenerateCvService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -18,13 +20,21 @@ class Calendar
 
     public static function calendar(array $filters)
     {
+        $page = $filters['page'] ?? 1;
+        $perPage = $filters['perPage'] ?? 2; // BUs per page
         $data = self::distinctMonths($filters['company'] ?? null);
+
         if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
             $navRecords = self::distinctMonthsNav($filters['monthDetails']);
             $data = $data->merge($navRecords);
         }
-        $records = collect();
+
+        $total = $data->count();
+        $data = $data->slice(($page - 1) * $perPage, $perPage);
+        
+        
         $navDetails = self::getNavConnectionDetails($data);
+        $records = collect();
 
         foreach ($data as $bu => $cheques) {
 
@@ -55,7 +65,15 @@ class Calendar
                 'months' => $monthlyData->toArray(),
             ]);
         }
-        return $records->toArray();
+        return [
+            'data' => $records->toArray(),
+            'meta' => [
+                'current_page' => $page,
+                'per_page' => $perPage,
+                'total' => $total,
+                'last_page' => ceil($total / $perPage),
+            ]
+        ];
     }
 
     private static function distinctMonthsNav(array $details)

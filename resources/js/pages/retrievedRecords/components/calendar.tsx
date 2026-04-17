@@ -1,10 +1,16 @@
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { BuType, SelectionType } from '@/types';
+import { BuType, InertiaPagination, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 
-import { SelectChangeEvent, Stack, useTheme } from '@mui/material';
+import {
+    Button,
+    SelectChangeEvent,
+    Stack,
+    TablePagination,
+    useTheme,
+} from '@mui/material';
 import Box from '@mui/material/Box';
-import { useState } from 'react';
+import { useState, MouseEvent} from 'react';
 import CalendarLegend from './calendarLegend';
 import Months from './months';
 
@@ -16,7 +22,7 @@ const Calendar = ({
 }: {
     userId: number;
     onChangeTab: () => void;
-    data: BuType[];
+    data: InertiaPagination<BuType>;
     company: SelectionType[];
 }) => {
     const [selectedCompany, setSelectedCompany] = useState<string>('all');
@@ -31,7 +37,20 @@ const Calendar = ({
             },
         });
     };
+    const handleChangePage = (
+        _: MouseEvent<HTMLButtonElement> | null,
+        newPage: number,
+    ) => {
+        const page = newPage + 1;
+        const per_page = data.meta.per_page;
 
+        router.reload({
+            data: {
+                page: page,
+                per_page: per_page,
+            },
+        });
+    };
     const theme = useTheme();
     return (
         <Box sx={{ mt: 2 }}>
@@ -59,9 +78,27 @@ const Calendar = ({
                     <CalendarLegend color="orange" label="Total CV" />
                 </Stack>
             </Stack>
-
+            <Button
+                variant="outlined"
+                onClick={
+                    () =>
+                        // null
+                        router.reload({
+                            data: {
+                                page: 2,
+                            },
+                        })
+                    // onSyncData({
+                    //     month: month.m,
+                    //     year: month.y,
+                    //     businessUnit: month.businessUnit,
+                    // })
+                }
+            >
+                Sync Data
+            </Button>
             {/* CALENDAR */}
-            {data.length === 0 ? (
+            {data.data.length === 0 ? (
                 <Box
                     sx={{
                         display: 'flex',
@@ -74,7 +111,7 @@ const Calendar = ({
                     NO DATA{' '}
                 </Box>
             ) : (
-                data.map((buMonths, index) => (
+                data.data.map((buMonths, index) => (
                     <Box
                         key={`${buMonths.business_unit}-${index}`}
                         sx={{ mb: 6 }}
@@ -104,6 +141,15 @@ const Calendar = ({
                     // </div>
                 ))
             )}
+
+            <TablePagination
+                component="div"
+                count={data?.meta.total ?? 0}
+                page={data?.meta.current_page - 1}
+                onPageChange={handleChangePage}
+                rowsPerPage={data?.meta.per_page}
+                rowsPerPageOptions={[]}
+            />
         </Box>
     );
 };
