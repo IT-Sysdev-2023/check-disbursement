@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\NumberHelper;
+use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheck;
 use App\Models\CheckStatus;
 use App\Models\Crf;
@@ -28,21 +29,7 @@ class DashboardController extends Controller
 
     private static function defaultDashboard()
     {
-        $cvMax = Date::parse(CvCheckPayment::max('created_at'))->format('Y-m-d');
-        $cv = CvCheckPayment::
-            with('cvHeader', 'businessUnit')
-            ->whereDate('created_at', $cvMax)
-            ->paginate(5)
-            ->withQueryString()
-            ->toResourceCollection();
-
-        $crfMax = Date::parse(Crf::max('created_at'))->format('Y-m-d');
-        $crf = Crf::whereDate('created_at', $crfMax)
-            ->paginate(5)
-            ->withQueryString()
-            ->toResourceCollection();
-
-
+        $cheques = new ChequeCollection(self::chequeRecords());
         $raw = CvHeader::select(
             DB::raw('MONTH(cv_date) as month'),
             DB::raw('COUNT(*) as total')
@@ -67,8 +54,7 @@ class DashboardController extends Controller
         $crfCount = Crf::count();
 
         return [
-            'cv' => $cv,
-            'crf' => $crf,
+            'cheques' => $cheques,
             'totals' => (object) [
                 'cv' => (string) $cvCount,
                 'crf' => (string) $crfCount,
@@ -102,6 +88,21 @@ class DashboardController extends Controller
         ];
     }
 
+    private static function chequeRecords()
+    {
+        $cvQuery = CvCheckPayment::baseColumns();
+
+        $crfQuery = Crf::baseColumns();
+
+
+        $unionQuery = $cvQuery->unionAll($crfQuery);
+
+        return DB::query()
+            ->fromSub($unionQuery, 'merged')
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString();
+    }
     private static function checkStatus($tab)
     {
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
@@ -179,7 +180,6 @@ class DashboardController extends Controller
             ->withQueryString()
             ->toResourceCollection();
     }
-
     private static function countForReleasing()
     {
         return BorrowedCheck::query()

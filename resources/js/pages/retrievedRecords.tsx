@@ -18,7 +18,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import ViewCompactIcon from '@mui/icons-material/ViewCompact';
 import SwipeVerticalIcon from '@mui/icons-material/SwipeVertical';
 import AdfScannerOutlinedIcon from '@mui/icons-material/AdfScannerOutlined';
-import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
@@ -30,6 +30,7 @@ import { createManageColumns } from './retrievedRecords/components/columns';
 import ProgressModal from './retrievedRecords/components/progressModal';
 import ScanDetails from './retrievedRecords/components/scanDetails';
 import TableView from './retrievedRecords/components/tableView';
+import { HandCoins } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -85,23 +86,23 @@ export default function RetrievedRecords({
         
         setCurrentTab(newValue);
     };
-    // const handleSyncScanned = () => {
-    //     router.get(
-    //         scan(),
-    //         {},
-    //         {
-    //             preserveState: true,
-    //             preserveScroll: true,
-    //             onStart: () => {
-    //                 setOpenProgress(true);
-    //             },
-    //             onSuccess: () => {
+    const handleSyncScanned = () => {
+        // router.get(
+        //     scan(),
+        //     {},
+        //     {
+        //         preserveState: true,
+        //         preserveScroll: true,
+        //         onStart: () => {
+        //             setOpenProgress(true);
+        //         },
+        //         onSuccess: () => {
 
-    //                 setOpenProgress(false);
-    //             },
-    //         },
-    //     );
-    // };
+        //             setOpenProgress(false);
+        //         },
+        //     },
+        // );
+    };
 
     const handleUpdateScanned = (details) => {
         setOpenInputDetails(true);
@@ -212,7 +213,7 @@ export default function RetrievedRecords({
                                     columns={manageCvColumns}
                                 />
 
-                                {/* <Box
+                                <Box
                                 display="flex"
                                 justifyContent="flex-end"
                                 mt={3}
@@ -224,7 +225,7 @@ export default function RetrievedRecords({
                                 >
                                     Sync Check Scanned
                                 </Button>
-                            </Box> */}
+                            </Box>
                             </>
                         )}
                     </Box>

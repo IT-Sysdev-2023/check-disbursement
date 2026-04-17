@@ -19,13 +19,10 @@ class Calendar
     public static function calendar(array $filters)
     {
         $data = self::distinctMonths($filters['company'] ?? null);
-        // dd($data);
         if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
             $navRecords = self::distinctMonthsNav($filters['monthDetails']);
             $data = $data->merge($navRecords);
-            // $data = $navRecords;
         }
-
         $records = collect();
         $navDetails = self::getNavConnectionDetails($data);
 
@@ -112,7 +109,6 @@ class Calendar
     }
     private static function distinctMonths($company)
     {
-        // dd($company);
         $crf = Crf::select('date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"))
             ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
             ->when($company && $company != 'all', function ($q) use ($company) {
@@ -140,7 +136,6 @@ class Calendar
                 $crf->unionAll($cv),
                 'combined'
             )
-            // ->selectRaw('date, SUM(total) as total')
             ->selectRaw("
             date,
             business_unit,
@@ -153,17 +148,11 @@ class Calendar
             ->orderBy('date')
             ->get()
             ->groupBy('business_unit');
-        // ->groupBy(
-        //     fn($q) =>
-        //     Date::parse($q->date)->format('Y-m')
-        // );
-        // dd($result);
         return $result;
     }
 
     private static function getNavConnectionDetails($data)
     {
-        // dd($data);
         $buIds = $data->map(fn($item) => $item->first()->buId)->unique();
 
         return NavDatabase::with('navServer', 'navHeaderTable')

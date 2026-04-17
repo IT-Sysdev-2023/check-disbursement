@@ -117,8 +117,7 @@ class ChequeRequestService
     {
         $request->validate([
             'reason' => 'required|string|max:255',
-            // 'ids' => 'required|array',
-            'type' => ['required', 'in:include,exclude'],
+            // 'type' => ['required', 'in:include,exclude'],
             'ids' => [
                 'array',
                 Rule::requiredIf(fn() => $request->type === 'include'),
@@ -126,9 +125,10 @@ class ChequeRequestService
         ]);
 
         $ids = $request->ids ?? [];
-
+  
         BorrowedCheck::
             when(
+                isset($request->type) &&
                 $request->type == 'exclude',
                 fn($q) => $q->whereNotIn('id', $ids)
                 ,

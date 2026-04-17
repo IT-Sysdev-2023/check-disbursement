@@ -31,6 +31,9 @@ export default function ReasonCancellationModal({
         post(cancelCheck().url, {
             preserveScroll: true,
             preserveState: true,
+            onError: (e) => {
+                console.log(e);
+            },
             onSuccess: () => {
                 reset();
                 handleClose();
@@ -52,7 +55,7 @@ export default function ReasonCancellationModal({
                         variant="h6"
                         component="h2"
                     >
-                        Reason for Cancellation
+                        Reason for Cancellations
                     </Typography>
 
                     <form onSubmit={handleSubmit}>

@@ -2,12 +2,9 @@ import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { BuType, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 
-import {
-    SelectChangeEvent,
-    Stack,
-} from '@mui/material';
+import { SelectChangeEvent, Stack, useTheme } from '@mui/material';
 import Box from '@mui/material/Box';
-import {  useState } from 'react';
+import { useState } from 'react';
 import CalendarLegend from './calendarLegend';
 import Months from './months';
 
@@ -34,6 +31,8 @@ const Calendar = ({
             },
         });
     };
+
+    const theme = useTheme();
     return (
         <Box sx={{ mt: 2 }}>
             {/* LEGENDS */}
@@ -83,13 +82,18 @@ const Calendar = ({
                         <Box
                             component="span"
                             sx={{
-                                 fontSize: '3rem',
+                                fontSize: '3rem',
                                 fontWeight: 'bold',
+                                color: theme.palette.primary.main,
                             }}
                         >
                             {buMonths.business_unit}
                         </Box>
-                        <Months userId={userId} months={buMonths.months} onChangeTab={onChangeTab} />
+                        <Months
+                            userId={userId}
+                            months={buMonths.months}
+                            onChangeTab={onChangeTab}
+                        />
                     </Box>
                     // <div key={bu.business_unit}>
                     //     <h3>{bu.business_unit}</h3>

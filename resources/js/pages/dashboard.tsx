@@ -1,15 +1,14 @@
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { Crf, Cv, InertiaPagination, type BreadcrumbItem } from '@/types';
+import { ChequeType, InertiaPagination, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { GridColDef } from '@mui/x-data-grid';
-import { useState } from 'react';
 import PageViewsBarChart from './dashboard/components/PageViewsBarChart';
 import SessionsChart from './dashboard/components/SessionsChart';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
+import CustomizedDataGrid from './dashboard/components/dashboardTable';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -18,96 +17,13 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const cvColumns: GridColDef[] = [
-    {
-        field: 'cvNumber',
-        headerName: 'CV Number',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 50,
-        renderCell: (params) => {
-            const { row } = params;
-            return row.cvHeader?.cvNo;
-        },
-    },
-    {
-        field: 'cvDate',
-        headerName: 'Cv Date',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-        renderCell: (params) => {
-            const { row } = params;
-            return row.cvHeader?.cvDate;
-        },
-    },
-    {
-        field: 'payee',
-        headerName: 'Payee',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'company',
-        headerName: 'Company',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-        renderCell: (params) => {
-            const { row } = params;
-            return row.company?.name;
-        },
-    },
-];
-
-const crfColumns: GridColDef[] = [
-    {
-        field: 'crf',
-        headerName: 'CRF #',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'company',
-        headerName: 'Company',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'no',
-        headerName: 'No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 80,
-    },
-    {
-        field: 'ckNo',
-        headerName: 'CK No.',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-];
 
 export default function Dashboard({
-    cv,
-    crf,
+    cheques,
     totals,
     chart,
 }: {
-    cv: InertiaPagination<Cv>;
-    crf: InertiaPagination<Crf>;
+    cheques: InertiaPagination<ChequeType>;
     totals: {
         cv: string;
         crf: string;
@@ -155,12 +71,8 @@ export default function Dashboard({
             ],
         },
     ];
-    const [value, setValue] = useState('cv');
 
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-        setValue(newValue);
-    };
-
+console.log(cheques.data);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -199,69 +111,15 @@ export default function Dashboard({
                                 count={chart.countCv}
                             />
                         </Grid>
+                    </Grid>
 
-                        {/* <TabContext value={value}>
-                                <Box
-                                    sx={{
-                                        borderBottom: 1,
-                                        borderColor: 'divider',
-                                    }}
-                                >
-                                    <TabList
-                                        onChange={handleChange}
-                                        aria-label="lab API tabs example"
-                                    >
-                                        <Tab label="CV" value="cv" />
-                                        <Tab label="CRF" value="crf" />
-                                    </TabList>
-                                </Box>
-                                <TabPanel value="cv">
-                                    <Grid container spacing={2}>
-                                        <Grid size={{ xs: 12, md: 6 }}>
-                                            <PageViewsBarChart
-                                                data={chart}
-                                                label="Cheque Voucher"
-                                                count={chart.countCv}
-                                            />
-                                        </Grid>
-
-                                        <Grid size={{ xs: 12, md: 6 }}>
-                                            <TableDataGrid
-                                                data={cv}
-                                                pagination={() => null}
-                                                handleSearchFilter={() => null}
-                                                handleSortFilter={() => null}
-                                                columns={cvColumns}
-                                                isLoading={false}
-                                                density="compact"
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </TabPanel>
-                                <TabPanel value="crf">
-                                    {' '}
-                                    <Grid container spacing={2}>
-                                        <Grid size={{ xs: 12, md: 6 }}>
-                                            <PageViewsBarChart
-                                                data={chart}
-                                                label="Check Request Form"
-                                                count={chart.countCrf}
-                                            />
-                                        </Grid>
-                                        <Grid size={{ xs: 12, md: 6 }}>
-                                            <TableDataGrid
-                                                data={crf}
-                                                pagination={() => null}
-                                                handleSearchFilter={() => null}
-                                                handleSortFilter={() => null}
-                                                columns={crfColumns}
-                                                isLoading={false}
-                                                density="compact"
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </TabPanel>
-                            </TabContext> */}
+                    <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+                        Details
+                    </Typography>
+                    <Grid container spacing={2}>
+                        <Grid size={{ xs: 12 }}>
+                            <CustomizedDataGrid cheques={cheques}/>
+                        </Grid>
                     </Grid>
                 </Box>
             </div>
