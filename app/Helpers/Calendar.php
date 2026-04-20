@@ -117,7 +117,6 @@ class Calendar
             )
             ->getNavMissingRecords(
                 $nav->business_unit_id,
-                $bu,
                 $nav->navHeaderTable->name,
                 $details['month'],
                 $details['year']

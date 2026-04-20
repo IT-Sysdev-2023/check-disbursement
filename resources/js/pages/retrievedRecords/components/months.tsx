@@ -49,7 +49,6 @@ export default function Months({
                 status,
             },
         }));
-        console.log(e);
         if (e.status === 'finished') {
             setLoadingMap((prev) => ({ ...prev, [key]: false }));
             router.reload();
@@ -68,7 +67,9 @@ export default function Months({
             bu: month.businessUnit,
         });
     };
-
+    const key = (month: MonthType) =>
+        `${month.businessUnit}-${month.y}-${month.m}`;
+    
     const handleCheckChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         month: {
@@ -155,15 +156,9 @@ export default function Months({
                                     {month.totalNavRecords} in Navision
                                     <Switch
                                         disabled={
-                                             loading || loadingMap[
-                                                `${month.businessUnit}-${month.y}-${month.m}`
-                                            ]
+                                            loading || loadingMap[key(month)]
                                         }
-                                        checked={
-                                            checked[
-                                                `${month.businessUnit}-${month.y}-${month.m}`
-                                            ] || false
-                                        }
+                                        checked={checked[key(month)] || false}
                                         onChange={(e) =>
                                             handleCheckChange(e, {
                                                 month: month.m,
@@ -175,10 +170,7 @@ export default function Months({
                                     />
                                     <Button
                                         loading={
-                                            loading ||
-                                            loadingMap[
-                                                `${month.businessUnit}-${month.y}-${month.m}`
-                                            ]
+                                            loading || loadingMap[key(month)]
                                         }
                                         variant="outlined"
                                         startIcon={<RefreshCcw />}
@@ -215,9 +207,7 @@ export default function Months({
                             overflow: 'hidden',
                         }}
                     >
-                        {loadingMap[
-                            `${month.businessUnit}-${month.y}-${month.m}`
-                        ] && (
+                        {loadingMap[key(month)] && (
                             <Box
                                 sx={{
                                     position: 'absolute',
@@ -233,9 +223,7 @@ export default function Months({
                             >
                                 <CircularProgress />
 
-                                {progress[
-                                    `${month.businessUnit}-${month.y}-${month.m}`
-                                ] && (
+                                {progress[key(month)] && (
                                     <Box
                                         component="span"
                                         sx={{
@@ -244,13 +232,7 @@ export default function Months({
                                             fontWeight: 500,
                                         }}
                                     >
-                                        Loading{' '}
-                                        {
-                                            progress[
-                                                `${month.businessUnit}-${month.y}-${month.m}`
-                                            ].progress
-                                        }
-                                        %
+                                        Loading {progress[key(month)].progress}%
                                     </Box>
                                 )}
                             </Box>

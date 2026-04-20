@@ -79,15 +79,18 @@ class NavConnection
                 ];
             })
             ->groupBy('business_unit');
-            // ->groupBy(function ($item, $date) {
-            //     return substr($date, 0, 7); // "YYYY-MM"
-            // });
+        // ->groupBy(function ($item, $date) {
+        //     return substr($date, 0, 7); // "YYYY-MM"
+        // });
         return $data;
     }
 
-    public function getNavMissingRecords(int $buId, string $bu, string $tableName, string $month, string $year)
+    public function getNavMissingRecords(int $buId, string $tableName, string $month, string $year)
     {
         $existingCv = CvHeader::query()
+            ->whereHas('cvCheckPayment', function ($q) use ($buId) {
+                $q->where('business_unit_id', $buId);
+            })
             ->whereYear('cv_date', $year)
             ->whereMonth('cv_date', $month)
             ->pluck('cv_no')
@@ -116,6 +119,7 @@ class NavConnection
     }
     public function headerConnection(string $name): mixed
     {
+        Log::info('Missing Cheques:', $this->missingCheques);
         $record = $this->connection->table($name)
             ->when(!empty($this->missingCheques), function ($query) {
                 $query->whereIn('Check Voucher No_', $this->missingCheques);
@@ -127,6 +131,7 @@ class NavConnection
                 $query->whereRaw("CONVERT(VARCHAR(10), [CV Date], 120) BETWEEN ? AND ?", [$this->dateFilter->start, $this->dateFilter->end]);
             })
             ->orderBy('Check Voucher No_');
+
         return $record;
     }
     public function lineConnection(string $name)
