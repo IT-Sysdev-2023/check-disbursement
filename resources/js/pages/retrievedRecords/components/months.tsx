@@ -41,13 +41,10 @@ export default function Months({
         const { percentage, message, status, key } = e;
 
         setLoadingMap((prev) => ({ ...prev, [key]: true }));
-
-        const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
         setProgress((prev) => ({
             ...prev,
             [key]: {
                 progress: percentage,
-                buffer,
                 message,
                 status,
             },

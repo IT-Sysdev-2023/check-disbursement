@@ -314,7 +314,7 @@ export interface Option {
 export interface ProgressState {
     [message: string]: {
         progress: number;
-        buffer: number;
+        buffer?: number;
         message: string;
         status: string;
     };

@@ -3,7 +3,6 @@ import { BuType, InertiaPagination, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 
 import {
-    Button,
     SelectChangeEvent,
     Stack,
     TablePagination,
@@ -78,25 +77,6 @@ const Calendar = ({
                     <CalendarLegend color="orange" label="Total CV" />
                 </Stack>
             </Stack>
-            <Button
-                variant="outlined"
-                onClick={
-                    () =>
-                        // null
-                        router.reload({
-                            data: {
-                                page: 2,
-                            },
-                        })
-                    // onSyncData({
-                    //     month: month.m,
-                    //     year: month.y,
-                    //     businessUnit: month.businessUnit,
-                    // })
-                }
-            >
-                Sync Data
-            </Button>
             {/* CALENDAR */}
             {data.data.length === 0 ? (
                 <Box
@@ -132,13 +112,6 @@ const Calendar = ({
                             onChangeTab={onChangeTab}
                         />
                     </Box>
-                    // <div key={bu.business_unit}>
-                    //     <h3>{bu.business_unit}</h3>
-
-                    //     {bu.months.map((m) => (
-                    //         <div key={m.month}>{m.month}</div>
-                    //     ))}
-                    // </div>
                 ))
             )}
 
