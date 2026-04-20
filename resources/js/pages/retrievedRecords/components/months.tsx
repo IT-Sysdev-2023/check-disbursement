@@ -49,7 +49,7 @@ export default function Months({
                 status,
             },
         }));
-
+        console.log(e);
         if (e.status === 'finished') {
             setLoadingMap((prev) => ({ ...prev, [key]: false }));
             router.reload();
@@ -154,6 +154,11 @@ export default function Months({
                                 <>
                                     {month.totalNavRecords} in Navision
                                     <Switch
+                                        disabled={
+                                             loading || loadingMap[
+                                                `${month.businessUnit}-${month.y}-${month.m}`
+                                            ]
+                                        }
                                         checked={
                                             checked[
                                                 `${month.businessUnit}-${month.y}-${month.m}`
@@ -169,7 +174,12 @@ export default function Months({
                                         }
                                     />
                                     <Button
-                                        loading={loading}
+                                        loading={
+                                            loading ||
+                                            loadingMap[
+                                                `${month.businessUnit}-${month.y}-${month.m}`
+                                            ]
+                                        }
                                         variant="outlined"
                                         startIcon={<RefreshCcw />}
                                         onClick={() =>

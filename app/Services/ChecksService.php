@@ -110,7 +110,7 @@ class ChecksService
         Bus::batch($allJobs)
             ->name("CV Import All Servers")
             ->then(function (Batch $batch) use ($id, $key) {
-                CvProgress::dispatch($id, "Data Retrieval Completed", ProgressStatus::Finished, '', 0, 0, $key);
+                CvProgress::dispatch($id, "Data Retrieval Completed", ProgressStatus::Finished, '', 0, 0, 0, $key);
             })
             ->catch(function (Batch $batch, Throwable $e) use ($id) {
                 CvProgress::dispatch($id, "Data Retrieval Failed: " . $e->getMessage(), ProgressStatus::NoConnection);

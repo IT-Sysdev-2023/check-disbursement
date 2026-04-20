@@ -16,12 +16,14 @@ import {
     Container,
     SelectChangeEvent,
     Stack,
+    Tooltip,
     Typography,
 } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import axios from 'axios';
 import { useState } from 'react';
 
+import HelpCenterOutlinedIcon from '@mui/icons-material/HelpCenterOutlined';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -51,17 +53,18 @@ export default function ExtractCv({
     const [selectedBu, setSelectedBu] = useState<string[]>([]);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
-        const { percentage, message, status } = e;
+        const { percentage, message, status, key, duplicates } = e;
         setLoading(false);
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
         setProgress((prev) => ({
             ...prev,
-            [message]: {
+            [key]: {
                 progress: percentage,
                 buffer,
                 message,
                 status,
+                duplicates,
             },
         }));
     });
@@ -271,18 +274,54 @@ export default function ExtractCv({
                                     <Alert
                                         variant="filled"
                                         severity="success"
-                                        sx={{ mb: 2 }}
+                                        sx={{
+                                            mb: 2,
+                                            bgcolor: 'success.light',
+                                            '& .MuiAlert-icon': {
+                                                color: 'success.dark', // or any color you want
+                                            },
+                                            borderColor: 'success.main',
+                                        }}
                                     >
                                         {item.message}
                                     </Alert>
                                 ) : (
                                     <>
-                                        <Typography
-                                            variant="body2"
-                                            sx={{ mb: 1 }}
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                mb: 1,
+                                            }}
                                         >
-                                            {item.message}
-                                        </Typography>
+                                            <Typography variant="body2">
+                                                {item.message}
+                                            </Typography>
+
+                                            {item.duplicates ? (
+                                                <Box
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 1,
+                                                    }}
+                                                >
+                                                    <Typography
+                                                        variant="body2"
+                                                        fontWeight={600}
+                                                    >
+                                                        Total duplicates:{' '}
+                                                        {item.duplicates}
+                                                    </Typography>
+
+                                                    <Tooltip title="Duplicates are ignored and will not be saved to the database.">
+                                                        <HelpCenterOutlinedIcon fontSize="small" />
+                                                    </Tooltip>
+                                                </Box>
+                                            ) : null}
+                                        </Box>
+
                                         <LinearProgress
                                             variant="buffer"
                                             value={item.progress}

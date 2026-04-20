@@ -317,6 +317,7 @@ export interface ProgressState {
         buffer?: number;
         message: string;
         status: string;
+        duplicates?: number;
     };
 }
 
@@ -364,6 +365,7 @@ export interface EventType {
     totalFiles: number;
     status: string;
     key: string;
+    duplicates: number;
 }
 
 export interface FlashReponse {

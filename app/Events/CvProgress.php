@@ -27,6 +27,7 @@ class CvProgress implements ShouldBroadcast
         protected string $tableName = '',
         protected int $currentRow = 0,
         protected int $totalRows = 0,
+        protected int $duplicates = 0,
         protected string $key = ''
     ) {
         //
@@ -55,6 +56,7 @@ class CvProgress implements ShouldBroadcast
             'totalRows' => $this->totalRows,
             'status' => $this->status,
             'key' => $this->key,
+            'duplicates' => $this->duplicates,
             // 'isFinished' => $this->isFinished,
             // 'hasNoRecord' => $this->hasNoRecord
         ];
