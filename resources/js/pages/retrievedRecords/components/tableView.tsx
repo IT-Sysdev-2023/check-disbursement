@@ -28,7 +28,7 @@ import {
 } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import axios from 'axios';
-import { HandCoins } from 'lucide-react';
+import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import { FormEvent, useState } from 'react';
 import AssignCdModal from './assignCdModal';
 import AssignCnModal from './assignCnModal';
@@ -54,6 +54,7 @@ export default function TableView({
     const [isLoading, setIsLoading] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState('');
     const [openTagModal, setOpenTagModal] = useState(false);
+    const [tagLoading, setTagLoading] = useState(false);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
     const [openAssignCnModal, setOpenAssignCnModal] = useState(false);
     const [openAssignCdModal, setOpenAssignCdModal] = useState(false);
@@ -63,7 +64,6 @@ export default function TableView({
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
-    // const [alignment, setAlignment] = useState();
     const [alignment, setAlignment] = useState(filter.assignments,
     );
 
@@ -121,7 +121,9 @@ export default function TableView({
             {
                 preserveScroll: true,
                 preserveState: true,
+                onBefore: () => setTagLoading(true),
                 onSuccess: () => {
+                    setTagLoading(false);
                     setSelectedLocation('');
                     setOpenTagModal(false);
                 },
@@ -152,7 +154,6 @@ export default function TableView({
         if (newAlignment !== null) {
             handleAssignment(newAlignment);
             setAlignment(newAlignment);
-            // localStorage.setItem('selectedTab', newAlignment);
         }
     };
 
@@ -200,7 +201,7 @@ export default function TableView({
                 <Button
                     disabled={!enableButton}
                     variant="outlined"
-                    startIcon={<HandCoins />}
+                    startIcon={<CallMissedOutgoingOutlinedIcon />}
                     onClick={() => setOpen(true)}
                 >
                     Borrow
@@ -223,6 +224,7 @@ export default function TableView({
                 }
                 selectedItem={selectedLocation}
                 item={location}
+                loading={tagLoading}
             />
 
             {chequeData && (

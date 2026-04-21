@@ -1,6 +1,4 @@
 import AppLayout from '@/layouts/app-layout';
-import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { details, detailsCrf, retrievedRecords } from '@/routes';
 import {
     Auth,
     Borrower,
@@ -16,24 +14,20 @@ import { router } from '@inertiajs/react';
 import {
     AdfScannerOutlined,
     CalendarToday,
-    DocumentScanner,
     SwipeVertical,
     ViewCompact,
 } from '@mui/icons-material';
-import { Box, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import PageContainer from '../components/pageContainer';
-import TableFilter from '../components/tableFilter';
 import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
-import TableDataGrid from './dashboard/components/TableDataGrid';
 import {
-    AssignScanDetailsModal,
     Calendar,
-    createManageColumns,
     ProgressModal,
-    ScanDetails,
     TableView,
 } from './retrievedRecords/components';
+import ManageCheques from './retrievedRecords/components/manageCheques';
+import { retrievedRecords } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -67,10 +61,6 @@ export default function RetrievedRecords({
     auth: Auth;
 }) {
     const [openProgress, setOpenProgress] = useState(false);
-    const [openInputDetails, setOpenInputDetails] = useState(false);
-    const [scannedDetailsModal, setScannedDetailsModal] = useState(false);
-    const [scannedId, setScannedId] = useState<number>();
-    const [checkRecords, setCheckRecords] = useState({});
     const [currentTab, setCurrentTab] = useState(filter.tab);
     // const [pendingId, setPendingId] = useState<number>();
     // const [pendingModal, setPendingModal] = useState(false);
@@ -78,52 +68,19 @@ export default function RetrievedRecords({
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue === null) return;
         if (newValue !== 'calendar') {
-            router.reload({
-                data: {
-                    tab: newValue,
-                    page: 1,
-                },
-                replace: false,
+            router.get(retrievedRecords(), {
+                tab: newValue,
+            }, {
+                replace: true,
+                preserveState: true
             });
         }
 
         setCurrentTab(newValue);
     };
-    const handleSyncScanned = () => {
-        // router.get(
-        //     scan(),
-        //     {},
-        //     {
-        //         preserveState: true,
-        //         preserveScroll: true,
-        //         onStart: () => {
-        //             setOpenProgress(true);
-        //         },
-        //         onSuccess: () => {
-        //             setOpenProgress(false);
-        //         },
-        //     },
-        // );
-    };
-
-    const handleUpdateScanned = (details) => {
-        setOpenInputDetails(true);
-
-        if (details) setCheckRecords(details);
-    };
 
     const handleClickCalendar = () => {
         setCurrentTab('cheques');
-    };
-
-    const handleScanDetails = (id: number) => {
-        setScannedDetailsModal(true);
-        setScannedId(id);
-    };
-
-    const handleDetails = (id: number, type: 'cv' | 'crf') => {
-        if (type === 'cv') router.visit(details(id));
-        else router.visit(detailsCrf(id));
     };
 
     // const handleOnView = (id: number) => {
@@ -132,11 +89,7 @@ export default function RetrievedRecords({
     // };
 
     // const pendingColumns = createPendingChequeColumns(handleOnView);
-    const manageCvColumns = createManageColumns(
-        handleDetails,
-        handleUpdateScanned,
-        handleScanDetails,
-    );
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">
@@ -185,54 +138,21 @@ export default function RetrievedRecords({
                             />
                         )}
                         {currentTab === 'borrowed' && (
-                                <BorrowedTableGrid data={pending} />
+                            <BorrowedTableGrid data={pending} />
                         )}
                         {currentTab === 'manageChecks' && (
-                            <>
-                                <TableFilter
-                                    handleChangeCheck={() => null}
-                                    company={company}
-                                    filters={filter}
-                                    resetFilterRouter={retrievedRecords()}
-                                    businessUnits={businessUnits}
-                                />
-                                <TableDataGrid
-                                    data={manageChecks}
-                                    filter={filter.search}
-                                    pagination={handlePagination}
-                                    handleSearchFilter={handleSearch}
-                                    handleSortFilter={handleSort}
-                                    columns={manageCvColumns}
-                                />
-
-                                <Box
-                                    display="flex"
-                                    justifyContent="flex-end"
-                                    mt={3}
-                                >
-                                    <Button
-                                        variant="outlined"
-                                        startIcon={<DocumentScanner />}
-                                        onClick={handleSyncScanned}
-                                    >
-                                        Sync Check Scanned
-                                    </Button>
-                                </Box>
-                            </>
+                            <ManageCheques
+                                cheques={manageChecks}
+                                company={company}
+                                businessUnits={businessUnits}
+                                filter={filter}
+                            />
                         )}
                     </Box>
                 </Box>
             </PageContainer>
 
-            {/* scannedDetailsModal */}
-            {scannedId && (
-                <ScanDetails
-                    id={scannedId}
-                    title="Scanned Check Details"
-                    open={scannedDetailsModal}
-                    onClose={() => setScannedDetailsModal(false)}
-                />
-            )}
+           
             {/* 
             {pendingId && (
                 <PendingDetails
@@ -242,16 +162,6 @@ export default function RetrievedRecords({
                     onClose={() => setPendingModal(false)}
                 />
             )} */}
-
-            {checkRecords && (
-                <AssignScanDetailsModal
-                    borrowedCheckId={checkRecords}
-                    title="Input Check Details"
-                    open={openInputDetails}
-                    onClose={() => setOpenInputDetails(false)}
-                />
-            )}
-
             <ProgressModal
                 userId={auth.user.id}
                 open={openProgress}

@@ -164,7 +164,8 @@ export default function BorrowedCheckModal({
                         <Box sx={{ textAlign: 'right', mt: 2 }}>
                             <Button
                                 type="submit"
-                                variant="contained"
+                                variant="outlined"
+                                 color="secondary"
                                 size="large"
                                 loading={processing}
                             >

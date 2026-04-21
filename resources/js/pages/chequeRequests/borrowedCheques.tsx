@@ -50,6 +50,7 @@ export default function BorrowedCheques({
     const [selectedApprover, setSelectedApprover] = useState('');
     const [openApproval, setOpenApproval] = useState(false);
     const [openCancel, setOpenCancel] = useState(false);
+    const [onSaveLoading, setOnSaveLoading] = useState(false);
 
     const { data, setData, put, transform } = useForm<FormData>({
         type: 'include',
@@ -70,18 +71,19 @@ export default function BorrowedCheques({
 
         transform((data) => ({
             ...data,
-            approver: selectedApprover
+            approver: selectedApprover,
         }));
 
         put(approveCheck().url, {
             onError: (e) => {
                 console.log(e);
             },
+            onBefore: () => setOnSaveLoading(true),
             onSuccess: () => {
+                setOnSaveLoading(false);
                 setOpenApproval(false);
             },
         });
-      
     };
 
     const columns = createRequestsChequeColumns();
@@ -146,6 +148,7 @@ export default function BorrowedCheques({
                     }
                     selectedItem={selectedApprover}
                     item={approvers}
+                    loading={onSaveLoading}
                 ></OnlySelectionModal>
             </PageContainer>
         </AppLayout>

@@ -11,7 +11,6 @@ import {
     Modal,
     Paper,
     SelectChangeEvent,
-    Stack,
     TextField,
     Typography,
 } from '@mui/material';
@@ -42,8 +41,9 @@ export default function AssignScanDetailsModal({
     open: boolean;
     borrowedCheckId: any;
     onClose: () => void;
-    }) {
+}) {
     const [bank, setBank] = useState('');
+    const [onLoading, setOnLoading] = useState(false);
     const [bankRecords, setBankRecords] = useState<SelectionType[]>([]);
     const { data, setData, errors, post, reset, transform } = useForm({
         accountNumber: '',
@@ -82,7 +82,9 @@ export default function AssignScanDetailsModal({
 
         post(storeScanRecord(borrowedCheckId.id).url, {
             preserveScroll: true,
+            onBefore: () => setOnLoading(true),
             onSuccess: () => {
+                setOnLoading(false);
                 reset();
                 onClose();
             },
@@ -254,7 +256,17 @@ export default function AssignScanDetailsModal({
                     </Grid>
                     <Divider sx={{ my: 3 }} />
 
-                    <Stack
+                    <Box sx={{ textAlign: 'right', mt: 2 }}>
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            onClick={handleSubmit}
+                            loading={onLoading}
+                        >
+                            Submit
+                        </Button>
+                    </Box>
+                    {/* <Stack
                         direction="row"
                         spacing={2}
                         justifyContent="space-between"
@@ -264,11 +276,12 @@ export default function AssignScanDetailsModal({
                                 variant="contained"
                                 color="secondary"
                                 onClick={handleSubmit}
+                                loading={onLoading}
                             >
                                 Submit
                             </Button>
                         </Stack>
-                    </Stack>
+                    </Stack> */}
                 </Box>
             </Box>
         </Modal>

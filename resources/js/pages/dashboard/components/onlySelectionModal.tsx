@@ -19,6 +19,7 @@ export default function ({
     selectedItem,
     children,
     item,
+    loading = false,
 }: {
     title: string;
     open: boolean;
@@ -27,7 +28,8 @@ export default function ({
     handleSelectedItem: (value: SelectChangeEvent) => void;
     selectedItem: string;
     children?: React.ReactNode;
-    item: SelectionType[];
+        item: SelectionType[];
+    loading?: boolean;
 }) {
     return (
         <Modal
@@ -62,8 +64,10 @@ export default function ({
                     <Box sx={{ textAlign: 'right', mt: 2 }}>
                         <Button
                             type="submit"
-                            variant="contained"
+                            variant="outlined"
+                             color="secondary"
                             size="large"
+                            loading={loading}
                             //  disabled={processing}
                         >
                             Save
