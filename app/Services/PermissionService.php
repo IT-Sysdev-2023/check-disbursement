@@ -34,7 +34,7 @@ class PermissionService
     {
         return self::getCompanyPermissions($user)->prepend([
             'label' => 'All',
-            'value' => '0'
+            'value' => 'all'
         ]);
     }
 }

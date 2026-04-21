@@ -10,7 +10,6 @@ import {
     about,
     bankAccountSetup,
     bankSetup,
-    checkBorrowing,
     checkReleasing,
     checkRequestForm,
     checkStatus,

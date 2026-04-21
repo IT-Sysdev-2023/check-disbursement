@@ -9,28 +9,31 @@ import {
     FilterType,
     InertiaPagination,
     ManageChecks,
-    MonthType,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
 import { router } from '@inertiajs/react';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import ViewCompactIcon from '@mui/icons-material/ViewCompact';
-import SwipeVerticalIcon from '@mui/icons-material/SwipeVertical';
-import AdfScannerOutlinedIcon from '@mui/icons-material/AdfScannerOutlined';
+import {
+    AdfScannerOutlined,
+    CalendarToday,
+    DocumentScanner,
+    SwipeVertical,
+    ViewCompact,
+} from '@mui/icons-material';
 import { Box, Button, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import PageContainer from '../components/pageContainer';
 import TableFilter from '../components/tableFilter';
 import BorrowedTableGrid from './dashboard/components/borrowedTableGrid';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import AssignScanDetailsModal from './retrievedRecords/components/assignScanDetailsModal';
-import Calendar from './retrievedRecords/components/calendar';
-import { createManageColumns } from './retrievedRecords/components/columns';
-import ProgressModal from './retrievedRecords/components/progressModal';
-import ScanDetails from './retrievedRecords/components/scanDetails';
-import TableView from './retrievedRecords/components/tableView';
-import { HandCoins } from 'lucide-react';
+import {
+    AssignScanDetailsModal,
+    Calendar,
+    createManageColumns,
+    ProgressModal,
+    ScanDetails,
+    TableView,
+} from './retrievedRecords/components';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -56,7 +59,7 @@ export default function RetrievedRecords({
         completed: string;
     };
     businessUnits: SelectionType[];
-    calendar: BuType[];
+    calendar: InertiaPagination<BuType>;
     cheques: InertiaPagination<ChequeType>;
     pending: InertiaPagination<Borrower>;
     company: SelectionType[];
@@ -73,7 +76,7 @@ export default function RetrievedRecords({
     // const [pendingModal, setPendingModal] = useState(false);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
-        if(newValue === null) return;
+        if (newValue === null) return;
         if (newValue !== 'calendar') {
             router.reload({
                 data: {
@@ -83,7 +86,7 @@ export default function RetrievedRecords({
                 replace: false,
             });
         }
-        
+
         setCurrentTab(newValue);
     };
     const handleSyncScanned = () => {
@@ -97,7 +100,6 @@ export default function RetrievedRecords({
         //             setOpenProgress(true);
         //         },
         //         onSuccess: () => {
-
         //             setOpenProgress(false);
         //         },
         //     },
@@ -147,19 +149,19 @@ export default function RetrievedRecords({
                         aria-label="Platform"
                     >
                         <ToggleButton value="calendar">
-                            <CalendarTodayIcon sx={{ mr: 1, fontSize: 18 }} />
+                            <CalendarToday sx={{ mr: 1, fontSize: 18 }} />
                             Calendar View
                         </ToggleButton>
                         <ToggleButton value="cheques">
-                            <ViewCompactIcon sx={{ mr: 1, fontSize: 18 }} />
+                            <ViewCompact sx={{ mr: 1, fontSize: 18 }} />
                             Table View
                         </ToggleButton>
                         <ToggleButton value="borrowed">
-                            <SwipeVerticalIcon sx={{ mr: 1, fontSize: 18 }} />
+                            <SwipeVertical sx={{ mr: 1, fontSize: 18 }} />
                             Borrowed Cheques
                         </ToggleButton>
                         <ToggleButton value="manageChecks">
-                            <AdfScannerOutlinedIcon sx={{ mr: 1, fontSize: 18 }} />
+                            <AdfScannerOutlined sx={{ mr: 1, fontSize: 18 }} />
                             Manage Cheques
                         </ToggleButton>
                     </ToggleButtonGroup>
@@ -183,17 +185,7 @@ export default function RetrievedRecords({
                             />
                         )}
                         {currentTab === 'borrowed' && (
-                            <>
                                 <BorrowedTableGrid data={pending} />
-                                {/* <TableDataGrid
-                                data={pending}
-                                filter={filter.search}
-                                pagination={handlePagination}
-                                handleSearchFilter={handleSearch}
-                                handleSortFilter={handleSort}
-                                columns={pendingColumns}
-                            /> */}
-                            </>
                         )}
                         {currentTab === 'manageChecks' && (
                             <>
@@ -214,18 +206,18 @@ export default function RetrievedRecords({
                                 />
 
                                 <Box
-                                display="flex"
-                                justifyContent="flex-end"
-                                mt={3}
-                            >
-                                <Button
-                                    variant="outlined"
-                                    startIcon={<HandCoins />}
-                                    onClick={handleSyncScanned}
+                                    display="flex"
+                                    justifyContent="flex-end"
+                                    mt={3}
                                 >
-                                    Sync Check Scanned
-                                </Button>
-                            </Box>
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<DocumentScanner />}
+                                        onClick={handleSyncScanned}
+                                    >
+                                        Sync Check Scanned
+                                    </Button>
+                                </Box>
                             </>
                         )}
                     </Box>

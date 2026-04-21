@@ -43,6 +43,7 @@ export default function CheckStatus({
     auth: Auth;
 }) {
     const [openModal, setOpenModal] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [scannedRecord, setScannedRecord] = useState<CheckScannedDetails>();
 
     const handleStatusChange = (value: string, record: CheckScannedDetails) => {
@@ -67,6 +68,8 @@ export default function CheckStatus({
             data: {
                 tab: newValue,
             },
+            onBefore: () => setLoading(true),
+            onFinish: () => setLoading(false),
         });
     };
 
@@ -123,6 +126,7 @@ export default function CheckStatus({
 
                     <TableDataGrid
                         data={cheques}
+                        isLoading={loading}
                         filter={filter.search}
                         pagination={handlePagination}
                         handleSearchFilter={handleSearch}

@@ -37,6 +37,7 @@ class ChecksService
     {
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page']);
         $assignment = $filters['assignment'] ?? 'toAssign';
+        $company = $filters['company'] ?? 'all';
 
         $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
         // $borrowedChecks = self::pendingRecords($filters);
@@ -47,7 +48,7 @@ class ChecksService
             'pending' => $borrowedRecords,
             'manageChecks' => new ChequeCollection($manageCheques ?? []),
             'filter' => (object) [
-                'selectedCompany' => $filters['company'] ?? 'all',
+                'selectedCompany' => $company,
                 'assignments' => $assignment,
                 'selectedBu' => $filters['bu'] ?? 'all',
                 'search' => $filters['search'] ?? '',
@@ -58,7 +59,7 @@ class ChecksService
                 'tab' => $filters['tab'] ?? 'calendar'
             ],
             'company' => PermissionService::userAssignedCompany($request->user()),
-            'businessUnits' => isset($filters['company']) ? self::businessUnits($filters['company']) : [],
+            'businessUnits' => self::businessUnits($company),
             'counts' => (object) [
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
@@ -303,14 +304,14 @@ class ChecksService
         return response()->json($transform);
     }
 
-    public static function businessUnits($company)
+    public static function businessUnits(int|string $company)
     {
         return BusinessUnit::query()
-            ->whereHas(
+            ->when($company !== 'all', fn($q) => $q->whereHas(
                 'company',
                 fn($q) =>
                 $q->where('id', $company)
-            )
+            ))
             ->pluck('name', 'id')
             ->map(fn($label, $value) => compact('label', 'value'))
             ->values()
