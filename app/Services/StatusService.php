@@ -16,7 +16,7 @@ class StatusService
 {
     public function checkStatus(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'tab']);
+        $filters = $request->only(['company', 'search', 'sort', 'date', 'tab']);
         $tab = $filters['tab'] ?? 'deposited';
         $staleThreshold = Date::today()->subMonths(6);
 
@@ -24,7 +24,7 @@ class StatusService
         $cheque = BorrowedCheck::query()
             ->filter($filters)
             ->with('checkable.checkStatus.checkForwardedStatus')
-            
+
             ->where(function (Builder $q) use ($tab) {
                 // if ($tab === 'all') { //Disable temporarily "For Releasing Tab"
                 //     $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
@@ -100,11 +100,11 @@ class StatusService
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
-
+        $company = $filters['company'] ?? 'all';
         return Inertia::render('checkStatus', [
             'cheques' => $cheque,
             'filter' => (object) [
-                'selectedBu' => $filters['bu'] ?? '0',
+                'selectedBu' => $company,
                 'search' => $filters['search'] ?? '',
                 'tab' => $tab,
                 'date' => $filters['date'] ?? (object) [
@@ -112,9 +112,10 @@ class StatusService
                     'end' => null
                 ]
             ],
+            'businessUnits' => ChecksService::businessUnits($company),
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
-                'value' => '0'
+                'value' => 'all'
             ]),
         ]);
     }

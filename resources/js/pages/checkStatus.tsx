@@ -2,7 +2,12 @@ import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { cancelStaleCheck, detailsCrf, signatureDetails } from '@/routes';
+import {
+    cancelStaleCheck,
+    checkStatus,
+    detailsCrf,
+    signatureDetails,
+} from '@/routes';
 import {
     Auth,
     CheckScannedDetails,
@@ -13,11 +18,13 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import AccessAlarmsOutlinedIcon from '@mui/icons-material/AccessAlarmsOutlined';
-import CancelPresentationOutlinedIcon from '@mui/icons-material/CancelPresentationOutlined';
-import CreditScoreOutlinedIcon from '@mui/icons-material/CreditScoreOutlined';
-import DownloadDoneOutlinedIcon from '@mui/icons-material/DownloadDoneOutlined';
-import SwipeRightOutlinedIcon from '@mui/icons-material/SwipeRightOutlined';
+import {
+    AccessAlarmsOutlined,
+    CancelPresentationOutlined,
+    CreditScoreOutlined,
+    DownloadDoneOutlined,
+    SwipeRightOutlined,
+} from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import { createStatusChequeColumns } from './checkStatus/components/columns';
@@ -34,10 +41,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function CheckStatus({
     cheques,
     company,
+    businessUnits,
     filter,
     auth,
 }: {
     cheques: InertiaPagination<ChequeType>;
+    businessUnits: SelectionType[];
     company: SelectionType[];
     filter: FilterType;
     auth: Auth;
@@ -58,6 +67,7 @@ export default function CheckStatus({
             setScannedRecord(record);
         }
     };
+    console.log(company);
 
     const [tab, setTab] = useState(filter.tab);
 
@@ -90,40 +100,42 @@ export default function CheckStatus({
                         aria-label="Platform"
                     >
                         <ToggleButton value="deposited">
-                            <CreditScoreOutlinedIcon
-                                sx={{ mr: 1, fontSize: 18 }}
-                            />
+                            <CreditScoreOutlined sx={{ mr: 1, fontSize: 18 }} />
                             Deposited
                         </ToggleButton>
                         <ToggleButton value="released">
-                            <DownloadDoneOutlinedIcon
+                            <DownloadDoneOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Released
                         </ToggleButton>
                         <ToggleButton value="cancelled">
-                            <CancelPresentationOutlinedIcon
+                            <CancelPresentationOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Cancelled
                         </ToggleButton>
                         {!isRegional && (
                             <ToggleButton value="forwarded">
-                                <SwipeRightOutlinedIcon
+                                <SwipeRightOutlined
                                     sx={{ mr: 1, fontSize: 18 }}
                                 />
                                 Forwarded
                             </ToggleButton>
                         )}
                         <ToggleButton value="staled">
-                            <AccessAlarmsOutlinedIcon
+                            <AccessAlarmsOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Staled
                         </ToggleButton>
                     </ToggleButtonGroup>
-                    <TableFilter company={company} filters={filter} />
-
+                    <TableFilter
+                        company={company}
+                        filters={filter}
+                        businessUnits={businessUnits}
+                        resetFilterRouter={checkStatus()}
+                    />
                     <TableDataGrid
                         data={cheques}
                         isLoading={loading}

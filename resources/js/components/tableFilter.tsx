@@ -31,7 +31,7 @@ export default function ({
     handleChangeCheck?: (value: SelectChangeEvent) => void;
 }) {
     const [selectedCompany, setSelectedCompany] = useState<string>(
-        filters.selectedCompany,
+        filters.selectedCompany ?? 'all',
     );
     const [selectedBu, setSelectedBu] = useState<string>(filters.selectedBu);
     const [startDate, setStartDate] = useState<Dayjs | null>(
