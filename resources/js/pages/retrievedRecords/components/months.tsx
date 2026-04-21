@@ -112,7 +112,7 @@ export default function Months({
     };
     return (
         <>
-            {Object.entries(months).map(([value, month], monthIndex) => (
+            {Object.entries(months).map(([,month], monthIndex) => (
                 <Box key={monthIndex} sx={{ mb: 4, position: 'relative' }}>
                     <Box
                         sx={{

@@ -116,7 +116,6 @@ class ChecksService
                 CvProgress::dispatch($id, "Data Retrieval Failed: " . $e->getMessage(), ProgressStatus::NoConnection);
             })
             ->dispatch();
-        // $navRecords = Calendar::distinctMonthsNav($filters['monthDetails']);
     }
 
     public static function manageChecks(array $filters = [])
