@@ -51,7 +51,7 @@ export default function PageViewsBarChart({
                     direction="row"
                     sx={{
                         justifyContent: 'space-between',
-                        alignItems: 'center',
+                        alignItems: 'start',
                     }}
                 >
                     {/* LEFT SIDE */}

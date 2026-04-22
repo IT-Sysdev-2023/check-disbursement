@@ -1,3 +1,4 @@
+import { handlePagination } from '@/lib/utils';
 import { ChequeType, InertiaPagination } from '@/types';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
@@ -65,6 +66,14 @@ export default function CustomizedDataGrid({
         <DataGrid
             rows={cheques.data}
             columns={columns}
+            paginationMode="server"
+            paginationModel={{
+                page: cheques.meta.current_page - 1,
+                pageSize: cheques.meta.per_page,
+            }}
+            pagination
+            rowCount={cheques.meta.total}
+            onPaginationModelChange={handlePagination}
             getRowClassName={(params) =>
                 params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
             }

@@ -77,8 +77,6 @@ export default function Dashboard({
             ],
         },
     ];
-
-    console.log(cheques.data);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
