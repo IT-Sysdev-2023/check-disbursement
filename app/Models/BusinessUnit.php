@@ -8,11 +8,30 @@ class BusinessUnit extends Model
 {
     protected $guarded = [];
 
-    public function company(){
+    public static function businessUnits(int|string $company)
+    {
+        return self::query()
+            ->when($company !== 'all', fn($q) => $q->whereHas(
+                'company',
+                fn($q) =>
+                $q->where('id', $company)
+            ))
+            ->pluck('name', 'id')
+            ->map(fn($label, $value) => compact('label', 'value'))
+            ->values()
+            ->prepend([
+                'label' => 'All',
+                'value' => 'all',
+            ]);
+    }
+
+    public function company()
+    {
         return $this->belongsTo(Company::class);
     }
 
-    public function navDatabases(){
+    public function navDatabases()
+    {
         return $this->hasOne(NavDatabase::class);
     }
 }

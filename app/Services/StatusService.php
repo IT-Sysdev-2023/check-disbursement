@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Http\Resources\ScannedRecordResource;
 use App\Models\BorrowedCheck;
+use App\Models\BusinessUnit;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
 use App\Models\ScannedRecords;
@@ -112,7 +113,7 @@ class StatusService
                     'end' => null
                 ]
             ],
-            'businessUnits' => ChecksService::businessUnits($company),
+            'businessUnits' => BusinessUnit::businessUnits($company),
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
                 'value' => 'all'

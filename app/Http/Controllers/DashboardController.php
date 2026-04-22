@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\NumberHelper;
 use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheck;
+use App\Models\BusinessUnit;
 use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
@@ -19,24 +20,42 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $filters = $request->only(['tab']);
-
+        $filters = $request->only(['tab', 'bu']);
         return Inertia::render(
             $request->user()->hasRole('viewing') ? 'viewingDashboard' : 'dashboard',
-            $request->user()->hasRole('viewing') ? [...self::viewingDashboard($filters)] : [...self::defaultDashboard()]
+            $request->user()->hasRole('viewing') ? [...self::viewingDashboard($filters)] : [...self::defaultDashboard($filters)]
         );
     }
 
-    private static function defaultDashboard()
+    private static function defaultDashboard($filters)
     {
         $cheques = new ChequeCollection(self::chequeRecords());
-        $raw = CvHeader::select(
-            DB::raw('MONTH(cv_date) as month'),
+        $cv = CvHeader::query()
+            ->when(isset($filters['bu']) && $filters['bu'] !== 'all', function ($q) use ($filters) {
+                $q->whereHas('cvCheckPayment', fn($builder) => $builder->where('business_unit_id', $filters['bu']));
+            })
+            ->leftJoin('cv_check_payments', 'cv_check_payments.cv_header_id', '=', 'cv_headers.id')
+            ->leftJoin('borrowed_checks', function ($join) {
+                $join->on('borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
+                    ->where('borrowed_checks.checkable_type', '=', 'cv');
+            })
+            ->selectRaw('
+                    DATE_FORMAT(cv_headers.cv_date, "%Y-%m") as month,
+                    COUNT(DISTINCT cv_headers.id) as total,
+                    COUNT(borrowed_checks.id) as borrowed_checks_count
+            ')
+            ->where('cv_headers.cv_date', '>=', now()->subMonths(6)->startOfMonth())
+            ->groupByRaw('DATE_FORMAT(cv_headers.cv_date, "%Y-%m")')
+            ->orderBy('month', 'desc')
+            ->get();
+
+        $crf = Crf::select(
+            DB::raw('MONTHNAME(date) as month'),
             DB::raw('COUNT(*) as total')
         )
-            ->where('cv_date', '>=', Date::now()->subMonths(6)->startOfMonth())
-            ->groupBy('month')
-            ->orderBy('month')
+            ->where('date', '>=', Date::now()->subMonths(6)->startOfMonth())
+            ->groupBy(DB::raw('MONTHNAME(date)'))
+            ->orderByDesc(DB::raw('MIN(MONTH(date))'))
             ->get();
 
         $countCvForMonths = CvHeader::where('cv_date', '>=', Date::now()->subMonths(6)->startOfMonth())
@@ -44,15 +63,9 @@ class DashboardController extends Controller
 
         $countCrfForMonths = Crf::where('date', '>=', Date::now()->subMonths(6)->startOfMonth())
             ->count();
-
-        $months = $raw->pluck('month')->map(function ($m) {
-            $date = Date::createFromFormat('m', $m);
-            return $date->format('M');
-        });
-
         $cvCount = CvCheckPayment::count();
         $crfCount = Crf::count();
-
+        $bu = BusinessUnit::businessUnits('all');
         return [
             'cheques' => $cheques,
             'totals' => (object) [
@@ -61,11 +74,20 @@ class DashboardController extends Controller
                 'total' => (string) ($cvCount + $crfCount),
             ],
             'chart' => (object) [
-                'months' => $months,
-                'totals' => $raw->pluck('total'),
+                'cvChart' => (object) [
+                    'labels' => $cv->pluck('month'),
+                    'data' => $cv->pluck('total'),
+                    'borrowedChecks' => $cv->pluck('borrowed_checks_count')
+                ],
+                'crfChart' => (object) [
+                    'labels' => $crf->pluck('month'),
+                    'data' => $crf->pluck('total')
+                ],
+
                 'countCv' => (string) $countCvForMonths,
                 'countCrf' => (string) $countCrfForMonths
-            ]
+            ],
+            'bu' => $bu
         ];
     }
 

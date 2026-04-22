@@ -9,6 +9,7 @@ use App\Helpers\StringHelper;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheck;
+use App\Models\BusinessUnit;
 use App\Models\CheckStatus;
 use App\Models\Crf;
 use App\Models\CvCheckPayment;
@@ -38,7 +39,7 @@ class CheckReleasingService
                     'end' => null
                 ]
             ],
-             'businessUnits' => isset($filters['company']) ? ChecksService::businessUnits($filters['company']) : [],
+             'businessUnits' => isset($filters['company']) ? BusinessUnit::businessUnits($filters['company']) : [],
             'company' => PermissionService::userAssignedCompany($request->user())
         ]);
     }

@@ -1,6 +1,11 @@
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
-import { ChequeType, InertiaPagination, type BreadcrumbItem } from '@/types';
+import {
+    ChequeType,
+    InertiaPagination,
+    SelectionType,
+    type BreadcrumbItem,
+} from '@/types';
 import { Head } from '@inertiajs/react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -17,11 +22,11 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
 export default function Dashboard({
     cheques,
     totals,
     chart,
+    bu,
 }: {
     cheques: InertiaPagination<ChequeType>;
     totals: {
@@ -29,9 +34,10 @@ export default function Dashboard({
         crf: string;
         total: string;
     };
+    bu: SelectionType[];
     chart: {
-        months: string[];
-        totals: number[];
+        cvChart: { labels: string[]; data: number[]; borrowedChecks: number[] };
+        crfChart: { labels: string[]; data: number[] };
         countCv: string;
         countCrf: string;
     };
@@ -72,7 +78,7 @@ export default function Dashboard({
         },
     ];
 
-console.log(cheques.data);
+    console.log(cheques.data);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -102,13 +108,13 @@ console.log(cheques.data);
                         <HighlightedCard />
                         </Grid> */}
                         <Grid size={{ xs: 12, md: 6 }}>
-                            <SessionsChart />
+                            <SessionsChart crf={chart} />
                         </Grid>
                         <Grid size={{ xs: 12, md: 6 }}>
                             <PageViewsBarChart
+                                bu={bu}
                                 data={chart}
                                 label="Cheque Voucher"
-                                count={chart.countCv}
                             />
                         </Grid>
                     </Grid>
@@ -118,7 +124,7 @@ console.log(cheques.data);
                     </Typography>
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
-                            <CustomizedDataGrid cheques={cheques}/>
+                            <CustomizedDataGrid cheques={cheques} />
                         </Grid>
                     </Grid>
                 </Box>

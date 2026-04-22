@@ -10,6 +10,7 @@ interface SelectItemProps {
     items: SelectionType[];
     handleChange: (e: SelectChangeEvent) => void;
     value: string;
+    size?: 'medium' | 'small';
     isDisabled?: boolean;
 }
 
@@ -19,12 +20,14 @@ export default function SelectItem({
     handleChange,
     value,
     isDisabled = false,
+    size = 'medium',
 }: SelectItemProps) {
     return (
         <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
+            <FormControl fullWidth size={size}>
                 <InputLabel id={`${title}-label`}>{title}</InputLabel>
                 <Select
+                    size={size}
                     disabled={isDisabled}
                     labelId={`${title}-label`}
                     id={`${title}-select`}

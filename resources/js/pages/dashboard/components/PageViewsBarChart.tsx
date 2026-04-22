@@ -1,81 +1,129 @@
-import * as React from 'react';
+import { SelectionType } from '@/types';
+import { SelectChangeEvent } from '@mui/material';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Chip from '@mui/material/Chip';
-import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import { BarChart } from '@mui/x-charts/BarChart';
 import { useTheme } from '@mui/material/styles';
+import Typography from '@mui/material/Typography';
+import { BarChart } from '@mui/x-charts/BarChart';
+import SelectItem from './SelectItem';
+import { useState } from 'react';
+import { router } from '@inertiajs/react';
 
-export default function PageViewsBarChart({ data, label, count }: { data: { months: string[], totals: number[]}, label: string, count: string}) {
-  const theme = useTheme();
-  const colorPalette = [
-    (theme.vars || theme).palette.primary.dark,
-    (theme.vars || theme).palette.primary.main,
-    (theme.vars || theme).palette.primary.light,
-  ];
-  return (
-    <Card variant="outlined" sx={{ width: '100%' }}>
-      <CardContent>
-        <Typography component="h2" variant="subtitle2" gutterBottom>
-          {label}
-        </Typography>
-        <Stack sx={{ justifyContent: 'space-between' }}>
-          <Stack
-            direction="row"
-            sx={{
-              alignContent: { xs: 'center', sm: 'flex-start' },
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            <Typography variant="h4" component="p">
-              {count}
-            </Typography>
-            <Chip size="small" color="error" label="-8%" />
-          </Stack>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            {label} for the last 6 months
-          </Typography>
-        </Stack>
-        <BarChart
-          borderRadius={8}
-          colors={colorPalette}
-          xAxis={[
-            {
-              scaleType: 'band',
-              categoryGapRatio: 0.5,
-              data: data.months,
-              height: 24,
+export default function PageViewsBarChart({
+    data,
+    label,
+    bu,
+}: {
+    data: {
+        cvChart: { labels: string[]; data: number[]; borrowedChecks: number[] };
+        countCv: string;
+    };
+    label: string;
+    bu: SelectionType[];
+  }) {
+  const [selectedBu, setSelectedBu] = useState('all');
+  
+    const theme = useTheme();
+    const colorPalette = [
+        (theme.vars || theme).palette.primary.dark,
+        (theme.vars || theme).palette.primary.main,
+        (theme.vars || theme).palette.primary.light,
+    ];
+
+    const handleChangeBu = (event: SelectChangeEvent) => {
+        setSelectedBu(event.target.value);
+
+        router.reload({
+            data: {
+                bu: event.target.value,
             },
-          ]}
-          yAxis={[{ width: 50 }]}
-          series={[
-            {
-              id: 'page-views',
-              label: 'Page views',
-              data: data.totals,
-              stack: 'A',
-            },
-            // {
-            //   id: 'downloads',
-            //   label: 'Downloads',
-            //   data: [3098, 4215, 2384, 2101, 4752, 3593, 2384],
-            //   stack: 'A',
-            // },
-            // {
-            //   id: 'conversions',
-            //   label: 'Conversions',
-            //   data: [4051, 2275, 3129, 4693, 3904, 2038, 2275],
-            //   stack: 'A',
-            // },
-          ]}
-          height={250}
-          margin={{ left: 0, right: 0, top: 20, bottom: 0 }}
-          grid={{ horizontal: true }}
-          hideLegend
-        />
-      </CardContent>
-    </Card>
-  );
+        });
+    };
+    return (
+        <Card variant="outlined" sx={{ width: '100%' }}>
+            <CardContent>
+                <Typography component="h2" variant="subtitle2" gutterBottom>
+                    {label}
+                </Typography>
+                <Stack
+                    direction="row"
+                    sx={{
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                    }}
+                >
+                    {/* LEFT SIDE */}
+                    <Stack>
+                        <Stack
+                            direction="row"
+                            sx={{
+                                alignItems: 'center',
+                                gap: 1,
+                            }}
+                        >
+                            <Typography variant="h4" component="p">
+                                {data.countCv}
+                            </Typography>
+                            <Chip size="small" color="error" label="-8%" />
+                        </Stack>
+
+                        <Typography
+                            variant="caption"
+                            sx={{ color: 'text.secondary' }}
+                        >
+                            {label} for the last 6 months
+                        </Typography>
+                    </Stack>
+
+                    {/* RIGHT SIDE */}
+                    <SelectItem
+                        size="small"
+                        handleChange={handleChangeBu}
+                        value={selectedBu}
+                        title="Business Unit"
+                        items={bu}
+                    />
+                </Stack>
+                <BarChart
+                    borderRadius={8}
+                    colors={colorPalette}
+                    xAxis={[
+                        {
+                            scaleType: 'band',
+                            categoryGapRatio: 0.5,
+                            data: data.cvChart.labels,
+                            height: 24,
+                        },
+                    ]}
+                    yAxis={[{ width: 50 }]}
+                    series={[
+                        {
+                            id: 'page-views',
+                            label: 'Total Records',
+                            data: data.cvChart.data,
+                            stack: 'A',
+                        },
+                        {
+                            id: 'downloads',
+                            label: 'Total Borrowed',
+                            data: data.cvChart.borrowedChecks,
+                            stack: 'A',
+                        },
+                        // {
+                        //   id: 'conversions',
+                        //   label: 'Conversions',
+                        //   data: [4051, 2275, 3129, 4693, 3904, 2038, 2275],
+                        //   stack: 'A',
+                        // },
+                    ]}
+                    height={250}
+                    margin={{ left: 0, right: 0, top: 20, bottom: 0 }}
+                    grid={{ horizontal: true }}
+                    hideLegend
+                />
+            </CardContent>
+        </Card>
+    );
 }

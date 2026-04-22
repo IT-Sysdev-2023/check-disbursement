@@ -59,7 +59,7 @@ class ChecksService
                 'tab' => $filters['tab'] ?? 'calendar'
             ],
             'company' => PermissionService::userAssignedCompany($request->user()),
-            'businessUnits' => self::businessUnits($company),
+            'businessUnits' => BusinessUnit::businessUnits($company),
             'counts' => (object) [
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
@@ -304,22 +304,6 @@ class ChecksService
         return response()->json($transform);
     }
 
-    public static function businessUnits(int|string $company)
-    {
-        return BusinessUnit::query()
-            ->when($company !== 'all', fn($q) => $q->whereHas(
-                'company',
-                fn($q) =>
-                $q->where('id', $company)
-            ))
-            ->pluck('name', 'id')
-            ->map(fn($label, $value) => compact('label', 'value'))
-            ->values()
-            ->prepend([
-                'label' => 'All',
-                'value' => 'all',
-            ]);
-    }
 
     public function setLocation(Request $request)
     {
