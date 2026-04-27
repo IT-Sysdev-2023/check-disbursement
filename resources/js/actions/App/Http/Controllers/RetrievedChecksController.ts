@@ -1,7 +1,7 @@
 import { queryParams, type RouteQueryOptions, type RouteDefinition, type RouteFormDefinition } from './../../../../wayfinder'
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::index
- * @see app/Http/Controllers/RetrievedChecksController.php:19
+ * @see app/Http/Controllers/RetrievedChecksController.php:22
  * @route '/retrieved-checks/index'
  */
 export const index = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -16,7 +16,7 @@ index.definition = {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::index
- * @see app/Http/Controllers/RetrievedChecksController.php:19
+ * @see app/Http/Controllers/RetrievedChecksController.php:22
  * @route '/retrieved-checks/index'
  */
 index.url = (options?: RouteQueryOptions) => {
@@ -25,7 +25,7 @@ index.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::index
- * @see app/Http/Controllers/RetrievedChecksController.php:19
+ * @see app/Http/Controllers/RetrievedChecksController.php:22
  * @route '/retrieved-checks/index'
  */
 index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -34,7 +34,7 @@ index.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::index
- * @see app/Http/Controllers/RetrievedChecksController.php:19
+ * @see app/Http/Controllers/RetrievedChecksController.php:22
  * @route '/retrieved-checks/index'
  */
 index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -44,7 +44,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\RetrievedChecksController::index
- * @see app/Http/Controllers/RetrievedChecksController.php:19
+ * @see app/Http/Controllers/RetrievedChecksController.php:22
  * @route '/retrieved-checks/index'
  */
     const indexForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -54,7 +54,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::index
- * @see app/Http/Controllers/RetrievedChecksController.php:19
+ * @see app/Http/Controllers/RetrievedChecksController.php:22
  * @route '/retrieved-checks/index'
  */
         indexForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -63,7 +63,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::index
- * @see app/Http/Controllers/RetrievedChecksController.php:19
+ * @see app/Http/Controllers/RetrievedChecksController.php:22
  * @route '/retrieved-checks/index'
  */
         indexForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -79,7 +79,7 @@ index.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     index.form = indexForm
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::businessUnits
- * @see app/Http/Controllers/RetrievedChecksController.php:44
+ * @see app/Http/Controllers/RetrievedChecksController.php:47
  * @route '/retrieved-checks/filter-business-units'
  */
 export const businessUnits = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -94,7 +94,7 @@ businessUnits.definition = {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::businessUnits
- * @see app/Http/Controllers/RetrievedChecksController.php:44
+ * @see app/Http/Controllers/RetrievedChecksController.php:47
  * @route '/retrieved-checks/filter-business-units'
  */
 businessUnits.url = (options?: RouteQueryOptions) => {
@@ -103,7 +103,7 @@ businessUnits.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::businessUnits
- * @see app/Http/Controllers/RetrievedChecksController.php:44
+ * @see app/Http/Controllers/RetrievedChecksController.php:47
  * @route '/retrieved-checks/filter-business-units'
  */
 businessUnits.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -112,7 +112,7 @@ businessUnits.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::businessUnits
- * @see app/Http/Controllers/RetrievedChecksController.php:44
+ * @see app/Http/Controllers/RetrievedChecksController.php:47
  * @route '/retrieved-checks/filter-business-units'
  */
 businessUnits.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -122,7 +122,7 @@ businessUnits.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => (
 
     /**
 * @see \App\Http\Controllers\RetrievedChecksController::businessUnits
- * @see app/Http/Controllers/RetrievedChecksController.php:44
+ * @see app/Http/Controllers/RetrievedChecksController.php:47
  * @route '/retrieved-checks/filter-business-units'
  */
     const businessUnitsForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -132,7 +132,7 @@ businessUnits.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => (
 
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::businessUnits
- * @see app/Http/Controllers/RetrievedChecksController.php:44
+ * @see app/Http/Controllers/RetrievedChecksController.php:47
  * @route '/retrieved-checks/filter-business-units'
  */
         businessUnitsForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -141,7 +141,7 @@ businessUnits.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => (
         })
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::businessUnits
- * @see app/Http/Controllers/RetrievedChecksController.php:44
+ * @see app/Http/Controllers/RetrievedChecksController.php:47
  * @route '/retrieved-checks/filter-business-units'
  */
         businessUnitsForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -157,7 +157,7 @@ businessUnits.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => (
     businessUnits.form = businessUnitsForm
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::getLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:34
+ * @see app/Http/Controllers/RetrievedChecksController.php:37
  * @route '/retrieved-checks/get-location'
  */
 export const getLocation = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -172,7 +172,7 @@ getLocation.definition = {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::getLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:34
+ * @see app/Http/Controllers/RetrievedChecksController.php:37
  * @route '/retrieved-checks/get-location'
  */
 getLocation.url = (options?: RouteQueryOptions) => {
@@ -181,7 +181,7 @@ getLocation.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::getLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:34
+ * @see app/Http/Controllers/RetrievedChecksController.php:37
  * @route '/retrieved-checks/get-location'
  */
 getLocation.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
@@ -190,7 +190,7 @@ getLocation.get = (options?: RouteQueryOptions): RouteDefinition<'get'> => ({
 })
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::getLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:34
+ * @see app/Http/Controllers/RetrievedChecksController.php:37
  * @route '/retrieved-checks/get-location'
  */
 getLocation.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
@@ -200,7 +200,7 @@ getLocation.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
     /**
 * @see \App\Http\Controllers\RetrievedChecksController::getLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:34
+ * @see app/Http/Controllers/RetrievedChecksController.php:37
  * @route '/retrieved-checks/get-location'
  */
     const getLocationForm = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -210,7 +210,7 @@ getLocation.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
 
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::getLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:34
+ * @see app/Http/Controllers/RetrievedChecksController.php:37
  * @route '/retrieved-checks/get-location'
  */
         getLocationForm.get = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -219,7 +219,7 @@ getLocation.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
         })
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::getLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:34
+ * @see app/Http/Controllers/RetrievedChecksController.php:37
  * @route '/retrieved-checks/get-location'
  */
         getLocationForm.head = (options?: RouteQueryOptions): RouteFormDefinition<'get'> => ({
@@ -235,7 +235,7 @@ getLocation.head = (options?: RouteQueryOptions): RouteDefinition<'head'> => ({
     getLocation.form = getLocationForm
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::updateLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:39
+ * @see app/Http/Controllers/RetrievedChecksController.php:42
  * @route '/retrieved-checks/tag-location'
  */
 export const updateLocation = (options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -250,7 +250,7 @@ updateLocation.definition = {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::updateLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:39
+ * @see app/Http/Controllers/RetrievedChecksController.php:42
  * @route '/retrieved-checks/tag-location'
  */
 updateLocation.url = (options?: RouteQueryOptions) => {
@@ -259,7 +259,7 @@ updateLocation.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::updateLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:39
+ * @see app/Http/Controllers/RetrievedChecksController.php:42
  * @route '/retrieved-checks/tag-location'
  */
 updateLocation.put = (options?: RouteQueryOptions): RouteDefinition<'put'> => ({
@@ -269,7 +269,7 @@ updateLocation.put = (options?: RouteQueryOptions): RouteDefinition<'put'> => ({
 
     /**
 * @see \App\Http\Controllers\RetrievedChecksController::updateLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:39
+ * @see app/Http/Controllers/RetrievedChecksController.php:42
  * @route '/retrieved-checks/tag-location'
  */
     const updateLocationForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -284,7 +284,7 @@ updateLocation.put = (options?: RouteQueryOptions): RouteDefinition<'put'> => ({
 
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::updateLocation
- * @see app/Http/Controllers/RetrievedChecksController.php:39
+ * @see app/Http/Controllers/RetrievedChecksController.php:42
  * @route '/retrieved-checks/tag-location'
  */
         updateLocationForm.put = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -299,8 +299,63 @@ updateLocation.put = (options?: RouteQueryOptions): RouteDefinition<'put'> => ({
     
     updateLocation.form = updateLocationForm
 /**
+* @see \App\Http\Controllers\RetrievedChecksController::initialScan
+ * @see app/Http/Controllers/RetrievedChecksController.php:70
+ * @route '/retrieved-checks/initial-scan'
+ */
+export const initialScan = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: initialScan.url(options),
+    method: 'post',
+})
+
+initialScan.definition = {
+    methods: ["post"],
+    url: '/retrieved-checks/initial-scan',
+} satisfies RouteDefinition<["post"]>
+
+/**
+* @see \App\Http\Controllers\RetrievedChecksController::initialScan
+ * @see app/Http/Controllers/RetrievedChecksController.php:70
+ * @route '/retrieved-checks/initial-scan'
+ */
+initialScan.url = (options?: RouteQueryOptions) => {
+    return initialScan.definition.url + queryParams(options)
+}
+
+/**
+* @see \App\Http\Controllers\RetrievedChecksController::initialScan
+ * @see app/Http/Controllers/RetrievedChecksController.php:70
+ * @route '/retrieved-checks/initial-scan'
+ */
+initialScan.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
+    url: initialScan.url(options),
+    method: 'post',
+})
+
+    /**
+* @see \App\Http\Controllers\RetrievedChecksController::initialScan
+ * @see app/Http/Controllers/RetrievedChecksController.php:70
+ * @route '/retrieved-checks/initial-scan'
+ */
+    const initialScanForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+        action: initialScan.url(options),
+        method: 'post',
+    })
+
+            /**
+* @see \App\Http\Controllers\RetrievedChecksController::initialScan
+ * @see app/Http/Controllers/RetrievedChecksController.php:70
+ * @route '/retrieved-checks/initial-scan'
+ */
+        initialScanForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
+            action: initialScan.url(options),
+            method: 'post',
+        })
+    
+    initialScan.form = initialScanForm
+/**
 * @see \App\Http\Controllers\RetrievedChecksController::syncMissingData
- * @see app/Http/Controllers/RetrievedChecksController.php:62
+ * @see app/Http/Controllers/RetrievedChecksController.php:65
  * @route '/retrieved-checks/sync-missing-data'
  */
 export const syncMissingData = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -315,7 +370,7 @@ syncMissingData.definition = {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::syncMissingData
- * @see app/Http/Controllers/RetrievedChecksController.php:62
+ * @see app/Http/Controllers/RetrievedChecksController.php:65
  * @route '/retrieved-checks/sync-missing-data'
  */
 syncMissingData.url = (options?: RouteQueryOptions) => {
@@ -324,7 +379,7 @@ syncMissingData.url = (options?: RouteQueryOptions) => {
 
 /**
 * @see \App\Http\Controllers\RetrievedChecksController::syncMissingData
- * @see app/Http/Controllers/RetrievedChecksController.php:62
+ * @see app/Http/Controllers/RetrievedChecksController.php:65
  * @route '/retrieved-checks/sync-missing-data'
  */
 syncMissingData.post = (options?: RouteQueryOptions): RouteDefinition<'post'> => ({
@@ -334,7 +389,7 @@ syncMissingData.post = (options?: RouteQueryOptions): RouteDefinition<'post'> =>
 
     /**
 * @see \App\Http\Controllers\RetrievedChecksController::syncMissingData
- * @see app/Http/Controllers/RetrievedChecksController.php:62
+ * @see app/Http/Controllers/RetrievedChecksController.php:65
  * @route '/retrieved-checks/sync-missing-data'
  */
     const syncMissingDataForm = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -344,7 +399,7 @@ syncMissingData.post = (options?: RouteQueryOptions): RouteDefinition<'post'> =>
 
             /**
 * @see \App\Http\Controllers\RetrievedChecksController::syncMissingData
- * @see app/Http/Controllers/RetrievedChecksController.php:62
+ * @see app/Http/Controllers/RetrievedChecksController.php:65
  * @route '/retrieved-checks/sync-missing-data'
  */
         syncMissingDataForm.post = (options?: RouteQueryOptions): RouteFormDefinition<'post'> => ({
@@ -353,6 +408,6 @@ syncMissingData.post = (options?: RouteQueryOptions): RouteDefinition<'post'> =>
         })
     
     syncMissingData.form = syncMissingDataForm
-const RetrievedChecksController = { index, businessUnits, getLocation, updateLocation, syncMissingData }
+const RetrievedChecksController = { index, businessUnits, getLocation, updateLocation, initialScan, syncMissingData }
 
 export default RetrievedChecksController

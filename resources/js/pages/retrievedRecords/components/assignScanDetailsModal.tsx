@@ -1,8 +1,8 @@
 import NumberFormatInput from '@/components/numberFormatInput';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { banks, storeScanRecord } from '@/routes';
+import { banks, initialScan, storeScanRecord } from '@/routes';
 import { SelectionType } from '@/types';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import {
     Box,
     Button,
@@ -83,6 +83,7 @@ export default function AssignScanDetailsModal({
         post(storeScanRecord(borrowedCheckId.id).url, {
             preserveScroll: true,
             onBefore: () => setOnLoading(true),
+            onError:() => setOnLoading(false),
             onSuccess: () => {
                 setOnLoading(false);
                 reset();
@@ -106,6 +107,18 @@ export default function AssignScanDetailsModal({
             label: String(acc.account_no),
         }));
     }, [bankRecords, bank]);
+
+    const scanCv = () => {
+        router.post(
+            initialScan(),
+            {
+                id: borrowedCheckId.id,
+            },
+            {
+                onSuccess: () => onClose(),
+            },
+        );
+    };
 
     return (
         <Modal
@@ -257,14 +270,26 @@ export default function AssignScanDetailsModal({
                     <Divider sx={{ my: 3 }} />
 
                     <Box sx={{ textAlign: 'right', mt: 2 }}>
-                        <Button
+                        {!borrowedCheckId.isScanned && (
+                            <Button
+                                sx={{ mr: 2 }}
+                                variant="outlined"
+                                color="secondary"
+                                onClick={scanCv}
+                                loading={onLoading}
+                            >
+                                Scan CV
+                            </Button>
+                        )}
+
+                        {borrowedCheckId.isScanned === 1 && <Button
                             variant="contained"
                             color="secondary"
                             onClick={handleSubmit}
                             loading={onLoading}
                         >
                             Submit
-                        </Button>
+                        </Button>}
                     </Box>
                     {/* <Stack
                         direction="row"

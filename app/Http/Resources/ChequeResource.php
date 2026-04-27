@@ -31,6 +31,7 @@ class ChequeResource extends JsonResource
             'id' => $this->cheque_id,
             'chequeId' => $this->cheque_id,
             'checkNumber' => $this->check_number,
+            'isScanned' => $this->isScanned ?? null,
             'borrowedCheckId' => optional($this)->borrowedCheckId,
             'checkDateUnformatted' => optional($checkDate)->format('m-d-Y'),
             'checkDate' => optional($checkDate)->toFormattedDateString(),

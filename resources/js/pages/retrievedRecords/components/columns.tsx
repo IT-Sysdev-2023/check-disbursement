@@ -282,7 +282,7 @@ export const createManageColumns = (
         align: 'center',
         headerAlign: 'center',
         renderCell: ({ row }) => {
-            return row.scannedId ? (
+            return row.isScanned ? (
                 <Chip label="Scanned" color="success" size="small" />
             ) : (
                 <Chip label="Not Scanned" color="error" size="small" />
@@ -315,6 +315,7 @@ export const createManageColumns = (
             const details = {
                 'id': row.borrowedCheckId,
                 'amount': row.amountUnformatted,
+                'isScanned': row.isScanned,
                 'payee': row.payee,
                 'checkDate': row.checkDateUnformatted,
                 'checkNumber': row.checkNumber,
@@ -329,23 +330,25 @@ export const createManageColumns = (
                         <NotepadText />
                     </IconButton>
 
-                    {row.scannedId && (
-                        <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={() => handleScanDetails(row.scannedId)}
-                        >
-                            <Notebook />
-                        </IconButton>
-                    )}
+                   
 
-                    {!row.scannedId && (
+                    {(!row.scannedId || !row.isScanned) && (
                         <IconButton
                             size="small"
                             color="primary"
                             onClick={() => handleAction(details)}
                         >
                             <Edit2 />
+                        </IconButton>
+                    )}
+
+                     {(row.scannedId && (row.isScanned == 1)) && (
+                        <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => handleScanDetails(row.scannedId)}
+                        >
+                            <Notebook />
                         </IconButton>
                     )}
                 </Stack>

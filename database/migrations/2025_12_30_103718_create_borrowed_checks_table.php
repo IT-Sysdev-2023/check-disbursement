@@ -21,6 +21,8 @@ return new class extends Migration {
             $table->unsignedBigInteger('borrower_no');
             $table->string('reason');
             $table->timestamp('approved_at')->nullable();
+            $table->boolean('was_scanned')->default(false);
+            $table->string('doc_path')->nullable();
             // $table->string('item_borrowed')->nullable();
             // $table->string('secondary_reason')->nullable();
             // $table->string('secondary_borrower')->nullable();

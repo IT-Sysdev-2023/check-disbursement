@@ -127,9 +127,11 @@ class ChecksService
             baseColumns()
             ->doesntHave('checkStatus')
             ->leftJoinScanRecords()
+            
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
+                'borrowed_checks.was_scanned as isScanned', 
                 // 'borrowed_checks.is_returned',
                 // 'borrowed_checks.secondary_borrower',
                 'borrowed_checks.approved_at',
@@ -144,9 +146,11 @@ class ChecksService
             baseColumns()
             ->doesntHave('checkStatus')
             ->leftJoinScanRecords()
+            
             ->filter($filters)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId',
+                'borrowed_checks.was_scanned as isScanned',
                 // 'borrowed_checks.is_returned',
                 // 'borrowed_checks.secondary_borrower',
                 'borrowed_checks.approved_at',
@@ -157,6 +161,7 @@ class ChecksService
             );
 
         $unionQuery = $cv->unionAll($crf);
+
         return DB::query()
             ->fromSub($unionQuery, 'merged')
             ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {

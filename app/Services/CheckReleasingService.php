@@ -28,7 +28,6 @@ class CheckReleasingService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
         $chequeRecords = ChecksService::manageChecks($filters);
-
         return Inertia::render('checkReleasing', [
             'cheques' => new ChequeCollection($chequeRecords),
             'filter' => (object) [
