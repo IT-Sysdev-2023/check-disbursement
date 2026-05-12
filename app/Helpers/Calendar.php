@@ -22,7 +22,7 @@ class Calendar
     {
         $page = $filters['page'] ?? 1;
         $perPage = $filters['perPage'] ?? 2; // BUs per page
-        $data = self::distinctMonths($filters['company'] ?? null);
+        // $data = self::distinctMonths($filters['company'] ?? null);
 
         // if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
         //     $navRecords = self::distinctMonthsNav($filters['monthDetails']);
@@ -139,7 +139,7 @@ class Calendar
     }
     private static function distinctMonths($company)
     {
-        $crf = Crf::select('date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"))
+        $crf = Crf::select('date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"),  DB::raw('MAX(crfs.created_at) as created_at'))
             ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
             ->when($company && $company != 'all', function ($q) use ($company) {
                 $q->whereHas('businessUnit', function ($q) use ($company) {
@@ -149,7 +149,7 @@ class Calendar
             // ->doesntHave('checkStatus')
             ->groupBy('date', 'business_units.name', 'business_units.id');
 
-        $cv = CvCheckPayment::select('cv_headers.cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"))
+        $cv = CvCheckPayment::select('cv_headers.cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"),  DB::raw('MAX(cv_check_payments.created_at) as created_at'))
             ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
             ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
             ->when($company && $company != 'all', function ($q) use ($company) {
@@ -172,10 +172,12 @@ class Calendar
             buId,
             SUM(CASE WHEN type = 'crf' THEN total ELSE 0 END) as crf_total,
             SUM(CASE WHEN type = 'cv' THEN total ELSE 0 END) as cv_total,
-            SUM(total) as total
+            SUM(total) as total,
+            MAX(created_at) as latest_created_at
         ")
             ->groupBy('date', 'business_unit', 'buId')
-            ->orderBy('date')
+            // ->orderBy('date')
+            ->orderByDesc('latest_created_at')
             ->get()
             ->groupBy('business_unit');
         return $result;
