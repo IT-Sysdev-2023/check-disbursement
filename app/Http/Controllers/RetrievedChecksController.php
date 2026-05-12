@@ -75,4 +75,11 @@ class RetrievedChecksController extends Controller
         ]);
         return Redirect::back()->with(['status' => $isSuccess ? 'success' : 'failed', 'message' => $isSuccess ? 'Scan successfully' : 'Update Failed']);
     }
+
+    // public function syncCheques(Request $request){
+    //     $isSuccess = BorrowedCheck::findOrFail($request->id)->update([
+    //             'was_sync' => true,
+    //     ]);
+    //     return Redirect::back()->with(['status' => $isSuccess ? 'success' : 'failed', 'message' => $isSuccess ? 'Scan successfully' : 'Update Failed']);
+    // }
 }

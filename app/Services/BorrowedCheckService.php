@@ -28,7 +28,8 @@ class BorrowedCheckService
 
         $validated = $request->validate([
             // 'approver' => 'required|exists:approvers,id',
-            'borrower' => 'required|exists:borrowers,id',
+            // 'borrower' => 'required|exists:borrowers,id',
+            'borrower' => 'required|string',
             'reason' => 'required|string|max:255',
             'cheques' => 'required|array',
         ]);
@@ -102,7 +103,7 @@ class BorrowedCheckService
             'borrowerNo' => NumberHelper::padLeft($borrowerNo),
             'noOfChecks' => $borrower->count(),
             'purpose' => $reason,
-            'borrowedBy' => Str::upper($borrower->first()->borrower?->name),
+            'borrowedBy' => Str::upper($borrower->first()->borrower_id),
             'releasedBy' => Str::upper(auth()->user()->name),
             'chequeNumbers' => $chequeNumbers->toArray()
         ];

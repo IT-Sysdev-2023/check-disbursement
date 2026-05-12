@@ -11,7 +11,7 @@ import {
 import { router } from '@inertiajs/react';
 import { DocumentScanner } from '@mui/icons-material';
 import { Box, Button } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AssignScanDetailsModal from './assignScanDetailsModal';
 import { createManageColumns } from './columns';
 import ScanDetails from './scanDetails';
@@ -31,8 +31,11 @@ export default function ManageCheques({
     const [checkRecords, setCheckRecords] = useState({});
     const [scannedDetailsModal, setScannedDetailsModal] = useState(false);
     const [openInputDetails, setOpenInputDetails] = useState(false);
+    const [sync, setSync] = useState(false);
 
     const handleSyncScanned = () => {
+        setSync(true);
+        localStorage.setItem('syncScanned', 'true');
         // router.get(
         //     scan(),
         //     {},
@@ -50,6 +53,10 @@ export default function ManageCheques({
     };
 
     const handleUpdateScanned = (details) => {
+        if (!sync) {
+            alert('Please Sync Cheque Scan first');
+            return;
+        }
         setOpenInputDetails(true);
 
         if (details) setCheckRecords(details);
@@ -91,6 +98,7 @@ export default function ManageCheques({
                     variant="outlined"
                     startIcon={<DocumentScanner />}
                     onClick={handleSyncScanned}
+                    disabled={sync}
                 >
                     Sync Check Scanned
                 </Button>

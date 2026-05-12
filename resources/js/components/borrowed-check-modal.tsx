@@ -1,14 +1,15 @@
 import { modalStyle } from '@/lib/modalStyle';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { borrowCheck, borrowerNames } from '@/routes';
-import { FlashReponse, SelectionType } from '@/types';
+import { FlashReponse, Option, SelectionType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Grid, SelectChangeEvent, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
+import AutocompleteUser from './autocomplete-user';
 
 const reasons = [
     {
@@ -91,6 +92,9 @@ export default function BorrowedCheckModal({
     const handleChange = (event: SelectChangeEvent) => {
         setData('borrower', event.target.value);
     };
+    const handleTextChange = (_: SyntheticEvent, name: Option) => {
+        setData('borrower', name.label);
+    };
 
     // const handleChangeApprover = (event: SelectChangeEvent) => {
     //     setData('approver', event.target.value);
@@ -131,12 +135,16 @@ export default function BorrowedCheckModal({
                                 />
                             </Grid> */}
                             <Grid size={{ xs: 12, sm: 12 }}>
-                                <SelectItem
+                                <AutocompleteUser
+                                    label="Assign Laison"
+                                    handleTextChange={handleTextChange}
+                                />
+                                {/* <SelectItem
                                     handleChange={handleChange}
                                     value={data.borrower}
                                     title="Assign Laison"
                                     items={borrowerSelection}
-                                />
+                                /> */}
                             </Grid>
                             <Grid size={{ xs: 12, sm: 12 }}>
                                 <SelectItem
@@ -165,7 +173,7 @@ export default function BorrowedCheckModal({
                             <Button
                                 type="submit"
                                 variant="outlined"
-                                 color="secondary"
+                                color="secondary"
                                 size="large"
                                 loading={processing}
                             >

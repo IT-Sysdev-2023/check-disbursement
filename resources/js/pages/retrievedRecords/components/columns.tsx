@@ -320,6 +320,7 @@ export const createManageColumns = (
                 'checkDate': row.checkDateUnformatted,
                 'checkNumber': row.checkNumber,
             }
+            const isSync = localStorage.getItem('syncScanned') === 'true';
             return (
                 <Stack direction="row" sx={{ gap: 1 }}>
                     <IconButton
@@ -332,17 +333,18 @@ export const createManageColumns = (
 
                    
 
-                    {(!row.scannedId || !row.isScanned) && (
+                    {( !row.isScanned) && (
                         <IconButton
                             size="small"
                             color="primary"
+                            disabled={!isSync}
                             onClick={() => handleAction(details)}
                         >
                             <Edit2 />
                         </IconButton>
                     )}
 
-                     {(row.scannedId && (row.isScanned == 1)) && (
+                     {(row.scannedId || (row.isScanned == 1)) && (
                         <IconButton
                             size="small"
                             color="primary"

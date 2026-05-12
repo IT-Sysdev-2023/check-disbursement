@@ -24,15 +24,25 @@ class Calendar
         $perPage = $filters['perPage'] ?? 2; // BUs per page
         $data = self::distinctMonths($filters['company'] ?? null);
 
+        // if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
+        //     $navRecords = self::distinctMonthsNav($filters['monthDetails']);
+
+        //     $data = $data->map(function ($item, $key) use ($navRecords) {
+        //         return $navRecords->has($key) ? $navRecords->get($key) : $item;
+        //     });
+        // }
         if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
-            $navRecords = self::distinctMonthsNav($filters['monthDetails']);
-            $data = $data->merge($navRecords);
+            // ✅ Nav selected: use nav records only, don't merge with base
+            $data = self::distinctMonthsNav($filters['monthDetails']);
+        } else {
+            // ✅ Normal: use base data only
+            $data = self::distinctMonths($filters['company'] ?? null);
         }
 
         $total = $data->count();
         $data = $data->slice(($page - 1) * $perPage, $perPage);
-        
-        
+
+
         $navDetails = self::getNavConnectionDetails($data);
         $records = collect();
 
@@ -46,18 +56,21 @@ class Calendar
 
             foreach ($groupdByDate as $groupedMonthYear => $value) {
 
-                $nav = $navDetails[$value->first()->buId];
+                $nav = $navDetails[$value->first()->buId] ?? null;
 
-                $totalNavRecords = (new GenerateCvService())
-                    ->setConnection($nav->navServer, $nav->name)
-                    ->countNavRecords($nav->navHeaderTable->name, $groupedMonthYear);
+                if (!is_null($nav)) {
+                    $totalNavRecords = (new GenerateCvService())
+                        ->setConnection($nav->navServer, $nav->name)
+                        ->countNavRecords($nav->navHeaderTable->name, $groupedMonthYear);
 
-                $date = Date::createFromFormat('!Y-m', $groupedMonthYear);
+                    $date = Date::createFromFormat('!Y-m', $groupedMonthYear);
 
-                $monthlyData->put(
-                    $groupedMonthYear,
-                    self::transformCalendarData($date, $value, $totalNavRecords)
-                );
+                    $monthlyData->put(
+                        $groupedMonthYear,
+                        self::transformCalendarData($date, $value, $totalNavRecords)
+                    );
+                }
+
             }
 
             $records->push([

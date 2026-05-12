@@ -74,23 +74,7 @@ export default function AssignScanDetailsModal({
         getRecord();
     }, []);
 
-    const handleSubmit = () => {
-        transform((data) => ({
-            ...data,
-            checkDate: dayjs(data.checkDate).format('YYYY-MM-DD'),
-        }));
-
-        post(storeScanRecord(borrowedCheckId.id).url, {
-            preserveScroll: true,
-            onBefore: () => setOnLoading(true),
-            onError:() => setOnLoading(false),
-            onSuccess: () => {
-                setOnLoading(false);
-                reset();
-                onClose();
-            },
-        });
-    };
+   
 
     const handleBankChange = (e: SelectChangeEvent) => {
         setBank(e.target.value);
@@ -118,6 +102,25 @@ export default function AssignScanDetailsModal({
                 onSuccess: () => onClose(),
             },
         );
+    };
+
+     const handleSubmit = () => {
+        transform((data) => ({
+            ...data,
+            checkDate: dayjs(data.checkDate).format('YYYY-MM-DD'),
+        }));
+
+        post(storeScanRecord(borrowedCheckId.id).url, {
+            preserveScroll: true,
+            onBefore: () => setOnLoading(true),
+            onError:() => setOnLoading(false),
+            onSuccess: () => {
+                scanCv();
+                setOnLoading(false);
+                reset();
+                onClose();
+            },
+        });
     };
 
     return (
@@ -275,21 +278,21 @@ export default function AssignScanDetailsModal({
                                 sx={{ mr: 2 }}
                                 variant="outlined"
                                 color="secondary"
-                                onClick={scanCv}
+                                onClick={handleSubmit}
                                 loading={onLoading}
                             >
                                 Scan CV
                             </Button>
                         )}
 
-                        {borrowedCheckId.isScanned === 1 && <Button
+                        {/* {borrowedCheckId.isScanned === 1 && <Button
                             variant="contained"
                             color="secondary"
                             onClick={handleSubmit}
                             loading={onLoading}
                         >
                             Submit
-                        </Button>}
+                        </Button>} */}
                     </Box>
                     {/* <Stack
                         direction="row"

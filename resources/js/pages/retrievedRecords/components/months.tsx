@@ -69,7 +69,7 @@ export default function Months({
     };
     const key = (month: MonthType) =>
         `${month.businessUnit}-${month.y}-${month.m}`;
-    
+
     const handleCheckChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         month: {
@@ -81,38 +81,25 @@ export default function Months({
         const key = `${month.businessUnit}-${month.year}-${month.month}`;
         const value = e.target.checked;
 
-        setChecked(() => {
-            let updated;
+        setChecked(value ? { [key]: true } : {});
 
-            if (value) {
-                //CHECK CURRENT ITEM
-                updated = {
-                    [key]: true,
-                };
-            } else {
-                // UNCHECK PREVIOUS ITEM
-                updated = {};
-            }
-
-            router.reload({
-                data: {
-                    isNavSelected: value,
-                    monthDetails: value ? month : null,
-                },
-                onBefore: () => {
-                    setLoadingMap((prev) => ({ ...prev, [key]: true }));
-                },
-                onFinish: () => {
-                    setLoadingMap((prev) => ({ ...prev, [key]: false }));
-                },
-            });
-
-            return updated;
+        // ✅ Side effect outside the updater
+        router.reload({
+            data: {
+                isNavSelected: value,
+                monthDetails: value ? month : null,
+            },
+            onBefore: () => {
+                setLoadingMap((prev) => ({ ...prev, [key]: true }));
+            },
+            onFinish: () => {
+                setLoadingMap((prev) => ({ ...prev, [key]: false }));
+            },
         });
     };
     return (
         <>
-            {Object.entries(months).map(([,month], monthIndex) => (
+            {Object.entries(months).map(([, month], monthIndex) => (
                 <Box key={monthIndex} sx={{ mb: 4, position: 'relative' }}>
                     <Box
                         sx={{
