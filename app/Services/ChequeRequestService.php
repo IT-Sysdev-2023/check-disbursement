@@ -152,11 +152,11 @@ class ChequeRequestService
         return BorrowedCheck::select(
             'borrower_no',
             'reason',
-            'borrowers.name as borrower',
+            'borrower_id as borrower',
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
         )
-            ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
+            // ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
             ->when($filters['search'] ?? null, function (Builder $query, $search) {
                 $query->where(function ($q) use ($search) {
 
@@ -167,7 +167,7 @@ class ChequeRequestService
                         $q->where('borrower_no', 'LIKE', "%{$clean}%");
                     }
 
-                    $q->orWhere('borrowers.name', 'LIKE', "%{$search}%");
+                    $q->orWhere('borrower_id', 'LIKE', "%{$search}%");
                 });
             })
             ->whereDoesntHaveMorph(
@@ -176,7 +176,7 @@ class ChequeRequestService
                 fn($query) => $query->has('checkStatus')
             )
             ->whereNull('approved_at')
-            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrowers.name')
+            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrower')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()
