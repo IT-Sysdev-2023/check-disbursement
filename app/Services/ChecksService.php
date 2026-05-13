@@ -14,6 +14,7 @@ use App\Models\Approver;
 use App\Models\BorrowedCheck;
 use App\Models\BusinessUnit;
 use App\Models\Crf;
+use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Models\NavServer;
 use App\Models\TagLocation;
@@ -123,7 +124,7 @@ class ChecksService
     {
         // LAST OPTION : JOIN TYPE AND CHECKABLE
         // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
-        $cv = CvCheckPayment::
+        $cv = Cv::
             baseColumns()
             ->doesntHave('checkStatus')
             ->leftJoinScanRecords()
@@ -177,7 +178,7 @@ class ChecksService
             ->filter($filters)
             ->whereDoesntHaveMorph(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
+                [Cv::class, Crf::class],
                 fn($query) => $query->has('checkStatus')
             )
             ->whereNull('approved_at')
@@ -188,7 +189,7 @@ class ChecksService
 
     public static function checkIfHasNoCheckNumber()
     {
-        return CvCheckPayment::where([['check_number', 0], ['resolved_check_number', null]])
+        return Cv::where([['check_number', 0], ['resolved_check_number', null]])
             ->doesntHave('borrowedCheck')
             ->exists();
     }
@@ -202,15 +203,15 @@ class ChecksService
 
     private function countToAssign(array $filters)
     {
-        $cvQuery = CvCheckPayment::baseColumns()
+        $cvQuery = Cv::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck')
-            ->where([['check_number', 0], ['resolved_check_number', null]]);
+            ->where([['cheque_number', 0], ['resolved_cheque_number', null]]);
 
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck')
-            ->where('resolved_check_date', null);
+            ->where('resolved_cheque_date', null);
 
 
         return DB::query()
@@ -222,12 +223,12 @@ class ChecksService
     }
     private function countCompleted(array $filters)
     {
-        $cvQuery = CvCheckPayment::baseColumns()
+        $cvQuery = Cv::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck')
             ->where(function ($q) {
-                $q->whereNotNull('resolved_check_number')
-                    ->orWhere('check_number', '!=', 0);
+                $q->whereNotNull('resolved_cheque_number')
+                    ->orWhere('cheque_number', '!=', 0);
             });
         // ->whereNotNull('resolved_check_number')
         // ->whereNot('check_number');
@@ -235,7 +236,7 @@ class ChecksService
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck')
-            ->whereNotNull('resolved_check_date');
+            ->whereNotNull('resolved_cheque_date');
 
         return DB::query()
             ->fromSub(
@@ -247,7 +248,7 @@ class ChecksService
 
     private static function mergeRecords(array $filters, bool $hasMissingField)
     {
-        $cvQuery = CvCheckPayment::baseColumns()
+        $cvQuery = Cv::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheck');
 
@@ -256,14 +257,14 @@ class ChecksService
             ->doesntHave('borrowedCheck');
 
         if ($hasMissingField) { //ASSIGNMENT
-            $cvQuery->where([['check_number', 0], ['resolved_check_number', null]]);
-            $crfQuery->where('resolved_check_date', null);
+            $cvQuery->where([['cheque_number', 0], ['resolved_cheque_number', null]]);
+            $crfQuery->where('resolved_cheque_date', null);
         } else { // COMPLETED
             $cvQuery->where(function ($q) {
-                $q->whereNotNull('resolved_check_number')
-                    ->orWhere('check_number', '!=', 0);
+                $q->whereNotNull('resolved_cheque_number')
+                    ->orWhere('cheque_number', '!=', 0);
             });
-            $crfQuery->whereNotNull('resolved_check_date');
+            $crfQuery->whereNotNull('resolved_cheque_date');
         }
 
         $unionQuery = $cvQuery->unionAll($crfQuery);

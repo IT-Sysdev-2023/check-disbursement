@@ -23,11 +23,11 @@ return new class extends Migration {
             $table->string('particulars');
             $table->decimal('amount', 20);
             $table->string('bank');
-            $table->string('ck_no');
+            $table->string('cheque_number');
             $table->string('prepared_by');
 
-            $table->string('resolved_check_number')->nullable();
-            $table->date('resolved_check_date')->nullable();
+            $table->string('resolved_cheque_number')->nullable();
+            $table->date('resolved_cheque_date')->nullable();
             $table->foreignId('tag_location_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamp('tagged_at')->nullable();
             $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();

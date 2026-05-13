@@ -119,7 +119,6 @@ class NavConnection
     }
     public function headerConnection(string $name): mixed
     {
-        Log::info('Missing Cheques:', $this->missingCheques);
         $record = $this->connection->table($name)
             ->when(!empty($this->missingCheques), function ($query) {
                 $query->whereIn('Check Voucher No_', $this->missingCheques);

@@ -7,6 +7,7 @@ use App\Http\Resources\BorrowedCheckResource;
 use App\Models\Approver;
 use App\Models\BorrowedCheck;
 use App\Models\Crf;
+use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
@@ -47,7 +48,7 @@ class ChequeRequestService
             ->where([['borrower_no', $request->borrowerNo], ['approved_at', null]])
             ->whereDoesntHaveMorph(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
+                [Cv::class, Crf::class],
                 fn($query) => $query->has('checkStatus')
             )
             ->get();
@@ -91,7 +92,7 @@ class ChequeRequestService
             ->where([['borrower_no', $id], ['approved_at', null]])
             ->whereDoesntHaveMorph(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
+                [Cv::class, Crf::class],
                 fn(Builder $query) => $query->has('checkStatus')
             )
             ->paginate(5)
@@ -172,7 +173,7 @@ class ChequeRequestService
             })
             ->whereDoesntHaveMorph(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
+                [Cv::class, Crf::class],
                 fn($query) => $query->has('checkStatus')
             )
             ->whereNull('approved_at')

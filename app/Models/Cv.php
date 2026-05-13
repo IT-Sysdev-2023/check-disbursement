@@ -98,7 +98,7 @@ class Cv extends Model
             'cheque_date',
             'business_units.name as company_name',
             'cheque_amount as amount',
-            'payee',
+            'cvs.payee',
             'tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),
@@ -144,26 +144,26 @@ class Cv extends Model
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder
-            ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
+            ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'cvs.id')
             // ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_checks.primary_approver_id')
             // ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_checks.secondary_approver_id')
             ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
             ->where('borrowed_checks.checkable_type', 'cv')
             ->whereNotNull('borrowed_checks.approved_at')
             ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
+                $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
                     ->where(function ($q) {
                         $q->where(function ($q) {
-                            $q->where('cv_check_payments.check_number', '!=', 0)
+                            $q->where('cvs.cheque_number', '!=', 0)
                                 ->whereColumn(
                                     'scanned_records.check_no',
-                                    'cv_check_payments.check_number'
+                                    'cvs.cheque_number'
                                 );
                         })->orWhere(function ($q) {
-                            $q->where('cv_check_payments.check_number', 0)
+                            $q->where('cvs.cheque_number', 0)
                                 ->whereColumn(
                                     'scanned_records.check_no',
-                                    'cv_check_payments.resolved_check_number'
+                                    'cvs.resolved_cheque_number'
                                 );
                         });
                     });

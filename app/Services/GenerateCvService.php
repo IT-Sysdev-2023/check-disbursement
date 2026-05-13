@@ -54,7 +54,7 @@ class GenerateCvService extends NavConnection
         }
 
         $start = 1;
-        $duplicates = 1;
+        $duplicates = 0;
         $tableName = $navHeaderTable->name;
         $tableId = $navHeaderTable->id;
 
@@ -141,7 +141,7 @@ class GenerateCvService extends NavConnection
                     ->get()
                     ->keyBy('CV No_');
 
-                $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId) {
+                $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId, $now) {
                     $payment = $otherField->get($header['cv_no']);
 
                     return [
@@ -150,56 +150,21 @@ class GenerateCvService extends NavConnection
                         'business_unit_id' => $buId,
                         'causer_id' => $this->userId,
 
-                        'payee' => $payment?->Payee,
-                        'amount' => $payment?->Amount,
-                        'bank' => $payment?->Bank,
+                        'cheque_number' => $payment->{'Check Number'},
+                        'cheque_amount' => $payment->{'Check Amount'},
+                        'bank_account_no' => $payment->{'Bank Account No_'},
+                        'bank_name' => $payment->{'Bank Name'},
+                        'cheque_date' => optional($payment->{'Check Date'}, fn($d) => Date::parse($d)),
+                        'payee' => $payment->{'Payee'},
+                        'created_at' => $now,
+                        'updated_at' => $now,
                     ];
                 });
 
-                DB::table('cv_headers')->insertOrIgnore($newHeaders->toArray());
-
-                if ($newCvNos->isEmpty()) {
-                    DB::commit();
-                    return;
-                }
-
-                $headerMap = DB::table('cv_headers')
-                    ->where('nav_header_table_id', $tableId)
-                    ->whereIn('cv_no', $newCvNos)
-                    ->pluck('id', 'cv_no');
-
-                $checkPayments = (clone $checkPaymentQuery)
-                    ->whereIn('CV No_', $newCvNos)
-                    ->get()
-                    ->map(fn($check) => [
-                        'cv_header_id' => $headerMap[$check->{'CV No_'}],
-                        'causer_id' => $this->userId,
-
-                        
-                        'check_number' => $check->{'Check Number'},
-                        'check_amount' => $check->{'Check Amount'},
-                        'bank_account_no' => $check->{'Bank Account No_'},
-                        'bank_name' => $check->{'Bank Name'},
-                        'check_date' => optional($check->{'Check Date'}, fn($d) => Date::parse($d)),
-                        'clearing_date' => optional($check->{'Clearing Date'}, fn($d) => Date::parse($d)),
-                        'cleared_flag' => $check->{'Cleared Flag'},
-                        'cancelled_flag' => $check->{'Cancelled Flag'},
-                        'cancelled_date' => optional($check->{'Cancelled Date'}, fn($d) => Date::parse($d)),
-                        'cancelled_by' => $check->{'Cancelled By'},
-                        'cancellation_reason' => $check->{'Cancellation Reason'},
-                        'cancelled_with_check_number' => $check->{'Cancelled with Check Number'},
-                        'check_class' => $check->{'Check Class'},
-                        'check_class_location' => $check->{'Check Class Location'},
-                        'payee' => $check->{'Payee'},
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ]);
-
-                if ($checkPayments->isNotEmpty()) {
-                    DB::table('cv_check_payments')->insertOrIgnore($checkPayments->toArray());
-                }
+                DB::table('cvs')->insertOrIgnore($merged->toArray());
 
                 DB::commit();
+
             } catch (Throwable $e) {
                 DB::rollBack();
                 Log::error("Failed storing CV Header chunk: " . $e->getMessage());

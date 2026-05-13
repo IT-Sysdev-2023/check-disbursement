@@ -105,8 +105,8 @@ class Crf extends Model
     {
         return $builder->select(
             'crfs.id as cheque_id',
-            'ck_no as check_number',
-            'resolved_check_date as check_date',
+            'cheque_number',
+            'resolved_cheque_date as check_date',
             'business_units.name as company_name',
             'crfs.amount',
             'paid_to as payee',
@@ -117,8 +117,8 @@ class Crf extends Model
 
             DB::raw("
                 CASE
-                    WHEN ck_no is NULL THEN 'Assign Check Number'
-                    WHEN crfs.resolved_check_date IS NULL THEN 'Assign Check Date'
+                    WHEN cheque_number is NULL THEN 'Assign Cheque Number'
+                    WHEN crfs.resolved_cheque_date IS NULL THEN 'Assign Cheque Date'
                     WHEN tagged_at IS NOT NULL THEN 'For Signature'
                     ELSE 'Tagging'
                 END as status_order
@@ -144,7 +144,7 @@ class Crf extends Model
             ->where('borrowed_checks.checkable_type', 'crf')
             ->whereNotNull('borrowed_checks.approved_at')
             ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
+                $join->on('scanned_records.check_no', '=', 'crfs.cheque_number')
                     ->on('scanned_records.amount', '=', 'crfs.amount');
             });
     }
