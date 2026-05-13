@@ -14,6 +14,6 @@ class CvCheckPaymentCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-        return ['data' => CvCheckPaymentResource::collection($this->collection)];
+        return ['data' => CvResource::collection($this->collection)];
     }
 }

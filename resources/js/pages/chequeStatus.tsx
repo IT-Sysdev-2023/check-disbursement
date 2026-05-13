@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import {
     cancelStaleCheck,
-    checkStatus,
+    chequeStatus,
     detailsCrf,
     signatureDetails,
 } from '@/routes';
@@ -27,8 +27,8 @@ import {
 } from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
-import { createStatusChequeColumns } from './checkStatus/components/columns';
-import ScannedDetails from './checkStatus/components/scannedDetails';
+import { createStatusChequeColumns } from './chequeStatus/components/columns';
+import ScannedDetails from './chequeStatus/components/scannedDetails';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -38,7 +38,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CheckStatus({
+export default function ChequeStatus({
     cheques,
     company,
     businessUnits,
@@ -134,7 +134,7 @@ export default function CheckStatus({
                         company={company}
                         filters={filter}
                         businessUnits={businessUnits}
-                        resetFilterRouter={checkStatus()}
+                        resetFilterRouter={chequeStatus()}
                     />
                     <TableDataGrid
                         data={cheques}

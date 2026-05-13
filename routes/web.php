@@ -148,7 +148,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('mark-close/{id}', [ClosingController::class, 'close'])->name('mark-as-close');
     });
 
-    Route::get('check-status', [StatusController::class, 'checkStatus'])->name('check-status');
+    Route::get('cheque-status', [StatusController::class, 'chequeStatus'])->name('cheque-status');
     Route::post('cancel-stale-check/{id}', [StatusController::class, 'cancelStale'])->name('cancel-stale-check');
 
     Route::prefix('reports')->group(function () {

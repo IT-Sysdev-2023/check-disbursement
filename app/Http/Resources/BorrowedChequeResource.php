@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 
-class BorrowedCheckResource extends JsonResource
+class BorrowedChequeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -35,7 +35,7 @@ class BorrowedCheckResource extends JsonResource
     protected function resolveCheckable()
     {
         return match ($this->checkable_type) {
-            'cv' => new CvCheckPaymentResource($this->checkable),
+            'cv' => new CvResource($this->checkable),
             'crf' => new CrfResource($this->checkable),
             default => null,
         };

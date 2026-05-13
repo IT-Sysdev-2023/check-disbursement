@@ -1,4 +1,4 @@
-import CheckStatusChip from '@/components/chip-status';
+import ChequeStatusChip from '@/components/chip-status';
 import { Cv } from '@/types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
@@ -20,7 +20,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">CV Number</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.cvHeader?.cvNo}
+                            {details.cvNo}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -36,7 +36,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Check Number</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.checkNumber}
+                            {details.chequeNumber}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -56,7 +56,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         </Typography>
                     </Paper>
                 </Grid>
-                {details.checkStatus && (
+                {details.chequeStatus && (
                     <>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
@@ -64,7 +64,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                     Released Date:
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.checkStatus?.createdAt ?? '-'}
+                                    {details.chequeStatus?.createdAt ?? '-'}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -75,8 +75,8 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                 </Typography>
 
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    <CheckStatusChip
-                                        status={details?.checkStatus?.status}
+                                    <ChequeStatusChip
+                                        status={details?.chequeStatus?.status}
                                     />
                                 </Typography>
                             </Paper>
@@ -91,20 +91,20 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         </Typography>
                     </Paper>
                 </Grid>
-                {details?.checkStatus?.receiversName && (
+                {details?.chequeStatus?.receiversName && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">
                                 Receivers Name
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 1 }}>
-                                {details.checkStatus?.receiversName}
+                                {details.chequeStatus?.receiversName}
                             </Typography>
                         </Paper>
                     </Grid>
                 )}
 
-                {details?.checkStatus?.image && (
+                {details?.chequeStatus?.image && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">Image</Typography>
@@ -113,7 +113,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                 <Button
                                     variant="contained"
                                     component="a"
-                                    href={details.checkStatus.image}
+                                    href={details.chequeStatus.image}
                                     download
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -123,7 +123,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                             </Box>
                             {/* <Box
                                 component="img"
-                                src={details.checkStatus.image}
+                                src={details.chequeStatus.image}
                                 alt="Check preview"
                                 sx={{
                                     mt: 1,
@@ -137,7 +137,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         </Paper>
                     </Grid>
                 )}
-                {details?.checkStatus?.signature && (
+                {details?.chequeStatus?.signature && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">
@@ -148,7 +148,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                                 <Button
                                     variant="contained"
                                     component="a"
-                                    href={details.checkStatus.signature}
+                                    href={details.chequeStatus.signature}
                                     download
                                     target="_blank"
                                     rel="noopener noreferrer"
@@ -170,7 +170,7 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                             >
                                 <Box
                                     component="img"
-                                    src={details.checkStatus.signature}
+                                    src={details.chequeStatus.signature}
                                     alt="Signature preview"
                                     sx={{
                                         maxWidth: '100%',
@@ -182,14 +182,14 @@ export default function CvDetailsSignature({ details }: { details: Cv }) {
                         </Paper>
                     </Grid>
                 )}
-                {details?.checkStatus?.status === 'cancelled' && (
+                {details?.chequeStatus?.status === 'cancelled' && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">
                                 Cancelled Reason
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 1 }}>
-                                {details.checkStatus?.cancelledReason}
+                                {details.chequeStatus?.cancelledReason}
                             </Typography>
                         </Paper>
                     </Grid>

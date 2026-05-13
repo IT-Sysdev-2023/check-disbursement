@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\FileHandler;
 use App\Http\Resources\ChequeCollection;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\Crf;
+use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Services\PermissionService;
 use Illuminate\Database\Eloquent\Builder;
@@ -59,7 +60,7 @@ class CheckBorrowingController extends Controller
             ],
         ]);
         $ids = $request->cheques ?? [];
-        $isSuccess = BorrowedCheck::
+        $isSuccess = BorrowedCheque::
             when(
                 $request->type == 'exclude',
                 fn($q) => $q->whereNotIn('id', $ids)
@@ -89,9 +90,9 @@ class CheckBorrowingController extends Controller
             }
         };
 
-        $cv = CvCheckPayment::
+        $cv = Cv::
             baseColumns()
-            ->doesntHave('checkStatus')
+            ->doesntHave('chequeStatus')
             ->scanRecords()
             ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
             ->filter($filters)
@@ -102,7 +103,7 @@ class CheckBorrowingController extends Controller
 
         $crf = Crf::
             baseColumns()
-            ->doesntHave('checkStatus')
+            ->doesntHave('chequeStatus')
             ->scanRecords()
             ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'crfs.id')
             ->filter($filters)
@@ -133,7 +134,7 @@ class CheckBorrowingController extends Controller
         ]);
 
         $ids = $request->checks ?? [];
-        $isSuccess = BorrowedCheck::
+        $isSuccess = BorrowedCheque::
             when(
                 $request->type == 'exclude',
                 fn($q) => $q->whereNotIn('id', $ids)

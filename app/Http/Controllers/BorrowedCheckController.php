@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\BorrowedCheckRequest;
-use App\Http\Resources\BorrowedCheckResource;
-use App\Models\BorrowedCheck;
+
+use App\Models\BorrowedCheque;
 use App\Services\BorrowedCheckService;
 use Illuminate\Http\Request;
 
@@ -24,7 +23,7 @@ class BorrowedCheckController extends Controller
         return $this->service->borrower();
     }
 
-    public function pendingDetails(BorrowedCheck $id)
+    public function pendingDetails(BorrowedCheque $id)
     {
 
         return $this->service->pendingDetails($id);

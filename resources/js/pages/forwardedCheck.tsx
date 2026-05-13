@@ -42,10 +42,10 @@ export default function ForwardedCheck({
 }) {
     const [openModal, setOpenModal] = useState(false);
     const [selectedReceiver, setselectedReceiver] = useState('0');
-    const [checkStatusId, setCheckStatusId] = useState<number>();
+    const [chequeStatusId, setChequeStatusId] = useState<number>();
 
     const handleStatusChange = (
-        checkStatusId: number,
+        chequeStatusId: number,
         value: string,
         checkId: number,
     ) => {
@@ -53,15 +53,15 @@ export default function ForwardedCheck({
             router.visit(signatureDetails(checkId));
             return;
         }
-        setCheckStatusId(checkStatusId);
+        setChequeStatusId(chequeStatusId);
         setOpenModal(true);
     };
 
     const handleReceiveSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (checkStatusId)
+        if (chequeStatusId)
             router.put(
-                receiverForwarded(checkStatusId),
+                receiverForwarded(chequeStatusId),
                 {},
                 {
                     preserveScroll: true,

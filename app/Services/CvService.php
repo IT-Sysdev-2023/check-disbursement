@@ -4,11 +4,12 @@ namespace App\Services;
 
 use App\Enums\ProgressStatus;
 use App\Events\CvProgress;
-use App\Http\Resources\CvCheckPaymentResource;
+use App\Http\Resources\CvResource;
 use App\Jobs\CvDatabase;
 use App\Jobs\CvServer;
 use App\Models\BusinessUnit;
 use App\Models\Company;
+use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Models\NavHeaderTable;
 use App\Models\NavServer;
@@ -91,17 +92,17 @@ class CvService
 
     }
 
-    public function details(CvCheckPayment $cv)
+    public function details(Cv $cv)
     {
         return Inertia::render('retrievedRecords/checkDetailsCv', [
-            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks', 'checkStatus'))
+            'cv' => new CvResource($cv->load('chequeStatus'))
         ]);
     }
 
-    public function signatureDetails(CvCheckPayment $cv)
+    public function signatureDetails(Cv $cv)
     {
         return Inertia::render('retrievedRecords/checkDetailsCvSignature', [
-            'cv' => new CvCheckPaymentResource($cv->load('cvHeader:id,cv_no,vendor_no,remarks', 'checkStatus'))
+            'cv' => new CvResource($cv->load('chequeStatus'))
         ]);
     }
 

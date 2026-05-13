@@ -8,7 +8,7 @@ class CheckForwardedStatus extends Model
 {
     protected $guarded = [];
 
-    public function checkStatus(){
-        return $this->belongsTo(CheckStatus::class);
+    public function chequeStatus(){
+        return $this->belongsTo(ChequeStatus::class);
     }
 }

@@ -10,7 +10,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('check_statuses', function (Blueprint $table) {
+        Schema::create('cheque_statuses', function (Blueprint $table) {
             $table->id();
             $table->enum('status', ['released', 'forwarded', 'deposited', 'staled', 'cancelled'])->nullable();
             $table->string('receivers_name')->nullable();
@@ -35,6 +35,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('check_statuses');
+        Schema::dropIfExists('cheque_statuses');
     }
 };

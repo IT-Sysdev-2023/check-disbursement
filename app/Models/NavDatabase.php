@@ -17,9 +17,6 @@ class NavDatabase extends Model
     public function navHeaderTable(){
         return $this->hasOne(NavHeaderTable::class);
     }
-    // public function navLineTable(){
-    //     return $this->hasOne(NavLineTable::class);
-    // }
 
     public function businessUnit(){
         return $this->belongsTo(BusinessUnit::class);

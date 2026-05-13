@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\FileHandler;
 use App\Http\Requests\ReleasingCheckRequest;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Services\CheckReleasingService;
 use Illuminate\Http\Request;
 
@@ -24,7 +24,7 @@ class CheckReleasingController extends Controller
         return $this->service->getReleaseCheck($checkId, $status);
     }
 
-    public function store(BorrowedCheck $id,  ReleasingCheckRequest $request)
+    public function store(BorrowedCheque $id,  ReleasingCheckRequest $request)
     {
         return $this->service->storeReleaseCheck($id, $request);
     }

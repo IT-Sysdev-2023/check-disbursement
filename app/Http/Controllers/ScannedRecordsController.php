@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\ScanProgress;
 use App\Http\Resources\ScannedRecordResource;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\ScannedRecords;
 use App\Services\ScannedRecordsService;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
 
 class ScannedRecordsController extends Controller
 {
@@ -50,7 +47,7 @@ class ScannedRecordsController extends Controller
         return $this->service->update($id, $request);
     }
 
-    public function store(BorrowedCheck $id, Request $request)
+    public function store(BorrowedCheque $id, Request $request)
     {
         $validated = $request->validate([
             "accountNumber" => "required",

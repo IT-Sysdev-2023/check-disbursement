@@ -56,12 +56,12 @@ class User extends Authenticatable
 
     public function borrowedChecks()
     {
-        return $this->hasMany(BorrowedCheck::class);
+        return $this->hasMany(BorrowedCheque::class);
     }
 
-    public function checkStatuses()
+    public function chequeStatuses()
     {
-        return $this->hasMany(CheckStatus::class, 'caused_by');
+        return $this->hasMany(ChequeStatus::class, 'caused_by');
     }
     public function assignedCheckNumber()
     {

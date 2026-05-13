@@ -12,7 +12,7 @@ import {
     bankSetup,
     checkReleasing,
     checkRequestForm,
-    checkStatus,
+    chequeStatus,
     checkVoucher,
     chequeRequests,
     closingChecks,
@@ -144,7 +144,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 ? [
                       {
                           title: 'Cheque Status',
-                          href: checkStatus(),
+                          href: chequeStatus(),
                           icon: Activity,
                       },
                   ]

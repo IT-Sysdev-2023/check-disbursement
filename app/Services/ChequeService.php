@@ -3,24 +3,18 @@
 namespace App\Services;
 
 use App\Enums\ProgressStatus;
-use App\Events\CalendarProgress;
 use App\Events\CvProgress;
 use App\Helpers\Calendar;
-use App\Http\Controllers\CheckRequestController;
 use App\Http\Resources\ChequeCollection;
-use App\Http\Resources\ChequeResource;
 use App\Jobs\CvDatabase;
 use App\Models\Approver;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
 use App\Models\Crf;
 use App\Models\Cv;
-use App\Models\CvCheckPayment;
 use App\Models\NavServer;
 use App\Models\TagLocation;
 use Illuminate\Bus\Batch;
-use Carbon\CarbonPeriod;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
@@ -31,7 +25,7 @@ use Illuminate\Support\Facades\Bus;
 use Inertia\Inertia;
 use Throwable;
 
-class ChecksService
+class ChequeService
 {
 
     public function records(Request $request)
@@ -80,9 +74,6 @@ class ChecksService
         );
 
         $missingCheques = Calendar::getMissingRecordsNav($validated);
-
-        $user = $request->user();
-
         // Get all the Navition Servers
         $buId = BusinessUnit::
             where('name', $validated['bu'])
@@ -91,11 +82,11 @@ class ChecksService
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function ($query) use ($buId) {
                 $query->whereIn('business_unit_id', $buId)
-                    ->with('navHeaderTable', 'navLineTable', 'navCheckPaymentTable');
+                    ->with('navHeaderTable', 'navCheckPaymentTable');
             })
             ->lazy();
 
-        $id = $user->id;
+        $id = $request->user()->id;
         $allJobs = [];
 
         $date = (object) [
@@ -126,16 +117,16 @@ class ChecksService
         // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
         $cv = Cv::
             baseColumns()
-            ->doesntHave('checkStatus')
+            ->doesntHave('chequeStatus')
             ->leftJoinScanRecords()
             
             ->filter($filters)
             ->addSelect(
-                'borrowed_checks.id as borrowedCheckId',
-                'borrowed_checks.was_scanned as isScanned', 
-                // 'borrowed_checks.is_returned',
-                // 'borrowed_checks.secondary_borrower',
-                'borrowed_checks.approved_at',
+                'borrowed_cheques.id as borrowedCheckId',
+                'borrowed_cheques.was_scanned as isScanned', 
+                // 'borrowed_cheques.is_returned',
+                // 'borrowed_cheques.secondary_borrower',
+                'borrowed_cheques.approved_at',
                 DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
@@ -145,16 +136,16 @@ class ChecksService
         $crf = Crf::
             // whereHas('borrowedCheck', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
             baseColumns()
-            ->doesntHave('checkStatus')
+            ->doesntHave('chequeStatus')
             ->leftJoinScanRecords()
             
             ->filter($filters)
             ->addSelect(
-                'borrowed_checks.id as borrowedCheckId',
-                'borrowed_checks.was_scanned as isScanned',
-                // 'borrowed_checks.is_returned',
-                // 'borrowed_checks.secondary_borrower',
-                'borrowed_checks.approved_at',
+                'borrowed_cheques.id as borrowedCheckId',
+                'borrowed_cheques.was_scanned as isScanned',
+                // 'borrowed_cheques.is_returned',
+                // 'borrowed_cheques.secondary_borrower',
+                'borrowed_cheques.approved_at',
                 DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
@@ -174,12 +165,12 @@ class ChecksService
 
     private static function pendingRecords(array $filters)
     {
-        return BorrowedCheck::with('checkable')
+        return BorrowedCheque::with('checkable')
             ->filter($filters)
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
-                fn($query) => $query->has('checkStatus')
+                fn($query) => $query->has('chequeStatus')
             )
             ->whereNull('approved_at')
             ->paginate(10)
@@ -297,7 +288,7 @@ class ChecksService
             'approver' => ['required', 'integer'],
         ]);
 
-        $isSuccess = BorrowedCheck::whereIn('id', $request->borrowedNo)
+        $isSuccess = BorrowedCheque::whereIn('id', $request->borrowedNo)
             ->update(['approved_at' => Date::now(), 'primary_approver_id' => $request->approver]);
 
         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);

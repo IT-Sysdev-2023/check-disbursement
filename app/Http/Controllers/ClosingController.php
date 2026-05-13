@@ -3,13 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\FileHandler;
-use App\Helpers\NumberHelper;
-use App\Models\CheckStatus;
+use App\Models\ChequeStatus;
 use App\Services\ClosingService;
-use App\Services\PermissionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Inertia\Inertia;
 
 class ClosingController extends Controller
 {
@@ -22,7 +18,7 @@ class ClosingController extends Controller
     }
 
 
-    public function close(CheckStatus $id)
+    public function close(ChequeStatus $id)
     {
         return $this->service->close($id);
 

@@ -157,7 +157,7 @@ export const createReleasingColumns = (
 
 export const createForwardedCvColumns = (
     handleStatusChange: (
-        checkStatus: number,
+        chequeStatus: number,
         value: string,
         checkId: number,
     ) => void,

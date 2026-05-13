@@ -30,10 +30,10 @@ class Cv extends Model
 
     }
 
-    protected function checkNumber(): Attribute
+    protected function chequeNumber(): Attribute
     {
         return new Attribute(
-            get: fn($value, $attributes) => $attributes['check_number'] ?: $attributes['resolved_check_number'],
+            get: fn($value, $attributes) => $attributes['cheque_number'] ?: $attributes['resolved_cheque_number'],
         );
     }
 
@@ -144,12 +144,12 @@ class Cv extends Model
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder
-            ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'cvs.id')
-            // ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_checks.primary_approver_id')
-            // ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_checks.secondary_approver_id')
-            ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
-            ->where('borrowed_checks.checkable_type', 'cv')
-            ->whereNotNull('borrowed_checks.approved_at')
+            ->join('borrowed_cheques', 'borrowed_cheques.checkable_id', '=', 'cvs.id')
+            // ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_cheques.primary_approver_id')
+            // ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_cheques.secondary_approver_id')
+            ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
+            ->where('borrowed_cheques.checkable_type', 'cv')
+            ->whereNotNull('borrowed_cheques.approved_at')
             ->leftJoin('scanned_records', function ($join) {
                 $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
                     ->where(function ($q) {
@@ -191,12 +191,12 @@ class Cv extends Model
         return $this->belongsTo(TagLocation::class);
     }
 
-    public function checkStatus()
+    public function chequeStatus()
     {
-        return $this->morphOne(CheckStatus::class, 'checkable');
+        return $this->morphOne(ChequeStatus::class, 'checkable');
     }
     public function borrowedCheck()
     {
-        return $this->morphOne(BorrowedCheck::class, 'checkable');
+        return $this->morphOne(BorrowedCheque::class, 'checkable');
     }
 }

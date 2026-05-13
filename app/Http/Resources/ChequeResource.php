@@ -17,7 +17,7 @@ class ChequeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $checkDate = $this->check_date ? Date::parse($this->check_date) : null;
+        $checkDate = $this->cheque_date ? Date::parse($this->cheque_date) : null;
         $staleThreshold = Date::today()->subMonths(6);
 
         $status = null;
@@ -30,7 +30,7 @@ class ChequeResource extends JsonResource
         return [
             'id' => $this->cheque_id,
             'chequeId' => $this->cheque_id,
-            'checkNumber' => $this->check_number,
+            'checkNumber' => $this->cheque_number,
             'isScanned' => $this->isScanned ?? null,
             'borrowedCheckId' => optional($this)->borrowedCheckId,
             'checkDateUnformatted' => optional($checkDate)->format('m-d-Y'),

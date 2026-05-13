@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { markAsClose } from '@/routes';
 import {
-    CheckStatus,
+    ChequeStatus,
     ClosingCheckDetailsType,
     DateFilterType,
     FlashReponse,
@@ -40,7 +40,7 @@ export default function CvCrfList({
     company,
     filter,
 }: {
-    cheques: InertiaPagination<CheckStatus>;
+    cheques: InertiaPagination<ChequeStatus>;
     company: SelectionType[];
     filter: {
         selectedCompany: string;

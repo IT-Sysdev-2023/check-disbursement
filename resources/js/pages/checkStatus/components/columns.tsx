@@ -55,7 +55,7 @@ export const createStatusChequeColumns = (
         minWidth: 120,
         flex: 1,
         renderCell: ({ row }) => {
-            const { checkStatus } = row.checkable;
+            const { chequeStatus } = row.checkable;
 
             let status = null;
 
@@ -63,14 +63,14 @@ export const createStatusChequeColumns = (
                 status = row.checkable.status;
             }
 
-            if (checkStatus?.status) {
-                status = checkStatus.status;
+            if (chequeStatus?.status) {
+                status = chequeStatus.status;
             }
-            if (checkStatus?.forwardedStatus?.status) {
-                status = checkStatus.forwardedStatus.status;
+            if (chequeStatus?.forwardedStatus?.status) {
+                status = chequeStatus.forwardedStatus.status;
             }
 
-            if (checkStatus?.isClosed) {
+            if (chequeStatus?.isClosed) {
                 status = 'closed';
             }
 
@@ -141,7 +141,7 @@ export const createStatusChequeColumns = (
                         <MenuItem value="details">
                             Check Request Form Details
                         </MenuItem>
-                        {row.checkable?.checkStatus?.status !== 'cancel' && (
+                        {row.checkable?.chequeStatus?.status !== 'cancel' && (
                             <MenuItem value="scannedDetails">
                                 Scanned Check Details
                             </MenuItem>

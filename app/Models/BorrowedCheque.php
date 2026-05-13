@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class BorrowedCheck extends Model
+class BorrowedCheque extends Model
 {
     protected $guarded = [];
 
@@ -39,7 +39,7 @@ class BorrowedCheck extends Model
             ->when($filters['search'] ?? null, function ($query, $search) use ($filters) {
                 $query->whereHasMorph(
                     'checkable',
-                    [Crf::class, CvCheckPayment::class],
+                    [Crf::class, Cv::class],
                     function ($q, $type) use ($filters) {
                         $q->filter($filters);
                     }

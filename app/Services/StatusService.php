@@ -3,9 +3,10 @@
 namespace App\Services;
 
 use App\Http\Resources\ScannedRecordResource;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
 use App\Models\Crf;
+use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Models\ScannedRecords;
 use App\Services\PermissionService;
@@ -15,16 +16,16 @@ use Illuminate\Contracts\Database\Query\Builder;
 use Inertia\Inertia;
 class StatusService
 {
-    public function checkStatus(Request $request)
+    public function chequeStatus(Request $request)
     {
         $filters = $request->only(['company', 'search', 'sort', 'date', 'tab']);
         $tab = $filters['tab'] ?? 'deposited';
         $staleThreshold = Date::today()->subMonths(6);
 
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
-        $cheque = BorrowedCheck::query()
+        $cheque = BorrowedCheque::query()
             ->filter($filters)
-            ->with('checkable.checkStatus.checkForwardedStatus')
+            ->with('checkable.chequeStatus.checkForwardedStatus')
 
             ->where(function (Builder $q) use ($tab) {
                 // if ($tab === 'all') { //Disable temporarily "For Releasing Tab"
@@ -41,7 +42,7 @@ class StatusService
                 //             ->whereDoesntHaveMorph(
                 //                 'checkable',
                 //                 [CvCheckPayment::class, Crf::class],
-                //                 fn($query) => $query->has('checkStatus')
+                //                 fn($query) => $query->has('chequeStatus')
                 //             )
     
                 //         ;
@@ -58,11 +59,11 @@ class StatusService
                             )
                             ->whereHasMorph(
                                 'checkable',
-                                [CvCheckPayment::class, Crf::class],
+                                [Cv::class, Crf::class],
                                 function (Builder $query, string $type) {
-                                $column = $type === CvCheckPayment::class ? 'check_date' : 'resolved_check_date';
+                                $column = $type === Cv::class ? 'cheque_date' : 'resolved_cheque_date';
                                 $query->where($column, '<', Date::today()->subMonths(6))
-                                    ->whereDoesntHave('checkStatus', function ($q) {
+                                    ->whereDoesntHave('chequeStatus', function ($q) {
                                         $q->where('status', 'cancelled');
                                     });
                             }
@@ -75,24 +76,24 @@ class StatusService
                     $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
                         $q->whereHasMorph(
                             'checkable',
-                            [CvCheckPayment::class, Crf::class],
+                            [Cv::class, Crf::class],
                             fn(Builder $q) =>
                             $q->when(
                                 auth()->user()->hasRole('regional_officer'),
 
                                 function ($query) use ($tab) {
-                                $query->has('checkStatus.checkForwardedStatus')
+                                $query->has('chequeStatus.checkForwardedStatus')
                                     ->when($tab === 'released', function ($q) use ($tab) {
-                                        $q->whereRelation('checkStatus.checkForwardedStatus', 'status', 'released');
+                                        $q->whereRelation('chequeStatus.checkForwardedStatus', 'status', 'released');
                                     }, function ($query) use ($tab) {
-                                        $query->whereRelation('checkStatus', 'status', $tab);
+                                        $query->whereRelation('chequeStatus', 'status', $tab);
                                     });
                             },
                                 function ($query) use ($tab) {
-                                $query->whereRelation('checkStatus', 'status', $tab);
+                                $query->whereRelation('chequeStatus', 'status', $tab);
                             }
                             )
-                                ->has('checkStatus')
+                                ->has('chequeStatus')
                         );
                     });
                 }
@@ -102,7 +103,7 @@ class StatusService
             ->withQueryString()
             ->toResourceCollection();
         $company = $filters['company'] ?? 'all';
-        return Inertia::render('checkStatus', [
+        return Inertia::render('chequeStatus', [
             'cheques' => $cheque,
             'filter' => (object) [
                 'selectedBu' => $company,

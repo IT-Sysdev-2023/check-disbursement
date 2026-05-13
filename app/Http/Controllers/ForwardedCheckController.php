@@ -2,21 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\FileHandler;
-use App\Helpers\ModelHelper;
-use App\Helpers\NumberHelper;
-use App\Helpers\StringHelper;
-use App\Http\Requests\ReleasingCheckRequest;
-use App\Models\CheckForwardedStatus;
-use App\Models\CheckStatus;
-use App\Models\Crf;
-use App\Models\CvCheckPayment;
+
+use App\Models\ChequeStatus;
 use App\Services\ForwardedCheckService;
-use App\Services\PermissionService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Inertia\Inertia;
 
 class ForwardedCheckController extends Controller
 {
@@ -28,11 +17,11 @@ class ForwardedCheckController extends Controller
         return $this->service->index($request);
     }
 
-    public function cancelForwarded(CheckStatus $id, Request $request)
+    public function cancelForwarded(ChequeStatus $id, Request $request)
     {
         return $this->service->cancelForwarded($id, $request);
     }
-    public function update(CheckStatus $id, Request $request)
+    public function update(ChequeStatus $id, Request $request)
     {
         return $this->service->update($id, $request);
     }
@@ -42,7 +31,7 @@ class ForwardedCheckController extends Controller
         return $this->service->showForwarded($id, $status);
     }
 
-    public function storeReleaseCheck(CheckStatus $id, Request $request)
+    public function storeReleaseCheck(ChequeStatus $id, Request $request)
     {
         return $this->service->storeReleaseCheck($id, $request);
     }

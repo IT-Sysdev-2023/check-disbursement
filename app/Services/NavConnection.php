@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Services;
+use App\Models\Cv;
 use App\Models\CvHeader;
 use App\Models\NavServer;
 use Illuminate\Support\Facades\Config;
@@ -46,7 +47,7 @@ class NavConnection
 
     public function navRecords(int $buId, string $bu, string $tableName, string $month, string $year)
     {
-        $existingDates = CvHeader::
+        $existingDates = Cv::
             selectRaw("cv_date as date, cv_no")
             ->whereYear('cv_date', $year)
             ->whereMonth('cv_date', $month)
@@ -87,10 +88,11 @@ class NavConnection
 
     public function getNavMissingRecords(int $buId, string $tableName, string $month, string $year)
     {
-        $existingCv = CvHeader::query()
-            ->whereHas('cvCheckPayment', function ($q) use ($buId) {
-                $q->where('business_unit_id', $buId);
-            })
+        $existingCv = Cv::query()
+            ->where('business_unit_id', $buId)
+            // ->whereHas('cvCheckPayment', function ($q) use ($buId) {
+            //     $q->where('business_unit_id', $buId);
+            // })
             ->whereYear('cv_date', $year)
             ->whereMonth('cv_date', $month)
             ->pluck('cv_no')
