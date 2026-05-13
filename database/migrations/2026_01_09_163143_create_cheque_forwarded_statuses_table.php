@@ -10,9 +10,9 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('check_forwarded_statuses', function (Blueprint $table) {
+        Schema::create('cheque_forwarded_statuses', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('check_status_id')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->unsignedBigInteger('cheque_status_id')->cascadeOnUpdate()->cascadeOnDelete();
             $table->enum('status', ['released', 'cancelled'])->nullable();
             $table->string('forwarded_receivers_name')->nullable();
             $table->string('image')->nullable();
@@ -30,6 +30,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('check_forwarded_statuses');
+        Schema::dropIfExists('cheque_forwarded_statuses');
     }
 };

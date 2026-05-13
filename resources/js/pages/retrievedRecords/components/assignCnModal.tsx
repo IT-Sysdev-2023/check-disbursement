@@ -1,4 +1,4 @@
-import { updateAssignCheckNumber } from '@/routes';
+import { updateAssignChequeNumber } from '@/routes';
 import { ChequeType } from '@/types';
 import { useForm } from '@inertiajs/react';
 import {
@@ -45,7 +45,7 @@ export default function AssignCnModal({
             id: chequeData.chequeId,
             type: chequeData.type,
         }));
-        put(updateAssignCheckNumber().url, {
+        put(updateAssignChequeNumber().url, {
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {

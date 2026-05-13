@@ -67,7 +67,7 @@ class CvService
         $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) use ($buId) {
                 $query->whereIn('business_unit_id', $buId)
-                    ->with('navHeaderTable', 'navCheckPaymentTable');
+                    ->with('navHeaderTable', 'navChequePaymentTable');
             })
             ->lazy();
 

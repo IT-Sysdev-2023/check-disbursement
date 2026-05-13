@@ -81,7 +81,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
             Route::post('store-scan-record/{id}', [ScannedRecordsController::class, 'store'])->name('store-scan-record');
 
-            Route::put('update-assign-check-number', [AssignedCheckNumberController::class, 'updateCheckNumber'])->name('update-assign-check-number');
+            Route::put('update-assign-cheque-number', [AssignedCheckNumberController::class, 'updateChequeNumber'])->name('update-assign-cheque-number');
             Route::put('update-assign-check-date', [AssignedCheckNumberController::class, 'updateCheckDate'])->name('update-assign-check-date');
 
             Route::post('initial-scan', [RetrievedChecksController::class, 'initialScan'])->name('initial-scan');

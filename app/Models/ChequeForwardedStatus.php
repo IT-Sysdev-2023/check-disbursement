@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CheckForwardedStatus extends Model
+class ChequeForwardedStatus extends Model
 {
     protected $guarded = [];
 

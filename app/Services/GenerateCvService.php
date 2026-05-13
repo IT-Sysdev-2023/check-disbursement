@@ -45,7 +45,7 @@ class GenerateCvService extends NavConnection
 
     public function storeRecord(
         ?NavHeaderTable $navHeaderTable,
-        ?string $navCheckPaymentTable,
+        ?string $navChequePaymentTable,
         int $buId,
         ?string $buName
     ) {
@@ -59,7 +59,7 @@ class GenerateCvService extends NavConnection
         $tableId = $navHeaderTable->id;
 
         $headerQuery = $this->headerConnection($tableName);
-        $checkPaymentQuery = $this->checkPaymentConnection($navCheckPaymentTable);
+        $checkPaymentQuery = $this->checkPaymentConnection($navChequePaymentTable);
 
         $total = $headerQuery->count();
 

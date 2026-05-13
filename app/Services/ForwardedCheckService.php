@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
-use App\Models\CheckForwardedStatus;
+use App\Models\ChequeForwardedStatus;
 use App\Models\ChequeStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,7 +59,7 @@ class ForwardedCheckService
             'reason' => 'required | string'
         ]);
 
-        $id->checkForwardedStatus()
+        $id->chequeForwardedStatus()
             ->create([
                 'status' => 'cancel',
                 'cancelled_reason' => $request->reason,
@@ -92,7 +92,7 @@ class ForwardedCheckService
             'status' => 'required|string',
         ]);
 
-        if (CheckForwardedStatus::where('check_status_id', $id->id)->exists()) {
+        if (ChequeForwardedStatus::where('check_status_id', $id->id)->exists()) {
             return redirect()->back()->with(['status' => false, 'message' => 'Duplicate entry in check forward status']);
         }
 
@@ -100,7 +100,7 @@ class ForwardedCheckService
 
         $stream = DB::transaction(function () use ($id, $validated, $handleFiles, $request) {
             $chequeStatus = $id
-                ->checkForwardedStatus()
+                ->chequeForwardedStatus()
                 ->create([
                     'status' => Str::lower($validated['status']),
                     'forwarded_receivers_name' => $validated['receiversName'],
@@ -150,7 +150,7 @@ class ForwardedCheckService
             ->where(['status' => 'forwarded'])
             ->whereNotNull('received_by')
             ->regionalPermission()
-            ->doesntHave('checkForwardedStatus')
+            ->doesntHave('chequeForwardedStatus')
             ->paginate()
             ->withQueryString()
             ->toResourceCollection();

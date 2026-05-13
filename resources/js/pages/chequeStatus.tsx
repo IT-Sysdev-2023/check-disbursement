@@ -27,9 +27,9 @@ import {
 } from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
-import { createStatusChequeColumns } from './chequeStatus/components/columns';
-import ScannedDetails from './chequeStatus/components/scannedDetails';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import { createStatusChequeColumns } from './checkStatus/components/columns';
+import ScannedDetails from './checkStatus/components/scannedDetails';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

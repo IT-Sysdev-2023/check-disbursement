@@ -24,7 +24,7 @@ class ClosingService
             with(['checkable' => ['borrowedCheck', 'tagLocation']])
             ->where('is_closed', false)
             ->whereNot('status', 'cancel')
-            ->has('checkForwardedStatus')
+            ->has('chequeForwardedStatus')
             ->get();
 
         $cheques = ChequeStatus::
@@ -34,7 +34,7 @@ class ClosingService
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->where('status', 'forwarded')
-                        ->has('checkForwardedStatus');
+                        ->has('chequeForwardedStatus');
                 })
                     ->orWhere('status', '!=', 'forwarded');
             })

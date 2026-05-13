@@ -127,7 +127,7 @@ class DashboardController extends Controller
     {
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
         return BorrowedCheque::query()
-            ->with('checkable.chequeStatus.checkForwardedStatus')
+            ->with('checkable.chequeStatus.chequeForwardedStatus')
             ->where(function (Builder $q) use ($tab) {
 
                 if ($tab === 'fo_releasing') { //Disable temporarily "For Releasing Tab"

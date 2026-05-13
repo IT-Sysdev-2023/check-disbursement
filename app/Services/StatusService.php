@@ -25,7 +25,7 @@ class StatusService
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
         $cheque = BorrowedCheque::query()
             ->filter($filters)
-            ->with('checkable.chequeStatus.checkForwardedStatus')
+            ->with('checkable.chequeStatus.chequeForwardedStatus')
 
             ->where(function (Builder $q) use ($tab) {
                 // if ($tab === 'all') { //Disable temporarily "For Releasing Tab"
@@ -82,9 +82,9 @@ class StatusService
                                 auth()->user()->hasRole('regional_officer'),
 
                                 function ($query) use ($tab) {
-                                $query->has('chequeStatus.checkForwardedStatus')
+                                $query->has('chequeStatus.chequeForwardedStatus')
                                     ->when($tab === 'released', function ($q) use ($tab) {
-                                        $q->whereRelation('chequeStatus.checkForwardedStatus', 'status', 'released');
+                                        $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'released');
                                     }, function ($query) use ($tab) {
                                         $query->whereRelation('chequeStatus', 'status', $tab);
                                     });

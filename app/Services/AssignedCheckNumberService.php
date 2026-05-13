@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 
 class AssignedCheckNumberService
 {
-    public function updateAssignCheckNumber(Request $request)
+    public function updateAssignChequeNumber(Request $request)
     {
         $validated = $request->validate([
             'type' => 'required|string',

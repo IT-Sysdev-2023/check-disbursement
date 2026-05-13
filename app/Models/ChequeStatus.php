@@ -23,8 +23,8 @@ class ChequeStatus extends Model
           return $this->morphTo();
      }
 
-     public function checkForwardedStatus(){
-        return $this->hasOne(CheckForwardedStatus::class);
+     public function chequeForwardedStatus(){
+        return $this->hasOne(ChequeForwardedStatus::class);
      }
 
     #[Scope]
