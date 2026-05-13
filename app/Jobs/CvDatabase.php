@@ -43,7 +43,7 @@ class CvDatabase implements ShouldQueue
         }
 
         $server = NavServer::findOrFail($this->serverId);
-        $table = NavDatabase::findOrFail($this->dbId)->load('navHeaderTable', 'navLineTable', 'navCheckPaymentTable', 'businessUnit');
+        $table = NavDatabase::findOrFail($this->dbId)->load('navHeaderTable', 'navCheckPaymentTable', 'businessUnit');
 
         (new GenerateCvService())
             ->setConnection(
@@ -55,7 +55,6 @@ class CvDatabase implements ShouldQueue
             ->setUser($this->userId)
             ->storeRecord(
                 $table->navHeaderTable,
-                $table->navLineTable?->name,
                 $table->navCheckPaymentTable?->name,
                 $table->business_unit_id,
                 $table->businessUnit->name

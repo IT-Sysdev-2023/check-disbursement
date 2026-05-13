@@ -134,11 +134,11 @@ class NavConnection
 
         return $record;
     }
-    public function lineConnection(string $name)
-    {
-        $record = $this->connection->table($name);
-        return $record;
-    }
+    // public function lineConnection(string $name)
+    // {
+    //     $record = $this->connection->table($name);
+    //     return $record;
+    // }
     public function checkPaymentConnection(string $name)
     {
         $record = $this->connection->table($name);

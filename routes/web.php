@@ -49,6 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         //! EXTRACT CHECKS
         Route::prefix('extract')->group(function () {
             Route::get('business-units', [CvController::class, 'businessUnits'])->name('get-business-units');
+            
             Route::prefix('check-voucher')->group(function () {
                 Route::get('index', [CvController::class, 'index'])->name('check-voucher');
                 Route::post('extract-cv', [CvController::class, 'extractCv'])->name('extract-cv');
@@ -179,13 +180,13 @@ Route::get('/test', function () {
     $tables = DB::connection('sqlsrvCaf')
         ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
 
-    dd($tables);
+    // dd($tables);
 
 
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
         // ->table('SON-OK AGRI FARM$CV Check Payment')
-        ->table('ALTURAS GLASS SERVICE$CV Check Payment')
+        ->table('MFI RICEMILL ACCOUNTING$CV Header')
 
         // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
         // ->where('Check Class Location', '==',  '!=', '')
