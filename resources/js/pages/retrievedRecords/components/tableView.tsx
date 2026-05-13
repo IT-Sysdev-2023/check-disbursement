@@ -19,6 +19,8 @@ import {
     SelectionType,
 } from '@/types';
 import { router } from '@inertiajs/react';
+import { LocationOnOutlined } from '@mui/icons-material';
+import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import {
     Badge,
     Box,
@@ -28,7 +30,6 @@ import {
 } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import axios from 'axios';
-import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import { FormEvent, useState } from 'react';
 import AssignCdModal from './assignCdModal';
 import AssignCnModal from './assignCnModal';
@@ -64,8 +65,7 @@ export default function TableView({
     const [selectedRows, setSelectedRows] = useState<
         { chequeId: number; type: string; id: number }[]
     >([]);
-    const [alignment, setAlignment] = useState(filter.assignments,
-    );
+    const [alignment, setAlignment] = useState(filter.assignments);
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const selectedR = cheques.data
@@ -84,6 +84,11 @@ export default function TableView({
         cheques.data
             .filter((row) => selectedRows.some((r) => r.id === row.id))
             .every((row) => row.taggedAt !== null);
+    const enableButtonTag =
+        selectedRows.length > 0 &&
+        cheques.data
+            .filter((row) => selectedRows.some((r) => r.id === row.id))
+            .every((row) => row.taggedAt === null && row.checkNumber !== null);
 
     const actionHandlers: Record<string, ActionHandler> = {
         details: (record) => {
@@ -197,7 +202,15 @@ export default function TableView({
                 handleSortFilter={handleSort}
                 columns={chequeColumns}
             />
-            <Box display="flex" justifyContent="flex-end" mt={3}>
+            <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
+                <Button
+                    disabled={!enableButtonTag}
+                    variant="outlined"
+                    startIcon={<LocationOnOutlined />}
+                    onClick={() => alert('Under Maintenance')}
+                >
+                    Tag Location
+                </Button>
                 <Button
                     disabled={!enableButton}
                     variant="outlined"
