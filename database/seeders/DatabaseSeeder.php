@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             NavDatabaseSeeder::class,
             NavCpSeeder::class,
             NavHeaderSeeder::class,
-            NavLineSeeder::class,
+            // NavLineSeeder::class,
             BorrowerNameSeeder::class,
             BankSeeder::class
         ]);

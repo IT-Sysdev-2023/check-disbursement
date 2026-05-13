@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[ScopedBy([BusinessUnitAssignedScope::class])]
-class CvCheckPayment extends Model
+class Cv extends Model
 {
 
     protected $guarded = [];
@@ -23,8 +23,9 @@ class CvCheckPayment extends Model
     protected function casts(): array
     {
         return [
-            'check_date' => 'date',
-            'clearing_date' => 'date',
+            'cheque_date' => 'date',
+            'cv_date' => 'date',
+            'resolved_cheque_date' => 'date',
         ];
 
     }
@@ -92,29 +93,28 @@ class CvCheckPayment extends Model
     public function scopeBaseColumns(Builder $builder)
     {
         return $builder->select(
-            'cv_check_payments.id as cheque_id',
-            DB::raw('CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END as check_number'),
-            'cv_check_payments.check_date',
+            'cvs.id as cheque_id',
+            DB::raw('CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END as cheque_number'),
+            'cheque_date',
             'business_units.name as company_name',
-            'check_amount as amount',
-            'cv_check_payments.payee',
+            'cheque_amount as amount',
+            'payee',
             'tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),
-            'cv_check_payments.created_at',
+            'cvs.created_at',
 
             DB::raw("
                 CASE
-                    WHEN (CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END) IS NULL THEN 'Assign Check Number'
-                    WHEN cv_check_payments.check_date IS NULL THEN 'Assign Check Date'
+                    WHEN (CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END) IS NULL THEN 'Assign Cheque Number'
+                    WHEN cvs.cheque_date IS NULL THEN 'Assign Cheque Date'
                     WHEN tagged_at IS NOT NULL THEN 'For Signature'
                     ELSE 'Tagging'
                 END as status_order
             ")
         )
-            ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
-            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-            ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cv_check_payments.tag_location_id');
+            ->join('business_units', 'business_units.id', '=', 'cvs.business_unit_id')
+            ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cvs.tag_location_id');
     }
 
     public function scopeScanRecords(Builder $builder)
@@ -170,10 +170,10 @@ class CvCheckPayment extends Model
             });
     }
 
-    public function cvHeader()
-    {
-        return $this->belongsTo(CvHeader::class);
-    }
+    // public function cvHeader()
+    // {
+    //     return $this->belongsTo(CvHeader::class);
+    // }
 
     // public function assignedCheckNumber()
     // {

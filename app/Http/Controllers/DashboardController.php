@@ -8,6 +8,7 @@ use App\Models\BorrowedCheck;
 use App\Models\BusinessUnit;
 use App\Models\CheckStatus;
 use App\Models\Crf;
+use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Models\CvHeader;
 use Illuminate\Http\Request;
@@ -30,22 +31,21 @@ class DashboardController extends Controller
     private static function defaultDashboard($filters)
     {
         $cheques = new ChequeCollection(self::chequeRecords());
-        $cv = CvHeader::query()
+        $cv = Cv::query()
             ->when(isset($filters['bu']) && $filters['bu'] !== 'all', function ($q) use ($filters) {
                 $q->whereHas('cvCheckPayment', fn($builder) => $builder->where('business_unit_id', $filters['bu']));
             })
-            ->leftJoin('cv_check_payments', 'cv_check_payments.cv_header_id', '=', 'cv_headers.id')
             ->leftJoin('borrowed_checks', function ($join) {
-                $join->on('borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
+                $join->on('borrowed_checks.checkable_id', '=', 'cvs.id')
                     ->where('borrowed_checks.checkable_type', '=', 'cv');
             })
             ->selectRaw('
-                    DATE_FORMAT(cv_headers.cv_date, "%Y-%m") as month,
-                    COUNT(DISTINCT cv_headers.id) as total,
+                    DATE_FORMAT(cv_date, "%Y-%m") as month,
+                    COUNT(DISTINCT cvs.id) as total,
                     COUNT(borrowed_checks.id) as borrowed_checks_count
             ')
-            ->where('cv_headers.cv_date', '>=', now()->subMonths(6)->startOfMonth())
-            ->groupByRaw('DATE_FORMAT(cv_headers.cv_date, "%Y-%m")')
+            ->where('cv_date', '>=', now()->subMonths(6)->startOfMonth())
+            ->groupByRaw('DATE_FORMAT(cv_date, "%Y-%m")')
             ->orderBy('month', 'desc')
             ->get();
 
@@ -58,12 +58,12 @@ class DashboardController extends Controller
             ->orderByDesc(DB::raw('MIN(MONTH(date))'))
             ->get();
 
-        $countCvForMonths = CvHeader::where('cv_date', '>=', Date::now()->subMonths(6)->startOfMonth())
+        $countCvForMonths = Cv::where('cv_date', '>=', Date::now()->subMonths(6)->startOfMonth())
             ->count();
 
         $countCrfForMonths = Crf::where('date', '>=', Date::now()->subMonths(6)->startOfMonth())
             ->count();
-        $cvCount = CvCheckPayment::count();
+        $cvCount = Cv::count();
         $crfCount = Crf::count();
         $bu = BusinessUnit::businessUnits('all');
         return [
@@ -95,7 +95,7 @@ class DashboardController extends Controller
     {
         $checks = self::checkStatus($filters['tab'] ?? 'all');
         $total = bcadd(
-            CvCheckPayment::sum('check_amount'),
+            Cv::sum('cheque_amount'),
             Crf::sum('amount'),
             2
         );
@@ -112,7 +112,7 @@ class DashboardController extends Controller
 
     private static function chequeRecords()
     {
-        $cvQuery = CvCheckPayment::baseColumns();
+        $cvQuery = Cv::baseColumns();
 
         $crfQuery = Crf::baseColumns();
 
