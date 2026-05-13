@@ -24,14 +24,12 @@ import {
     ListItemIcon,
     ListItemText,
     ListSubheader,
-    SelectChangeEvent,
     Stack,
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
-import SelectBu from './components/selectBu';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -83,7 +81,7 @@ export default function ExtractCrf({
                 progress: percentage,
                 buffer,
                 message,
-                status
+                status,
             },
         }));
     });
@@ -218,6 +216,16 @@ export default function ExtractCrf({
                                 multiple
                             />
                         </Button>
+                        <Typography
+                            variant="h6" // makes it larger than "caption"
+                            sx={{
+                                color: 'red', // change to any color you like
+                                fontWeight: 'bold', // optional: makes it stand out
+                                fontSize: '1rem', // optional: fine-tune size
+                            }}
+                        >
+                            "This File Upload is Intended for Head Office Only"
+                        </Typography>
                         {files.length > 0 && (
                             <>
                                 <List
