@@ -36,13 +36,13 @@ export const createChequeColumns = (
     handleStatusChange: (value: ActionType, type: ChequeType) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         flex: 1,
     },
     {
-        field: 'checkDate',
-        headerName: 'Check Date',
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
         headerAlign: 'left',
         align: 'left',
         flex: 1,
@@ -56,7 +56,7 @@ export const createChequeColumns = (
     },
     {
         field: 'amount',
-        headerName: 'Check Amount',
+        headerName: 'Cheque Amount',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
@@ -76,7 +76,7 @@ export const createChequeColumns = (
         flex: 1,
         renderCell: ({ row }) => {
             //ASSIGNMENT STATUS
-            if (!row.checkNumber || !row.checkDate) {
+            if (!row.chequeNumber || !row.chequeDate) {
                 return (
                     <Chip label={row.statusOrder} color="error" size="small" />
                 );
@@ -118,25 +118,25 @@ export const createChequeColumns = (
                         {(() => {
                             const items: JSX.Element[] = [];
 
-                            if (!row.checkNumber) {
+                            if (!row.chequeNumber) {
                                 items.push(
                                     <MenuItem key="assignCn" value="assignCn">
-                                        Assign Check Number
+                                        Assign Cheque Number
                                     </MenuItem>,
                                 );
                             }
 
-                            if (!row.checkDate) {
+                            if (!row.chequeDate) {
                                 items.push(
                                     <MenuItem key="assignCd" value="assignCd">
-                                        Assign Check Date
+                                        Assign Cheque Date
                                     </MenuItem>,
                                 );
                             }
 
                             if (
-                                row.checkDate &&
-                                row.checkNumber &&
+                                row.chequeDate &&
+                                row.chequeNumber &&
                                 !row.taggedAt
                             ) {
                                 items.push(
@@ -159,18 +159,18 @@ export const createPendingChequeColumns = (
     onView: (id: number) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         minWidth: 150,
-        renderCell: ({ row }) => row.checkable?.checkNumber,
+        renderCell: ({ row }) => row.checkable?.chequeNumber,
     },
     {
-        field: 'checkDate',
-        headerName: 'Check Date',
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
         headerAlign: 'left',
         align: 'left',
         flex: 1,
-        renderCell: ({ row }) => row.checkable?.checkDate,
+        renderCell: ({ row }) => row.checkable?.chequeDate,
     },
     {
         field: 'payee',
