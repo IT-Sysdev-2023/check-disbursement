@@ -119,11 +119,11 @@ class ChequeService
             baseColumns()
             ->doesntHave('chequeStatus')
             ->leftJoinScanRecords()
-            
+
             ->filter($filters)
             ->addSelect(
                 'borrowed_cheques.id as borrowedCheckId',
-                'borrowed_cheques.was_scanned as isScanned', 
+                'borrowed_cheques.was_scanned as isScanned',
                 // 'borrowed_cheques.is_returned',
                 // 'borrowed_cheques.secondary_borrower',
                 'borrowed_cheques.approved_at',
@@ -138,7 +138,7 @@ class ChequeService
             baseColumns()
             ->doesntHave('chequeStatus')
             ->leftJoinScanRecords()
-            
+
             ->filter($filters)
             ->addSelect(
                 'borrowed_cheques.id as borrowedCheckId',
@@ -305,18 +305,19 @@ class ChequeService
     public function setLocation(Request $request)
     {
         $validated = $request->validate([
-            'id' => ['required', 'integer'],
+            'cheques' => ['required'],
             'locationId' => ['required', 'integer'],
-            'type' => ['required', 'in:cv,crf'],
+            // 'type' => ['required', 'in:cv,crf'],
         ]);
 
-        $model = Relation::getMorphedModel($validated['type']);
-
-        $model::findOrFail($validated['id'])
-            ->update([
-                'tag_location_id' => $validated['locationId'],
-                'tagged_at' => now()
-            ]);
+        foreach ($validated['cheques'] as $cheque) {
+            $model = Relation::getMorphedModel($cheque['type']);
+            $model::findOrFail($cheque['id'])
+                ->update([
+                    'tag_location_id' => $validated['locationId'],
+                    'tagged_at' => now()
+                ]);
+        }
 
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Tagged']);
     }

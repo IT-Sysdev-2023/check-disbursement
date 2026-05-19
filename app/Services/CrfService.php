@@ -24,6 +24,8 @@ class CrfService
         $request->validate([
             'files' => 'required',
             'files.*' => 'file|max:5120|unique:crfs,filename',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             // 'bu' => ['required', 'array', 'min:1']
         ]);
 
@@ -64,9 +66,16 @@ class CrfService
             return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);
         }
 
-        $uniqueKeys = $records->pluck('ck_no');
-        $existing = Crf::whereIn('ck_no', $uniqueKeys)->pluck('filename');
-        
+        // $uniqueKeys = $records->pluck('ck_no');
+        // $existing = Crf::whereIn('ck_no', $uniqueKeys)->pluck('filename');
+        $isDateValid = $records->every(function ($item) use ($request) {
+            return $item['date']->between($request->start_date, $request->end_date);
+        });
+
+        if (!$isDateValid) {
+            return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. One or more records have dates outside the selected range.']);
+        }
+
         DB::transaction(function () use ($records) {
             Crf::insertOrIgnore($records->toArray());
         });
