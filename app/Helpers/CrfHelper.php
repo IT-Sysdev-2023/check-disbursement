@@ -157,7 +157,7 @@ class CrfHelper
             'crf_location' => $this->location,
             'date' => $this->date,
             'bank' => $this->bank,
-            'ck_no' => $this->ckNo,
+            'cheque_number' => $this->ckNo,
             'prepared_by' => $this->preparedBy,
             'paid_to' => $this->paidTo,
             'amount' => $this->amount,
