@@ -28,6 +28,9 @@ import {
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { Dayjs } from 'dayjs';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
 
@@ -65,6 +68,8 @@ export default function ExtractCrf({
     });
     const [files, setFiles] = useState<File[]>([]);
     const [permissionList, setPermissionList] = useState<string[]>([]);
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!event.target.files) return;
@@ -87,11 +92,18 @@ export default function ExtractCrf({
     });
 
     const simulateDataRetrieval = () => {
+        if (!startDate || !endDate) {
+            alert('Please select both start and end dates');
+            return;
+        }
+        
         router.post(
             extractCrf(),
             {
                 files,
                 bu: permissionList,
+                start_date: startDate.format('YYYY-MM-DD'),
+                end_date: endDate.format('YYYY-MM-DD'),
             },
             {
                 onSuccess: (page) => {
@@ -198,6 +210,26 @@ export default function ExtractCrf({
                             selectedPermission={permissionList}
                             handleChange={handleChange}
                         /> */}
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+                                <DatePicker
+                                    label="Start Date"
+                                    value={startDate}
+                                    onChange={(newValue) =>
+                                        setStartDate(newValue)
+                                    }
+                                    maxDate={endDate || undefined}
+                                />
+                                <DatePicker
+                                    label="End Date"
+                                    value={endDate}
+                                    onChange={(newValue) =>
+                                        setEndDate(newValue)
+                                    }
+                                    minDate={startDate || undefined}
+                                />
+                            </Box>
+                        </LocalizationProvider>
                         <Button
                             sx={{
                                 mt: 5,
