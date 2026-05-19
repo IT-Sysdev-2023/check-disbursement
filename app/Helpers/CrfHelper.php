@@ -173,7 +173,7 @@ class CrfHelper
         return $records->every(function ($item) use ($bu) {
             return (!empty($item['company_office']) && !empty($item['no'])
                 && !empty($item['crf_location']) && !empty($item['date'])
-                && !empty($item['bank']) && !empty($item['ck_no'])
+                && !empty($item['bank']) && !empty($item['cheque_number'])
                 && !empty($item['prepared_by']) && !empty($item['paid_to'])
                 && !empty($item['amount']) && !empty($item['particulars'])) 
                 // &&
