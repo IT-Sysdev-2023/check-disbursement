@@ -2,20 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
-use App\Models\InitialCheckCapture;
-use App\Services\CalendarHandler;
-use App\Services\ChecksService;
 
-use Carbon\CarbonPeriod;
+use App\Services\ChequeService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Redirect;
 class RetrievedChecksController extends Controller
 {
 
-    public function __construct(protected ChecksService $service)
+    public function __construct(protected ChequeService $service)
     {
     }
 
@@ -69,7 +65,7 @@ class RetrievedChecksController extends Controller
 
     public function initialScan(Request $request)
     {
-        $isSuccess = BorrowedCheck::findOrFail($request->id)->update([
+        $isSuccess = BorrowedCheque::findOrFail($request->id)->update([
                 'was_scanned' => true,
                 'doc_path' => 'path/sa/gi/scan'
         ]);

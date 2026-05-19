@@ -2,22 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\CvReportExport;
 use App\Exports\ReportExport;
 use App\Helpers\ColumnResolver;
 use App\Helpers\FileHandler;
 use App\Models\Borrower;
-use App\Models\CheckStatus;
-use App\Models\Crf;
-use App\Models\CvCheckPayment;
 use App\Models\TagLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Maatwebsite\Excel\Facades\Excel;
-use Maatwebsite\Excel\Excel as ExcelExcel;
 
 class ReportController extends Controller
 {

@@ -2,19 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\CvCheckPaymentCollection;
-use App\Http\Resources\ScannedRecordResource;
-use App\Models\BorrowedCheck;
-use App\Models\CheckStatus;
-use App\Models\Crf;
-use App\Models\CvCheckPayment;
+
+use App\Models\BorrowedCheque;
 use App\Models\ScannedRecords;
-use App\Services\PermissionService;
 use App\Services\StatusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
-use Illuminate\Contracts\Database\Query\Builder;
-use Inertia\Inertia;
 
 class StatusController extends Controller
 {
@@ -24,9 +17,9 @@ class StatusController extends Controller
 
     }
 
-    public function checkStatus(Request $request)
+    public function chequeStatus(Request $request)
     {
-        return $this->service->checkStatus($request);
+        return $this->service->chequeStatus($request);
     }
 
     public function scannedRecordsAmountCheckNo(Request $request)
@@ -39,11 +32,11 @@ class StatusController extends Controller
         return $this->service->scannedRecords($id);
     }
 
-    public function cancelStale(BorrowedCheck $id, Request $request)
+    public function cancelStale(BorrowedCheque $id, Request $request)
     {
         if(!$id) return Redirect::back()->withErrors(['message' => 'Check not found.']);
         
-        $id->checkable?->checkStatus()->create([
+        $id->checkable?->chequeStatus()->create([
                         'status' => 'cancelled',
                         'cancelled_reason' => $request->reason,
                         'caused_by' => $request->user()->id,

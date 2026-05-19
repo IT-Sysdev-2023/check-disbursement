@@ -2,22 +2,22 @@ import { GridColDef } from '@mui/x-data-grid';
 
 export const createRequestsChequeColumns = (): GridColDef[] => [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         headerAlign: 'left',
         align: 'left',
         flex: 1,
         minWidth: 50,
-        renderCell: ({ row }) => row.checkable?.checkNumber,
+        renderCell: ({ row }) => row.checkable?.chequeNumber,
     },
     {
-        field: 'checkDate',
-        headerName: 'Check Date',
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
         headerAlign: 'left',
         align: 'left',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable?.checkDate,
+        renderCell: ({ row }) => row.checkable?.chequeDate,
     },
     {
         field: 'cvNo',

@@ -69,7 +69,7 @@ const crfColumns: GridColDef[] = [
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable?.checkStatus?.createdAt,
+        renderCell: ({ row }) => row.checkable?.chequeStatus?.createdAt,
     },
     {
         field: 'Status',
@@ -79,21 +79,21 @@ const crfColumns: GridColDef[] = [
         flex: 1,
         minWidth: 100,
         renderCell: ({ row }) => {
-            const { checkStatus } = row.checkable;
+            const { chequeStatus } = row.checkable;
             let status = null;
 
             if (row.checkable?.status) {
                 status = row.checkable.status;
             }
 
-            if (checkStatus?.status) {
-                status = checkStatus.status;
+            if (chequeStatus?.status) {
+                status = chequeStatus.status;
             }
-            if (checkStatus?.forwardedStatus?.status) {
-                status = checkStatus.forwardedStatus.status;
+            if (chequeStatus?.forwardedStatus?.status) {
+                status = chequeStatus.forwardedStatus.status;
             }
 
-            if (checkStatus?.isClosed) {
+            if (chequeStatus?.isClosed) {
                 status = 'closed';
             }
 

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Str;
 
-class CheckStatusResource extends JsonResource
+class ChequeStatusResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -34,7 +34,7 @@ class CheckStatusResource extends JsonResource
             "checkableType" => Str::upper($this->checkable_type),
             "checkableId" => $this->checkable_id,
             'isClosed' => $this->is_closed,
-            'forwardedStatus' => $this->whenLoaded('checkForwardedStatus'),
+            'forwardedStatus' => $this->whenLoaded('chequeForwardedStatus'),
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
             "createdAt" => $this->created_at ? $this->created_at->toFormattedDateString() : 'N/A',
             "updatedAt" => $this->updated_at,
@@ -44,7 +44,7 @@ class CheckStatusResource extends JsonResource
     protected function resolveCheckable()
     {
         return match ($this->checkable_type) {
-            'cv' => new CvCheckPaymentResource($this->checkable),
+            'cv' => new CvResource($this->checkable),
             'crf' => new CrfResource($this->checkable),
             default => null,
         };

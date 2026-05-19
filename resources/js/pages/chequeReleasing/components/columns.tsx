@@ -77,7 +77,7 @@ export const createReleasingColumns = (
         minWidth: 80,
     },
     {
-        field: 'checkDateStatus',
+        field: 'chequeDateStatus',
         headerName: 'Status',
         headerAlign: 'right',
         align: 'right',
@@ -86,9 +86,9 @@ export const createReleasingColumns = (
         sortable: false,
         renderCell: ({ row }) => {
             
-            return row.checkDateStatus ? (
+            return row.chequeDateStatus ? (
                 <Chip
-                    label={row.checkDateStatus}
+                    label={row.chequeDateStatus}
                     color="primary"
                     variant="outlined"
                 />
@@ -155,30 +155,30 @@ export const createReleasingColumns = (
     },
 ];
 
-export const createForwardedCvColumns = (
+export const createForwardedColumns = (
     handleStatusChange: (
-        checkStatus: number,
+        chequeStatus: number,
         value: string,
         checkId: number,
     ) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 50,
-        renderCell: ({ row }) => row.checkable?.checkNumber,
+        renderCell: ({ row }) => row.checkable?.chequeNumber,
     },
     {
-        field: 'checkDate',
-        headerName: 'Check Date',
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable?.checkDate,
+        renderCell: ({ row }) => row.checkable?.chequeDate,
     },
     {
         field: 'type',
@@ -262,22 +262,22 @@ export const createForwardedReleasingColumns = (
     handleStatusChange: (id: number, value: string) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 50,
-        renderCell: ({ row }) => row.checkable.checkNumber,
+        renderCell: ({ row }) => row.checkable.chequeNumber,
     },
     {
-        field: 'checkDate',
-        headerName: 'Check Date',
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable.checkDate,
+        renderCell: ({ row }) => row.checkable.chequeDate,
     },
     {
         field: 'type',

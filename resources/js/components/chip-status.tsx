@@ -1,30 +1,30 @@
 import { Chip } from '@mui/material';
 
 interface Props {
-  status?: CheckStatus | string;
+  status?: ChequeStatus | string;
 }
 
-export default function CheckStatusChip({ status }: Props) {
+export default function ChequeStatusChip({ status }: Props) {
   if (!status) return null;
 
   return (
     <Chip
       label={status}
-      color={checkStatusColorMap[status as CheckStatus] ?? 'default'}
+      color={chequeStatusColorMap[status as ChequeStatus] ?? 'default'}
       size="small"
     />
   );
 }
 
-type CheckStatus =
+type ChequeStatus =
   | 'released'
   | 'forwarded'
   | 'deposited'
   | 'staled'
   | 'cancelled';
 
-const checkStatusColorMap: Record<
-  CheckStatus,
+const chequeStatusColorMap: Record<
+  ChequeStatus,
   'default' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning'
 > = {
   released: 'success',

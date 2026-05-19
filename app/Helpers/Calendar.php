@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Models\BusinessUnit;
 use App\Models\Crf;
+use App\Models\Cv;
 use App\Models\CvCheckPayment;
 use App\Models\NavDatabase;
 use App\Services\GenerateCvService;
@@ -149,16 +150,15 @@ class Calendar
             // ->doesntHave('checkStatus')
             ->groupBy('date', 'business_units.name', 'business_units.id');
 
-        $cv = CvCheckPayment::select('cv_headers.cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"),  DB::raw('MAX(cv_check_payments.created_at) as created_at'))
-            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-            ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
+        $cv = Cv::select('cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"),  DB::raw('MAX(cvs.created_at) as created_at'))
+            ->join('business_units', 'business_units.id', '=', 'cvs.business_unit_id')
             ->when($company && $company != 'all', function ($q) use ($company) {
                 $q->whereHas('businessUnit', function ($q) use ($company) {
                     $q->where('company_id', $company);
                 });
             })
             // ->doesntHave('checkStatus')
-            ->groupBy('cv_headers.cv_date', 'business_units.name', 'business_units.id');
+            ->groupBy('cv_date', 'business_units.name', 'business_units.id');
 
 
         $result = DB::query()
@@ -176,7 +176,6 @@ class Calendar
             MAX(created_at) as latest_created_at
         ")
             ->groupBy('date', 'business_unit', 'buId')
-            // ->orderBy('date')
             ->orderByDesc('latest_created_at')
             ->get()
             ->groupBy('business_unit');

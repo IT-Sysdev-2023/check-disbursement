@@ -35,7 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ForwardedCheckReleasing({
+export default function ForwardedChequeReleasing({
     cheques,
     company,
     filter,
@@ -51,7 +51,7 @@ export default function ForwardedCheckReleasing({
     receiver: SelectionType[];
 }) {
     const [open, setOpen] = useState(false);
-    const [checkStatusId, setCheckStatusId] = useState<number | undefined>(
+    const [chequeStatusId, setChequeStatusId] = useState<number | undefined>(
         undefined,
     );
     const [stream, setStream] = useState('');
@@ -72,28 +72,28 @@ export default function ForwardedCheckReleasing({
         }
     }, [flash]);
 
-    // const handleStatusChange = (checkStatusId: number, value: string) => {
+    // const handleStatusChange = (chequeStatusId: number, value: string) => {
     //     if (value === 'view') {
-    //         router.visit(signatureDetails(checkStatusId));
+    //         router.visit(signatureDetails(chequeStatusId));
     //         return;
     //     }
-    //     setCheckStatusId(checkStatusId);
+    //     setChequeStatusId(chequeStatusId);
     //     setOpenModal(true);
     // };
 
-    const handleStatusChange = (checkStatusId: number, value: string) => {
+    const handleStatusChange = (chequeStatusId: number, value: string) => {
         if (value === 'cancel') {
-            setCheckStatusId(checkStatusId);
+            setChequeStatusId(chequeStatusId);
             setOpen(true);
             return;
         }
 
         router.push({
-            url: releaseCheckForwarded([checkStatusId, value]).url,
+            url: releaseCheckForwarded([chequeStatusId, value]).url,
             component: 'chequeReleasing/releaseCheckForwarded',
             props: (curr) => ({
                 ...curr,
-                id: checkStatusId,
+                id: chequeStatusId,
                 status: value,
                 label: value + ' Check',
             }),
@@ -103,8 +103,8 @@ export default function ForwardedCheckReleasing({
     const handleSubmitCancellation = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (checkStatusId)
-            post(cancelForwarded(checkStatusId).url, {
+        if (chequeStatusId)
+            post(cancelForwarded(chequeStatusId).url, {
                 preserveScroll: true,
                 preserveState: true,
                 onSuccess: () => {

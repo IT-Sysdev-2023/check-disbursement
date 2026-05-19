@@ -120,7 +120,7 @@ export default function TableView({
 
     const handleTagSubmit = (e: FormEvent) => {
         e.preventDefault();
-        
+
         const data = chequeData
             ? [
                   {
@@ -246,7 +246,8 @@ export default function TableView({
             <OnlySelectionModal
                 title="Tag Location"
                 open={openTagModal}
-                onClose={() => {
+                // onClose={() => setOpenTagModal(false)}
+                 onClose={() => {
                     setChequeData(null);
                     setOpenTagModal(false);
                 }}

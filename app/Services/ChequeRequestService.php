@@ -2,17 +2,16 @@
 
 namespace App\Services;
 
-use App\Helpers\NumberHelper;
 use App\Http\Resources\BorrowedCheckResource;
+use App\Http\Resources\BorrowedChequeResource;
 use App\Models\Approver;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\Crf;
-use App\Models\CvCheckPayment;
+use App\Models\Cv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -43,15 +42,15 @@ class ChequeRequestService
 
     public function borrowedChecks(Request $request)
     {
-        $records = BorrowedCheck::with('checkable')
+        $records = BorrowedCheque::with('checkable')
             ->where([['borrower_no', $request->borrowerNo], ['approved_at', null]])
             ->whereDoesntHaveMorph(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
-                fn($query) => $query->has('checkStatus')
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
             )
             ->get();
-        return response()->json(BorrowedCheckResource::collection($records));
+        return response()->json(BorrowedChequeResource::collection($records));
     }
 
     public function approveCheck(Request $request)
@@ -66,7 +65,7 @@ class ChequeRequestService
         ]);
         $ids = $request->borrowedNo ?? [];
 
-        $isSuccess = BorrowedCheck::
+        $isSuccess = BorrowedCheque::
             when(
                 $request->type == 'exclude',
                 fn($q) => $q->whereNotIn('id', $ids)
@@ -87,12 +86,12 @@ class ChequeRequestService
 
     public function borrowedNumberCheques(int $id)
     {
-        $record = BorrowedCheck::with('checkable.tagLocation')
+        $record = BorrowedCheque::with('checkable.tagLocation')
             ->where([['borrower_no', $id], ['approved_at', null]])
             ->whereDoesntHaveMorph(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
-                fn(Builder $query) => $query->has('checkStatus')
+                [Cv::class, Crf::class],
+                fn(Builder $query) => $query->has('chequeStatus')
             )
             ->paginate(5)
             ->withQueryString()
@@ -126,7 +125,7 @@ class ChequeRequestService
 
         $ids = $request->ids ?? [];
   
-        BorrowedCheck::
+        BorrowedCheque::
             when(
                 isset($request->type) &&
                 $request->type == 'exclude',
@@ -136,7 +135,7 @@ class ChequeRequestService
             )
             ->chunkById(100, function ($checks) use ($request) {
                 foreach ($checks as $check) {
-                    $check->checkable?->checkStatus()->create([
+                    $check->checkable?->chequeStatus()->create([
                         'status' => 'cancelled',
                         'cancelled_reason' => $request->reason,
                         'caused_by' => $request->user()->id,
@@ -149,12 +148,12 @@ class ChequeRequestService
 
     public static function borrowedRecords(array $filters)
     {
-        return BorrowedCheck::select(
+        return BorrowedCheque::select(
             'borrower_no',
             'reason',
-            'borrower_id as borrower',
+            'borrower_name as borrower',
             DB::raw('COUNT(*) as total_checks'),
-            DB::raw('MAX(borrowed_checks.created_at) as last_borrowed_at')
+            DB::raw('MAX(created_at) as last_borrowed_at')
         )
             // ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
             ->when($filters['search'] ?? null, function (Builder $query, $search) {
@@ -167,16 +166,16 @@ class ChequeRequestService
                         $q->where('borrower_no', 'LIKE', "%{$clean}%");
                     }
 
-                    $q->orWhere('borrower_id', 'LIKE', "%{$search}%");
+                    $q->orWhere('borrower_name', 'LIKE', "%{$search}%");
                 });
             })
             ->whereDoesntHaveMorph(
                 'checkable',
-                [CvCheckPayment::class, Crf::class],
-                fn($query) => $query->has('checkStatus')
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
             )
             ->whereNull('approved_at')
-            ->groupBy('borrower_no', 'borrower_id', 'reason', 'borrower')
+            ->groupBy('borrower_no', 'borrower_name', 'reason')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()
@@ -191,7 +190,7 @@ class ChequeRequestService
             'borrower' => 'required'
         ]);
 
-        $isSuccess = BorrowedCheck::where('borrower_no', $validated['borrower'])->update(['secondary_approver_id' => $validated['approver']]);
+        $isSuccess = BorrowedCheque::where('borrower_no', $validated['borrower'])->update(['secondary_approver_id' => $validated['approver']]);
         if (!$isSuccess)
             return;
 

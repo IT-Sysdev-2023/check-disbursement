@@ -3,18 +3,13 @@
 namespace App\Services;
 
 use App\Helpers\FileHandler;
-use App\Helpers\ModelHelper;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\ChequeCollection;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
-use App\Models\CheckStatus;
-use App\Models\Crf;
-use App\Models\CvCheckPayment;
 use App\Services\PermissionService;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -27,7 +22,7 @@ class CheckReleasingService
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
-        $chequeRecords = ChecksService::manageChecks($filters);
+        $chequeRecords = ChequeService::manageChecks($filters);
         return Inertia::render('checkReleasing', [
             'cheques' => new ChequeCollection($chequeRecords),
             'filter' => (object) [
@@ -52,7 +47,7 @@ class CheckReleasingService
         ]);
     }
 
-    public function storeReleaseCheck(BorrowedCheck $id, ReleasingCheckRequest $request)
+    public function storeReleaseCheck(BorrowedCheque $id, ReleasingCheckRequest $request)
     {
         $request->validated();
 
@@ -65,7 +60,7 @@ class CheckReleasingService
         $stream = DB::transaction(function () use ($id, $validated, $handleFiles, $request) {
             $label = StringHelper::statusPastTense($validated['status']);
 
-            $checkStatus = $id->checkable->checkStatus()
+            $chequeStatus = $id->checkable->chequeStatus()
                 ->create([
                     'status' => Str::lower($label),
                     'receivers_name' => $validated['receiversName'],
@@ -74,15 +69,15 @@ class CheckReleasingService
                     'caused_by' => $request->user()->id,
                 ]);
 
-            $checkCompany = $checkStatus->load('checkable')->checkable->getCompany;
+            $checkCompany = $chequeStatus->load('checkable')->checkable->getCompany;
 
 
 
             $data = [
-                'transactionNo' => NumberHelper::padLeft($checkStatus->id),
+                'transactionNo' => NumberHelper::padLeft($chequeStatus->id),
 
                 'dateLabel' => 'Date ' . $label . ':',
-                'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
+                'dateReleased' => $chequeStatus->created_at->format('M d, Y H:i A'),
 
                 'causedLabel' => 'Released By:',
                 'causedBy' => auth()->user()->name,
@@ -91,13 +86,13 @@ class CheckReleasingService
                 'receivedBy' => $validated['receiversName'],
 
                 'company' => $checkCompany,
-                'location' => $checkStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
+                'location' => $chequeStatus->load('checkable.tagLocation')->checkable?->tagLocation->location,
 
             ];
 
             return $this->fileHandler
                 ->inFolder('pdfs/releasing/' . $label . '/')
-                ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
+                ->createFileName($chequeStatus->id, $request->user()->id, '.pdf')
                 ->handlePdf($data, 'releasingPdf');
         });
 

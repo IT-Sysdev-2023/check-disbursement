@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 #[ScopedBy([BusinessUnitAssignedScope::class])]
-class CvCheckPayment extends Model
+class Cv extends Model
 {
 
     protected $guarded = [];
@@ -23,16 +23,17 @@ class CvCheckPayment extends Model
     protected function casts(): array
     {
         return [
-            'check_date' => 'date',
-            'clearing_date' => 'date',
+            'cheque_date' => 'date',
+            'cv_date' => 'date',
+            'resolved_cheque_date' => 'date',
         ];
 
     }
 
-    protected function checkNumber(): Attribute
+    protected function chequeNumber(): Attribute
     {
         return new Attribute(
-            get: fn($value, $attributes) => $attributes['check_number'] ?: $attributes['resolved_check_number'],
+            get: fn($value, $attributes) => $attributes['cheque_number'] ?: $attributes['resolved_cheque_number'],
         );
     }
 
@@ -92,49 +93,48 @@ class CvCheckPayment extends Model
     public function scopeBaseColumns(Builder $builder)
     {
         return $builder->select(
-            'cv_check_payments.id as cheque_id',
-            DB::raw('CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END as check_number'),
-            'cv_check_payments.check_date',
+            'cvs.id as cheque_id',
+            DB::raw('CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END as cheque_number'),
+            'cvs.cheque_date',
             'business_units.name as company_name',
-            'check_amount as amount',
-            'cv_check_payments.payee',
+            'cheque_amount as amount',
+            'cvs.payee',
             'tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),
-            'cv_check_payments.created_at',
+            'cvs.created_at',
 
             DB::raw("
                 CASE
-                    WHEN (CASE WHEN check_number = 0 THEN resolved_check_number ELSE check_number END) IS NULL THEN 'Assign Check Number'
-                    WHEN cv_check_payments.check_date IS NULL THEN 'Assign Check Date'
+                    WHEN (CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END) IS NULL THEN 'Assign Cheque Number'
+                    WHEN cvs.cheque_date IS NULL THEN 'Assign Cheque Date'
                     WHEN tagged_at IS NOT NULL THEN 'For Signature'
                     ELSE 'Tagging'
                 END as status_order
             ")
         )
-            ->join('business_units', 'business_units.id', '=', 'cv_check_payments.business_unit_id')
-            ->join('cv_headers', 'cv_headers.id', '=', 'cv_check_payments.cv_header_id')
-            ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cv_check_payments.tag_location_id');
+            ->join('business_units', 'business_units.id', '=', 'cvs.business_unit_id')
+            ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cvs.tag_location_id');
     }
 
     public function scopeScanRecords(Builder $builder)
     {
         return $builder
             ->join('scanned_records', function ($join) {
-                $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
+                $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
                     // ->whereNotNull('scanned_records.payee')
                     ->where(function ($q) {
                         $q->where(function ($q) {
-                            $q->where('cv_check_payments.check_number', '!=', 0)
+                            $q->where('cvs.cheque_number', '!=', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
-                                    'cv_check_payments.check_number'
+                                    'scanned_records.cheque_no',
+                                    'cvs.cheque_number'
                                 );
                         })->orWhere(function ($q) {
-                            $q->where('cv_check_payments.check_number', 0)
+                            $q->where('cvs.cheque_number', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
-                                    'cv_check_payments.resolved_check_number'
+                                    'scanned_records.cheque_no',
+                                    'cvs.resolved_cheque_number'
                                 );
                         });
                     });
@@ -144,36 +144,36 @@ class CvCheckPayment extends Model
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder
-            ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
-            // ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_checks.primary_approver_id')
-            // ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_checks.secondary_approver_id')
-            ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_checks.approver_id')
-            ->where('borrowed_checks.checkable_type', 'cv')
-            ->whereNotNull('borrowed_checks.approved_at')
+            ->join('borrowed_cheques', 'borrowed_cheques.checkable_id', '=', 'cvs.id')
+            // ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_cheques.primary_approver_id')
+            // ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_cheques.secondary_approver_id')
+            ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
+            ->where('borrowed_cheques.checkable_type', 'cv')
+            ->whereNotNull('borrowed_cheques.approved_at')
             ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
+                $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
                     ->where(function ($q) {
                         $q->where(function ($q) {
-                            $q->where('cv_check_payments.check_number', '!=', 0)
+                            $q->where('cvs.cheque_number', '!=', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
-                                    'cv_check_payments.check_number'
+                                    'scanned_records.cheque_no',
+                                    'cvs.cheque_number'
                                 );
                         })->orWhere(function ($q) {
-                            $q->where('cv_check_payments.check_number', 0)
+                            $q->where('cvs.cheque_number', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
-                                    'cv_check_payments.resolved_check_number'
+                                    'scanned_records.cheque_no',
+                                    'cvs.resolved_cheque_number'
                                 );
                         });
                     });
             });
     }
 
-    public function cvHeader()
-    {
-        return $this->belongsTo(CvHeader::class);
-    }
+    // public function cvHeader()
+    // {
+    //     return $this->belongsTo(CvHeader::class);
+    // }
 
     // public function assignedCheckNumber()
     // {
@@ -191,12 +191,12 @@ class CvCheckPayment extends Model
         return $this->belongsTo(TagLocation::class);
     }
 
-    public function checkStatus()
+    public function chequeStatus()
     {
-        return $this->morphOne(CheckStatus::class, 'checkable');
+        return $this->morphOne(ChequeStatus::class, 'checkable');
     }
-    public function borrowedCheck()
+    public function borrowedCheque()
     {
-        return $this->morphOne(BorrowedCheck::class, 'checkable');
+        return $this->morphOne(BorrowedCheque::class, 'checkable');
     }
 }

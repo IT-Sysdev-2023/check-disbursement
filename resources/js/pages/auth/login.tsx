@@ -19,7 +19,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
     const [showPassword, setShowPassword] = useState(false);
 
     const props = usePage().props;
-
+    const loginRoute = AuthenticatedSessionController.store();
     return (
         <div className="flex min-h-screen items-center justify-center bg-[#0e1117] px-4">
             <Head title="Log in" />
@@ -28,14 +28,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                 {/* Left panel */}
                 <div className="relative hidden w-2/5 flex-col justify-between bg-gradient-to-br from-[#0a0e18] via-[#111827] to-[#0d1520] p-12 md:flex">
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_60%,rgba(196,157,73,0.08),transparent_60%)]" />
-                    <div className="flex items-center flex-col justify-center">
+                    <div className="flex flex-col items-center justify-center">
                         <img
                             src="/storage/cd-logo.png"
                             alt="CDS Logo"
                             className="h-auto w-50 rounded object-contain"
                         />
 
-                        <div className="flex flex-col leading-none mt-5">
+                        <div className="mt-5 flex flex-col leading-none">
                             {/* <p className="font-serif text-xl tracking-wide text-[#c49d49]">
                                 CDS
                             </p> */}
@@ -66,7 +66,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     </div>
 
                     <Form
-                        {...AuthenticatedSessionController.store.form()}
+                        action={loginRoute.url}
+                        method={loginRoute.method}
+                        // {...AuthenticatedSessionController.store.form()}
                         resetOnSuccess={['password']}
                         className="flex flex-col gap-5"
                     >

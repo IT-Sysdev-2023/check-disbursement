@@ -80,19 +80,19 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
                                 gutterBottom
                                 component="div"
                             >
-                                Checks
+                                Cheques
                             </Typography>
 
                             <Table size="small" aria-label="cv">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Check Number</TableCell>
-                                        <TableCell>Check Date</TableCell>
-                                        <TableCell>Check Amount</TableCell>
-                                        <TableCell>Bu</TableCell>
+                                        <TableCell>Cheque Number</TableCell>
+                                        <TableCell>Cheque Date</TableCell>
+                                        <TableCell>Cheque Amount</TableCell>
+                                        <TableCell>Business Unit</TableCell>
                                         <TableCell>Payee</TableCell>
                                         <TableCell>Tagged Location</TableCell>
-                                        <TableCell>Check Type</TableCell>
+                                        <TableCell>Cheque Type</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -105,7 +105,7 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
                                                 >
                                                     {
                                                         historyRow.checkable
-                                                            .checkNumber
+                                                            .chequeNumber
                                                     }
                                                 </TableCell>
                                                 <TableCell
@@ -114,7 +114,7 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
                                                 >
                                                     {
                                                         historyRow.checkable
-                                                            .checkDate
+                                                            .chequeDate
                                                     }
                                                 </TableCell>
                                                 <TableCell>

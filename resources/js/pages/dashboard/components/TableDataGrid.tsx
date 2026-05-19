@@ -1,6 +1,6 @@
 import {
     Borrower,
-    CheckStatus,
+    ChequeStatus,
     ChequeType,
     Crf,
     Cv,
@@ -36,7 +36,7 @@ export default function TableDataGrid({
     handleSelectionChange,
 }: {
     data: InertiaPagination<
-        Cv | Crf | ManageChecks | ChequeType | Borrower | CheckStatus | User
+        Cv | Crf | ManageChecks | ChequeType | Borrower | ChequeStatus | User
     >;
     columns: GridColDef[];
     isLoading?: boolean;

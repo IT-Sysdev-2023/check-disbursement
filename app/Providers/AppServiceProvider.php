@@ -4,8 +4,7 @@ namespace App\Providers;
 
 use App\Helpers\FileHandler;
 use App\Models\Crf;
-use App\Models\CvCheckPayment;
-use App\Models\User;
+use App\Models\Cv;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -28,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Relation::morphMap([
-            'cv' => CvCheckPayment::class,
+            'cv' => Cv::class,
             'crf' => Crf::class,
         ]);
     }

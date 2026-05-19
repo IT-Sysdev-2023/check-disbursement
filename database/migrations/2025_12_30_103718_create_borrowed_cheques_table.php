@@ -10,14 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('borrowed_checks', function (Blueprint $table) {
+        Schema::create('borrowed_cheques', function (Blueprint $table) {
             // $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             // $table->foreignId('primary_approver_id')->constrained('approvers')->cascadeOnUpdate()->cascadeOnDelete();
             // $table->foreignId('secondary_approver_id')->constrained('approvers')->cascadeOnUpdate()->cascadeOnDelete()->nullable();
             $table->foreignId('approver_id')->cascadeOnUpdate()->cascadeOnDelete()->nullable();
-            $table->foreignId('borrower_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('borrower_name');
             $table->unsignedBigInteger('borrower_no');
             $table->string('reason');
             $table->timestamp('approved_at')->nullable();
@@ -38,6 +38,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('borrowed_checks');
+        Schema::dropIfExists('borrowed_cheques');
     }
 };

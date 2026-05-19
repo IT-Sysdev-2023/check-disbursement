@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 
-class CvCheckPaymentResource extends JsonResource
+class CvResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -17,12 +17,12 @@ class CvCheckPaymentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $checkDate = $this->check_date ? Date::parse($this->check_date) : null;
+        $chequeDate = $this->cheque_date ? Date::parse($this->cheque_date) : null;
         $staleThreshold = Date::today()->subMonths(6);
 
         $status = null;
-        if ($checkDate) {
-            if ($checkDate->lt($staleThreshold)) {
+        if ($chequeDate) {
+            if ($chequeDate->lt($staleThreshold)) {
                 $status = 'staled';
             }
         }
@@ -33,29 +33,28 @@ class CvCheckPaymentResource extends JsonResource
 
             'cvHeaderId' => $this->cv_header_id,
 
-            'checkNumber' => $this->check_number,
-            'checkDate' => $checkDate ? $checkDate->toFormattedDateString() : 'N/A',
+            'chequeNumber' => $this->cheque_number,
+            'chequeDate' => $chequeDate ? $chequeDate->toFormattedDateString() : 'N/A',
 
-            'amount' => $this->check_amount ? NumberHelper::currency($this->check_amount) : 0,
-            'unformattedAmount' => $this->check_amount,
+            'amount' => $this->cheque_amount ? NumberHelper::currency($this->cheque_amount) : 0,
+            'unformattedAmount' => $this->cheque_amount,
 
             'status' => $status,
             'taggedAt' => $this->tagged_at,
             'payee' => $this->payee,
             'bank' => $this->bank_name,
             'bankAccountNo' => $this->bank_account_no,
-            'checkClassLocation' => $this->check_class_location ?: 'N/A',
-            'clearingDate' => $this->clearing_date ? $this->clearing_date->toFormattedDateString() : 'N/A',
+            'remarks' => $this->remarks,
 
             'scannedId' => $this->scanned_id,
             'location' => $this->tagLocation?->location,
             'taggedLocation' => $this->when($this->tag_location_id, StringHelper::statusLocation($this->tagLocation?->location)),
-            'cvNo' => $this->cvHeader?->cv_no,
+            'cvNo' => $this->cv_no,
             'company' => $this->businessUnit->name,
 
             'cvHeader' => new CvHeaderResource($this->whenLoaded('cvHeader')),
-            'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
-            'checkStatus' => new CheckStatusResource($this->whenLoaded('checkStatus')),
+            'borrowedCheque' => $this->whenLoaded('borrowedCheque'),
+            'chequeStatus' => new ChequeStatusResource($this->whenLoaded('chequeStatus')),
             'assignedCheckNumbers' => $this->whenLoaded('assignedCheckNumber'),
             'tagLocation' => new TagLocationResource($this->whenLoaded('tagLocation')),
             'businessUnit' => $this->whenLoaded('businessUnit')

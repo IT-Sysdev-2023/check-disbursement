@@ -13,17 +13,17 @@ class ColumnResolver
         'borrowers.name',
         'borrower no',
         'approvers.name',
-        'check_statuses.status',
+        'cheque_statuses.status',
         'receivers name',
-        'check_date'
+        'cheque_date'
     ];
 
     public const TYPE_COLUMNS = [
         'cv' => [
             'cv no',
             'cv date',
-            'check number',
-            'check amount',
+            'cheque number',
+            'cheque amount',
             'payee',
         ],
         'crf' => [
@@ -31,7 +31,7 @@ class ColumnResolver
             'amount',
             'paid to',
             'bank',
-            'ck no',
+            'cheque number',
             'prepared by',
 
         ],
@@ -51,7 +51,7 @@ class ColumnResolver
 
     public static function statusColumnEnums()
     {
-        $column = DB::selectOne("SHOW COLUMNS FROM `check_statuses` WHERE Field = 'status'");
+        $column = DB::selectOne("SHOW COLUMNS FROM `cheque_statuses` WHERE Field = 'status'");
 
         $enumValues = [];
 

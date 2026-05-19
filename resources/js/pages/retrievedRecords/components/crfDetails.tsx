@@ -1,4 +1,4 @@
-import CheckStatusChip from '@/components/chip-status';
+import ChequeStatusChip from '@/components/chip-status';
 import { Crf } from '@/types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import {
@@ -80,7 +80,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                         </Typography>
                     </Paper>
                 </Grid>
-                {details.checkStatus && (
+                {details.chequeStatus && (
                     <>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
@@ -88,7 +88,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                                     Released Date:
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {details.checkStatus?.createdAt ?? '-'}
+                                    {details.chequeStatus?.createdAt ?? '-'}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -99,46 +99,46 @@ export default function CrfDetails({ details }: { details: Crf }) {
                                 </Typography>
 
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    <CheckStatusChip
-                                        status={details?.checkStatus?.status}
+                                    <ChequeStatusChip
+                                        status={details?.chequeStatus?.status}
                                     />
                                 </Typography>
                             </Paper>
                         </Grid>
                     </>
                 )}
-                 {details?.checkStatus?.status === 'cancelled' && (
+                 {details?.chequeStatus?.status === 'cancelled' && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">
                                 Cancelled Reason
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 1 }}>
-                                {details.checkStatus?.cancelledReason}
+                                {details.chequeStatus?.cancelledReason}
                             </Typography>
                         </Paper>
                     </Grid>
                 )}
-                {details?.checkStatus?.receiversName && (
+                {details?.chequeStatus?.receiversName && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">
                                 Receivers Name
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 1 }}>
-                                {details.checkStatus?.receiversName}
+                                {details.chequeStatus?.receiversName}
                             </Typography>
                         </Paper>
                     </Grid>
                 )}
-                {details?.checkStatus?.image && (
+                {details?.chequeStatus?.image && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">Image</Typography>
 
                             <Box
                                 component="img"
-                                src={details.checkStatus.image}
+                                src={details.chequeStatus.image}
                                 alt="Check preview"
                                 sx={{
                                     mt: 1,
@@ -152,7 +152,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                         </Paper>
                     </Grid>
                 )}
-                {details?.checkStatus?.signature && (
+                {details?.chequeStatus?.signature && (
                     <Grid size={{ xs: 12, sm: 6 }}>
                         <Paper sx={{ px: 2, py: 1 }}>
                             <Typography variant="overline">
@@ -173,7 +173,7 @@ export default function CrfDetails({ details }: { details: Crf }) {
                             >
                                 <Box
                                     component="img"
-                                    src={details.checkStatus.signature}
+                                    src={details.chequeStatus.signature}
                                     alt="Signature preview"
                                     sx={{
                                         maxWidth: '100%',

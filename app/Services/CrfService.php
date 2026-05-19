@@ -68,7 +68,6 @@ class CrfService
 
         // $uniqueKeys = $records->pluck('ck_no');
         // $existing = Crf::whereIn('ck_no', $uniqueKeys)->pluck('filename');
-
         $isDateValid = $records->every(function ($item) use ($request) {
             return $item['date']->between($request->start_date, $request->end_date);
         });
@@ -102,7 +101,7 @@ class CrfService
     public function detailsCrf(Crf $id)
     {
         return Inertia::render('retrievedRecords/checkDetailsCrf', [
-            'crf' => $id->load('checkStatus.checkForwardedStatus')->toResource()
+            'crf' => $id->load('chequeStatus.chequeForwardedStatus')->toResource()
         ]);
     }
 }

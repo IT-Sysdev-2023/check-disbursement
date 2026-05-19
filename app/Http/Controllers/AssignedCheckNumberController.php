@@ -13,9 +13,9 @@ class AssignedCheckNumberController extends Controller
     {
     }
 
-    public function updateCheckNumber(Request $request) // store
+    public function updateChequeNumber(Request $request) // store
     {
-        return $this->service->updateAssignCheckNumber($request);
+        return $this->service->updateAssignChequeNumber($request);
     }
 
     public function updateCheckDate(Request $request)

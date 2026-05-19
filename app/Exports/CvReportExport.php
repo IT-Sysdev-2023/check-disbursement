@@ -2,11 +2,10 @@
 
 namespace App\Exports;
 
-use App\Helpers\ColumnResolver;
-use App\Models\CheckStatus;
+
+use App\Models\ChequeStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -65,7 +64,7 @@ class CvReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoSi
             );
         }
 
-        return CheckStatus::select($columns)
+        return ChequeStatus::select($columns)
             ->join('cv_check_payments', 'cv_check_payments.id', '=', 'check_statuses.checkable_id')
               ->join('borrowed_checks', function ($join) {
                 $join->on('cv_check_payments.id', '=', 'borrowed_checks.checkable_id')

@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class CheckStatusCollection extends ResourceCollection
+class ChequeStatusCollection extends ResourceCollection
 {
     /**
      * Transform the resource collection into an array.
@@ -14,6 +14,6 @@ class CheckStatusCollection extends ResourceCollection
      */
     public function toArray(Request $request): array
     {
-         return ['data' => CheckStatusResource::collection($this->collection)];
+         return ['data' => ChequeStatusResource::collection($this->collection)];
     }
 }

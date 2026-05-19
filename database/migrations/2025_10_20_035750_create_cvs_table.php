@@ -10,21 +10,20 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('crfs', function (Blueprint $table) {
+        Schema::create('cvs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('nav_header_table_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('filename');
-            $table->string('crf')->nullable();
-            $table->string('company_office');
-            $table->unsignedBigInteger('no');
-            $table->string('crf_location');
-            $table->date('date')->nullable();
-            $table->string('paid_to');
-            $table->string('particulars');
-            $table->decimal('amount', 20);
-            $table->string('bank');
-            $table->string('cheque_number');
-            $table->string('prepared_by');
+            // $table->string('cv_no')->unique();
+            $table->unsignedBigInteger('cheque_number');
+            $table->decimal('cheque_amount', 20);
+            $table->date('cheque_date')->nullable();
+            $table->string('payee');
+            $table->string('cv_no');
+            $table->date('cv_date')->nullable();
+            $table->string('bank_account_no');
+            $table->string('bank_name');
+            $table->string('remarks');
 
             $table->string('resolved_cheque_number')->nullable();
             $table->date('resolved_cheque_date')->nullable();
@@ -32,8 +31,6 @@ return new class extends Migration {
             $table->timestamp('tagged_at')->nullable();
             $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
-
-            $table->unique(['no']);
         });
     }
 
@@ -42,6 +39,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('crfs');
+        Schema::dropIfExists('cvs');
     }
 };

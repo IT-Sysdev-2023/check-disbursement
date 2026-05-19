@@ -4,17 +4,14 @@ namespace App\Services;
 
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
-use App\Http\Requests\BorrowedCheckRequest;
-use App\Http\Resources\BorrowedCheckResource;
+use App\Http\Resources\BorrowedChequeResource;
 use App\Models\Approver;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\Borrower;
-use App\Models\Crf;
-use App\Models\CvCheckPayment;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class BorrowedCheckService
@@ -50,14 +47,14 @@ class BorrowedCheckService
             }
         }
 
-        $borrowerNo = (BorrowedCheck::max('borrower_no') ?? 0) + 1;
+        $borrowerNo = (BorrowedCheque::max('borrower_no') ?? 0) + 1;
 
         $stream = DB::transaction(function () use ($borrowerNo, $validated) {
 
-            BorrowedCheck::insert(
+            BorrowedCheque::insert(
                 collect($validated['cheques'])->map(fn($c) => [
                     'borrower_no' => $borrowerNo,
-                    'borrower_id' => $validated['borrower'],
+                    'borrower_name' => $validated['borrower'],
                     'reason' => $validated['reason'],
                     'checkable_id' => $c['chequeId'],
                     'checkable_type' => $c['type'],
@@ -82,18 +79,17 @@ class BorrowedCheckService
 
     private function download(int $borrowerNo, string $reason)
     {
-        $borrower = BorrowedCheck::with('borrower:id,name')
+        $borrower = BorrowedCheque::with('borrower:id,name')
             ->with('checkable')
             ->where('borrower_no', $borrowerNo)
             ->get();
-
         $companyNames = $borrower->pluck('checkable.getCompany')
             ->filter()
             ->unique()
             ->implode(', ');
 
         $chequeNumbers = $borrower
-            ->map(fn($b) => $b->checkable?->checkNumber)
+            ->map(fn($b) => $b->checkable?->chequeNumber)
             ->filter()
             ->unique();
 
@@ -103,7 +99,7 @@ class BorrowedCheckService
             'borrowerNo' => NumberHelper::padLeft($borrowerNo),
             'noOfChecks' => $borrower->count(),
             'purpose' => $reason,
-            'borrowedBy' => Str::upper($borrower->first()->borrower_id),
+            'borrowedBy' => Str::upper($borrower->first()->borrower_name),
             'releasedBy' => Str::upper(auth()->user()->name),
             'chequeNumbers' => $chequeNumbers->toArray()
         ];
@@ -116,8 +112,8 @@ class BorrowedCheckService
 
     }
 
-    public function pendingDetails(BorrowedCheck $id)
+    public function pendingDetails(BorrowedCheque $id)
     {
-        return response()->json(new BorrowedCheckResource($id->load('checkable.tagLocation')));
+        return response()->json(new BorrowedChequeResource($id->load('checkable.tagLocation')));
     }
 }

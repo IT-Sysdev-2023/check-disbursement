@@ -12,15 +12,15 @@ import {
     bankSetup,
     checkReleasing,
     checkRequestForm,
-    checkStatus,
+    chequeStatus,
     checkVoucher,
     chequeRequests,
-    closingChecks,
-    forwardedCheckReleasing,
     forwardedReleasing,
     report,
     retrievedRecords,
     users,
+    forwardedChequeReleasing,
+    closingCheque,
 } from '@/routes';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -117,7 +117,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 ? [
                       {
                           title: 'CV/ CRF List',
-                          href: closingChecks(),
+                          href: closingCheque(),
                           icon: BookmarkX,
                       },
                   ]
@@ -125,8 +125,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             ...(isAdmin || regionalOfficer
                 ? [
                       {
-                          title: 'Forwarded Check',
-                          href: forwardedCheckReleasing(),
+                          title: 'Forwarded Cheque',
+                          href: forwardedChequeReleasing(),
                           icon: Forward,
                       },
                       {
@@ -144,7 +144,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 ? [
                       {
                           title: 'Cheque Status',
-                          href: checkStatus(),
+                          href: chequeStatus(),
                           icon: Activity,
                       },
                   ]

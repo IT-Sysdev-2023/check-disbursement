@@ -18,12 +18,12 @@ class CrfResource extends JsonResource
     public function toArray(Request $request): array
     {
 
-        $checkDate = $this->resolved_check_date ? Date::parse($this->resolved_check_date) : null;
+        $chequeDate = $this->resolved_cheque_date ? Date::parse($this->resolved_cheque_date) : null;
         $staleThreshold = Date::today()->subMonths(6);
 
         $status = null;
-        if ($checkDate) {
-            if ($checkDate->lt($staleThreshold)) {
+        if ($chequeDate) {
+            if ($chequeDate->lt($staleThreshold)) {
                 $status = 'staled';
             }
         }
@@ -33,7 +33,7 @@ class CrfResource extends JsonResource
             'no' => $this->no,
             'company' => $this->getCompany,
             'status' => $status,
-            'checkDate' => $checkDate ? $checkDate->toFormattedDateString() : 'N/A',
+            'chequeDate' => $chequeDate ? $chequeDate->toFormattedDateString() : 'N/A',
             'location' => $this->tagLocation?->location,
             'date' => $this->date ? $this->date->toFormattedDateString() : 'N/A',
             'payee' => $this->paid_to,
@@ -44,8 +44,8 @@ class CrfResource extends JsonResource
             'checkNumber' => $this->ck_no,
             'preparedBy' => $this->prepared_by,
             'taggedAt' => $this->tagged_at,
-            'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
-            'checkStatus' => new CheckStatusResource($this->whenLoaded('checkStatus')),
+            'borrowedCheque' => $this->whenLoaded('borrowedCheque'),
+            'chequeStatus' => new ChequeStatusResource($this->whenLoaded('chequeStatus')),
 
             'tagLocation' => new TagLocationResource($this->whenLoaded('tagLocation')),
             'scannedId' => $this->scanned_id,

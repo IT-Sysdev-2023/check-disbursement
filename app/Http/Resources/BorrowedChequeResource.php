@@ -8,7 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 
-class BorrowedCheckResource extends JsonResource
+class BorrowedChequeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -22,7 +22,7 @@ class BorrowedCheckResource extends JsonResource
             'borrowerNoClean' => $this->borrower_no,
             'primaryApproverName' => $this->primaryApproverName,
             'borrowerNo' => NumberHelper::padLeft($this->borrower_no),
-            'borrower' => $this->borrower,
+            'borrower' => $this->borrower_name,
             'reason' => $this->reason,
             'check' => $this->checkable_type,
             'totalChecks' => $this->total_checks,
@@ -35,7 +35,7 @@ class BorrowedCheckResource extends JsonResource
     protected function resolveCheckable()
     {
         return match ($this->checkable_type) {
-            'cv' => new CvCheckPaymentResource($this->checkable),
+            'cv' => new CvResource($this->checkable),
             'crf' => new CrfResource($this->checkable),
             default => null,
         };

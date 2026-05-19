@@ -47,8 +47,8 @@ export default function AssignScanDetailsModal({
     const [bankRecords, setBankRecords] = useState<SelectionType[]>([]);
     const { data, setData, errors, post, reset, transform } = useForm({
         accountNumber: '',
-        checkNumber: '',
-        checkDate: null as any,
+        chequeNumber: '',
+        chequeDate: null as any,
         payee: '',
         amount: 0,
     });
@@ -56,8 +56,8 @@ export default function AssignScanDetailsModal({
         if (borrowedCheckId) {
             setData({
                 ...data,
-                checkDate: dayjs(borrowedCheckId.checkDate),
-                checkNumber: borrowedCheckId.checkNumber,
+                chequeDate: dayjs(borrowedCheckId.chequeDate),
+                chequeNumber: borrowedCheckId.chequeNumber,
                 amount: borrowedCheckId.amount,
                 payee: borrowedCheckId.payee,
             });
@@ -107,7 +107,7 @@ export default function AssignScanDetailsModal({
      const handleSubmit = () => {
         transform((data) => ({
             ...data,
-            checkDate: dayjs(data.checkDate).format('YYYY-MM-DD'),
+            chequeDate: dayjs(data.chequeDate).format('YYYY-MM-DD'),
         }));
 
         post(storeScanRecord(borrowedCheckId.id).url, {
@@ -181,11 +181,11 @@ export default function AssignScanDetailsModal({
                                 <TextField
                                     fullWidth
                                     size="small"
-                                    value={data.checkNumber}
-                                    error={!!errors.checkNumber}
-                                    helperText={errors.checkNumber ?? ' '}
+                                    value={data.chequeNumber}
+                                    error={!!errors.chequeNumber}
+                                    helperText={errors.chequeNumber ?? ' '}
                                     onChange={(e) =>
-                                        setData('checkNumber', e.target.value)
+                                        setData('chequeNumber', e.target.value)
                                     }
                                     sx={{ mb: 1 }}
                                 />
@@ -200,15 +200,15 @@ export default function AssignScanDetailsModal({
                                     </Typography>
                                     <DatePicker
                                         label="Check Date"
-                                        value={data.checkDate}
+                                        value={data.chequeDate}
                                         onChange={(newValue) =>
-                                            setData('checkDate', newValue)
+                                            setData('chequeDate', newValue)
                                         }
                                         slotProps={{
                                             textField: {
                                                 fullWidth: true,
-                                                error: !!errors.checkDate,
-                                                helperText: errors.checkDate,
+                                                error: !!errors.chequeDate,
+                                                helperText: errors.chequeDate,
                                                 sx: { mt: 1 },
                                             },
                                         }}

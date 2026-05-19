@@ -13,6 +13,6 @@ class Approver extends Model
     }
     public function primaryBorrowedCheck()
     {
-        return $this->hasOne(BorrowedCheck::class, 'primary_approver_id');
+        return $this->hasOne(BorrowedCheque::class, 'primary_approver_id');
     }
 }

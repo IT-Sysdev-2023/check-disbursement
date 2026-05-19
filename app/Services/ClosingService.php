@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
-use App\Models\CheckStatus;
+use App\Models\ChequeStatus;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -20,21 +20,21 @@ class ClosingService
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
 
-        $cheques = CheckStatus::
-            with(['checkable' => ['borrowedCheck', 'tagLocation']])
+        $cheques = ChequeStatus::
+            with(['checkable' => ['borrowedCheque', 'tagLocation']])
             ->where('is_closed', false)
             ->whereNot('status', 'cancel')
-            ->has('checkForwardedStatus')
+            ->has('chequeForwardedStatus')
             ->get();
 
-        $cheques = CheckStatus::
-            with(['checkable' => ['borrowedCheck', 'tagLocation']])
+        $cheques = ChequeStatus::
+            with(['checkable' => ['borrowedCheque', 'tagLocation']])
             ->where('is_closed', false)
             ->whereNot('status', 'cancel')
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->where('status', 'forwarded')
-                        ->has('checkForwardedStatus');
+                        ->has('chequeForwardedStatus');
                 })
                     ->orWhere('status', '!=', 'forwarded');
             })
@@ -62,7 +62,7 @@ class ClosingService
     }
 
 
-    public function close(CheckStatus $id)
+    public function close(ChequeStatus $id)
     {
 
         $stream = DB::transaction(function () use ($id) {

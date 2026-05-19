@@ -96,7 +96,7 @@ export default function ExtractCrf({
             alert('Please select both start and end dates');
             return;
         }
-        
+
         router.post(
             extractCrf(),
             {

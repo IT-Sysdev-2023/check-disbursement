@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\CheckStatus;
+use App\Models\ChequeStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromQuery;
@@ -62,7 +62,7 @@ class CrfReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoS
             );
         }
 
-        return CheckStatus::select($columns)
+        return ChequeStatus::select($columns)
             ->join('crfs', 'crfs.id', '=', 'check_statuses.checkable_id')
             ->join('borrowed_checks', function ($join) {
                 $join->on('crfs.id', '=', 'borrowed_checks.checkable_id')

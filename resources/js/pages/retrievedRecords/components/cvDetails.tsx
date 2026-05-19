@@ -1,7 +1,5 @@
 import { Cv } from '@/types';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-// import DeleteIcon from '@mui/icons-material/Delete';
-// import EditIcon from '@mui/icons-material/Edit';
 import {
     Box,
     Button,
@@ -21,7 +19,7 @@ export default function CvDetails({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">CV Number</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.cvHeader?.cvNo}
+                            {details.cvNo}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -37,7 +35,7 @@ export default function CvDetails({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Check Number</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.checkNumber}
+                            {details.chequeNumber}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -53,7 +51,7 @@ export default function CvDetails({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Check Date</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {dayjs(details.checkDate).format('MMMM D, YYYY')}
+                            {dayjs(details.chequeDate).format('MMMM D, YYYY')}
                         </Typography>
                     </Paper>
                 </Grid>
@@ -79,7 +77,7 @@ export default function CvDetails({ details }: { details: Cv }) {
                     <Paper sx={{ px: 2, py: 1 }}>
                         <Typography variant="overline">Remarks</Typography>
                         <Typography variant="body1" sx={{ mb: 1 }}>
-                            {details.cvHeader?.remarks}
+                            {details.remarks}
                         </Typography>
                     </Paper>
                 </Grid>

@@ -5,15 +5,13 @@ namespace App\Services;
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
-use App\Models\CheckForwardedStatus;
-use App\Models\CheckStatus;
-use App\Models\Crf;
-use App\Models\CvCheckPayment;
+use App\Models\ChequeForwardedStatus;
+use App\Models\ChequeStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-class ForwardedCheckService
+class ForwardedChequeService
 {
     public function __construct(protected FileHandler $fileHandler)
     {
@@ -22,8 +20,8 @@ class ForwardedCheckService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
-        $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'businessUnit', 'tagLocation']])
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status')
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
             ->regionalPermission()
             ->where(['status' => 'forwarded', 'received_by' => null])
             ->paginate()
@@ -55,13 +53,13 @@ class ForwardedCheckService
         ]);
     }
 
-    public function cancelForwarded(CheckStatus $id, Request $request)
+    public function cancelForwarded(ChequeStatus $id, Request $request)
     {
         $request->validate([
             'reason' => 'required | string'
         ]);
 
-        $id->checkForwardedStatus()
+        $id->chequeForwardedStatus()
             ->create([
                 'status' => 'cancel',
                 'cancelled_reason' => $request->reason,
@@ -70,7 +68,7 @@ class ForwardedCheckService
 
         return redirect()->back()->with(['status' => true, 'message' => 'Save Successfully!']);
     }
-    public function update(CheckStatus $id, Request $request)
+    public function update(ChequeStatus $id, Request $request)
     {
         $id->update(['received_by' => $request->user()->id]);
         return redirect()->back()->with(['status' => true, 'message' => 'Save Successfully!']);
@@ -85,7 +83,7 @@ class ForwardedCheckService
         ]);
     }
 
-    public function storeReleaseCheck(CheckStatus $id, Request $request)
+    public function storeReleaseCheck(ChequeStatus $id, Request $request)
     {
         $validated = $request->validate([
             'receiversName' => 'required|string|max:255',
@@ -94,15 +92,15 @@ class ForwardedCheckService
             'status' => 'required|string',
         ]);
 
-        if (CheckForwardedStatus::where('check_status_id', $id->id)->exists()) {
-            return redirect()->back()->with(['status' => false, 'message' => 'Duplicate entry in check forward status']);
+        if (ChequeForwardedStatus::where('cheque_status_id', $id->id)->exists()) {
+            return redirect()->back()->with(['status' => false, 'message' => 'Duplicate entry in cheque forward status']);
         }
 
         $handleFiles = $this->handleFiles($validated, $id->id);
 
         $stream = DB::transaction(function () use ($id, $validated, $handleFiles, $request) {
-            $checkStatus = $id
-                ->checkForwardedStatus()
+            $chequeStatus = $id
+                ->chequeForwardedStatus()
                 ->create([
                     'status' => Str::lower($validated['status']),
                     'forwarded_receivers_name' => $validated['receiversName'],
@@ -111,16 +109,16 @@ class ForwardedCheckService
                     'caused_by' => $request->user()->id,
                 ]);
 
-            $checkCompany = $checkStatus->load('checkStatus.checkable')->checkStatus->checkable->getCompany;
-            $location = $checkStatus->load('checkStatus.checkable.tagLocation')->checkStatus->checkable?->getLocation;
+            $checkCompany = $chequeStatus->load('chequeStatus.checkable')->chequeStatus->checkable->getCompany;
+            $location = $chequeStatus->load('chequeStatus.checkable.tagLocation')->chequeStatus->checkable?->getLocation;
 
             $label = StringHelper::statusPastTense($validated['status']);
 
             $data = [
-                'transactionNo' => NumberHelper::padLeft($checkStatus->id),
+                'transactionNo' => NumberHelper::padLeft($chequeStatus->id),
 
                 'dateLabel' => 'Date ' . $label . ':',
-                'dateReleased' => $checkStatus->created_at->format('M d, Y H:i A'),
+                'dateReleased' => $chequeStatus->created_at->format('M d, Y H:i A'),
 
                 'causedLabel' => 'Received By:',
                 'causedBy' => $validated['receiversName'],
@@ -135,7 +133,7 @@ class ForwardedCheckService
 
             return $this->fileHandler
                 ->inFolder('pdfs/releasing/' . $label . '/')
-                ->createFileName($checkStatus->id, $request->user()->id, '.pdf')
+                ->createFileName($chequeStatus->id, $request->user()->id, '.pdf')
                 ->handlePdf($data, 'releasingPdf');
         });
 
@@ -146,18 +144,18 @@ class ForwardedCheckService
     public function forwardedReleasing(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
-        $chequeRecords = CheckStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'businessUnit', 'tagLocation']])
-            // ->whereHas('checkable.checkStatus', function ($query) {
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status')
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
+            // ->whereHas('checkable.chequeStatus', function ($query) {
             ->where(['status' => 'forwarded'])
             ->whereNotNull('received_by')
             ->regionalPermission()
-            ->doesntHave('checkForwardedStatus')
+            ->doesntHave('chequeForwardedStatus')
             ->paginate()
             ->withQueryString()
             ->toResourceCollection();
 
-        return Inertia::render('forwardedCheckReleasing', [
+        return Inertia::render('forwardedChequeReleasing', [
             'cheques' => $chequeRecords,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',

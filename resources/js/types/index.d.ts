@@ -142,19 +142,17 @@ export interface PivotRole {
 export interface Cv {
     id: number;
     nav_table_id: number;
-    cv_number: string;
+    remarks: string;
+    cvNo: string;
     company: string;
-    checkNumber: number;
-    checkAmount: string;
-    checkDate: string;
+    chequeNumber: number;
+    chequeAmount: string;
+    chequeDate: string;
     payee: string;
     bankAccountNo: string;
     bankName: string;
-    checkClassLocation: string;
-    clearingDate: string;
-    cvHeader?: CvHeader;
-    borrowedCheck: BorrowedCheck;
-    checkStatus: CheckStatus;
+    borrowedCheque: BorrowedCheck;
+    chequeStatus: ChequeStatus;
     tagLocation: TagLocation;
     amount: string;
     bank: string;
@@ -221,7 +219,7 @@ export interface BorrowedCheck {
     check: 'crf' | 'cv';
 }
 
-export interface CheckStatus {
+export interface ChequeStatus {
     id: number;
     status: 'released' | 'forwarded' | 'deposited' | 'cancelled' | 'staled';
     checkableType: 'CRF' | 'CV';
@@ -257,7 +255,7 @@ export interface Crf {
     preparedBy: string;
     created_at: string;
     updated_at: string;
-    checkStatus: CheckStatus;
+    chequeStatus: ChequeStatus;
     tagLocation: TagLocation;
 }
 
@@ -381,7 +379,7 @@ export interface MonthType {
     month: string;
     y: number;
     totalMonthly: number;
-    businessUnit?: string;    
+    businessUnit?: string;
     totalNavRecords?: number;
 }
 

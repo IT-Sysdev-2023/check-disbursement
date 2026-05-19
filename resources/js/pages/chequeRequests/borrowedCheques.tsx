@@ -90,7 +90,7 @@ export default function BorrowedCheques({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
-            <PageContainer title="Borrowed Checks">
+            <PageContainer title="Borrowed Cheques">
                 <TableDataGrid
                     data={cheques}
                     filter={filter.search}

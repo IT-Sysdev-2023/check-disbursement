@@ -4,12 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Helpers\NumberHelper;
 use App\Http\Resources\ChequeCollection;
-use App\Models\BorrowedCheck;
+use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
-use App\Models\CheckStatus;
+use App\Models\ChequeStatus;
 use App\Models\Crf;
-use App\Models\CvCheckPayment;
-use App\Models\CvHeader;
+use App\Models\Cv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -30,22 +29,21 @@ class DashboardController extends Controller
     private static function defaultDashboard($filters)
     {
         $cheques = new ChequeCollection(self::chequeRecords());
-        $cv = CvHeader::query()
+        $cv = Cv::query()
             ->when(isset($filters['bu']) && $filters['bu'] !== 'all', function ($q) use ($filters) {
                 $q->whereHas('cvCheckPayment', fn($builder) => $builder->where('business_unit_id', $filters['bu']));
             })
-            ->leftJoin('cv_check_payments', 'cv_check_payments.cv_header_id', '=', 'cv_headers.id')
-            ->leftJoin('borrowed_checks', function ($join) {
-                $join->on('borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
-                    ->where('borrowed_checks.checkable_type', '=', 'cv');
+            ->leftJoin('borrowed_cheques', function ($join) {
+                $join->on('borrowed_cheques.checkable_id', '=', 'cvs.id')
+                    ->where('borrowed_cheques.checkable_type', '=', 'cv');
             })
             ->selectRaw('
-                    DATE_FORMAT(cv_headers.cv_date, "%Y-%m") as month,
-                    COUNT(DISTINCT cv_headers.id) as total,
-                    COUNT(borrowed_checks.id) as borrowed_checks_count
+                    DATE_FORMAT(cv_date, "%Y-%m") as month,
+                    COUNT(DISTINCT cvs.id) as total,
+                    COUNT(borrowed_cheques.id) as borrowed_checks_count
             ')
-            ->where('cv_headers.cv_date', '>=', now()->subMonths(6)->startOfMonth())
-            ->groupByRaw('DATE_FORMAT(cv_headers.cv_date, "%Y-%m")')
+            ->where('cv_date', '>=', now()->subMonths(6)->startOfMonth())
+            ->groupByRaw('DATE_FORMAT(cv_date, "%Y-%m")')
             ->orderBy('month', 'desc')
             ->get();
 
@@ -58,12 +56,12 @@ class DashboardController extends Controller
             ->orderByDesc(DB::raw('MIN(MONTH(date))'))
             ->get();
 
-        $countCvForMonths = CvHeader::where('cv_date', '>=', Date::now()->subMonths(6)->startOfMonth())
+        $countCvForMonths = Cv::where('cv_date', '>=', Date::now()->subMonths(6)->startOfMonth())
             ->count();
 
         $countCrfForMonths = Crf::where('date', '>=', Date::now()->subMonths(6)->startOfMonth())
             ->count();
-        $cvCount = CvCheckPayment::count();
+        $cvCount = Cv::count();
         $crfCount = Crf::count();
         $bu = BusinessUnit::businessUnits('all');
         return [
@@ -93,9 +91,9 @@ class DashboardController extends Controller
 
     private static function viewingDashboard($filters)
     {
-        $checks = self::checkStatus($filters['tab'] ?? 'all');
+        $checks = self::chequeStatus($filters['tab'] ?? 'all');
         $total = bcadd(
-            CvCheckPayment::sum('check_amount'),
+            Cv::sum('cheque_amount'),
             Crf::sum('amount'),
             2
         );
@@ -103,16 +101,16 @@ class DashboardController extends Controller
             'checks' => $checks,
             'totals' => (object) [
                 'amount' => NumberHelper::currency($total),
-                'releasedChecks' => CheckStatus::whereIn('status', ['released', 'forwarded'])->count(),
+                'releasedChecks' => ChequeStatus::whereIn('status', ['released', 'forwarded'])->count(),
                 'pending' => self::countForReleasing()
             ],
-            'checkIssued' => CheckStatus::count()
+            'checkIssued' => ChequeStatus::count()
         ];
     }
 
     private static function chequeRecords()
     {
-        $cvQuery = CvCheckPayment::baseColumns();
+        $cvQuery = Cv::baseColumns();
 
         $crfQuery = Crf::baseColumns();
 
@@ -125,11 +123,11 @@ class DashboardController extends Controller
             ->paginate(10)
             ->withQueryString();
     }
-    private static function checkStatus($tab)
+    private static function chequeStatus($tab)
     {
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
-        return BorrowedCheck::query()
-            ->with('checkable.checkStatus.checkForwardedStatus')
+        return BorrowedCheque::query()
+            ->with('checkable.chequeStatus.chequeForwardedStatus')
             ->where(function (Builder $q) use ($tab) {
 
                 if ($tab === 'fo_releasing') { //Disable temporarily "For Releasing Tab"
@@ -137,16 +135,16 @@ class DashboardController extends Controller
                         $q->whereNotNull('secondary_approver_id')
                             ->whereHasMorph(
                                 'checkable',
-                                [CvCheckPayment::class, Crf::class],
+                                [Cv::class, Crf::class],
                                 function (Builder $q, string $type) {
-                                $column = $type === CvCheckPayment::class ? 'cv_check_payments.check_date' : 'resolved_check_date';
+                                $column = $type === Cv::class ? 'cvs.check_date' : 'resolved_cheque_date';
                                 $q->scanRecords()->where($column, '>', Date::today()->subMonths(6));
                             }
                             )
                             ->whereDoesntHaveMorph(
                                 'checkable',
-                                [CvCheckPayment::class, Crf::class],
-                                fn($query) => $query->has('checkStatus')
+                                [Cv::class, Crf::class],
+                                fn($query) => $query->has('chequeStatus')
                             )
 
                         ;
@@ -162,11 +160,11 @@ class DashboardController extends Controller
                                 )
                                 ->whereHasMorph(
                                     'checkable',
-                                    [CvCheckPayment::class, Crf::class],
+                                    [Cv::class, Crf::class],
                                     function (Builder $query, string $type) {
-                                    $column = $type === CvCheckPayment::class ? 'check_date' : 'resolved_check_date';
+                                    $column = $type === Cv::class ? 'check_date' : 'resolved_check_date';
                                     $query->where($column, '<', Date::today()->subMonths(6))
-                                        ->whereDoesntHave('checkStatus', function ($q) {
+                                        ->whereDoesntHave('chequeStatus', function ($q) {
                                             $q->where('status', 'cancelled');
                                         });
                                 }
@@ -179,20 +177,20 @@ class DashboardController extends Controller
                         $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
                             $q->whereHasMorph(
                                 'checkable',
-                                [CvCheckPayment::class, Crf::class],
+                                [Cv::class, Crf::class],
                                 fn(Builder $q) =>
                                 $q->when($tab !== 'all', function ($q) use ($tab) {
                                 if ($tab === 'closed') {
-                                    $q->whereRelation('checkStatus', 'is_closed', 1);
+                                    $q->whereRelation('chequeStatus', 'is_closed', 1);
                                     // }else if ($tab === 'cancelled') {
                                 } else {
-                                    $q->whereRelation('checkStatus', function ($query) use ($tab) {
+                                    $q->whereRelation('chequeStatus', function ($query) use ($tab) {
                                         $query->where('status', $tab)
                                             ->where('is_closed', 0);
                                     });
                                 }
                             })
-                                    ->has('checkStatus')
+                                    ->has('chequeStatus')
                             );
                         });
                     }
@@ -204,21 +202,21 @@ class DashboardController extends Controller
     }
     private static function countForReleasing()
     {
-        return BorrowedCheck::query()
+        return BorrowedCheque::query()
             ->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
                 $q->whereNotNull('secondary_approver_id')
                     ->whereHasMorph(
                         'checkable',
-                        [CvCheckPayment::class, Crf::class],
+                        [Cv::class, Crf::class],
                         function (Builder $q, string $type) {
-                        $column = $type === CvCheckPayment::class ? 'cv_check_payments.check_date' : 'resolved_check_date';
+                        $column = $type === Cv::class ? 'cvs.cheque_date' : 'resolved_cheque_date';
                         $q->scanRecords()->where($column, '>', Date::today()->subMonths(6));
                     }
                     )
                     ->whereDoesntHaveMorph(
                         'checkable',
-                        [CvCheckPayment::class, Crf::class],
-                        fn($query) => $query->has('checkStatus')
+                        [Cv::class, Crf::class],
+                        fn($query) => $query->has('chequeStatus')
                     )
 
                 ;

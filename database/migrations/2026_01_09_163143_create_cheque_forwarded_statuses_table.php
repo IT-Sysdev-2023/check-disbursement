@@ -10,23 +10,18 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('check_statuses', function (Blueprint $table) {
+        Schema::create('cheque_forwarded_statuses', function (Blueprint $table) {
             $table->id();
-            $table->enum('status', ['released', 'forwarded', 'deposited', 'staled', 'cancelled'])->nullable();
-            $table->string('receivers_name')->nullable();
+            $table->unsignedBigInteger('cheque_status_id')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->enum('status', ['released', 'cancelled'])->nullable();
+            $table->string('forwarded_receivers_name')->nullable();
             $table->string('image')->nullable();
             $table->string('signature')->nullable();
             $table->string('cancelled_reason')->nullable();
-            $table->string('received_by')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete(); //this is for check_forward_statuses
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->boolean('is_closed')->default(false);
-
-            $table->morphs('checkable');
-            $table->unique(['checkable_id', 'checkable_type']);
-
-            $table->timestamp('closed_at')->nullable();
             $table->timestamps();
 
+            $table->unique(['check_status_id']);
         });
     }
 
@@ -35,6 +30,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('check_statuses');
+        Schema::dropIfExists('cheque_forwarded_statuses');
     }
 };

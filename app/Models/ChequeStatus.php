@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class CheckStatus extends Model
+class ChequeStatus extends Model
 {
      protected $guarded = [];
 
@@ -23,8 +23,8 @@ class CheckStatus extends Model
           return $this->morphTo();
      }
 
-     public function checkForwardedStatus(){
-        return $this->hasOne(CheckForwardedStatus::class);
+     public function chequeForwardedStatus(){
+        return $this->hasOne(ChequeForwardedStatus::class);
      }
 
     #[Scope]
@@ -46,7 +46,7 @@ class CheckStatus extends Model
             if (!empty($locations)) {
                 $query->whereHasMorph(
                     'checkable',
-                    [CvCheckPayment::class, Crf::class],
+                    [Cv::class, Crf::class],
                     function ($morphQuery) use ($locations) {
                         $morphQuery->whereHas('tagLocation', function ($locationQuery) use ($locations) {
                             $locationQuery->whereIn('location', $locations);
