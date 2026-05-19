@@ -112,16 +112,32 @@ export default function TableView({
         },
     };
 
+    const listTagLocation = async () => {
+        setOpenTagModal(true);
+        const { data } = await axios.get(getLocation().url);
+        setLocation(data);
+    };
+
     const handleTagSubmit = (e: FormEvent) => {
         e.preventDefault();
-        if (!chequeData) return;
+        
+        const data = chequeData
+            ? [
+                  {
+                      id: chequeData.chequeId,
+                      type: chequeData.type,
+                  },
+              ]
+            : selectedRows.map((row) => ({
+                  id: row.chequeId,
+                  type: row.type,
+              }));
 
         router.put(
             tagLocation(),
             {
-                id: chequeData.chequeId,
+                cheques: data,
                 locationId: selectedLocation,
-                type: chequeData.type,
             },
             {
                 preserveScroll: true,
@@ -207,7 +223,7 @@ export default function TableView({
                     disabled={!enableButtonTag}
                     variant="outlined"
                     startIcon={<LocationOnOutlined />}
-                    onClick={() => alert('Under Maintenance')}
+                    onClick={listTagLocation}
                 >
                     Tag Location
                 </Button>
@@ -230,7 +246,10 @@ export default function TableView({
             <OnlySelectionModal
                 title="Tag Location"
                 open={openTagModal}
-                onClose={() => setOpenTagModal(false)}
+                onClose={() => {
+                    setChequeData(null);
+                    setOpenTagModal(false);
+                }}
                 handleSubmit={handleTagSubmit}
                 handleSelectedItem={(event) =>
                     setSelectedLocation(event.target.value)
