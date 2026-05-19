@@ -22,7 +22,7 @@ class BorrowedChequeResource extends JsonResource
             'borrowerNoClean' => $this->borrower_no,
             'primaryApproverName' => $this->primaryApproverName,
             'borrowerNo' => NumberHelper::padLeft($this->borrower_no),
-            'borrower' => $this->borrower,
+            'borrower' => $this->borrower_name,
             'reason' => $this->reason,
             'check' => $this->checkable_type,
             'totalChecks' => $this->total_checks,

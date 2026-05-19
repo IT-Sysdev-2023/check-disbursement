@@ -17,16 +17,16 @@ return new class extends Migration {
             $table->string('seq')->nullable();
             $table->dateTime('date')->nullable();
             $table->dateTime('posted_date')->nullable();
-            $table->string('check_no');
+            $table->string('cheque_no');
             $table->unsignedBigInteger('branch_code')->nullable();
             $table->string('branch_name')->nullable();
             $table->decimal('amount', 20);
             $table->string('payee')->nullable();
-            $table->timestamp('check_date')->nullable();
+            $table->timestamp('cheque_date')->nullable();
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['check_no', 'payee', 'amount']);
+            $table->unique(['cheque_no', 'payee', 'amount']);
         });
     }
 

@@ -6,15 +6,15 @@ export const createStatusChequeColumns = (
     handleStatusChange: (value: string, record: CheckScannedDetails) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
+        field: 'chequeNumber',
         headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        renderCell: ({ row }) => row.checkable.checkNumber,
+        renderCell: ({ row }) => row.checkable.chequeNumber,
     },
     {
-        field: 'checkAmount',
+        field: 'chequeAmount',
         headerName: 'Cheque Amount',
         headerAlign: 'right',
         align: 'right',
@@ -33,13 +33,13 @@ export const createStatusChequeColumns = (
         renderCell: ({ row }) => row.checkable.bank,
     },
     {
-        field: 'checkDate',
+        field: 'chequeDate',
         headerName: 'Cheque Date',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable.checkDate,
+        renderCell: ({ row }) => row.checkable.chequeDate,
     },
     {
         field: 'check',
@@ -127,7 +127,7 @@ export const createStatusChequeColumns = (
                 id: row.checkable.id,
                 type: row.check,
                 amount: row.checkable.unformattedAmount,
-                checkNumber: row.checkable.checkNumber,
+                checkNumber: row.checkable.chequeNumber,
             };
             return (
                 <Box sx={{ width: '100%' }}>

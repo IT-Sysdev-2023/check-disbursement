@@ -95,7 +95,7 @@ class Cv extends Model
         return $builder->select(
             'cvs.id as cheque_id',
             DB::raw('CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END as cheque_number'),
-            'cheque_date',
+            'cvs.cheque_date',
             'business_units.name as company_name',
             'cheque_amount as amount',
             'cvs.payee',
@@ -121,20 +121,20 @@ class Cv extends Model
     {
         return $builder
             ->join('scanned_records', function ($join) {
-                $join->on('scanned_records.amount', '=', 'cv_check_payments.check_amount')
+                $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
                     // ->whereNotNull('scanned_records.payee')
                     ->where(function ($q) {
                         $q->where(function ($q) {
-                            $q->where('cv_check_payments.check_number', '!=', 0)
+                            $q->where('cvs.cheque_number', '!=', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
-                                    'cv_check_payments.check_number'
+                                    'scanned_records.cheque_no',
+                                    'cvs.cheque_number'
                                 );
                         })->orWhere(function ($q) {
-                            $q->where('cv_check_payments.check_number', 0)
+                            $q->where('cvs.cheque_number', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
-                                    'cv_check_payments.resolved_check_number'
+                                    'scanned_records.cheque_no',
+                                    'cvs.resolved_cheque_number'
                                 );
                         });
                     });
@@ -156,13 +156,13 @@ class Cv extends Model
                         $q->where(function ($q) {
                             $q->where('cvs.cheque_number', '!=', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
+                                    'scanned_records.cheque_no',
                                     'cvs.cheque_number'
                                 );
                         })->orWhere(function ($q) {
                             $q->where('cvs.cheque_number', 0)
                                 ->whereColumn(
-                                    'scanned_records.check_no',
+                                    'scanned_records.cheque_no',
                                     'cvs.resolved_cheque_number'
                                 );
                         });
@@ -195,7 +195,7 @@ class Cv extends Model
     {
         return $this->morphOne(ChequeStatus::class, 'checkable');
     }
-    public function borrowedCheck()
+    public function borrowedCheque()
     {
         return $this->morphOne(BorrowedCheque::class, 'checkable');
     }

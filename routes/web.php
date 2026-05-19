@@ -12,6 +12,7 @@ use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForwardedCheckController;
+use App\Http\Controllers\ForwardedChequeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
@@ -133,18 +134,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //! REGIONAL OFFICER
     //Cebu & Manila
-    Route::prefix('forwarded-check')->middleware('role:regional_officer|admin')->group(function () {
-        Route::get('index', [ForwardedCheckController::class, 'index'])->name('forwarded-check-releasing');
-        Route::get('release-check/{id}/{status}', [ForwardedCheckController::class, 'showForwarded'])->name('release-check-forwarded');
-        Route::post('store-release-check/{id}', [ForwardedCheckController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
-        Route::put('update-receiver-{id}', [ForwardedCheckController::class, 'update'])->name('receiver-forwarded');
+    Route::prefix('forwarded-cheque')->middleware('role:regional_officer|admin')->group(function () {
+        Route::get('index', [ForwardedChequeController::class, 'index'])->name('forwarded-cheque-releasing');
+        Route::get('release-check/{id}/{status}', [ForwardedChequeController::class, 'showForwarded'])->name('release-check-forwarded');
+        Route::post('store-release-check/{id}', [ForwardedChequeController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
+        Route::put('update-receiver-{id}', [ForwardedChequeController::class, 'update'])->name('receiver-forwarded');
 
-        Route::get('releasing', [ForwardedCheckController::class, 'forwardedReleasing'])->name('forwarded-releasing');
-        Route::post('cancel/{id}', [ForwardedCheckController::class, 'cancelForwarded'])->name('cancel-forwarded');
+        Route::get('releasing', [ForwardedChequeController::class, 'forwardedReleasing'])->name('forwarded-releasing');
+        Route::post('cancel/{id}', [ForwardedChequeController::class, 'cancelForwarded'])->name('cancel-forwarded');
     });
 
-    Route::prefix('closing-checks')->group(function () {
-        Route::get('index', [ClosingController::class, 'index'])->name('closing-checks');
+    Route::prefix('closing-cheque')->group(function () {
+        Route::get('index', [ClosingController::class, 'index'])->name('closing-cheque');
         Route::post('mark-close/{id}', [ClosingController::class, 'close'])->name('mark-as-close');
     });
 

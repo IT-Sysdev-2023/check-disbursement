@@ -151,7 +151,7 @@ export interface Cv {
     payee: string;
     bankAccountNo: string;
     bankName: string;
-    borrowedCheck: BorrowedCheck;
+    borrowedCheque: BorrowedCheck;
     chequeStatus: ChequeStatus;
     tagLocation: TagLocation;
     amount: string;

@@ -96,7 +96,7 @@ class CheckBorrowingController extends Controller
             ->scanRecords()
             ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'cv_check_payments.id')
             ->filter($filters)
-            ->whereHas('borrowedCheck', $callback)
+            ->whereHas('borrowedCheque', $callback)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId'
             );
@@ -107,7 +107,7 @@ class CheckBorrowingController extends Controller
             ->scanRecords()
             ->join('borrowed_checks', 'borrowed_checks.checkable_id', '=', 'crfs.id')
             ->filter($filters)
-            ->whereHas('borrowedCheck', $callback)
+            ->whereHas('borrowedCheque', $callback)
             ->addSelect(
                 'borrowed_checks.id as borrowedCheckId'
             );

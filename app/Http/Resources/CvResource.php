@@ -53,7 +53,7 @@ class CvResource extends JsonResource
             'company' => $this->businessUnit->name,
 
             'cvHeader' => new CvHeaderResource($this->whenLoaded('cvHeader')),
-            'borrowedCheck' => $this->whenLoaded('borrowedCheck'),
+            'borrowedCheque' => $this->whenLoaded('borrowedCheque'),
             'chequeStatus' => new ChequeStatusResource($this->whenLoaded('chequeStatus')),
             'assignedCheckNumbers' => $this->whenLoaded('assignedCheckNumber'),
             'tagLocation' => new TagLocationResource($this->whenLoaded('tagLocation')),

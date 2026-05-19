@@ -100,7 +100,7 @@ export default function ManageCheques({
                     onClick={handleSyncScanned}
                     disabled={sync}
                 >
-                    Sync Check Scanned
+                    Sync Cheque Scanned
                 </Button>
             </Box>
 

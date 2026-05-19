@@ -21,14 +21,14 @@ class ClosingService
 
 
         $cheques = ChequeStatus::
-            with(['checkable' => ['borrowedCheck', 'tagLocation']])
+            with(['checkable' => ['borrowedCheque', 'tagLocation']])
             ->where('is_closed', false)
             ->whereNot('status', 'cancel')
             ->has('chequeForwardedStatus')
             ->get();
 
         $cheques = ChequeStatus::
-            with(['checkable' => ['borrowedCheck', 'tagLocation']])
+            with(['checkable' => ['borrowedCheque', 'tagLocation']])
             ->where('is_closed', false)
             ->whereNot('status', 'cancel')
             ->where(function ($query) {

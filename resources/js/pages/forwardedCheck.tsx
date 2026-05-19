@@ -13,7 +13,7 @@ import {
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
 import TableFilter from '../components/tableFilter';
-import { createForwardedCvColumns } from './chequeReleasing/components/columns';
+import { createForwardedColumns, createForwardedCvColumns } from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 
@@ -73,7 +73,7 @@ export default function ForwardedCheck({
             );
     };
     
-    const columns = createForwardedCvColumns(handleStatusChange);
+    const columns = createForwardedColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

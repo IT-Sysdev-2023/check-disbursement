@@ -48,39 +48,39 @@ class ScannedRecordsController extends Controller
     }
 
     public function store(BorrowedCheque $id, Request $request)
-    {
+    { 
         $validated = $request->validate([
             "accountNumber" => "required",
-            "checkNumber" => "required | string",
-            "checkDate" => "required | date",
+            "chequeNumber" => "required | string",
+            "chequeDate" => "required | date",
             "payee" => "required | string",
             "amount" => 'required | numeric | gt:0'
         ]);
 
-        $check = $id->load('checkable')->checkable;
+        $cheque = $id->load('checkable')->checkable;
 
-        $dbCheckNo = $check->check_number ?: $check->resolved_check_number;
+        $dbChequeNo = $cheque->cheque_number ?: $cheque->resolved_cheque_number;
 
-        $dbCheckDate = $check->check_date ?: $check->resolved_check_date;
-        $dbAmount = $id->checkable_type == 'crf' ? $check->amount : $check->check_amount;
-        $payee = $id->checkable_type == 'crf' ? $check->paid_to : $check->payee;
+        $dbChequeDate = $cheque->cheque_date ?: $cheque->resolved_cheque_date;
+        $dbAmount = $id->checkable_type == 'crf' ? $cheque->amount : $cheque->cheque_amount;
+        $payee = $id->checkable_type == 'crf' ? $cheque->paid_to : $cheque->payee;
 
         // Normalize before comparison
-        if ((string) $dbCheckNo !== (string) $validated['checkNumber']) {
+        if ((string) $dbChequeNo !== (string) $validated['chequeNumber']) {
             throw ValidationException::withMessages([
-                'checkNumber' => 'Check number mismatch.',
+                'chequeNumber' => 'Cheque number mismatch.',
             ]);
         }
 
-        if (!$dbCheckDate->isSameDay(Date::parse($validated['checkDate']))) {
+        if (!$dbChequeDate->isSameDay(Date::parse($validated['chequeDate']))) {
             throw ValidationException::withMessages([
-                'checkDate' => 'Check Date mismatch.',
+                'chequeDate' => 'Cheque Date mismatch.',
             ]);
         }
 
         if ((float) $dbAmount !== (float) $validated['amount']) {
             throw ValidationException::withMessages([
-                'amount' => 'Check amount mismatch.',
+                'amount' => 'Cheque amount mismatch.',
             ]);
         }
         
@@ -92,8 +92,8 @@ class ScannedRecordsController extends Controller
 
         ScannedRecords::create([
             'bank_account_id' => $request->accountNumber,
-            'check_no' => $request->checkNumber,
-            'check_date' => $request->checkDate,
+            'cheque_no' => $request->chequeNumber,
+            'cheque_date' => $request->chequeDate,
             'payee' => $request->payee,
             'amount' => $request->amount,
             'caused_by' => $request->user()->id

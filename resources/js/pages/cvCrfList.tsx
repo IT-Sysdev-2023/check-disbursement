@@ -87,7 +87,7 @@ export default function CvCrfList({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
-            <PageContainer title="Check Status">
+            <PageContainer title="Cheque Status">
                 <TableFilter company={company} filters={filter} />
 
                 <TableDataGrid

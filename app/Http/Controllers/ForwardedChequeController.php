@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 
 use App\Models\ChequeStatus;
-use App\Services\ForwardedCheckService;
+use App\Services\ForwardedChequeService;
 use Illuminate\Http\Request;
 
-class ForwardedCheckController extends Controller
+class ForwardedChequeController extends Controller
 {
-    public function __construct(protected ForwardedCheckService $service)
+    public function __construct(protected ForwardedChequeService $service)
     {
     }
     public function index(Request $request)

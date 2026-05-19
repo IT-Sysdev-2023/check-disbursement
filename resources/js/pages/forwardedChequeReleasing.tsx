@@ -35,7 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ForwardedCheckReleasing({
+export default function ForwardedChequeReleasing({
     cheques,
     company,
     filter,

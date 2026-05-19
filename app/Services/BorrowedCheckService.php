@@ -11,6 +11,7 @@ use App\Models\Borrower;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class BorrowedCheckService
@@ -82,14 +83,13 @@ class BorrowedCheckService
             ->with('checkable')
             ->where('borrower_no', $borrowerNo)
             ->get();
-
         $companyNames = $borrower->pluck('checkable.getCompany')
             ->filter()
             ->unique()
             ->implode(', ');
 
         $chequeNumbers = $borrower
-            ->map(fn($b) => $b->checkable?->checkNumber)
+            ->map(fn($b) => $b->checkable?->chequeNumber)
             ->filter()
             ->unique();
 
@@ -99,7 +99,7 @@ class BorrowedCheckService
             'borrowerNo' => NumberHelper::padLeft($borrowerNo),
             'noOfChecks' => $borrower->count(),
             'purpose' => $reason,
-            'borrowedBy' => Str::upper($borrower->first()->borrower_id),
+            'borrowedBy' => Str::upper($borrower->first()->borrower_name),
             'releasedBy' => Str::upper(auth()->user()->name),
             'chequeNumbers' => $chequeNumbers->toArray()
         ];

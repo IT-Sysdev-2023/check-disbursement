@@ -126,10 +126,10 @@ class StatusService
     {
         $validated = $request->validate([
             'amount' => 'required|string',
-            'checkNo' => 'required|string'
+            'chequeNo' => 'required|string'
         ]);
         $data = ScannedRecords::where('amount', $validated['amount'])
-            ->where('check_no', $validated['checkNo'])
+            ->where('cheque_no', $validated['chequeNo'])
             ->first();
 
         return response()->json(new ScannedRecordResource($data));

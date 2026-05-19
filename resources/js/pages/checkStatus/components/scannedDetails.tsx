@@ -38,7 +38,7 @@ export default function ScannedDetails({
             const { data } = await axios.get(scannedRecordsAmountCheckNo().url, {
                 params: {
                     amount: record.amount,
-                    checkNo: record.checkNumber
+                    chequeNo: record.checkNumber
                 }
             });
             setScannedRecord(data);
@@ -75,30 +75,20 @@ export default function ScannedDetails({
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
-                                    Check Number
+                                    Cheque Number
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {scannedRecord?.checkNo}
+                                    {scannedRecord?.chequeNo}
                                 </Typography>
                             </Paper>
                         </Grid>
                         <Grid size={{ xs: 12, sm: 6 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
-                                    Check Date
+                                    Cheque Date
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {scannedRecord?.checkDate}
-                                </Typography>
-                            </Paper>
-                        </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
-                            <Paper sx={{ px: 2, py: 1 }}>
-                                <Typography variant="overline">
-                                    Check No.
-                                </Typography>
-                                <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {scannedRecord?.checkNo}
+                                    {scannedRecord?.chequeDate}
                                 </Typography>
                             </Paper>
                         </Grid>

@@ -7,14 +7,14 @@ export const createClosingCvColumns = (
     handleStatusChange: (data: ClosingCheckDetailsType) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
         flex: 0.5,
         minWidth: 50,
         renderCell: ({ row }) => {
-            return row.checkable?.checkNumber;
+            return row.checkable?.chequeNumber;
         },
     },
     {
@@ -88,7 +88,7 @@ export const createClosingCvColumns = (
                 cvNo: row.checkable?.cvNo,
                 releasedAt: row.createdAt,
                 bank: row.checkable?.bank,
-                checkNo: row.checkable?.checkNumber,
+                checkNo: row.checkable?.chequeNumber,
                 payee: row.checkable?.payee,
                 amount: row.checkable?.amount,
                 receivedBy: row.receiversName,

@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-class ForwardedCheckService
+class ForwardedChequeService
 {
     public function __construct(protected FileHandler $fileHandler)
     {
@@ -21,7 +21,7 @@ class ForwardedCheckService
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
 
         $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'businessUnit', 'tagLocation']])
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
             ->regionalPermission()
             ->where(['status' => 'forwarded', 'received_by' => null])
             ->paginate()
@@ -92,8 +92,8 @@ class ForwardedCheckService
             'status' => 'required|string',
         ]);
 
-        if (ChequeForwardedStatus::where('check_status_id', $id->id)->exists()) {
-            return redirect()->back()->with(['status' => false, 'message' => 'Duplicate entry in check forward status']);
+        if (ChequeForwardedStatus::where('cheque_status_id', $id->id)->exists()) {
+            return redirect()->back()->with(['status' => false, 'message' => 'Duplicate entry in cheque forward status']);
         }
 
         $handleFiles = $this->handleFiles($validated, $id->id);
@@ -145,7 +145,7 @@ class ForwardedCheckService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
         $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status')
-            ->with(['checkable' => ['borrowedCheck', 'businessUnit', 'tagLocation']])
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
             // ->whereHas('checkable.chequeStatus', function ($query) {
             ->where(['status' => 'forwarded'])
             ->whereNotNull('received_by')
@@ -155,7 +155,7 @@ class ForwardedCheckService
             ->withQueryString()
             ->toResourceCollection();
 
-        return Inertia::render('forwardedCheckReleasing', [
+        return Inertia::render('forwardedChequeReleasing', [
             'cheques' => $chequeRecords,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',

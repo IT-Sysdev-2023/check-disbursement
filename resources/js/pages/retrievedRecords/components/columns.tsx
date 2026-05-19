@@ -93,7 +93,7 @@ export const createChequeColumns = (
             }
 
             //COMPLETED STATUS
-            return renderStatus(row?.borrowedCheck ? 'Borrowed' : 'Tagging');
+            return renderStatus(row?.borrowedCheque ? 'Borrowed' : 'Tagging');
         },
     },
     {
@@ -234,13 +234,13 @@ export const createManageColumns = (
     handleScanDetails: (id: number) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         minWidth: 150,
     },
     {
-        field: 'checkDate',
-        headerName: 'Check Date',
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
         headerAlign: 'left',
         align: 'left',
         minWidth: 80,
@@ -317,8 +317,8 @@ export const createManageColumns = (
                 'amount': row.amountUnformatted,
                 'isScanned': row.isScanned,
                 'payee': row.payee,
-                'checkDate': row.checkDateUnformatted,
-                'checkNumber': row.checkNumber,
+                'chequeDate': row.chequeDateUnformatted,
+                'chequeNumber': row.chequeNumber,
             }
             const isSync = localStorage.getItem('syncScanned') === 'true';
             return (

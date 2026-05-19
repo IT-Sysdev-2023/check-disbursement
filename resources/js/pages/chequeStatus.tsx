@@ -67,7 +67,6 @@ export default function ChequeStatus({
             setScannedRecord(record);
         }
     };
-    console.log(company);
 
     const [tab, setTab] = useState(filter.tab);
 

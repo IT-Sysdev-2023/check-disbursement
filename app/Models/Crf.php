@@ -106,7 +106,7 @@ class Crf extends Model
         return $builder->select(
             'crfs.id as cheque_id',
             'cheque_number',
-            'resolved_cheque_date as check_date',
+            'crfs.resolved_cheque_date as check_date',
             'business_units.name as company_name',
             'crfs.amount',
             'paid_to as payee',
@@ -130,7 +130,7 @@ class Crf extends Model
     public function scopeScanRecords(Builder $builder)
     {
         return $builder->join('scanned_records', function ($join) {
-            $join->on('scanned_records.check_no', '=', 'crfs.ck_no')
+            $join->on('scanned_records.cheque_no', '=', 'crfs.cheque_number')
                 ->on('scanned_records.amount', '=', 'crfs.amount');
             // ->whereNotNull('scanned_records.payee');
         });
@@ -144,7 +144,7 @@ class Crf extends Model
             ->where('borrowed_cheques.checkable_type', 'crf')
             ->whereNotNull('borrowed_cheques.approved_at')
             ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.check_no', '=', 'crfs.cheque_number')
+                $join->on('scanned_records.cheque_no', '=', 'crfs.cheque_number')
                     ->on('scanned_records.amount', '=', 'crfs.amount');
             });
     }
@@ -154,7 +154,7 @@ class Crf extends Model
         return $this->belongsTo(TagLocation::class);
     }
 
-    public function borrowedCheck()
+    public function borrowedCheque()
     {
         return $this->morphOne(BorrowedCheque::class, 'checkable');
     }
