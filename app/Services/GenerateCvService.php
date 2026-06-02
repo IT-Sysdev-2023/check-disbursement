@@ -150,7 +150,7 @@ class GenerateCvService extends NavConnection
                         'business_unit_id' => $buId,
                         'causer_id' => $this->userId,
 
-                        'cheque_number' => $payment->{'Check Number'},
+                        'cheque_number' => $payment?->{'Check Number'},
                         'cheque_amount' => $payment->{'Check Amount'},
                         'bank_account_no' => $payment->{'Bank Account No_'},
                         'bank_name' => $payment->{'Bank Name'},
