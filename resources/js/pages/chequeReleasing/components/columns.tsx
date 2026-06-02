@@ -7,7 +7,7 @@ export const createReleasingColumns = (
     handleStatusChange: (checkId: number, value: string) => void,
 ): GridColDef[] => [
     {
-        field: 'checkNumber',
+        field: 'chequeNumber',
         headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
@@ -15,7 +15,7 @@ export const createReleasingColumns = (
         minWidth: 50,
     },
     {
-        field: 'checkDate',
+        field: 'chequeDate',
         headerName: 'Cheque Date',
         headerAlign: 'right',
         align: 'right',

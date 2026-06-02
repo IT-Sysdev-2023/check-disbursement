@@ -34,12 +34,6 @@ class Crf extends Model
         );
     }
 
-    protected function chequeNumber(): Attribute
-    {
-        return new Attribute(
-            get: fn() => $this->cheque_number,
-        );
-    }
     protected function getLocation(): Attribute
     {
         return new Attribute(
