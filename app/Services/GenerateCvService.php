@@ -152,10 +152,10 @@ class GenerateCvService extends NavConnection
 
                         'cheque_number' => $payment?->{'Check Number'},
                         'cheque_amount' => $payment?->{'Check Amount'},
-                        'bank_account_no' => $payment->{'Bank Account No_'},
-                        'bank_name' => $payment->{'Bank Name'},
+                        'bank_account_no' => $payment?->{'Bank Account No_'},
+                        'bank_name' => $payment?->{'Bank Name'},
                         'cheque_date' => optional($payment->{'Check Date'}, fn($d) => Date::parse($d)),
-                        'payee' => $payment->{'Payee'},
+                        'payee' => $payment?->{'Payee'},
                         'created_at' => $now,
                         'updated_at' => $now,
                     ];
