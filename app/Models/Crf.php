@@ -99,8 +99,8 @@ class Crf extends Model
     {
         return $builder->select(
             'crfs.id as cheque_id',
-            'cheque_number',
-            'crfs.resolved_cheque_date as check_date',
+             DB::raw('COALESCE(cheque_number, resolved_cheque_number) as cheque_number'),
+            'crfs.resolved_cheque_date as cheque_date',
             'business_units.name as company_name',
             'crfs.amount',
             'paid_to as payee',

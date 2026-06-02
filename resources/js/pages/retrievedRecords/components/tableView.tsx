@@ -262,7 +262,7 @@ export default function TableView({
 
             {chequeData && (
                 <AssignCnModal
-                    title="Assign Check Number"
+                    title="Assign Cheque Number"
                     open={openAssignCnModal}
                     chequeData={chequeData}
                     onClose={() => setOpenAssignCnModal(false)}

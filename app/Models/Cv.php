@@ -55,17 +55,17 @@ class Cv extends Model
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->where(function ($q) use ($search) {
                 $q->whereAny([
-                    'cv_check_payments.check_amount',
-                    'cv_check_payments.payee'
+                    'cvs.cheque_amount',
+                    'cvs.payee'
                 ], 'LIKE', '%' . $search . '%')
                     ->orWhere(function ($q2) use ($search) {
                         $q2->where(function ($q3) use ($search) { // if check_number is not zero then filter
-                            $q3->where('cv_check_payments.check_number', '!=', 0)
-                                ->where('cv_check_payments.check_number', 'LIKE', "%{$search}%");
+                            $q3->where('cvs.cheque_number', '!=', 0)
+                                ->where('cvs.cheque_number', 'LIKE', "%{$search}%");
                         })
                             ->orWhere(function ($q3) use ($search) {
-                                $q3->where('cv_check_payments.check_number', 0)
-                                    ->where('cv_check_payments.resolved_check_number', 'LIKE', "%{$search}%");
+                                $q3->where('cvs.cheque_number', 0)
+                                    ->where('cvs.resolved_cheque_number', 'LIKE', "%{$search}%");
                             });
                     })
                     ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {

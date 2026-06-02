@@ -180,7 +180,7 @@ class ChequeService
 
     public static function checkIfHasNoCheckNumber()
     {
-        return Cv::where([['check_number', 0], ['resolved_check_number', null]])
+        return Cv::where([['cheque_number', 0], ['resolved_cheque_number', null]])
             ->doesntHave('borrowedCheque')
             ->exists();
     }

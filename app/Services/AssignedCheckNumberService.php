@@ -17,7 +17,7 @@ class AssignedCheckNumberService
         
         $model = Relation::getMorphedModel($validated['type']);
 
-        $model::findOrFail($validated['id'])->update(['resolved_check_number' => $validated['checkNumber']]);
+        $model::findOrFail($validated['id'])->update(['resolved_cheque_number' => $validated['checkNumber']]);
 
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Assigned']);
     }
