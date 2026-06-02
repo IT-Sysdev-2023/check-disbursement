@@ -22,22 +22,22 @@ class Crf extends Model
     {
         return [
             'date' => 'date',
-            'resolved_check_date' => 'date',
+            'resolved_cheque_date' => 'date',
         ];
 
     }
 
-    protected function checkDate(): Attribute
+    protected function chequeDate(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->check_date ?? $this->resolved_check_date,
+            get: fn() => $this->cheque_date ?? $this->resolved_cheque_date,
         );
     }
 
-    protected function checkNumber(): Attribute
+    protected function chequeNumber(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->ck_no,
+            get: fn() => $this->cheque_number,
         );
     }
     protected function getLocation(): Attribute
@@ -70,7 +70,7 @@ class Crf extends Model
                 'crfs.paid_to',
                 'crfs.particulars',
                 'crfs.amount',
-                'crfs.ck_no'
+                'crfs.cheque_number'
             ], 'LIKE', '%' . $search . '%');
         })
             ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {

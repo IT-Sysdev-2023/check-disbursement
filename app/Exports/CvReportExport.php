@@ -44,15 +44,15 @@ class CvReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoSi
 
         $columns = $this->columns;
 
-        $doesIncludeCN = in_array('check_number', $columns);
-        $doesIncludeCD = in_array('check_date', $columns);
+        $doesIncludeCN = in_array('cheque_number', $columns);
+        $doesIncludeCD = in_array('cheque_date', $columns);
 
         if ($doesIncludeCN) {
-            $columns = array_map(fn($col) => $col === 'check_number' ? DB::raw('CASE WHEN check_number != 0 THEN check_number ELSE resolved_check_number END as check_number') : $col, $columns);
+            $columns = array_map(fn($col) => $col === 'cheque_number' ? DB::raw('CASE WHEN cheque_number != 0 THEN cheque_number ELSE resolved_cheque_number END as cheque_number') : $col, $columns);
         }
 
         if ($doesIncludeCD) {
-            $columns = array_map(fn($col) => $col === 'check_date' ? DB::raw('CASE WHEN check_date IS NOT NULL THEN check_date ELSE resolved_check_date END as check_date') : $col, $columns);
+            $columns = array_map(fn($col) => $col === 'cheque_date' ? DB::raw('CASE WHEN cheque_date IS NOT NULL THEN cheque_date ELSE resolved_cheque_date END as cheque_date') : $col, $columns);
         }
 
         if (in_array('status', $columns)) { //select the 'check_forwarded_statuses' status if there is a relationship there otherwise use the 

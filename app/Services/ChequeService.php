@@ -187,7 +187,7 @@ class ChequeService
 
     public static function checkIfHasNoCheckDate()
     {
-        return Crf::where('resolved_check_date', null)
+        return Crf::where('resolved_cheque_date', null)
             ->doesntHave('borrowedCheque')
             ->exists();
     }

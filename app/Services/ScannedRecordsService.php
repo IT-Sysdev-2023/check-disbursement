@@ -48,7 +48,7 @@ class ScannedRecordsService
                             'date' => Date::createFromFormat('m/d/Y', $m[2]),
                             'account_no' => $m[3],
                             'posted_date' => Date::createFromFormat('m/d/Y', $m[4]),
-                            'check_no' => $m[5],
+                            'cheque_number' => $m[5],
                             'branch_code' => $m[6],
                             'branch_name' => trim($m[7]),
                             'amount' => str_replace(',', '', $m[8]),

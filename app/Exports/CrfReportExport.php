@@ -41,15 +41,15 @@ class CrfReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoS
         $validated = $this->validated;
         $columns = $this->columns;
 
-        $doesIncludeCN = in_array('ck_no', $columns);
-        $doesIncludeCD = in_array('check_date', $columns);
+        $doesIncludeCN = in_array('cheque_number', $columns);
+        $doesIncludeCD = in_array('cheque_date', $columns);
 
         if ($doesIncludeCN) {
-            $columns = array_map(fn($col) => $col === 'ck_no' ? DB::raw('CASE WHEN ck_no != 0 THEN ck_no ELSE resolved_check_number END as ck_no') : $col, $columns);
+            $columns = array_map(fn($col) => $col === 'cheque_number' ? DB::raw('CASE WHEN cheque_number != 0 THEN cheque_number ELSE resolved_cheque_number END as cheque_number') : $col, $columns);
         }
 
         if ($doesIncludeCD) {
-            $columns = array_map(fn($col) => $col === 'check_date' ? 'resolved_check_date' : $col, $columns);
+            $columns = array_map(fn($col) => $col === 'cheque_date' ? 'resolved_cheque_date' : $col, $columns);
         }
 
         //select the 'check_forwarded_statuses' status if there is a relationship there otherwise use the status in parent table instead

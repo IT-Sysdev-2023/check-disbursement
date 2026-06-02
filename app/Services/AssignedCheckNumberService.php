@@ -27,12 +27,12 @@ class AssignedCheckNumberService
         $validated = $request->validate([
             'type' => 'required|string',
             'id' => 'required',
-            'checkDate' => ['required', 'date'],
+            'chequeDate' => ['required', 'date'],
         ]);
 
         $model = Relation::getMorphedModel($validated['type']);
 
-        $model::findOrFail($validated['id'])->update(['resolved_check_date' => $validated['checkDate']]);
+        $model::findOrFail($validated['id'])->update(['resolved_cheque_date' => $validated['chequeDate']]);
 
         return redirect()->back()->with(['status' => true, 'message' => 'Successfully Assigned']);
     }

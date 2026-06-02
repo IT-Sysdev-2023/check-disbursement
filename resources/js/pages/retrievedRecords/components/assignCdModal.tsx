@@ -38,9 +38,9 @@ export default function AssignCdModal({
     chequeData: ChequeType;
 }) {
     const { data, setData, put, errors, reset, transform } = useForm<{
-        checkDate: string | null; // store as ISO string
+        chequeDate: string | null; // store as ISO string
     }>({
-        checkDate: chequeData.checkDate
+        chequeDate: chequeData.checkDate
             ? dayjs(chequeData.checkDate).format('YYYY-MM-DD')
             : null,
     });
@@ -109,13 +109,13 @@ export default function AssignCdModal({
                                     <DatePicker
                                         label="Check Date"
                                         value={
-                                            data.checkDate
-                                                ? dayjs(data.checkDate)
+                                            data.chequeDate
+                                                ? dayjs(data.chequeDate)
                                                 : null
                                         }
                                         onChange={(newValue) =>
                                             setData(
-                                                'checkDate',
+                                                'chequeDate',
                                                 newValue
                                                     ? newValue.format(
                                                           'YYYY-MM-DD',
@@ -126,8 +126,8 @@ export default function AssignCdModal({
                                         slotProps={{
                                             textField: {
                                                 fullWidth: true,
-                                                error: !!errors.checkDate,
-                                                helperText: errors.checkDate,
+                                                error: !!errors.chequeDate,
+                                                helperText: errors.chequeDate,
                                                 sx: { mt: 1 },
                                             },
                                         }}
