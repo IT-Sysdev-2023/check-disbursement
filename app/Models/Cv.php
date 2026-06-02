@@ -67,10 +67,10 @@ class Cv extends Model
                                 $q3->where('cvs.cheque_number', 0)
                                     ->where('cvs.resolved_cheque_number', 'LIKE', "%{$search}%");
                             });
-                    })
-                    ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {
-                        $q2->where('cv_no', 'LIKE', '%' . $search . '%');
                     });
+                    // ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {
+                    //     $q2->where('cv_no', 'LIKE', '%' . $search . '%');
+                    // });
             });
         })
             ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
@@ -84,9 +84,9 @@ class Cv extends Model
                 }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereRelation('cvHeader', function ($q) use ($date) {
-                    $q->whereBetween('cv_date', [$date['start'], $date['end']]);
-                });
+                // $query->whereRelation('cvHeader', function ($q) use ($date) {
+                    $query->whereBetween('cv_date', [$date['start'], $date['end']]);
+                // });
             });
     }
 

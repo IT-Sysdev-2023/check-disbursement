@@ -124,10 +124,12 @@ class StatusService
 
     public function scannedRecordsAmountCheckNo(Request $request)
     {
+       
         $validated = $request->validate([
             'amount' => 'required|string',
             'chequeNo' => 'required|string'
         ]);
+         //WALA MO DISPLAY SA SCANNED DETAILS? WALA NA MA SCAN NGA CHEQUE SA CHEQUE STATUS
         $data = ScannedRecords::where('amount', $validated['amount'])
             ->where('cheque_no', $validated['chequeNo'])
             ->first();
