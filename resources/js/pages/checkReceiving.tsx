@@ -15,7 +15,7 @@ export default function CheckReceiving({
     cheques,
 }: {
     cheques: InertiaPagination<Borrower>;
-}) {
+    }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CR" />
