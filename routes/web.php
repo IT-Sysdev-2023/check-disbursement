@@ -187,7 +187,12 @@ Route::get('/test', function () {
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
         // ->table('SON-OK AGRI FARM$CV Check Payment')
-        ->table('MFI RICEMILL ACCOUNTING$CV Header')
+        ->table('ALTA CITTA ACCOUNTING$CV Header')
+
+
+        
+        // ->where('CV No_', '2512000001')
+        ->where('Check Number', "")
 
         // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
         // ->where('Check Class Location', '==',  '!=', '')
