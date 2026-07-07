@@ -65,6 +65,7 @@ class ScannedRecordsController extends Controller
         $disk = Storage::disk('cheque_share');
         $files = $disk->files('new');
 
+
         $count = 0;
         $totalBatches = ceil(count($files) / 2);
         // This will be 2 when you have 4 files
@@ -144,6 +145,22 @@ class ScannedRecordsController extends Controller
 
         return response()->json([
             'record' => $record,
+        ]);
+    }
+
+    public function clearCache()
+    {
+        $disk = Storage::disk('cheque_share');
+        $files = $disk->files('new');
+
+        foreach ($files as $file) {
+            $filename = basename($file);
+
+            $disk->move($file, "scanned/{$filename}");
+        }
+
+        return response()->json([
+            'status' => 'success'
         ]);
     }
 

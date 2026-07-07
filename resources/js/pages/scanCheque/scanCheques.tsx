@@ -54,6 +54,7 @@ export default function ScanCheques({ files }: Props) {
     const [progress, setProgress] = useState<any>();
     const [open, setOpen] = React.useState(false);
     const [success, setSuccess] = React.useState(false);
+    const [alScanned, setAlreadyScanned] = React.useState<any[]>([]);
 
     const [selectedRow, setSelectedRow] = useState<any>({
         bank_account_name: '',
@@ -131,12 +132,17 @@ export default function ScanCheques({ files }: Props) {
             );
 
             if (data.status == 'success') {
-                router.reload({
-                    only: ['auth'], // Reload only the auth prop
-                });
+                router.reload();
             }
         } finally {
             // setLoading(false);
+        }
+    };
+
+    const clearCache = async () => {
+        const { data } = await axios.get('/retrieved-checks/clear-cache/');
+        if (data.status == 'success') {
+            router.reload();
         }
     };
 
@@ -160,6 +166,7 @@ export default function ScanCheques({ files }: Props) {
             // console.log('scanning-cheques-event', e);
             if (e.percentage == 100) {
                 setLoading(false);
+                clearCache();
             }
         },
     );
@@ -172,6 +179,14 @@ export default function ScanCheques({ files }: Props) {
         },
     );
 
+    useEcho(
+        `already-scanned-records.${page.user.id}`,
+        '.already-scanned-records-event',
+        (e: any) => {
+            setAlreadyScanned((prev: any[]) => [...prev, e.records]);
+        },
+    );
+
     useEffect(() => {
         getScannedCheques(dateValue, searchData);
     }, [dateValue, searchData]);
@@ -179,7 +194,32 @@ export default function ScanCheques({ files }: Props) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Scan Cheques" />
+            {alScanned.length > 0 && (
+                <>
+                    <div className="mt-6 rounded-lg border">
+                        <h3 className="border-b px-4 py-2 text-sm font-semibold">
+                            Already Scanned
+                        </h3>
 
+                        <ul className="divide-y">
+                            {alScanned.map((item, index) => (
+                                <li
+                                    key={index}
+                                    className="flex justify-between px-4 py-2 text-sm"
+                                >
+                                    <span className="">
+                                        {item.cheque_no ?? 'N/A'} —{' '}
+                                        {item.account_no ?? 'N/A'}
+                                    </span>
+                                    <span className="">
+                                        {item.bank_account_name ?? 'N/A'}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </>
+            )}
             <PageContainer title="Sync Scanned Cheques">
                 <Snackbar
                     open={success}

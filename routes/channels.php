@@ -24,3 +24,6 @@ Broadcast::channel('scanning-cheques.{id}', function (User $user, int $id) {
 Broadcast::channel('scanned-records.{id}', function (User $user, int $id) {
     return (int) $user->id === (int) $id;
 });
+Broadcast::channel('already-scanned-records.{id}', function (User $user, int $id) {
+    return (int) $user->id === (int) $id;
+});

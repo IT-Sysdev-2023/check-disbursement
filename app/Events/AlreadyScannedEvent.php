@@ -14,14 +14,13 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class ScannedRecordEvent implements ShouldBroadcastNow
+class AlreadyScannedEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    protected $percentage;
     /**
      * Create a new event instance.
      */
-    public function __construct(public ScannedRecords $data, protected int $id) {}
+    public function __construct(public Array $data, protected int $id) {}
 
     /**
      * Get the channels the event should broadcast on.
@@ -31,13 +30,13 @@ class ScannedRecordEvent implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('scanned-records.' . $this->id),
+            new PrivateChannel('already-scanned-records.' . $this->id),
         ];
     }
 
     public function broadcastAs()
     {
-        return 'scanned-records-event';
+        return 'already-scanned-records-event';
     }
 
     public function broadcastWith()

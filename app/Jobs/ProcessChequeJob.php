@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Events\AlreadyScannedEvent;
 use App\Events\ScannedRecordEvent;
 use App\Events\ScanningChequesEvent;
 use Illuminate\Bus\Queueable;
@@ -14,8 +15,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\Models\ScannedRecords;
 use Carbon\Carbon;
-use Carbon\Traits\Date;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
 
 class ProcessChequeJob implements ShouldQueue
 {
@@ -30,6 +30,7 @@ class ProcessChequeJob implements ShouldQueue
     }
     public function handle(): void
     {
+        $alreadyScanned = [];
         try {
 
             $bytes = Storage::disk('cheque_share')->get($this->imagePath);
@@ -83,7 +84,7 @@ class ProcessChequeJob implements ShouldQueue
             $data = json_decode(trim($clean), true);
 
             Log::info($data);
-         
+
             $result = ScannedRecords::create([
                 'payee'              => $data['payee'] ?? null,
                 'amount'             => $data['amount'] ?? null,
@@ -97,6 +98,18 @@ class ProcessChequeJob implements ShouldQueue
 
 
             ScannedRecordEvent::dispatch($result, $this->id);
+        } catch (QueryException $e) {
+            if ($e->errorInfo[1] === 1062) {
+                $alreadyScanned = [
+                    'cheque_no'        => $data['cheque_no'] ?? null,
+                    'account_no'       => $data['account_no'] ?? null,
+                    'bank_account_name' => $data['bank_name'] ?? null,
+                ];
+
+                AlreadyScannedEvent::dispatch($alreadyScanned, $this->id);
+                return; // important: don't retry on duplicate
+            }
+            throw $e;
         } catch (\Exception $e) {
             // $this->check->update(['status' => 'failed']);
             throw $e; // let Laravel retry
