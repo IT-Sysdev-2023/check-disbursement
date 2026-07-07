@@ -1,0 +1,148 @@
+<?php
+
+namespace App\Jobs;
+
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use App\Models\ScannedRecords;
+use Illuminate\Support\Facades\Auth;
+
+class ProcessChequeJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public string $imagePath;
+    public int $attempts = 5; // Max retries
+
+    public function __construct(string $imagePath)
+    {
+        $this->imagePath = $imagePath;
+    }
+
+    public function handle(): void
+    {
+        try {
+            if (!Storage::disk('cheque_share')->exists($this->imagePath)) {
+                Log::warning("Image not found", ['path' => $this->imagePath]);
+                return;
+            }
+
+            $bytes = Storage::disk('cheque_share')->get($this->imagePath);
+
+            Log::info('Image read', [
+                'path' => $this->imagePath,
+                'size' => strlen($bytes)
+            ]);
+
+            $prompt = "You are an expert at reading Philippine bank cheques, especially Landbank cheques.
+
+Carefully analyze this cheque image and extract the following fields. 
+Return **ONLY** valid JSON in this exact structure, no explanations:
+
+{
+  \"payee\": \"string\",
+  \"amount\": number,
+  \"amount_in_words\": \"string\",
+  \"account_no\": \"string\",
+  \"cheque_no\": \"string\",
+  \"cheque_date\": \"string (YYYY-MM-DD or null)\",
+  \"bank_name\": \"string\"
+}
+
+Rules:
+- Payee: The name after \"PAY TO THE ORDER OF\"
+- Amount: Numeric value (e.g. 14963.22)
+- Amount in words: Full text as written
+- Account No: The number at top left (Account No.)
+- Cheque No: The number at top right
+- Cheque Date: Convert to YYYY-MM-DD format
+- Bank Name: Usually \"Landbank\" or full branch name
+
+If a field is unclear or missing, use null.";
+
+            $payload = [
+                'contents' => [[
+                    'parts' => [
+                        ['text' => $prompt],
+                        [
+                            'inline_data' => [
+                                'mime_type' => 'image/jpeg',
+                                'data' => base64_encode($bytes)
+                            ]
+                        ]
+                    ]
+                ]]
+            ];
+            $response = Http::timeout(120)
+                ->post(
+                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" .
+                        config('app.GEMINI_API_KEY'),
+                    $payload
+                );
+
+            // $response = Http::timeout(120)
+            //     ->post(
+            //         "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" .
+            //             config('app.GEMINI_API_KEY'),
+            //         $payload
+            //     );
+
+            if (!$response->successful()) {
+                $body = $response->body();
+
+                if (str_contains($body, '429') || str_contains($body, 'RESOURCE_EXHAUSTED')) {
+                    Log::warning('Gemini quota hit - releasing job', ['path' => $this->imagePath]);
+
+                    // Release back to queue with delay
+                    $this->release(60); // 1 minute delay
+                    return;
+                }
+
+                throw new \Exception('Gemini API error: ' . $body);
+            }
+
+            $text = $response->json('candidates.0.content.parts.0.text', '');
+            $clean = preg_replace('/```(?:json)?\s*|\s*```/', '', $text);
+            $clean = trim($clean);
+
+            $data = json_decode($clean, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new \Exception('Invalid JSON: ' . json_last_error_msg());
+            }
+
+            // Save to DB
+            $record = ScannedRecords::create([
+                'payee'              => $data['payee'] ?? null,
+                'amount'             => $data['amount'] ?? null,
+                'account_number'     => $data['account_no'] ?? null,
+                'cheque_no'          => $data['cheque_no'] ?? null,
+                'cheque_date'        => $data['cheque_date'] ?? null,
+                'bank_account_name'  => $data['bank_name'] ?? null,
+                'caused_by'         => Auth::user()->id,
+            ]);
+
+            Log::info("✅ Cheque processed", [
+                'id' => $record->id,
+                'cheque_no' => $data['cheque_no'] ?? 'N/A'
+            ]);
+        } catch (\Exception $e) {
+            Log::error("ProcessChequeJob failed", [
+                'image' => $this->imagePath,
+                'error' => $e->getMessage()
+            ]);
+
+            if ($this->attempts() < 5) {
+                $this->release(30);
+            } else {
+                throw $e;
+            }
+        }
+    }
+}

@@ -12,8 +12,9 @@ return new class extends Migration {
     {
         Schema::create('scanned_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bank_account_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete()->nullable();
+            $table->string('bank_account_name')->nullable();
             $table->string('bu')->nullable();
+            $table->string('account_number')->nullable();
             $table->string('seq')->nullable();
             $table->dateTime('date')->nullable();
             $table->dateTime('posted_date')->nullable();
@@ -26,7 +27,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['cheque_no', 'payee', 'amount']);
+            // $table->unique(['cheque_no', 'payee', 'amount']);
         });
     }
 

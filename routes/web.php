@@ -77,7 +77,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('pending-details/{id}', [BorrowedCheckController::class, 'pendingDetails'])->name('pending-details');
             Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
+            Route::post('scan-analyze', [ScannedRecordsController::class, 'scanAnalyze'])->name('scanAnalyze');
+            Route::post('get-scanned-cheques', [ScannedRecordsController::class, 'getScannedCheques'])->name('getScannedCheques');
             Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');
+            Route::put('put-selected-rows-check', [ScannedRecordsController::class, 'putSelectedRowCheck'])->name('putSelectedRowCheck');
             Route::get('get-banks', [BankController::class, 'banks'])->name('banks');
             // Route::put('update-scanned-record/{id}', [ScannedRecordsController::class, 'update'])->name('update-scanned-record');
             Route::post('store-scan-record/{id}', [ScannedRecordsController::class, 'store'])->name('store-scan-record');

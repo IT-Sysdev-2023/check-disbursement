@@ -11,7 +11,9 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "icewind/smb": "^3.8",
         "inertiajs/inertia-laravel": "^2.0",
+        "jerodev/flysystem-v3-smb-adapter": "^1.2",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/reverb": "^1.0",
@@ -62,7 +64,15 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8001\" \"php artisan queue:listen --tries=1\" \"php artisan reverb:start\" \"npm run dev\" --names='server,queue,vite'"
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=0.0.0.0 --port=8001\" \"php artisan queue:listen\" \"php artisan reverb:start\" \"npm run dev\" --names='server,queue,vite'"
+        ],
+        "dev-ken": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=127.0.0.1 --port=8001\" \"php artisan queue:work\" \"php artisan reverb:start --host=127.0.0.1 --port=8003\" \"pnpm run dev\" --names='server,queue,vite'"
+        ],
+        "dev-ken-prod": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve --host=172.16.42.143 --port=8089\" \"php artisan queue:listen\" \"php artisan reverb:start --host=172.16.42.143 --port=8090\" --names='server,queue,vite'"
         ],
         "dev:ssr": [
             "npm run build:ssr",

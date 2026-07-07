@@ -18,3 +18,9 @@ Broadcast::channel('crf-progress.{id}', function (User $user, int $id) {
 Broadcast::channel('scan-progress.{id}', function (User $user, int $id) {
     return (int) $user->id === (int) $id;
 });
+Broadcast::channel('scanning-cheques.{id}', function (User $user, int $id) {
+    return (int) $user->id === (int) $id;
+});
+Broadcast::channel('scanned-records.{id}', function (User $user, int $id) {
+    return (int) $user->id === (int) $id;
+});

@@ -47,6 +47,11 @@ return [
             'report' => false,
         ],
 
+        'private' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/private'),
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
@@ -63,6 +68,15 @@ return [
         'scanned' => [
             'driver' => 'local',
             'root' => '\\\\172.16.42.91\jessan', //\\172.16.42.143\GiftCheckTextfile
+        ],
+
+        'cheque_share' => [
+            'driver' => 'smb',
+            'host' => '172.16.42.91',
+            'path' => 'scanned',   // ← the actual SMB share name (e.g., \\172.16.42.91\cheques)
+            'username' => env('SMB_USERNAME'),
+            'password' => env('SMB_PASSWORD'),
+            'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
         ],
 
     ],

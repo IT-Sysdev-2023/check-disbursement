@@ -54,6 +54,8 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'GEMINI_API_KEY' => env('GEMINI_API_KEY'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

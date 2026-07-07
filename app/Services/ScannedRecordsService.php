@@ -16,58 +16,58 @@ class ScannedRecordsService
 {
     private int $totalRecords;
     private string $filename;
-    public function scan(int $id)
-    {
-        $selectedFiles = self::checkFiles();
+    // public function scan(int $id)
+    // {
+    //     $selectedFiles = self::checkFiles();
 
-        if ($selectedFiles->isEmpty()) {
-            return redirect()->back()->with(['status' => false, 'message' => 'Files Already Synced']);
-        }
-        foreach ($selectedFiles as $fileIndex => $file) {
+    //     if ($selectedFiles->isEmpty()) {
+    //         return redirect()->back()->with(['status' => false, 'message' => 'Files Already Synced']);
+    //     }
+    //     foreach ($selectedFiles as $fileIndex => $file) {
 
-            $this->filename = $this->getBuLazy($file);
-            $totalFiles = count($selectedFiles);
+    //         $this->filename = $this->getBuLazy($file);
+    //         $totalFiles = count($selectedFiles);
 
-            self::lazyFiles($file)
-                ->tap(
-                    fn(LazyCollection $collection) => $this->totalRecords = $collection->count()
-                )->each(function ($line, $index) use ($id, $totalFiles, $fileIndex) {
-                    ScanProgress::dispatch("Retrieving Scanned checks in progress.. ", $index, $this->totalRecords, $id, $totalFiles, $fileIndex);
+    //         self::lazyFiles($file)
+    //             ->tap(
+    //                 fn(LazyCollection $collection) => $this->totalRecords = $collection->count()
+    //             )->each(function ($line, $index) use ($id, $totalFiles, $fileIndex) {
+    //                 ScanProgress::dispatch("Retrieving Scanned checks in progress.. ", $index, $this->totalRecords, $id, $totalFiles, $fileIndex);
 
-                    if (!preg_match('/^\s*\d+\s+\d{2}\/\d{2}\/\d{4}/', $line)) {
-                        return;
-                    }
+    //                 if (!preg_match('/^\s*\d+\s+\d{2}\/\d{2}\/\d{4}/', $line)) {
+    //                     return;
+    //                 }
 
-                    // Parse using regex (flexible for spacing)
-                    $pattern = '/^\s*(\d+)\s+(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(\d+)\s+([A-Z- ]+)\s+([\d,]+\.\d{2})/';
+    //                 // Parse using regex (flexible for spacing)
+    //                 $pattern = '/^\s*(\d+)\s+(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(\d{2}\/\d{2}\/\d{4})\s+(\d+)\s+(\d+)\s+([A-Z- ]+)\s+([\d,]+\.\d{2})/';
 
-                    if (preg_match($pattern, $line, $m)) {
-                        ScannedRecords::insertOrIgnore([
-                            'bu' => $this->filename,
-                            'seq' => $m[1],
-                            'date' => Date::createFromFormat('m/d/Y', $m[2]),
-                            'account_no' => $m[3],
-                            'posted_date' => Date::createFromFormat('m/d/Y', $m[4]),
-                            'cheque_number' => $m[5],
-                            'branch_code' => $m[6],
-                            'branch_name' => trim($m[7]),
-                            'amount' => str_replace(',', '', $m[8]),
-                            'caused_by' => $id,
-                            'created_at' => now(),
-                            'updated_at' => now()
-                        ]);
-                    }
-                });
+    //                 if (preg_match($pattern, $line, $m)) {
+    //                     ScannedRecords::insertOrIgnore([
+    //                         'bu' => $this->filename,
+    //                         'seq' => $m[1],
+    //                         'date' => Date::createFromFormat('m/d/Y', $m[2]),
+    //                         'account_no' => $m[3],
+    //                         'posted_date' => Date::createFromFormat('m/d/Y', $m[4]),
+    //                         'cheque_number' => $m[5],
+    //                         'branch_code' => $m[6],
+    //                         'branch_name' => trim($m[7]),
+    //                         'amount' => str_replace(',', '', $m[8]),
+    //                         'caused_by' => $id,
+    //                         'created_at' => now(),
+    //                         'updated_at' => now()
+    //                     ]);
+    //                 }
+    //             });
 
-            ScannedSync::create([
-                'filename' => $file->getFilename(),
-                'filepath' => $file->getRealPath(),
-                'size' => $file->getSize(),
-                'synced_at' => now()
-            ]);
-        }
-        return redirect()->back()->with(['status' => true, 'message' => 'Done Sync']);
-    }
+    //         ScannedSync::create([
+    //             'filename' => $file->getFilename(),
+    //             'filepath' => $file->getRealPath(),
+    //             'size' => $file->getSize(),
+    //             'synced_at' => now()
+    //         ]);
+    //     }
+    //     return redirect()->back()->with(['status' => true, 'message' => 'Done Sync']);
+    // }
 
     private function getBuLazy($file)
     {
@@ -140,4 +140,6 @@ class ScannedRecordsService
 
          return redirect()->back()->with(['status' => $status, 'message' => $status ? 'Successfully Updated' : 'Update Failed!']);
     }
+
+    
 }

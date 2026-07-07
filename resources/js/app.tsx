@@ -1,6 +1,8 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { configureEcho } from '@laravel/echo-react';
 import { CssBaseline } from '@mui/material';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
@@ -38,14 +40,16 @@ createInertiaApp({
         };
 
         root.render(
-            <AppTheme themeComponents={themeComponents}>
-                <CssBaseline />
-                <NotificationsProvider>
-                    <DialogsProvider>
-                        <App {...props} />
-                    </DialogsProvider>
-                </NotificationsProvider>
-            </AppTheme>,
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <AppTheme themeComponents={themeComponents}>
+                    <CssBaseline />
+                    <NotificationsProvider>
+                        <DialogsProvider>
+                            <App {...props} />
+                        </DialogsProvider>
+                    </NotificationsProvider>
+                </AppTheme>
+            </LocalizationProvider>
         );
     },
     progress: {
@@ -54,4 +58,4 @@ createInertiaApp({
 });
 
 // This will set light / dark mode on load...
-initializeTheme(); 
+initializeTheme();

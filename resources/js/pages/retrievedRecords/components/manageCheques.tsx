@@ -1,7 +1,7 @@
 import TableFilter from '@/components/tableFilter';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import TableDataGrid from '@/pages/dashboard/components/TableDataGrid';
-import { details, detailsCrf, retrievedRecords } from '@/routes';
+import { details, detailsCrf, retrievedRecords, scan } from '@/routes';
 import {
     FilterType,
     InertiaPagination,
@@ -34,25 +34,11 @@ export default function ManageCheques({
     const [sync, setSync] = useState(false);
 
     const handleSyncScanned = () => {
-        setSync(true);
-        localStorage.setItem('syncScanned', 'true');
-        // router.get(
-        //     scan(),
-        //     {},
-        //     {
-        //         preserveState: true,
-        //         preserveScroll: true,
-        //         onStart: () => {
-        //             setOpenProgress(true);
-        //         },
-        //         onSuccess: () => {
-        //             setOpenProgress(false);
-        //         },
-        //     },
-        // );
+        // setSync(true);
+        router.get(scan());
     };
 
-    const handleUpdateScanned = (details) => {
+    const handleUpdateScanned = (details: any) => {
         if (!sync) {
             alert('Please Sync Cheque Scan first');
             return;
