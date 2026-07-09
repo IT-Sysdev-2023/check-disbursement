@@ -83,7 +83,7 @@ class ProcessChequeJob implements ShouldQueue
             $clean = preg_replace('/```json|```/', '', $text);
             $data = json_decode(trim($clean), true);
 
-            Log::info($data);
+            // Log::info($data);
 
             $result = ScannedRecords::create([
                 'payee'              => $data['payee'] ?? null,
