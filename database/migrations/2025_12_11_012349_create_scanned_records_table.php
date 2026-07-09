@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('scanned_records', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('borrowed_cheque_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('bank_account_name')->nullable();
             $table->string('bu')->nullable();
             $table->string('account_number')->nullable();
@@ -23,7 +24,8 @@ return new class extends Migration {
             $table->string('branch_name')->nullable();
             $table->decimal('amount', 20);
             $table->string('payee')->nullable();
-            $table->timestamp('cheque_date')->nullable();
+            $table->date('cheque_date')->nullable();
+             $table->string('doc_path')->nullable();
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 

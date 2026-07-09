@@ -282,7 +282,7 @@ export const createManageColumns = (
         align: 'center',
         headerAlign: 'center',
         renderCell: ({ row }) => {
-            return row.isScanned ? (
+            return row.scannedId ? (
                 <Chip label="Scanned" color="success" size="small" />
             ) : (
                 <Chip label="Not Scanned" color="error" size="small" />
@@ -312,15 +312,15 @@ export const createManageColumns = (
         sortable: false,
         renderCell: ({ row }) => {
 
-            const details = {
-                'id': row.borrowedCheckId,
-                'amount': row.amountUnformatted,
-                'isScanned': row.isScanned,
-                'payee': row.payee,
-                'chequeDate': row.chequeDateUnformatted,
-                'chequeNumber': row.chequeNumber,
-            }
-            const isSync = localStorage.getItem('syncScanned') === 'true';
+            // const details = {
+            //     'id': row.borrowedCheckId,
+            //     'amount': row.amountUnformatted,
+            //     'isScanned': row.isScanned,
+            //     'payee': row.payee,
+            //     'chequeDate': row.chequeDateUnformatted,
+            //     'chequeNumber': row.chequeNumber,
+            // }
+            // const isSync = localStorage.getItem('syncScanned') === 'true';
             return (
                 <Stack direction="row" sx={{ gap: 1 }}>
                     <IconButton
@@ -333,7 +333,7 @@ export const createManageColumns = (
 
                    
 
-                    {( !row.isScanned) && (
+                    {/* {( row.isScanned === 1) && (
                         <IconButton
                             size="small"
                             color="primary"
@@ -342,9 +342,9 @@ export const createManageColumns = (
                         >
                             <Edit2 />
                         </IconButton>
-                    )}
+                    )} */}
 
-                     {(row.scannedId || (row.isScanned == 1)) && (
+                     {(row.scannedId) && (
                         <IconButton
                             size="small"
                             color="primary"

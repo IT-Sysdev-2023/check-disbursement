@@ -5,6 +5,9 @@ namespace App\Jobs;
 use App\Events\AlreadyScannedEvent;
 use App\Events\ScannedRecordEvent;
 use App\Events\ScanningChequesEvent;
+use App\Models\BorrowedCheque;
+use App\Models\Crf;
+use App\Models\Cv;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -21,7 +24,9 @@ class ProcessChequeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public string $imagePath, public int $id, public int $count, public int $totalcount) {}
+    public function __construct(public string $imagePath, public int $id, public int $count, public int $totalcount)
+    {
+    }
     public $tries = 5;
 
     public function backoff(): array
@@ -40,24 +45,26 @@ class ProcessChequeJob implements ShouldQueue
                 \"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\ , \"date\": \"string\"}";
 
             $payload = [
-                'contents' => [[
-                    'parts' => [
-                        ['text' => $prompt],
-                        [
-                            'inline_data' => [
-                                'mime_type' => 'image/jpeg',
-                                'data' => base64_encode($bytes)
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt],
+                            [
+                                'inline_data' => [
+                                    'mime_type' => 'image/jpeg',
+                                    'data' => base64_encode($bytes)
+                                ]
                             ]
                         ]
                     ]
-                ]]
+                ]
             ];
 
             $response = Http::timeout(60)
                 ->retry(3, 2000)
                 ->post(
                     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" .
-                        config('app.GEMINI_API_KEY'),
+                    config('app.GEMINI_API_KEY'),
                     $payload
                 );
 
@@ -83,26 +90,45 @@ class ProcessChequeJob implements ShouldQueue
             $clean = preg_replace('/```json|```/', '', $text);
             $data = json_decode(trim($clean), true);
 
-            // Log::info($data);
+
+            $amount = $data['amount'] ?? null;
+            $chequeNumber = $data['cheque_no'] ?? null;
+
+            $borrowedIChequeId = BorrowedCheque::whereHasMorph(
+                'checkable',
+                [Crf::class, Cv::class],
+                function ($q, $type) use ($chequeNumber, $amount) {
+                    $amountColumn = $type === Crf::class ? 'amount' : 'cheque_amount';
+                    $q->where(function ($query) use ($chequeNumber) {
+                        $query->where('cheque_number', $chequeNumber)
+                            ->orWhere(function ($query) use ($chequeNumber) {
+                                $query->where(function ($q) {
+                                    $q->whereNull('cheque_number')
+                                        ->orWhere('cheque_number', 0);
+                                })
+                                    ->where('resolved_cheque_number', $chequeNumber);
+                            });
+                    })->where($amountColumn, $amount);
+                }
+            )->value('id');
 
             $result = ScannedRecords::create([
-                'payee'              => $data['payee'] ?? null,
-                'amount'             => $data['amount'] ?? null,
-                'account_number'     => $data['account_no'] ?? null,
-                'cheque_no'          => $data['cheque_no'] ?? null,
-                'cheque_date'        => Carbon::createFromFormat('m-d-Y', $data['date']) ?? null,
-                'bank_account_name'  => $data['bank_name'] ?? null,
-                'caused_by'         => $this->id,
+                'payee' => $data['payee'] ?? null,
+                'borrowed_cheque_id' => $borrowedIChequeId,
+                'amount' => $amount,
+                'account_number' => $data['account_no'] ?? null,
+                'cheque_no' => $chequeNumber,
+                'cheque_date' => Carbon::createFromFormat('m-d-Y', $data['date']) ?? null,
+                'bank_account_name' => $data['bank_name'] ?? null,
+                'caused_by' => $this->id,
             ]);
-
-
 
             ScannedRecordEvent::dispatch($result, $this->id);
         } catch (QueryException $e) {
             if ($e->errorInfo[1] === 1062) {
                 $alreadyScanned = [
-                    'cheque_no'        => $data['cheque_no'] ?? null,
-                    'account_no'       => $data['account_no'] ?? null,
+                    'cheque_no' => $data['cheque_no'] ?? null,
+                    'account_no' => $data['account_no'] ?? null,
                     'bank_account_name' => $data['bank_name'] ?? null,
                 ];
 

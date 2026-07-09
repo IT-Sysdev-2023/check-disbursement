@@ -273,7 +273,7 @@ export default function AssignScanDetailsModal({
                     <Divider sx={{ my: 3 }} />
 
                     <Box sx={{ textAlign: 'right', mt: 2 }}>
-                        {!borrowedCheckId.isScanned && (
+                        {!borrowedCheckId.scannedId && (
                             <Button
                                 sx={{ mr: 2 }}
                                 variant="outlined"

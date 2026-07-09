@@ -123,7 +123,6 @@ class ChequeService
             ->filter($filters)
             ->addSelect(
                 'borrowed_cheques.id as borrowedCheckId',
-                'borrowed_cheques.was_scanned as isScanned',
                 // 'borrowed_cheques.is_returned',
                 // 'borrowed_cheques.secondary_borrower',
                 'borrowed_cheques.approved_at',
@@ -142,7 +141,6 @@ class ChequeService
             ->filter($filters)
             ->addSelect(
                 'borrowed_cheques.id as borrowedCheckId',
-                'borrowed_cheques.was_scanned as isScanned',
                 // 'borrowed_cheques.is_returned',
                 // 'borrowed_cheques.secondary_borrower',
                 'borrowed_cheques.approved_at',

@@ -50,6 +50,10 @@ class Cv extends Model
         );
     }
 
+    // public function scopeScan(Builder $builder, array $filters){
+    //     return $builder->where($this->chequeNumber, );
+    // }
+
     public function scopeFilter(Builder $builder, array $filters)
     {
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
@@ -68,9 +72,9 @@ class Cv extends Model
                                     ->where('cvs.resolved_cheque_number', 'LIKE', "%{$search}%");
                             });
                     });
-                    // ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {
-                    //     $q2->where('cv_no', 'LIKE', '%' . $search . '%');
-                    // });
+                // ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {
+                //     $q2->where('cv_no', 'LIKE', '%' . $search . '%');
+                // });
             });
         })
             ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
@@ -79,13 +83,13 @@ class Cv extends Model
             ->when(($filters['bu'] ?? null) && $filters['bu'] != 'all', function ($query) use ($filters) {
                 if (is_numeric($filters['bu'])) {
                     $query->where('business_unit_id', $filters['bu']);
-                }else{
+                } else {
                     $query->whereRelation('businessUnit', 'name', $filters['bu']);
                 }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 // $query->whereRelation('cvHeader', function ($q) use ($date) {
-                    $query->whereBetween('cv_date', [$date['start'], $date['end']]);
+                $query->whereBetween('cv_date', [$date['start'], $date['end']]);
                 // });
             });
     }
@@ -120,25 +124,27 @@ class Cv extends Model
     public function scopeScanRecords(Builder $builder)
     {
         return $builder
-            ->join('scanned_records', function ($join) {
-                $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
-                    // ->whereNotNull('scanned_records.payee')
-                    ->where(function ($q) {
-                        $q->where(function ($q) {
-                            $q->where('cvs.cheque_number', '!=', 0)
-                                ->whereColumn(
-                                    'scanned_records.cheque_no',
-                                    'cvs.cheque_number'
-                                );
-                        })->orWhere(function ($q) {
-                            $q->where('cvs.cheque_number', 0)
-                                ->whereColumn(
-                                    'scanned_records.cheque_no',
-                                    'cvs.resolved_cheque_number'
-                                );
-                        });
-                    });
-            });
+            ->join('borrowed_cheques', 'borrowed_cheques.checkable_id', '=', 'cvs.id')
+            ->join('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id');
+        // ->join('scanned_records', function ($join) {
+        //     $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
+        //         // ->whereNotNull('scanned_records.payee')
+        //         ->where(function ($q) {
+        //             $q->where(function ($q) {
+        //                 $q->where('cvs.cheque_number', '!=', 0)
+        //                     ->whereColumn(
+        //                         'scanned_records.cheque_no',
+        //                         'cvs.cheque_number'
+        //                     );
+        //             })->orWhere(function ($q) {
+        //                 $q->where('cvs.cheque_number', 0)
+        //                     ->whereColumn(
+        //                         'scanned_records.cheque_no',
+        //                         'cvs.resolved_cheque_number'
+        //                     );
+        //             });
+        //         });
+        // });
     }
 
     public function scopeLeftJoinScanRecords(Builder $builder)
@@ -150,24 +156,25 @@ class Cv extends Model
             ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
             ->where('borrowed_cheques.checkable_type', 'cv')
             ->whereNotNull('borrowed_cheques.approved_at')
-            ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
-                    ->where(function ($q) {
-                        $q->where(function ($q) {
-                            $q->where('cvs.cheque_number', '!=', 0)
-                                ->whereColumn(
-                                    'scanned_records.cheque_no',
-                                    'cvs.cheque_number'
-                                );
-                        })->orWhere(function ($q) {
-                            $q->where('cvs.cheque_number', 0)
-                                ->whereColumn(
-                                    'scanned_records.cheque_no',
-                                    'cvs.resolved_cheque_number'
-                                );
-                        });
-                    });
-            });
+            ->leftJoin('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id');
+        // ->leftJoin('scanned_records', function ($join) {
+        //     $join->on('scanned_records.amount', '=', 'cvs.cheque_amount')
+        //         ->where(function ($q) {
+        //             $q->where(function ($q) {
+        //                 $q->where('cvs.cheque_number', '!=', 0)
+        //                     ->whereColumn(
+        //                         'scanned_records.cheque_no',
+        //                         'cvs.cheque_number'
+        //                     );
+        //             })->orWhere(function ($q) {
+        //                 $q->where('cvs.cheque_number', 0)
+        //                     ->whereColumn(
+        //                         'scanned_records.cheque_no',
+        //                         'cvs.resolved_cheque_number'
+        //                     );
+        //             });
+        //         });
+        // });
     }
 
     // public function cvHeader()

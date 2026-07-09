@@ -89,6 +89,8 @@ class ScannedRecordsController extends Controller
             );
         }
 
+        
+
         return response()->json([
             'status' => 'success',
             // 'records' => $files

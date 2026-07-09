@@ -73,7 +73,7 @@ class Crf extends Model
             ->when(($filters['bu'] ?? null) && $filters['bu'] != 'all', function ($query) use ($filters) {
                 if (is_numeric($filters['bu'])) {
                     $query->where('business_unit_id', $filters['bu']);
-                }else{
+                } else {
                     $query->whereRelation('businessUnit', 'name', $filters['bu']);
                 }
             })
@@ -99,7 +99,7 @@ class Crf extends Model
     {
         return $builder->select(
             'crfs.id as cheque_id',
-             DB::raw('COALESCE(cheque_number, resolved_cheque_number) as cheque_number'),
+            DB::raw('COALESCE(cheque_number, resolved_cheque_number) as cheque_number'),
             'crfs.resolved_cheque_date as cheque_date',
             'business_units.name as company_name',
             'crfs.amount',
@@ -123,11 +123,13 @@ class Crf extends Model
     }
     public function scopeScanRecords(Builder $builder)
     {
-        return $builder->join('scanned_records', function ($join) {
-            $join->on('scanned_records.cheque_no', '=', 'crfs.cheque_number')
-                ->on('scanned_records.amount', '=', 'crfs.amount');
-            // ->whereNotNull('scanned_records.payee');
-        });
+        return $builder->join('borrowed_cheques', 'borrowed_cheques.checkable_id', '=', 'crfs.id')
+            ->join('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id');
+        // return $builder->join('scanned_records', function ($join) {
+        //     $join->on('scanned_records.cheque_no', '=', 'crfs.cheque_number')
+        //         ->on('scanned_records.amount', '=', 'crfs.amount');
+        //     // ->whereNotNull('scanned_records.payee');
+        // });
     }
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
@@ -137,10 +139,11 @@ class Crf extends Model
             ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
             ->where('borrowed_cheques.checkable_type', 'crf')
             ->whereNotNull('borrowed_cheques.approved_at')
-            ->leftJoin('scanned_records', function ($join) {
-                $join->on('scanned_records.cheque_no', '=', 'crfs.cheque_number')
-                    ->on('scanned_records.amount', '=', 'crfs.amount');
-            });
+            ->leftJoin('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id');
+        // ->leftJoin('scanned_records', function ($join) {
+        //     $join->on('scanned_records.cheque_no', '=', 'crfs.cheque_number')
+        //         ->on('scanned_records.amount', '=', 'crfs.amount');
+        // });
     }
 
     public function tagLocation()
