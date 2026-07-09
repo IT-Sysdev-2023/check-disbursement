@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Helpers\FileHandler;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Models\BorrowedCheque;
-use App\Services\CheckReleasingService;
+use App\Services\ChequeReleasingService;
 use Illuminate\Http\Request;
 
 class CheckReleasingController extends Controller
 {
 
-    public function __construct(protected CheckReleasingService $service)
+    public function __construct(protected ChequeReleasingService $service)
     {
     }
     public function index(Request $request)
@@ -19,14 +19,14 @@ class CheckReleasingController extends Controller
         return $this->service->index($request);
     }
 
-    public function show(string $checkId, string $status)
+    public function show(Request $request)
     {
-        return $this->service->getReleaseCheck($checkId, $status);
+        return $this->service->getReleaseCheck($request->ids, $request->status);
     }
 
-    public function store(BorrowedCheque $id,  ReleasingCheckRequest $request)
+    public function store(ReleasingCheckRequest $request)
     {
-        return $this->service->storeReleaseCheck($id, $request);
+        return $this->service->storeReleaseCheck($request);
     }
 
 }

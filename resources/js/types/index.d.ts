@@ -203,6 +203,32 @@ export interface ManageChecks {
     cvHeader: CvHeader;
 }
 
+export interface ChequeResourceType{
+      id: number
+      chequeId: number
+      chequeNumber: string
+      borrowedCheckId: number
+      chequeDateUnformatted: string
+      chequeDate: string
+      companyName: string
+      isReturned?: bool
+      approvedAt: string
+      statusOrder: string
+      chequeDateStatus?: string
+      amount: string
+      amountUnformatted: string
+      payee: string
+      taggedAt: string
+      type: string
+      createdAt: string
+      location: string
+      taggedLocation: string
+      approversName: string
+      scannedId?: number
+      scannedPayee?: string
+      scannedAmount?: string
+}
+
 export interface AssignedCheckNumber {
     id: number;
     check_number: string;

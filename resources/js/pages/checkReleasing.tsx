@@ -3,10 +3,10 @@ import PdfReader from '@/components/pdf-reader';
 import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
+import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import { checkReleasing, releaseCheck } from '@/routes';
 import {
-    Crf,
-    Cv,
+    ChequeResourceType,
     FilterType,
     InertiaPagination,
     SelectionType,
@@ -17,6 +17,8 @@ import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
 import { createReleasingColumns } from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import { GridRowSelectionModel } from '@mui/x-data-grid';
+import { Box, Button } from '@mui/material';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,11 +31,11 @@ export default function CheckReleasing({
     cheques,
     company,
     filter,
-    businessUnits
+    businessUnits,
 }: {
-    cheques: InertiaPagination<Cv | Crf>;
+    cheques: InertiaPagination<ChequeResourceType>;
     filter: FilterType;
-        company: SelectionType[];
+    company: SelectionType[];
     businessUnits: SelectionType[];
 }) {
     const [open, setOpen] = useState(false);
@@ -53,23 +55,51 @@ export default function CheckReleasing({
     }, [flash]);
 
     const handleStatusChange = (id: number, value: string) => {
+
         if (value === 'cancel') {
             setId(id);
             setOpen(true);
             return;
         }
 
-        router.push({
-            url: releaseCheck([id, value]).url,
-            component: 'chequeReleasing/releaseCheck',
-            props: (curr) => ({
-                ...curr,
-                id: id,
-                status: value,
-                label: value + ' Cheque',
-            }),
-        });
+        proceed([id], value);
     };
+
+    const multipleRelease = () => {
+        const ids = selectedRows.map(item => item.id);
+        proceed(ids, 'Release');
+    }
+
+    const proceed = (ids: number[], status: string) => {
+        console.log(ids);
+        router.get(releaseCheck().url, {
+            ids: ids,
+            status: status,
+        });
+    }
+
+
+    const [selectedRows, setSelectedRows] = useState<
+            { id: number }[]
+        >([]);
+        const handleSelectionChange = (model: GridRowSelectionModel) => {
+                const selectedR = cheques.data
+                    .filter((row) => model.ids.has(row.id))
+                    .map((row) => ({
+                        id: row.borrowedCheckId,
+                        // chequeId: row.chequeId,
+                        // type: row.type,
+                    }));
+        
+                setSelectedRows(selectedR);
+        };
+
+     const enableButton =
+        selectedRows.length > 0 &&
+        cheques.data
+            .filter((row) => selectedRows.some((r) => r.id === row.id))
+            .every((row) => row.scannedId !== null);
+    
     const columns = createReleasingColumns(handleStatusChange);
 
     return (
@@ -87,11 +117,23 @@ export default function CheckReleasing({
                 <TableDataGrid
                     data={cheques}
                     filter={filter.search}
+                    hasSelection
+                    handleSelectionChange={handleSelectionChange}
                     pagination={handlePagination}
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
                     columns={columns}
                 />
+                <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
+                <Button
+                    disabled={!enableButton}
+                    variant="outlined"
+                    startIcon={<CallMissedOutgoingOutlinedIcon />}
+                    onClick={multipleRelease}
+                >
+                    Release
+                </Button>
+            </Box>
 
                 {id && (
                     <ReasonCancellationModal

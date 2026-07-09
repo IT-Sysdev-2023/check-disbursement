@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('cheque_statuses', function (Blueprint $table) {
             $table->id();
+            $table->string('transaction_no')->nullable();
             $table->enum('status', ['released', 'forwarded', 'deposited', 'staled', 'cancelled'])->nullable();
             $table->string('receivers_name')->nullable();
             $table->string('image')->nullable();

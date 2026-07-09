@@ -37,7 +37,6 @@ class ChequeResource extends JsonResource
             'companyName' => optional($this)->company_name,
             'isReturned' => optional($this)->is_returned,
             'approvedAt' => optional($this)->approved_at,
-            'secondaryBorrower' => optional($this)->secondary_borrower,
             'statusOrder' => $this->status_order,
             'chequeDateStatus' => $status,
             'amount' => NumberHelper::currency($this->amount),

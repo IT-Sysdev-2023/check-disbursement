@@ -38,7 +38,7 @@ export default function ReleaseCheck({
 }: {
     status: string;
     label: string;
-    id: number;
+    id: number[];
 }) {
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
@@ -58,7 +58,6 @@ export default function ReleaseCheck({
             setData('file', e.target.files[0]);
         }
     };
-
     const handleClearSignature = () => {
         sigPadRef.current?.clear();
         setData('signature', null);
@@ -76,10 +75,11 @@ export default function ReleaseCheck({
 
         transform((data) => ({
             ...data,
+            ids: id,
             status: status,
         }));
 
-        post(storeReleaseCheck(id).url, {
+        post(storeReleaseCheck().url, {
             preserveScroll: true,
             preserveState: true,
             onError: (e) => {

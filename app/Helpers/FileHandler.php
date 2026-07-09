@@ -30,7 +30,7 @@ class FileHandler
         return $this;
     }
 
-    public function createFileName(int $uniqueIdentifier, int $causerId, $extension = '.jpg')
+    public function createFileName(int|string $uniqueIdentifier, int $causerId, $extension = '.jpg')
     {
         $this->fileName = "{$uniqueIdentifier}-{$causerId}-" . now()->format('Y-m-d-His') . Str::start($extension, '.');
         return $this;

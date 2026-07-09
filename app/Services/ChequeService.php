@@ -38,6 +38,7 @@ class ChequeService
         // $borrowedChecks = self::pendingRecords($filters);
         $borrowedRecords = ChequeRequestService::borrowedRecords($filters);
         $manageCheques = self::manageChecks($filters);
+
         return Inertia::render('retrievedRecords', [
             'cheques' => $chequeRecords ?? [],
             'pending' => $borrowedRecords,
