@@ -81,7 +81,7 @@ export default function ExtractCv({
 
         setLoading(true);
         const { url, method } = extractCv();
-        await axios({
+        const res = await axios({
             url,
             method,
             params: {
@@ -91,6 +91,12 @@ export default function ExtractCv({
                 bu: selectedBu,
             },
         });
+
+        if(res.data.status === 'error') {
+            alert(res.data.message);
+            setLoading(false);
+            return;
+        }
     };
 
     const handleChange = async (

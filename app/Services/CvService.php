@@ -71,17 +71,23 @@ class CvService
             })
             ->lazy();
 
+        if ($nav->isEmpty()) {
+            return response()->json([
+                'message' => 'No connection found in the server !',
+                'status' => 'error'
+            ]);
+        }
+
         $id = $user->id;
         $allJobs = [];
-
         $nav->each(function (NavServer $server) use ($id, $date, &$allJobs) {
             foreach ($server->navDatabases as $db) {
                 $allJobs[] = new CvDatabase($server->id, $id, $date, $db->id);
             }
         });
-
         Bus::batch($allJobs)
             ->name("CV Import All Servers")
+            ->allowFailures()
             ->then(function (Batch $batch) use ($id) {
                 CvProgress::dispatch($id, "Data Retrieval Completed", ProgressStatus::Finished);
             })

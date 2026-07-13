@@ -53,126 +53,130 @@ class GenerateCvService extends NavConnection
             return $this;
         }
 
-        $start = 1;
-        $duplicates = 0;
-        $tableName = $navHeaderTable->name;
-        $tableId = $navHeaderTable->id;
+        try {
 
-        $headerQuery = $this->headerConnection($tableName);
-        $checkPaymentQuery = $this->checkPaymentConnection($navChequePaymentTable);
+            $start = 1;
+            $duplicates = 0;
+            $tableName = $navHeaderTable->name;
+            $tableId = $navHeaderTable->id;
 
-        $total = $headerQuery->count();
+            $headerQuery = $this->headerConnection($tableName);
+            $checkPaymentQuery = $this->checkPaymentConnection($navChequePaymentTable);
 
-        $key = $this->generateKey($buName);
+            $total = $headerQuery->count();
 
-        if ($total === 0) {
-            CvProgress::dispatch($this->userId, "No records found for {$buName}...", ProgressStatus::NoRecord, $tableName);
-        }
+            $key = $this->generateKey($buName);
 
-        $headerQuery->chunkById(500, function ($chunk) use (&$start, &$duplicates, $total, $tableName, $tableId, $checkPaymentQuery, $buId, $buName, $key) {
+            if ($total === 0) {
+                CvProgress::dispatch($this->userId, "No records found for {$buName}...", ProgressStatus::NoRecord, $tableName);
+            }
 
-            DB::beginTransaction();
-            try {
+            $headerQuery->chunkById(500, function ($chunk) use (&$start, &$duplicates, $total, $tableName, $tableId, $checkPaymentQuery, $buId, $buName, $key) {
 
-                $now = now();
-                $checkPayments = collect();
+                DB::beginTransaction();
+                try {
 
-                $headers = collect();
+                    $now = now();
+                    $headers = collect();
 
-                $existingCvNo = Cv::where('nav_header_table_id', $tableId)
-                    ->whereIn('cv_no', collect($chunk)->pluck('Check Voucher No_'))
-                    ->pluck('cv_no')
-                    ->flip(); // for faster lookup using isset()
+                    $existingCvNo = Cv::where('nav_header_table_id', $tableId)
+                        ->whereIn('cv_no', collect($chunk)->pluck('Check Voucher No_'))
+                        ->pluck('cv_no')
+                        ->flip(); // for faster lookup using isset()
 
-                foreach ($chunk as $item) {
+                    foreach ($chunk as $item) {
 
-                    $cvNo = $item->{'Check Voucher No_'};
-                    if ($existingCvNo->has($cvNo)) {
+                        $cvNo = $item->{'Check Voucher No_'};
+                        if ($existingCvNo->has($cvNo)) {
+                            CvProgress::dispatch(
+                                $this->userId,
+                                "{$cvNo} already exists, skipping ....",
+                                ProgressStatus::Duplicate,
+                                $tableName,
+                                $start,
+                                $total,
+                                $duplicates,
+                                $key
+                            );
+                            $duplicates++;
+                            $start++;
+
+                            continue;
+                        }
+
                         CvProgress::dispatch(
                             $this->userId,
-                            "{$cvNo} already exists, skipping ....",
-                            ProgressStatus::Duplicate,
+                            "Generating " . $buName . " in progress.. ",
+                            ProgressStatus::Processing,
                             $tableName,
                             $start,
                             $total,
                             $duplicates,
                             $key
                         );
-                        $duplicates++;
+
                         $start++;
 
-                        continue;
+                        $headers->push([
+                            'cv_no' => $item->{'Check Voucher No_'},
+                            'cv_date' => optional($item->{'CV Date'}, fn($d) => Date::parse($d)),
+                            'remarks' => $item->{'Remarks'},
+                        ]);
                     }
 
-                    CvProgress::dispatch(
-                        $this->userId,
-                        "Generating " . $buName . " in progress.. ",
-                        ProgressStatus::Processing,
-                        $tableName,
-                        $start,
-                        $total,
-                        $duplicates,
-                        $key
-                    );
+                    $cvNo = $headers->pluck('cv_no');
 
-                    $start++;
+                    $existingCvNos = Cv::where('nav_header_table_id', $tableId)
+                        ->whereIn('cv_no', $cvNo)
+                        ->pluck('cv_no');
 
-                    $headers->push([
-                        'cv_no' => $item->{'Check Voucher No_'},
-                        'cv_date' => optional($item->{'CV Date'}, fn($d) => Date::parse($d)),
-                        'remarks' => $item->{'Remarks'},
-                    ]);
+                    $newCvNos = $cvNo->diff($existingCvNos);
+
+                    $newHeaders = $headers->filter(
+                        fn($h) => $newCvNos->contains($h['cv_no'])
+                    )->values();
+
+                    $otherField = (clone $checkPaymentQuery)
+                        ->whereIn('CV No_', $newCvNos)
+                        ->get()
+                        ->keyBy('CV No_');
+
+                    $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId, $now) {
+                        $payment = $otherField->get($header['cv_no']);
+
+                        return [
+                            ...$header,
+                            'nav_header_table_id' => $tableId,
+                            'business_unit_id' => $buId,
+                            'causer_id' => $this->userId,
+
+                            'cheque_number' => $payment?->{'Check Number'},
+                            'cheque_amount' => $payment?->{'Check Amount'},
+                            'bank_account_no' => $payment?->{'Bank Account No_'},
+                            'bank_name' => $payment?->{'Bank Name'},
+                            'cheque_date' => $payment?->{'Check Date'}
+                                ? Date::parse($payment->{'Check Date'})
+                                : null,
+                            'payee' => $payment?->{'Payee'},
+                            'created_at' => $now,
+                            'updated_at' => $now,
+                        ];
+                    });
+
+                    DB::table('cvs')->insertOrIgnore($merged->toArray());
+
+                    DB::commit();
+
+                } catch (Throwable $e) {
+                    DB::rollBack();
+                    Log::error("Failed storing CV Header chunk: " . $e->getMessage());
+                    throw $e;
                 }
-
-                $cvNo = $headers->pluck('cv_no');
-
-                $existingCvNos = Cv::where('nav_header_table_id', $tableId)
-                    ->whereIn('cv_no', $cvNo)
-                    ->pluck('cv_no');
-
-                $newCvNos = $cvNo->diff($existingCvNos);
-
-                $newHeaders = $headers->filter(
-                    fn($h) => $newCvNos->contains($h['cv_no'])
-                )->values();
-
-                $otherField = (clone $checkPaymentQuery)
-                    ->whereIn('CV No_', $newCvNos)
-                    ->get()
-                    ->keyBy('CV No_');
-
-                $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId, $now) {
-                    $payment = $otherField->get($header['cv_no']);
-
-                    return [
-                        ...$header,
-                        'nav_header_table_id' => $tableId,
-                        'business_unit_id' => $buId,
-                        'causer_id' => $this->userId,
-
-                        'cheque_number' => $payment?->{'Check Number'},
-                        'cheque_amount' => $payment?->{'Check Amount'},
-                        'bank_account_no' => $payment?->{'Bank Account No_'},
-                        'bank_name' => $payment?->{'Bank Name'},
-                        'cheque_date' => $payment?->{'Check Date'}
-                            ? Date::parse($payment->{'Check Date'})
-                            : null,
-                        'payee' => $payment?->{'Payee'},
-                        'created_at' => $now,
-                        'updated_at' => $now,
-                    ];
-                });
-
-                DB::table('cvs')->insertOrIgnore($merged->toArray());
-
-                DB::commit();
-
-            } catch (Throwable $e) {
-                DB::rollBack();
-                Log::error("Failed storing CV Header chunk: " . $e->getMessage());
-                throw $e;
-            }
-        }, 'Check Voucher No_');
+            }, 'Check Voucher No_');
+        } catch (Throwable $e) {
+            CvProgress::dispatch($this->userId, "No Connection for {$e->getMessage()}...", ProgressStatus::NoConnection, $tableName);
+            throw $e; // Keep this so Laravel marks the job as failed
+        }
 
         return $this;
     }
