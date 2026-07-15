@@ -39,7 +39,7 @@ class ChequeResource extends JsonResource
             'approvedAt' => optional($this)->approved_at,
             'statusOrder' => $this->status_order,
             'chequeDateStatus' => $status,
-            'amount' => NumberHelper::currency($this->amount),
+            'amount' => NumberHelper::currency($this->amount ?? 0),
             'amountUnformatted' => $this->amount,
             'payee' => $this->payee,
             'taggedAt' => $this->tagged_at,
