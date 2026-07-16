@@ -166,7 +166,7 @@ export default function ScanCheques({ files }: Props) {
             // console.log('scanning-cheques-event', e);
             if (e.percentage == 100) {
                 setLoading(false);
-                // clearCache();
+                clearCache();
             }
         },
     );
