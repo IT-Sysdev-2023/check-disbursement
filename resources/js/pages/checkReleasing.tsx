@@ -70,7 +70,6 @@ export default function CheckReleasing({
     };
 
     const proceed = (ids: number[], status: string) => {
-        console.log(ids);
         router.get(releaseCheck().url, {
             ids: ids,
             status: status,

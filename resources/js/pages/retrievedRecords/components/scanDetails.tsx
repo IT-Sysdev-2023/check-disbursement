@@ -72,7 +72,7 @@ export default function ScanDetails({
                                     Check Number
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.checkNo}
+                                    {record?.chequeNo}
                                 </Typography>
                             </Paper>
                         </Grid>
@@ -82,7 +82,7 @@ export default function ScanDetails({
                                     Check Date
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.checkDate}
+                                    {record?.chequeDate}
                                 </Typography>
                             </Paper>
                         </Grid>

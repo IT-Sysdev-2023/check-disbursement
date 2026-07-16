@@ -108,22 +108,24 @@ class ProcessChequeJob implements ShouldQueue
                                 })
                                     ->where('resolved_cheque_number', $chequeNumber);
                             });
-                    })->where($amountColumn, $amount);
+                    })
+                    ->where($amountColumn, $amount);
                 }
-            )->value('id');
+            )->whereNotNull(['approved_at', 'approver_id'])->value('id');
 
-            $result = ScannedRecords::create([
-                'payee' => $data['payee'] ?? null,
-                'borrowed_cheque_id' => $borrowedIChequeId,
-                'amount' => $amount,
-                'account_number' => $data['account_no'] ?? null,
-                'cheque_no' => $chequeNumber,
-                'cheque_date' => Carbon::createFromFormat('m-d-Y', $data['date']) ?? null,
-                'bank_account_name' => $data['bank_name'] ?? null,
-                'caused_by' => $this->id,
-            ]);
-
-            ScannedRecordEvent::dispatch($result, $this->id);
+            if ($borrowedIChequeId) {
+                $result = ScannedRecords::create([
+                    'payee' => $data['payee'] ?? null,
+                    'borrowed_cheque_id' => $borrowedIChequeId,
+                    'amount' => $amount,
+                    'account_number' => $data['account_no'] ?? null,
+                    'cheque_no' => $chequeNumber,
+                    'cheque_date' => Carbon::createFromFormat('m-d-Y', $data['date']) ?? null,
+                    'bank_account_name' => $data['bank_name'] ?? null,
+                    'caused_by' => $this->id,
+                ]);
+                ScannedRecordEvent::dispatch($result, $this->id);
+            }
         } catch (QueryException $e) {
             if ($e->errorInfo[1] === 1062) {
                 $alreadyScanned = [
