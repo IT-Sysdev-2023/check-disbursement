@@ -157,7 +157,7 @@ class ChequeService
             ->fromSub($unionQuery, 'merged')
             ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
                 $q->orderBy(Str::snake($sort['field']), $sort['sort']);
-            }, fn($q) => $q->orderByDesc('created_at'))
+            }, fn($q) => $q->orderByDesc('scanned_id'))
             ->paginate(10)
             ->withQueryString();
     }
