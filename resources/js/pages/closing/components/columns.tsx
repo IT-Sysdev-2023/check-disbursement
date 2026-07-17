@@ -9,10 +9,7 @@ export const createClosingCvColumns = (
     {
         field: 'chequeNumber',
         headerName: 'Cheque Number',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 0.5,
-        minWidth: 50,
+        flex: 1,
         renderCell: ({ row }) => {
             return row.checkable?.chequeNumber;
         },

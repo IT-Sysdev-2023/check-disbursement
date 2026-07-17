@@ -8,24 +8,38 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChequeStatus extends Model
 {
-     protected $guarded = [];
+    protected $guarded = [];
 
-     protected function casts(): array
+    protected function casts(): array
     {
         return [
             'created_at' => 'datetime',
         ];
 
     }
+    public function scopeFilter(Builder $builder, array $filters): Builder
+    {
+        return $builder
+            ->when($filters['search'] ?? null, function ($query, $search) use ($filters) {
+                $query->whereHasMorph(
+                    'checkable',
+                    [Crf::class, Cv::class],
+                    function ($q, $type) use ($filters) {
+                        $q->filter($filters);
+                    }
+                );
+            });
+    }
 
-     public function checkable()
-     {
-          return $this->morphTo();
-     }
+    public function checkable()
+    {
+        return $this->morphTo();
+    }
 
-     public function chequeForwardedStatus(){
+    public function chequeForwardedStatus()
+    {
         return $this->hasOne(ChequeForwardedStatus::class);
-     }
+    }
 
     #[Scope]
     protected function regionalPermission(Builder $query): void

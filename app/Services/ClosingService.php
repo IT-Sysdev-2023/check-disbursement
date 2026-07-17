@@ -20,12 +20,12 @@ class ClosingService
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
 
-        $cheques = ChequeStatus::
-            with(['checkable' => ['borrowedCheque', 'tagLocation']])
-            ->where('is_closed', false)
-            ->whereNot('status', 'cancel')
-            ->has('chequeForwardedStatus')
-            ->get();
+        // $cheques = ChequeStatus::
+        //     with(['checkable' => ['borrowedCheque', 'tagLocation']])
+        //     ->where('is_closed', false)
+        //     ->whereNot('status', 'cancel')
+        //     ->has('chequeForwardedStatus')
+        //     ->get();
 
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
@@ -34,10 +34,12 @@ class ClosingService
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->where('status', 'forwarded')
-                        ->has('chequeForwardedStatus');
+                    ->has('chequeForwardedStatus');
                 })
-                    ->orWhere('status', '!=', 'forwarded');
+                ->orWhere('status', '!=', 'forwarded');
             })
+            ->filter($filters)
+            ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
