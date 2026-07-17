@@ -1,8 +1,9 @@
-'use client';
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
+import { retrievedRecords } from '@/routes';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import DrawIcon from '@mui/icons-material/Draw';
 import {
     Alert,
@@ -386,6 +387,7 @@ export default function ScanCheques({ files }: Props) {
                                         </p>
                                     </div>
                                 </div>
+
                                 <div className="mb-2 flex justify-between">
                                     <div>
                                         <DatePicker
@@ -779,6 +781,13 @@ export default function ScanCheques({ files }: Props) {
                                         </Table>
                                     </TableContainer>
                                 </div>
+                                <Button
+                                    variant="contained"
+                                    startIcon={<ArrowBackIcon />}
+                                    onClick={() => router.get(retrievedRecords(), {tab: 'manageChecks'})}
+                                >
+                                    Back
+                                </Button>
                             </div>
                         </div>
                     </div>
