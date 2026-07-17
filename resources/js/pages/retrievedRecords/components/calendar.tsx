@@ -78,7 +78,7 @@ const Calendar = ({
                 </Stack>
             </Stack>
             {/* CALENDAR */}
-            {data.data.length === 0 ? (
+            {data?.data.length === 0 ? (
                 <Box
                     sx={{
                         display: 'flex',

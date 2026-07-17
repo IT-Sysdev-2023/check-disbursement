@@ -33,16 +33,32 @@ class ChequeService
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page']);
         $assignment = $filters['assignment'] ?? 'toAssign';
         $company = $filters['company'] ?? 'all';
+        $tab = $filters['tab'] ?? 'calendar';
 
-        $chequeRecords = new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign'));
-        // $borrowedChecks = self::pendingRecords($filters);
-        $borrowedRecords = ChequeRequestService::borrowedRecords($filters);
-        $manageCheques = self::manageChecks($filters);
+        // $chequeRecords = null;
+        // $borrowedRecords = null;
+        // $manageCheques = null;
+        // $calendar = null;
+
+        // if ($tab == 'cheques') {
+        //     $chequeRecords = 
+        // }
+
+        // if ($tab == 'borrowed') {
+        //     $borrowedRecords = ;
+        // }
+
+        // if ($tab == 'manageChecks') {
+        //     $manageCheques = new ChequeCollection(self::manageChecks($filters));
+        // }
+        // if ($tab == 'calendar') {
+        //     $calendar = Calendar::calendar($filters);
+        // }
+        // dd($chequeRecords);
+        $records = self::chequeRecords($tab, $filters, $assignment);
 
         return Inertia::render('retrievedRecords', [
-            'cheques' => $chequeRecords ?? [],
-            'pending' => $borrowedRecords,
-            'manageChecks' => new ChequeCollection($manageCheques ?? []),
+            'records' => $records,
             'filter' => (object) [
                 'selectedCompany' => $company,
                 'assignments' => $assignment,
@@ -52,7 +68,7 @@ class ChequeService
                     'start' => null,
                     'end' => null
                 ],
-                'tab' => $filters['tab'] ?? 'calendar'
+                'tab' => $tab
             ],
             'company' => PermissionService::userAssignedCompany($request->user()),
             'businessUnits' => BusinessUnit::businessUnits($company),
@@ -60,8 +76,20 @@ class ChequeService
                 'toAssign' => self::countToAssign($filters),
                 'completed' => self::countCompleted($filters)
             ],
-            'calendar' => Calendar::calendar($filters),
         ]);
+    }
+
+    private static function chequeRecords(string $tab, array $filters, string $assignment)
+    {
+        $records = match ($tab) {
+            'calendar' => Calendar::calendar($filters),
+            'cheques' => new ChequeCollection(self::mergeRecords($filters, $assignment == 'toAssign')),
+            'borrowed' => ChequeRequestService::borrowedRecords($filters),
+            'manageChecks' => new ChequeCollection(self::manageChecks($filters)),
+            default => null
+        };
+
+        return $records;
     }
 
     public function syncData(Request $request)

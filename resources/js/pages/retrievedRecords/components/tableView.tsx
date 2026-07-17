@@ -156,8 +156,8 @@ export default function TableView({
         router.reload({
             onBefore: () => setIsLoading(true),
             onFinish: () => setIsLoading(false),
-            only: ['cheques'],
             data: {
+                tab: 'cheques',
                 assignment: value,
             },
         });

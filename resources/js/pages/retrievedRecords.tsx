@@ -1,4 +1,5 @@
 import AppLayout from '@/layouts/app-layout';
+import { retrievedRecords } from '@/routes';
 import {
     Auth,
     Borrower,
@@ -27,7 +28,6 @@ import {
     TableView,
 } from './retrievedRecords/components';
 import ManageCheques from './retrievedRecords/components/manageCheques';
-import { retrievedRecords } from '@/routes';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -37,13 +37,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function RetrievedRecords({
-    cheques,
-    manageChecks,
-    pending,
+    records,
     filter,
     company,
     counts,
-    calendar,
     businessUnits,
     auth,
 }: {
@@ -53,50 +50,44 @@ export default function RetrievedRecords({
         completed: string;
     };
     businessUnits: SelectionType[];
-    calendar: InertiaPagination<BuType>;
-    cheques: InertiaPagination<ChequeType>;
-    pending: InertiaPagination<Borrower>;
+    records: InertiaPagination<ChequeType | ManageChecks | Borrower | BuType>;
     company: SelectionType[];
-    manageChecks: InertiaPagination<ManageChecks>;
     auth: Auth;
 }) {
     const [openProgress, setOpenProgress] = useState(false);
-    const [currentTab, setCurrentTab] = useState(filter.tab);
-    // const [pendingId, setPendingId] = useState<number>();
-    // const [pendingModal, setPendingModal] = useState(false);
+    // const [currentTab, setCurrentTab] = useState(filter.tab);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         if (newValue === null) return;
-        if (newValue !== 'calendar') {
-            router.get(retrievedRecords(), {
+        router.get(
+            retrievedRecords(),
+            {
                 tab: newValue,
-            }, {
+            },
+            {
                 replace: true,
-                preserveState: true
-            });
-        }
-
-        setCurrentTab(newValue);
+                preserveState: true,
+            },
+        );
     };
 
     const handleClickCalendar = () => {
-        setCurrentTab('cheques');
+        router.get(
+            retrievedRecords(),
+            { tab: 'cheques' },
+            {
+                replace: true,
+                preserveState: true,
+            },
+        );
     };
-
-    // const handleOnView = (id: number) => {
-    //     setPendingModal(true);
-    //     setPendingId(id);
-    // };
-
-    // const pendingColumns = createPendingChequeColumns(handleOnView);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <PageContainer title="Retrieved CV/CRF">
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <ToggleButtonGroup
                         color="primary"
-                        value={currentTab}
+                        value={filter.tab}
                         exclusive
                         onChange={handleChangeTab}
                         aria-label="Platform"
@@ -120,29 +111,29 @@ export default function RetrievedRecords({
                     </ToggleButtonGroup>
 
                     <Box sx={{ mt: 5 }}>
-                        {currentTab === 'calendar' && (
+                        {filter.tab === 'calendar' && (
                             <Calendar
                                 userId={auth.user.id}
-                                data={calendar}
+                                data={records}
                                 company={company}
                                 onChangeTab={handleClickCalendar}
                             ></Calendar>
                         )}
-                        {currentTab === 'cheques' && (
+                        {filter.tab === 'cheques' && (
                             <TableView
-                                cheques={cheques}
+                                cheques={records}
                                 company={company}
                                 businessUnits={businessUnits}
                                 filter={filter}
                                 counts={counts}
                             />
                         )}
-                        {currentTab === 'borrowed' && (
-                            <BorrowedTableGrid data={pending} />
+                        {filter.tab === 'borrowed' && (
+                            <BorrowedTableGrid data={records} />
                         )}
-                        {currentTab === 'manageChecks' && (
+                        {filter.tab === 'manageChecks' && (
                             <ManageCheques
-                                cheques={manageChecks}
+                                cheques={records}
                                 company={company}
                                 businessUnits={businessUnits}
                                 filter={filter}
@@ -152,7 +143,6 @@ export default function RetrievedRecords({
                 </Box>
             </PageContainer>
 
-           
             {/* 
             {pendingId && (
                 <PendingDetails
