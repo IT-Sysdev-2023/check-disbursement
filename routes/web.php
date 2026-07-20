@@ -13,6 +13,7 @@ use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForwardedCheckController;
 use App\Http\Controllers\ForwardedChequeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
@@ -93,6 +94,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Route::put('sync-cheques', [RetrievedChecksController::class, 'syncCheques'])->name('sync-cheques');
             Route::post('sync-missing-data', [RetrievedChecksController::class, 'syncMissingData'])->name('sync-missing-data');
         });
+
+        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
+        Route::post('check-notifications', [NotificationController::class, 'notify'])->name('check-notifications');
+        Route::put('read', [NotificationController::class, 'read'])->name('read-notifications');
     });
 
 
@@ -168,9 +173,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('aboutUs/aboutus');
     })->name('about');
 
-    Route::get('notifications', function () {
-        return Inertia::render('dashboard');
-    })->name('notifications');
+    // Route::get('notifications', function () {
+    //     return Inertia::render('dashboard');
+    // })->name('notifications');
 
 });
 Route::get('/test', function () {

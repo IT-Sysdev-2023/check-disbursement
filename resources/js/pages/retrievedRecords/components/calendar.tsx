@@ -3,13 +3,14 @@ import { BuType, InertiaPagination, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 
 import {
+    Alert,
     SelectChangeEvent,
     Stack,
     TablePagination,
     useTheme,
 } from '@mui/material';
 import Box from '@mui/material/Box';
-import { useState, MouseEvent} from 'react';
+import { MouseEvent, useState } from 'react';
 import CalendarLegend from './calendarLegend';
 import Months from './months';
 
@@ -77,6 +78,9 @@ const Calendar = ({
                     <CalendarLegend color="orange" label="Total CV" />
                 </Stack>
             </Stack>
+            {/* <Alert severity="info">
+                New records have been added for the following Business Units:
+            </Alert> */}
             {/* CALENDAR */}
             {data?.data.length === 0 ? (
                 <Box

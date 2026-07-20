@@ -12,20 +12,22 @@ import {
     bankSetup,
     checkReleasing,
     checkRequestForm,
-    chequeStatus,
     checkVoucher,
     chequeRequests,
+    chequeStatus,
+    closingCheque,
+    forwardedChequeReleasing,
     forwardedReleasing,
+    notifications,
     report,
     retrievedRecords,
     users,
-    forwardedChequeReleasing,
-    closingCheque,
 } from '@/routes';
 import { SharedData, type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import {
     Activity,
+    Bell,
     BookmarkX,
     BookOpen,
     Check,
@@ -92,6 +94,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           href: retrievedRecords(),
                           icon: PackageOpen,
                       },
+                      {
+                          title: 'Notifications',
+                          href: notifications(),
+                          icon: Bell,
+                      },
                   ]
                 : []),
             ...(isAdmin || sectionHead
@@ -101,11 +108,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           href: chequeRequests(),
                           icon: FolderCheck,
                       },
-                    //   {
-                    //       title: 'Check/Docs Borrowing',
-                    //       href: checkBorrowing(),
-                    //       icon: FolderCheck,
-                    //   },
+                      //   {
+                      //       title: 'Check/Docs Borrowing',
+                      //       href: checkBorrowing(),
+                      //       icon: FolderCheck,
+                      //   },
                       {
                           title: 'Cheque Releasing',
                           href: checkReleasing(),
@@ -140,7 +147,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             disbursementOfficer ||
             regionalOfficer ||
             sectionHead ||
-            closingOfficer || viewing
+            closingOfficer ||
+            viewing
                 ? [
                       {
                           title: 'Cheque Status',
@@ -161,7 +169,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                   href: bankSetup(),
                                   icon: Landmark,
                               },
-                                {
+                              {
                                   title: 'Bank Accounts',
                                   href: bankAccountSetup(),
                                   icon: Tickets,
@@ -209,7 +217,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         closingOfficer,
         regionalOfficer,
         sectionHead,
-        viewing
+        viewing,
     ]);
 
     // Automatically open submenu if current page belongs to it

@@ -1,3 +1,4 @@
+import { requestNotificationPermission } from '@/components/notification';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
@@ -10,6 +11,7 @@ import { Head } from '@inertiajs/react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { useEffect } from 'react';
 import PageViewsBarChart from './dashboard/components/PageViewsBarChart';
 import SessionsChart from './dashboard/components/SessionsChart';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
@@ -42,6 +44,9 @@ export default function Dashboard({
         countCrf: string;
     };
 }) {
+    useEffect(() => {
+        requestNotificationPermission();
+    }, []);
     const data: StatCardProps[] = [
         {
             title: 'Total Cheques',
