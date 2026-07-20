@@ -45,12 +45,12 @@ class ChequeReleasingService
         ]);
     }
 
-    public function getReleaseCheck(array $ids, string $status)
+    public function getReleaseCheck(array $cheques, string $status)
     {
         return Inertia::render('chequeReleasing/releaseCheck', [
-            'id' => $ids,
+            'cheques' => $cheques,
             'status' => $status,
-            'label' => Str::title($status) . ' Check'
+            'label' => Str::title($status) . ' Cheque'
         ]);
     }
 
@@ -60,25 +60,24 @@ class ChequeReleasingService
     {
         $validated = $request->validated();
 
-        $ids = $validated['ids'];
+        $cheques = $validated['cheques'];
 
         $validatedInputs = $request->safe()->only(['status', 'signature', 'file']);
+        $stream = DB::transaction(function () use ($cheques, $validated, $validatedInputs, $request) {
 
-        $stream = DB::transaction(function () use ($ids, $validated, $validatedInputs, $request) {
-
-            $transaction = now()->format('YmdHis') . '-' . auth()->id();
+            $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
             $companies = [];
             $locations = [];
-            $label = StringHelper::statusPastTense($validated['status']);
-          
-            $handleFiles = $this->handleFiles($validatedInputs);
-            foreach ($ids as $id) {
-                $borrowedCheque = BorrowedCheque::findOrFail($id);
+
+            $handleFiles = $this->handleFiles($validatedInputs, $transactionNo);
+            foreach ($cheques as $cheque) {
+                $borrowedCheque = BorrowedCheque::findOrFail($cheque['id']);
+                $label = StringHelper::statusPastTense($cheque['status']);
 
                 $chequeStatus = $borrowedCheque->checkable
                     ->chequeStatus()
                     ->create([
-                        'transaction_no' => $transaction,
+                        'transaction_no' => $transactionNo,
                         'status' => Str::lower($label),
                         'receivers_name' => $validated['receiversName'],
                         'image' => $handleFiles->imagePath,
@@ -92,7 +91,7 @@ class ChequeReleasingService
             }
 
             $data = [
-                'transactionNo' => $transaction,
+                'transactionNo' => $transactionNo,
 
                 'dateLabel' => 'Date ' . $label . ':',
                 'dateReleased' => now()->format('M d, Y H:i A'),
@@ -117,18 +116,18 @@ class ChequeReleasingService
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
     }
 
-    private function handleFiles(array $validated)
+    private function handleFiles(array $validated, string $transactionNo)
     {
         $userId = auth()->user()->id;
         $uuid = Str::uuid();
 
         $signaturePath = $this->fileHandler
-            ->inFolder(Str::lower($validated['status']) . "/signatures")
+            ->inFolder($transactionNo . "/signatures")
             ->createFileName($uuid, $userId, '.png')
             ->saveSignature($validated['signature']);
 
         $imagePath = $this->fileHandler
-            ->inFolder(Str::lower($validated['status']) . "/images")
+            ->inFolder($transactionNo . "/images")
             ->createFileName($uuid, $userId, '.png')
             ->saveFile($validated['file']);
 

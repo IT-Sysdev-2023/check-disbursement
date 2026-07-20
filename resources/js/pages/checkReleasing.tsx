@@ -54,45 +54,60 @@ export default function CheckReleasing({
         }
     }, [flash]);
 
-    const handleStatusChange = (id: number, value: string) => {
+    const handleStatusChange = (items: {id: number, status: string}, value: string) => {
         if (value === 'cancel') {
             setId(id);
             setOpen(true);
             return;
         }
 
-        proceed([id], value);
+        proceed([items], value);
     };
 
     const multipleRelease = () => {
-        const ids = selectedRows.map((item) => item.id);
-        proceed(ids, 'Release');
+        const selectedItems = selectedRows.map((item) => ({
+            id: item.id,
+            status:
+                item.status == 'Manila' || item.status == 'Cebu'
+                    ? 'Forward'
+                    : item.status == 'Deposit'
+                      ? 'Deposit'
+                      : 'Release',
+        }));
+
+        proceed(selectedItems, 'Release');
     };
 
-    const proceed = (ids: number[], status: string) => {
-        router.get(releaseCheck().url, {
-            ids: ids,
+    const proceed = (items: {id: number, status: string}[], status: string) => {
+        console.log(selectedRows);
+        router.post(releaseCheck().url, {
+            cheques: items,
             status: status,
         });
     };
 
-    const [selectedRows, setSelectedRows] = useState<{ id: number }[]>([]);
+    const [selectedRows, setSelectedRows] = useState<
+        { id: number; status: string }[]
+    >([]);
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const selectedR = cheques.data
             .filter((row) => model.ids.has(row.id))
             .map((row) => ({
                 id: row.borrowedCheckId,
+                status: row.location,
                 // chequeId: row.chequeId,
                 // type: row.type,
             }));
 
         setSelectedRows(selectedR);
     };
-   
+
     const enableButton =
         selectedRows.length > 0 &&
         cheques.data
-            .filter((row) => selectedRows.some((r) => r.id === row.borrowedCheckId))
+            .filter((row) =>
+                selectedRows.some((r) => r.id === row.borrowedCheckId),
+            )
             .every((row) => row.scannedId !== null);
 
     const columns = createReleasingColumns(handleStatusChange);

@@ -4,7 +4,10 @@ import { Button, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
 export const createReleasingColumns = (
-    handleStatusChange: (checkId: number, value: string) => void,
+    handleStatusChange: (
+        checkId: { id: number; status: string },
+        value: string,
+    ) => void,
 ): GridColDef[] => [
     {
         field: 'chequeNumber',
@@ -85,7 +88,6 @@ export const createReleasingColumns = (
         minWidth: 80,
         sortable: false,
         renderCell: ({ row }) => {
-            
             return row.chequeDateStatus ? (
                 <Chip
                     label={row.chequeDateStatus}
@@ -93,18 +95,16 @@ export const createReleasingColumns = (
                     variant="outlined"
                 />
             ) : row.isReturned && row.approvedAt ? (
-                 <Chip
-                    label='For Releasing'
+                <Chip
+                    label="For Releasing"
                     color="primary"
                     variant="outlined"
                 />
-            ) : !row.isReturned && row.approvedAt && row.secondaryBorrower  ? (
-                 <Chip
-                    label='Borrowed'
-                    color="primary"
-                    variant="outlined"
-                />
-            ): '';
+            ) : !row.isReturned && row.approvedAt && row.secondaryBorrower ? (
+                <Chip label="Borrowed" color="primary" variant="outlined" />
+            ) : (
+                ''
+            );
         },
     },
 
@@ -117,7 +117,18 @@ export const createReleasingColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            const { taggedLocation, scannedId, borrowedCheckId } = row;
+            const { taggedLocation, scannedId, borrowedCheckId, location } =
+                row;
+
+            const selectedItem = {
+                id: borrowedCheckId,
+                status:
+                    location == 'Manila' || location == 'Cebu'
+                        ? 'Forward'
+                        : location == 'Deposit'
+                          ? 'Deposit'
+                          : 'Release',
+            };
 
             if (!scannedId) {
                 return null;
@@ -130,7 +141,7 @@ export const createReleasingColumns = (
                     label="For Signature"
                     onChange={(e) => {
                         if (!e.target.value) return;
-                        handleStatusChange(borrowedCheckId, e.target.value);
+                        handleStatusChange(selectedItem, e.target.value);
                     }}
                 >
                     <MenuItem value="" disabled>

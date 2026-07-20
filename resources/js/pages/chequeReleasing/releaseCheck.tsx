@@ -34,11 +34,11 @@ interface MyFormData {
 export default function ReleaseCheck({
     status,
     label,
-    id,
+    cheques,
 }: {
     status: string;
     label: string;
-    id: number[];
+    cheques: { id: number; status: string }[];
 }) {
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
@@ -72,11 +72,9 @@ export default function ReleaseCheck({
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         transform((data) => ({
             ...data,
-            ids: id,
-            status: status,
+            cheques: cheques,
         }));
 
         post(storeReleaseCheck().url, {
@@ -122,7 +120,7 @@ export default function ReleaseCheck({
                             alignItems: 'center',
                         }}
                     >
-                         <AutocompleteUser handleTextChange={handleTextChange}/>
+                        <AutocompleteUser handleTextChange={handleTextChange} />
 
                         {/* File Upload */}
                         <FormControl error={!!errors.file}>

@@ -21,7 +21,7 @@ class CheckReleasingController extends Controller
 
     public function show(Request $request)
     {
-        return $this->service->getReleaseCheck($request->ids, $request->status);
+        return $this->service->getReleaseCheck($request->cheques, $request->status);
     }
 
     public function store(ReleasingCheckRequest $request)

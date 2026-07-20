@@ -131,7 +131,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::prefix('check-releasing')->group(function () {
             Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
 
-            Route::get('release-check', [CheckReleasingController::class, 'show'])->name('release-check');
+            Route::post('release-check', [CheckReleasingController::class, 'show'])->name('release-check');
             Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
         });
     });

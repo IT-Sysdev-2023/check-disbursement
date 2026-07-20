@@ -18,9 +18,7 @@ class ReleasingCheckRequest extends FormRequest
             'receiversName' => 'required|string|max:255',
             'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'signature' => 'required|string',
-            'status' => 'required|string',
-            'ids' => ['required', 'array'],
-            'ids.*' => ['integer', 'exists:borrowed_cheques,id'],
+            'cheques' => ['required', 'array'],
         ];
     }
 }
