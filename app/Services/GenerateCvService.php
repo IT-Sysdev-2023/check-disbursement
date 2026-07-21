@@ -143,7 +143,6 @@ class GenerateCvService extends NavConnection
 
                     $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId, $now) {
                         $payment = $otherField->get($header['cv_no']);
-
                         return [
                             ...$header,
                             'nav_header_table_id' => $tableId,
@@ -154,6 +153,7 @@ class GenerateCvService extends NavConnection
                             'cheque_amount' => $payment?->{'Check Amount'},
                             'bank_account_no' => $payment?->{'Bank Account No_'},
                             'bank_name' => $payment?->{'Bank Name'},
+                            'row_version' => $payment?->{'timestamp'},
                             'cheque_date' => $payment?->{'Check Date'}
                                 ? Date::parse($payment->{'Check Date'})
                                 : null,

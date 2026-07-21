@@ -33,10 +33,10 @@ class Calendar
         //     });
         // }
         if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
-            // ✅ Nav selected: use nav records only, don't merge with base
+            //  Nav selected: use nav records only, don't merge with base
             $data = self::distinctMonthsNav($filters['monthDetails']);
         } else {
-            // ✅ Normal: use base data only
+            //  Normal: use base data only
             $data = self::distinctMonths($filters['company'] ?? null);
         }
 

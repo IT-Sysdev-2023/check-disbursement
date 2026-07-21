@@ -19,6 +19,7 @@ use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
 use App\Http\Controllers\StatusController;
 use App\Models\Company;
+use App\Models\Cv;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -51,7 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         //! EXTRACT CHECKS
         Route::prefix('extract')->group(function () {
             Route::get('business-units', [CvController::class, 'businessUnits'])->name('get-business-units');
-            
+
             Route::prefix('check-voucher')->group(function () {
                 Route::get('index', [CvController::class, 'index'])->name('check-voucher');
                 Route::post('extract-cv', [CvController::class, 'extractCv'])->name('extract-cv');
@@ -110,9 +111,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('scanned-records/{id}', [StatusController::class, 'scannedRecords'])->name('scanned-records');
     });
 
-     Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->middleware('role:disbursement_officer|section_head|admin')->name('borrowed-checks');
-    
-     //! SECTION HEAD
+    Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->middleware('role:disbursement_officer|section_head|admin')->name('borrowed-checks');
+
+    //! SECTION HEAD
     Route::prefix('section-head')->middleware('role:section_head|admin')->group(function () {
 
         Route::prefix('check-receiving')->group(function () {
@@ -193,15 +194,24 @@ Route::get('/test', function () {
     // dd($tables);
 
 
+    $bu = Cv::select('business_unit_id')
+        ->with('businessUnit', 'navHeaderTable')
+        // ->distinct()
+        ->get();
+
+    dd($bu->toArray());
+    // dd($cv->toArray());
+
+
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
         // ->table('SON-OK AGRI FARM$CV Check Payment')
-        ->table('ALTA CITTA ACCOUNTING$CV Header')
+        ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
 
 
-        
+
         // ->where('CV No_', '2512000001')
-        ->where('Check Number', "")
+        // ->where('Check Number', "")
 
         // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])
         // ->where('Check Class Location', '==',  '!=', '')

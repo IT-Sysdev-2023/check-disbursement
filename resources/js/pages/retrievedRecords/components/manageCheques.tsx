@@ -10,8 +10,16 @@ import {
 } from '@/types';
 import { router } from '@inertiajs/react';
 import { DocumentScanner } from '@mui/icons-material';
-import { Box, Button } from '@mui/material';
-import { useEffect, useState } from 'react';
+import {
+    Alert,
+    Box,
+    Button,
+    List,
+    ListItem,
+    ListItemText,
+    Typography,
+} from '@mui/material';
+import { useState } from 'react';
 import AssignScanDetailsModal from './assignScanDetailsModal';
 import { createManageColumns } from './columns';
 import ScanDetails from './scanDetails';
@@ -61,6 +69,11 @@ export default function ManageCheques({
         handleUpdateScanned,
         handleScanDetails,
     );
+
+    const notScannedCheques = cheques.data.filter(
+        (cheque) => !cheque.scannedId,
+    );
+
     return (
         <>
             <TableFilter
@@ -70,6 +83,25 @@ export default function ManageCheques({
                 resetFilterRouter={retrievedRecords()}
                 businessUnits={businessUnits}
             />
+            {cheques.data.some((item) => item.scannedId) && (
+                <Alert sx={{ width: '100%' }}>
+                    <Typography
+                        variant="subtitle2"
+                        fontWeight="bold"
+                        gutterBottom
+                    >
+                        The following cheque numbers have not been scanned:
+                    </Typography>
+
+                    <List dense disablePadding>
+                        {notScannedCheques.map((item) => (
+                            <ListItem key={item.id} sx={{ py: 0 }}>
+                                <ListItemText primary={item.chequeNumber} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </Alert>
+            )}
             <TableDataGrid
                 data={cheques}
                 filter={filter.search}

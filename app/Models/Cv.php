@@ -192,6 +192,10 @@ class Cv extends Model
         return $this->belongsTo(BusinessUnit::class);
     }
 
+    public function navHeaderTable(){
+        return $this->belongsTo(NavHeaderTable::class);
+    }
+
 
     public function tagLocation()
     {

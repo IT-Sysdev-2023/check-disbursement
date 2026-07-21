@@ -37,7 +37,7 @@ class NavitionNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'HAHAH new Records Available',
+            'title' => 'Navition Records Available',
             'message' => 'New records have been added.',
         ];
     }

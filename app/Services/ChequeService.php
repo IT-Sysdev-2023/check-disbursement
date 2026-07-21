@@ -35,26 +35,6 @@ class ChequeService
         $company = $filters['company'] ?? 'all';
         $tab = $filters['tab'] ?? 'calendar';
 
-        // $chequeRecords = null;
-        // $borrowedRecords = null;
-        // $manageCheques = null;
-        // $calendar = null;
-
-        // if ($tab == 'cheques') {
-        //     $chequeRecords = 
-        // }
-
-        // if ($tab == 'borrowed') {
-        //     $borrowedRecords = ;
-        // }
-
-        // if ($tab == 'manageChecks') {
-        //     $manageCheques = new ChequeCollection(self::manageChecks($filters));
-        // }
-        // if ($tab == 'calendar') {
-        //     $calendar = Calendar::calendar($filters);
-        // }
-        // dd($chequeRecords);
         $records = self::chequeRecords($tab, $filters, $assignment);
 
         return Inertia::render('retrievedRecords', [

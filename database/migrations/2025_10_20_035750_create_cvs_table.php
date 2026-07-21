@@ -29,6 +29,7 @@ return new class extends Migration {
             $table->date('resolved_cheque_date')->nullable();
             $table->foreignId('tag_location_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamp('tagged_at')->nullable();
+            $table->binary('row_version')->nullable();
             $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
