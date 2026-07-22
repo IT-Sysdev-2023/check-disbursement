@@ -38,58 +38,9 @@ class ProcessChequeJob implements ShouldQueue
 
             $bytes = Storage::disk('cheque_share')->get($this->imagePath);
 
-            // $prompt = "Analyze this Philippine check. Return ONLY JSON: 
-            //     {\"payee\": \"string\", \"amount\": number, \"account_no\": \"string\", 
-            //     \"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\ , \"date\": \"string\"}";
+            $payload = self::payLayoadFunction($bytes);
 
-            $prompt = "Analyze this Philippine check image carefully. Return ONLY valid JSON (no markdown, no explanation, no code fences) in this exact structure:
-{\"payee\": \"string\", \"amount\": number, \"account_no\": \"string\", 
-\"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\", 
-\"date\": \"string\", \"bank_address\": \"string\", \"micr_number\": \"string\", 
-\"barcode_or_qr\": \"string\", \"serial_code\": \"string\", \"amount_in_words\": \"string\"}
-
-Field instructions:
-- payee: the name written on the 'PAY TO THE ORDER OF' line.
-- amount: the numeric amount in the amount box, as a number (no currency symbol, no commas).
-- account_no: the account number printed top-left.
-- signed: true if a signature is visible in the signature box, false otherwise.
-- cheque_no: the check number printed top-right.
-- bank_name: the issuing bank's name.
-- date: the date as printed (MM-DD-YYYY format if available).
-- bank_address: the branch name and address printed near the bank logo.
-- micr_number: the full raw MICR line at the bottom of the check (the row of stylized numbers/symbols), transcribed as-is.
-- barcode_or_qr: the code/text printed directly below or near the barcode or QR code, if present.
-- serial_code: the BRSTN branch/serial code printed in the top-right corner (distinct from cheque_no).
-
-Rules:
-- If any field is not visible, not printed, or not present on the check, return an empty string \"\" for that field (or false for signed if no signature is visible).
-- Do not guess or fabricate values.
-- If the handwritten legal amount (in words) does not match the numeric amount box, still extract both values as seen — do not attempt to reconcile them.
-- Return valid JSON only, with no leading or trailing text.";
-
-            $payload = [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt],
-                            [
-                                'inline_data' => [
-                                    'mime_type' => 'image/jpeg',
-                                    'data' => base64_encode($bytes)
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ];
-
-            $response = Http::timeout(60)
-                ->retry(3, 2000)
-                ->post(
-                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" .
-                        config('app.GEMINI_API_KEY'),
-                    $payload
-                );
+            $response = self::httpResponseFunction($payload);
 
             if ($response->status() === 503) {
                 Log::warning('Gemini is busy, retrying...', [
@@ -172,5 +123,63 @@ Rules:
             // $this->check->update(['status' => 'failed']);
             throw $e; // let Laravel retry
         }
+    }
+
+    private function promptFunction()
+    {
+        return "Analyze this Philippine check image carefully. Return ONLY valid JSON (no markdown, no explanation, no code fences) in this exact structure:
+{\"payee\": \"string\", \"amount\": number, \"account_no\": \"string\", 
+\"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\", 
+\"date\": \"string\", \"bank_address\": \"string\", \"micr_number\": \"string\", 
+\"barcode_or_qr\": \"string\", \"serial_code\": \"string\", \"amount_in_words\": \"string\"}
+
+Field instructions:
+- payee: the name written on the 'PAY TO THE ORDER OF' line.
+- amount: the numeric amount in the amount box, as a number (no currency symbol, no commas).
+- account_no: the account number printed top-left.
+- signed: true if a signature is visible in the signature box, false otherwise.
+- cheque_no: the check number printed top-right.
+- bank_name: the issuing bank's name.
+- date: the date as printed (MM-DD-YYYY format if available).
+- bank_address: the branch name and address printed near the bank logo.
+- micr_number: the full raw MICR line at the bottom of the check (the row of stylized numbers/symbols), transcribed as-is.
+- barcode_or_qr: the code/text printed directly below or near the barcode or QR code, if present.
+- serial_code: the BRSTN branch/serial code printed in the top-right corner (distinct from cheque_no).
+
+Rules:
+- If any field is not visible, not printed, or not present on the check, return an empty string \"\" for that field (or false for signed if no signature is visible).
+- Do not guess or fabricate values.
+- If the handwritten legal amount (in words) does not match the numeric amount box, still extract both values as seen — do not attempt to reconcile them.
+- Return valid JSON only, with no leading or trailing text.";
+    }
+
+    public function payLayoadFunction($bytes)
+    {
+        return
+            [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => self::promptFunction()],
+                            [
+                                'inline_data' => [
+                                    'mime_type' => 'image/jpeg',
+                                    'data' => base64_encode($bytes)
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ];
+    }
+    private function httpResponseFunction($payload)
+    {
+        return  Http::timeout(60)
+            ->retry(3, 2000)
+            ->post(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" .
+                    config('app.GEMINI_API_KEY'),
+                $payload
+            );
     }
 }
