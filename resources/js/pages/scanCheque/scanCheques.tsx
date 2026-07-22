@@ -667,12 +667,20 @@ export default function ScanCheques({ files }: Props) {
                                 </Modal>
 
                                 {/* Table Card */}
-                                <div className="overflow-hidden rounded-2xl border shadow-sm">
-                                    <TableContainer component={Paper}>
+                                <div className="overflow-x-auto rounded-2xl border shadow-sm">
+                                    <TableContainer
+                                        component={Paper}
+                                        sx={{ minWidth: 1200 }}
+                                    >
                                         <Table
-                                            // sx={{ minWidth: 650 }}
                                             size="small"
                                             aria-label="a dense table"
+                                            sx={{
+                                                '& .MuiTableCell-root': {
+                                                    whiteSpace: 'nowrap', // Prevent text wrapping
+                                                    padding: { xs: 1, sm: 1.5 }, // Smaller padding on mobile
+                                                },
+                                            }}
                                         >
                                             <TableHead>
                                                 <TableRow>
@@ -688,10 +696,22 @@ export default function ScanCheques({ files }: Props) {
                                                     <TableCell align="right">
                                                         Account Number
                                                     </TableCell>
-                                                    <TableCell align="right">
+                                                    <TableCell align="left">
                                                         Amount
                                                     </TableCell>
-                                                    <TableCell align="right">
+                                                    <TableCell align="left">
+                                                        Amount in words
+                                                    </TableCell>
+                                                    <TableCell align="left">
+                                                        Micr Number
+                                                    </TableCell>
+                                                    <TableCell align="left">
+                                                        Serial Code
+                                                    </TableCell>
+                                                    <TableCell align="left">
+                                                        Barcode/Qr
+                                                    </TableCell>
+                                                    <TableCell align="left">
                                                         Payee
                                                     </TableCell>
                                                     <TableCell align="center">
@@ -699,18 +719,21 @@ export default function ScanCheques({ files }: Props) {
                                                     </TableCell>
                                                 </TableRow>
                                             </TableHead>
+
                                             {getScanned?.length === 0 && (
                                                 <TableBody>
                                                     <TableRow>
                                                         <TableCell
-                                                            colSpan={7}
+                                                            colSpan={11}
                                                             align="center"
+                                                            sx={{ py: 4 }}
                                                         >
                                                             No data today
                                                         </TableCell>
                                                     </TableRow>
                                                 </TableBody>
                                             )}
+
                                             <TableBody>
                                                 {getScanned?.map((row: any) => (
                                                     <TableRow
@@ -728,25 +751,22 @@ export default function ScanCheques({ files }: Props) {
                                                                 row?.bank_account_name
                                                             }
                                                         </TableCell>
-                                                        <TableCell
-                                                            component="th"
-                                                            scope="row"
-                                                        >
+                                                        <TableCell>
                                                             {dayjs(
                                                                 row?.cheque_date,
                                                             ).format(
                                                                 'MMM DD, YYYY',
                                                             )}
                                                         </TableCell>
-                                                        <TableCell align="right">
+                                                        <TableCell align="left">
                                                             {row?.cheque_no}
                                                         </TableCell>
-                                                        <TableCell align="right">
+                                                        <TableCell align="left">
                                                             {
                                                                 row?.account_number
                                                             }
                                                         </TableCell>
-                                                        <TableCell align="right">
+                                                        <TableCell align="left">
                                                             {new Intl.NumberFormat(
                                                                 'en-PH',
                                                                 {
@@ -760,7 +780,21 @@ export default function ScanCheques({ files }: Props) {
                                                                 ),
                                                             )}
                                                         </TableCell>
-                                                        <TableCell align="right">
+                                                        <TableCell align="left">
+                                                            {
+                                                                row?.amount_in_words
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {row?.micr_number}
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {row?.serial_code}
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {row?.barcode_or_qr}
+                                                        </TableCell>
+                                                        <TableCell align="left">
                                                             {row?.payee}
                                                         </TableCell>
                                                         <TableCell align="center">
@@ -784,7 +818,11 @@ export default function ScanCheques({ files }: Props) {
                                 <Button
                                     variant="contained"
                                     startIcon={<ArrowBackIcon />}
-                                    onClick={() => router.get(retrievedRecords(), {tab: 'manageChecks'})}
+                                    onClick={() =>
+                                        router.get(retrievedRecords(), {
+                                            tab: 'manageChecks',
+                                        })
+                                    }
                                 >
                                     Back
                                 </Button>

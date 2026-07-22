@@ -24,9 +24,7 @@ class ProcessChequeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public string $imagePath, public int $id, public int $count, public int $totalcount)
-    {
-    }
+    public function __construct(public string $imagePath, public int $id, public int $count, public int $totalcount) {}
     public $tries = 5;
 
     public function backoff(): array
@@ -40,9 +38,34 @@ class ProcessChequeJob implements ShouldQueue
 
             $bytes = Storage::disk('cheque_share')->get($this->imagePath);
 
-            $prompt = "Analyze this Philippine check. Return ONLY JSON: 
-                {\"payee\": \"string\", \"amount\": number, \"account_no\": \"string\", 
-                \"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\ , \"date\": \"string\"}";
+            // $prompt = "Analyze this Philippine check. Return ONLY JSON: 
+            //     {\"payee\": \"string\", \"amount\": number, \"account_no\": \"string\", 
+            //     \"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\ , \"date\": \"string\"}";
+
+            $prompt = "Analyze this Philippine check image carefully. Return ONLY valid JSON (no markdown, no explanation, no code fences) in this exact structure:
+{\"payee\": \"string\", \"amount\": number, \"account_no\": \"string\", 
+\"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\", 
+\"date\": \"string\", \"bank_address\": \"string\", \"micr_number\": \"string\", 
+\"barcode_or_qr\": \"string\", \"serial_code\": \"string\", \"amount_in_words\": \"string\"}
+
+Field instructions:
+- payee: the name written on the 'PAY TO THE ORDER OF' line.
+- amount: the numeric amount in the amount box, as a number (no currency symbol, no commas).
+- account_no: the account number printed top-left.
+- signed: true if a signature is visible in the signature box, false otherwise.
+- cheque_no: the check number printed top-right.
+- bank_name: the issuing bank's name.
+- date: the date as printed (MM-DD-YYYY format if available).
+- bank_address: the branch name and address printed near the bank logo.
+- micr_number: the full raw MICR line at the bottom of the check (the row of stylized numbers/symbols), transcribed as-is.
+- barcode_or_qr: the code/text printed directly below or near the barcode or QR code, if present.
+- serial_code: the BRSTN branch/serial code printed in the top-right corner (distinct from cheque_no).
+
+Rules:
+- If any field is not visible, not printed, or not present on the check, return an empty string \"\" for that field (or false for signed if no signature is visible).
+- Do not guess or fabricate values.
+- If the handwritten legal amount (in words) does not match the numeric amount box, still extract both values as seen — do not attempt to reconcile them.
+- Return valid JSON only, with no leading or trailing text.";
 
             $payload = [
                 'contents' => [
@@ -64,7 +87,7 @@ class ProcessChequeJob implements ShouldQueue
                 ->retry(3, 2000)
                 ->post(
                     "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" .
-                    config('app.GEMINI_API_KEY'),
+                        config('app.GEMINI_API_KEY'),
                     $payload
                 );
 
@@ -90,6 +113,8 @@ class ProcessChequeJob implements ShouldQueue
             $clean = preg_replace('/```json|```/', '', $text);
             $data = json_decode(trim($clean), true);
 
+            Log::info($data);
+
 
             $amount = $data['amount'] ?? null;
             $chequeNumber = $data['cheque_no'] ?? null;
@@ -109,7 +134,7 @@ class ProcessChequeJob implements ShouldQueue
                                     ->where('resolved_cheque_number', $chequeNumber);
                             });
                     })
-                    ->where($amountColumn, $amount);
+                        ->where($amountColumn, $amount);
                 }
             )->whereNotNull(['approved_at', 'approver_id'])->value('id');
 
@@ -119,6 +144,11 @@ class ProcessChequeJob implements ShouldQueue
                     'borrowed_cheque_id' => $borrowedIChequeId,
                     'amount' => $amount,
                     'account_number' => $data['account_no'] ?? null,
+                    'amount_in_words' => $data['amount_in_words'] ?? null,
+                    'bank_address' => $data['bank_address'] ?? null,
+                    'micr_number' => $data['micr_number'] ?? null,
+                    'serial_code' => $data['serial_code'] ?? null,
+                    'barcode_or_qr' => $data['barcode_or_qr'] ?? null,
                     'cheque_no' => $chequeNumber,
                     'cheque_date' => Carbon::createFromFormat('m-d-Y', $data['date']) ?? null,
                     'bank_account_name' => $data['bank_name'] ?? null,

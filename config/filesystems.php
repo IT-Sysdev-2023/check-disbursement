@@ -67,7 +67,8 @@ return [
 
         'cheque_share' => [
             'driver' => 'local',
-            'root' => '\\\\172.16.42.91\\scanned', //\\172.16.42.143\GiftCheckTextfile
+            // 'root' => '\\\\172.16.42.91\\scanned', //\\172.16.42.143\GiftCheckTextfile
+            'root' => '/home/ken/Documents/checkscanned', //\\172.16.42.143\GiftCheckTextfile
         ],
 
         // 'cheque_share' => [
