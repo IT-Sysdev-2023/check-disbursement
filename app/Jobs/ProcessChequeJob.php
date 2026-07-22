@@ -100,6 +100,7 @@ class ProcessChequeJob implements ShouldQueue
                     'micr_number' => $data['micr_number'] ?? null,
                     'serial_code' => $data['serial_code'] ?? null,
                     'barcode_or_qr' => $data['barcode_or_qr'] ?? null,
+                    'account_name' => $data['account_name'] ?? null,
                     'cheque_no' => $chequeNumber,
                     'cheque_date' => Carbon::createFromFormat('m-d-Y', $data['date']) ?? null,
                     'bank_account_name' => $data['bank_name'] ?? null,
@@ -131,7 +132,7 @@ class ProcessChequeJob implements ShouldQueue
 {\"payee\": \"string\", \"amount\": number, \"account_no\": \"string\", 
 \"signed\": boolean, \"cheque_no\": \"string\", \"bank_name\": \"string\", 
 \"date\": \"string\", \"bank_address\": \"string\", \"micr_number\": \"string\", 
-\"barcode_or_qr\": \"string\", \"serial_code\": \"string\", \"amount_in_words\": \"string\"}
+\"barcode_or_qr\": \"string\", \"serial_code\": \"string\", \"amount_in_words\": \"string\",\"account_name\": \"string\"}
 
 Field instructions:
 - payee: the name written on the 'PAY TO THE ORDER OF' line.
