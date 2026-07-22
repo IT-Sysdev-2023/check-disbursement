@@ -696,6 +696,9 @@ export default function ScanCheques({ files }: Props) {
                                                     <TableCell align="right">
                                                         Account Number
                                                     </TableCell>
+                                                    <TableCell align="right">
+                                                        Account Name
+                                                    </TableCell>
                                                     <TableCell align="left">
                                                         Amount
                                                     </TableCell>
@@ -764,6 +767,11 @@ export default function ScanCheques({ files }: Props) {
                                                         <TableCell align="left">
                                                             {
                                                                 row?.account_number
+                                                            }
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {
+                                                                row?.account_name
                                                             }
                                                         </TableCell>
                                                         <TableCell align="left">
