@@ -12,9 +12,12 @@ return new class extends Migration {
     {
         Schema::create('sync_states', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('nav_database_id')->unique()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->binary('last_rowversion')->nullable();
+            $table->unsignedBigInteger('business_unit_id')->cascadeOnUpdate()->cascadeOnDelete();
+            $table->string('last_cv_no')->nullable();
+            $table->string('last_cv_date')->nullable();
             $table->timestamps();
+
+            $table->unique(['business_unit_id', 'last_cv_no', 'last_cv_date']);
         });
     }
 

@@ -65,20 +65,20 @@ return [
             'report' => false,
         ],
 
-        'cheque_share' => [
-            'driver' => 'local',
-            // 'root' => '\\\\172.16.42.91\\scanned', //\\172.16.42.143\GiftCheckTextfile
-            'root' => '/home/ken/Documents/checkscanned', //\\172.16.42.143\GiftCheckTextfile
-        ],
-
         // 'cheque_share' => [
-        //     'driver' => 'smb',
-        //     'host' => '172.16.42.91',
-        //     'path' => 'scanned',   // ← the actual SMB share name (e.g., \\172.16.42.91\cheques)
-        //     'username' => env('SMB_USERNAME'),
-        //     'password' => env('SMB_PASSWORD'),
-        //     'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
+        //     'driver' => 'local',
+        //     // 'root' => '\\\\172.16.42.91\\scanned', //\\172.16.42.143\GiftCheckTextfile
+        //     'root' => '/home/ken/Documents/checkscanned', //\\172.16.42.143\GiftCheckTextfile
         // ],
+
+        'cheque_share' => [
+            'driver' => 'smb',
+            'host' => '172.16.42.91',
+            'path' => 'scanned',   // ← the actual SMB share name (e.g., \\172.16.42.91\cheques)
+            'username' => env('SMB_USERNAME'),
+            'password' => env('SMB_PASSWORD'),
+            'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
+        ],
 
     ],
 

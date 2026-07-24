@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Carbon;
 
 class NavitionNotification extends Notification implements ShouldQueue
 {
@@ -14,7 +15,7 @@ class NavitionNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(protected int $total, protected string $bu, protected Carbon $date)
     {
         //
     }
@@ -37,8 +38,8 @@ class NavitionNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'Navition Records Available',
-            'message' => 'New records have been added.',
+            'title' => 'Navision new records found- ' . $this->bu,
+            'message' => "{$this->total} new record(s) are available for {$this->date->format('F Y')}.",
         ];
     }
 }

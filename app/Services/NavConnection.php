@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Cv;
 use App\Models\CvHeader;
 use App\Models\NavServer;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -20,13 +21,13 @@ class NavConnection
     protected static array $cache = [];
     public function setConnection(NavServer $server, string $database)
     {
-        $key = "{$server->name}_{$database}";
+        $key = "{$server->host}_{$database}";
         if (!isset(self::$cache[$key])) {
             $connectionName = 'nav_' . $key;
 
             $config = [
                 'driver' => 'sqlsrv',
-                'host' => $server->name,
+                'host' => $server->host,
                 'port' => $server->port,
                 'database' => $database,
                 'username' => $server->username,
@@ -144,6 +145,17 @@ class NavConnection
     {
         $record = $this->connection->table($name);
         return $record;
+    }
+
+    public function latestRecord(string $dbname, string $cvNo, Carbon $cvDate)
+    {
+        return $this->connection->table($dbname)
+            ->whereYear('CV Date', $cvDate->year)
+            ->whereMonth('CV Date', $cvDate->month)
+            ->where('Check Voucher No_', '>', $cvNo)
+            ->orderBy('timestamp', 'desc')
+            ->count();
+        
     }
 
 

@@ -3,10 +3,15 @@
 namespace App\Jobs;
 
 use App\Models\Cv;
+use App\Models\SyncState;
+use App\Models\User;
+use App\Notifications\NavitionNotification;
+use App\Services\GenerateCvService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class NotificationJob implements ShouldQueue
 {
@@ -25,51 +30,55 @@ class NotificationJob implements ShouldQueue
      */
     public function handle(): void
     {
-        // $bu = Cv::select('business_unit_id')
-        //     ->distinct()
-        //     ->get();
+        $latestCvNos = Cv::selectRaw('business_unit_id, MAX(cv_no) as cv_no')
+            ->groupByRaw('business_unit_id, YEAR(cv_date), MONTH(cv_date)');
 
-        // dd($bu);
-        $businessUnits = DB::table(DB::raw('(
-                select
-                    DATE_FORMAT(cv_date, "%Y-%m") as month_year,
-                    business_units.name as business_unit,
-                    business_units.id as buId,
-                    cvs.row_version,
-                    cvs.cheque_number,
-                    ROW_NUMBER() OVER (
-                        PARTITION BY DATE_FORMAT(cv_date, "%Y-%m")
-                        ORDER BY cvs.row_version DESC
-                    ) as rn
-                from cvs
-                inner join business_units 
-                    on business_units.id = cvs.business_unit_id
-                where business_units.company_id != 13
-              
-            ) as latest'))
-            ->select(
-                'month_year',
-                'business_unit',
-                'buId',
-                'row_version',
-                'cheque_number'
-            )
-            ->where('rn', 1)
-            ->orderBy('month_year')
-            ->get();
+        $cvs = Cv::with(['businessUnit.navDatabase' => ['navServer', 'navHeaderTable']])
+            ->joinSub($latestCvNos, 'latest', function ($join) {
+                $join->on('cvs.business_unit_id', '=', 'latest.business_unit_id')
+                    ->on('cvs.cv_no', '=', 'latest.cv_no');
+            })->get();
 
-        // $businessUnits->each(function ($bu) {
-        //     $cv = Cv::where('business_unit_id', $bu->buId)
-        //         ->whereRaw('DATE_FORMAT(cv_date, "%Y-%m") = ?', [$bu->month_year])
-        //         ->where('row_version', '!=', $bu->row_version)
-        //         ->first();
+        $users = User::role('disbursement_officer')->get();
+        $cvs->each(function ($item) use ($users) {
 
-        //     if ($cv) {
-        //         $this->sendNotification($cv);
-        //     }
-        // });
+            $totalNewRecords = (new GenerateCvService())
+                ->setConnection(
+                    $item->businessUnit->navDatabase->navServer,
+                    $item->businessUnit->navDatabase->name
+                )->latestRecord(
+                    $item->businessUnit->navDatabase->navHeaderTable->name,
+                    $item->cv_no,
+                    $item->cv_date
+                );
+
+            if (!$totalNewRecords)
+                return;
+
+            $syncState = SyncState::firstOrNew([
+                'business_unit_id' => $item->businessUnit->id,
+                'last_cv_date' => $item->cv_date->format('Y-m'),
+            ]);
+
+            if (
+                !$syncState->exists ||
+                ($syncState->last_cv_no !== $item->cv_no)
+            ) {
+                Notification::send(
+                    $users,
+                    new NavitionNotification(
+                        $totalNewRecords,
+                        $item->businessUnit->name,
+                        $item->cv_date
+                    )
+                );
+
+                $syncState->last_cv_no = $item->cv_no;
+                $syncState->save();
+            }
+
+        });
 
 
-        // Log::info($cv->toArray());
     }
 }

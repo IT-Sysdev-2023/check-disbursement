@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BusinessUnit;
+use App\Models\Cv;
 use App\Notifications\NavitionNotification;
+use App\Services\GenerateCvService;
 use Illuminate\Http\Request;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 
@@ -28,12 +32,6 @@ class NotificationController extends Controller
             });
         return Inertia::render('notificationPage', ['records' => $notifications]);
     }
-    public function notify()
-    {
-        $user = auth()->user();
-        $user->notify(new NavitionNotification());
-    }
-
     public function read(Request $request)
     {
         if ($request->markAll) {
@@ -44,7 +42,7 @@ class NotificationController extends Controller
         $notification = $request->user()
             ->unreadNotifications()
             ->findOrFail($request->id);
-            
+
         $notification->markAsRead();
     }
 }

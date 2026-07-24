@@ -64,7 +64,7 @@ class CvService
             })
             ->pluck('id', 'name')->values();
 
-        $nav = NavServer::select('id', 'name', 'username', 'password', 'port')
+        $nav = NavServer::select('id', 'host', 'username', 'password', 'port')
             ->withWhereHas('navDatabases', function (Builder $query) use ($buId) {
                 $query->whereIn('business_unit_id', $buId)
                     ->with('navHeaderTable', 'navChequePaymentTable');

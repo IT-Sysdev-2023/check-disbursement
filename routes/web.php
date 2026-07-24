@@ -97,7 +97,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
-        Route::post('check-notifications', [NotificationController::class, 'notify'])->name('check-notifications');
         Route::put('read', [NotificationController::class, 'read'])->name('read-notifications');
     });
 
@@ -194,12 +193,12 @@ Route::get('/test', function () {
     // dd($tables);
 
 
-    $bu = Cv::select('business_unit_id')
-        ->with('businessUnit', 'navHeaderTable')
-        // ->distinct()
-        ->get();
+    // $bu = Cv::select('business_unit_id')
+    //     ->with('businessUnit', 'navHeaderTable')
+    //     // ->distinct()
+    //     ->get();
 
-    dd($bu->toArray());
+    // dd($bu->toArray());
     // dd($cv->toArray());
 
 

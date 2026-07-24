@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { request } from '@/routes/password';
+import { SharedData } from '@/types';
 import { Form, Head, usePage } from '@inertiajs/react';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -18,7 +19,7 @@ interface LoginProps {
 export default function Login({ status, canResetPassword }: LoginProps) {
     const [showPassword, setShowPassword] = useState(false);
 
-    const props = usePage().props;
+    const props = usePage<SharedData>().props;
     const loginRoute = AuthenticatedSessionController.store();
     return (
         <div className="flex min-h-screen items-center justify-center bg-[#0e1117] px-4">

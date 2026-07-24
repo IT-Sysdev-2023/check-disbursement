@@ -30,7 +30,7 @@ class BusinessUnit extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function navDatabases()
+    public function navDatabase()
     {
         return $this->hasOne(NavDatabase::class);
     }

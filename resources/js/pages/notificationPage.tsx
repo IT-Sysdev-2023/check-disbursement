@@ -100,10 +100,8 @@ export default function NotificationPage({ auth, records }) {
         useState<NotificationItem[]>(initialNotifications);
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
-
-    useEchoNotification(`App.Models.User.${auth.user.id}`, (notification) => {
-        showNotification('Cheque Disbursement', 'Naay bag ong record choy');
-    });
+    
+  
 
     const unreadCount = records.filter((n) => !n.read).length;
 
