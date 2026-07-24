@@ -1,10 +1,8 @@
-import { showNotification } from '@/components/notification';
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
-import { checkNotifications, readNotifications } from '@/routes';
+import { readNotifications } from '@/routes';
 import { BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/react';
-import { useEchoNotification } from '@laravel/echo-react';
 import {
     Circle as CircleIcon,
     DoneAll as DoneAllIcon,
@@ -118,9 +116,6 @@ export default function NotificationPage({ auth, records }) {
         });
     };
 
-    const notification = () => {
-        router.post(checkNotifications());
-    };
 
     const removeNotification = (id: string) => {
         setNotifications((prev) => prev.filter((n) => n.id !== id));

@@ -49,7 +49,7 @@ return [
 
         'private' => [
             'driver' => 'local',
-            'root'   => storage_path('app/private'),
+            'root' => storage_path('app/private'),
         ],
 
         's3' => [
@@ -65,20 +65,19 @@ return [
             'report' => false,
         ],
 
-        // 'cheque_share' => [
-        //     'driver' => 'local',
-        //     // 'root' => '\\\\172.16.42.91\\scanned', //\\172.16.42.143\GiftCheckTextfile
-        //     'root' => '/home/ken/Documents/checkscanned', //\\172.16.42.143\GiftCheckTextfile
-        // ],
-
-        'cheque_share' => [
-            'driver' => 'smb',
-            'host' => '172.16.42.91',
-            'path' => 'scanned',   // ← the actual SMB share name (e.g., \\172.16.42.91\cheques)
-            'username' => env('SMB_USERNAME'),
-            'password' => env('SMB_PASSWORD'),
-            'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
-        ],
+        'cheque_share' => PHP_OS_FAMILY === 'Windows'
+            ? [
+                'driver' => 'local',
+                'root' => '/home/ken/Documents/checkscanned'
+            ]
+            : [
+                'driver' => 'smb',
+                'host' => '172.16.42.91',
+                'path' => 'scanned',
+                'username' => env('SMB_USERNAME'),
+                'password' => env('SMB_PASSWORD'),
+                'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
+            ],
 
     ],
 
