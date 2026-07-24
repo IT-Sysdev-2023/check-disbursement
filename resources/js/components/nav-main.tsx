@@ -5,7 +5,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-
+import { Badge } from "@/components/ui/badge";
 import {
     about,
     bankAccountSetup,
@@ -49,7 +49,7 @@ import { useEffect, useMemo, useState } from 'react';
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const page = usePage<SharedData>();
     const user = page.props.auth.user;
-
+    const notificationCount = page.props.notificationCount;
     // Memoize role names (array of strings)
     const roles = useMemo(
         () => user?.roles?.map((r) => r.name) || [],
@@ -287,6 +287,15 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                     >
                                         {item.icon && <item.icon />}
                                         <span>{item.title}</span>
+
+                                        {(item.title === 'Notifications' && notificationCount > 0) && (
+                                            <Badge
+                                                variant="destructive"
+                                                className="h-5 px-1.5"
+                                            >
+                                               {notificationCount}
+                                            </Badge>
+                                         )}
                                     </Link>
                                 )}
                             </SidebarMenuButton>

@@ -50,6 +50,7 @@ class HandleInertiaRequests extends Middleware
                     'stream' => $request->session()->get('stream'),
                 ];
             },
+            'notificationCount' => $request->user()?->unreadNotifications()->count(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
                 'user' => $request->user()?->load('roles'),

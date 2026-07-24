@@ -39,6 +39,7 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
+    notificationCount: number;
     [key: string]: unknown;
 }
 
