@@ -50,7 +50,7 @@ class Crf extends Model
     protected function formattedAmount(): Attribute
     {
         return Attribute::make(
-            get: fn() => NumberHelper::currency($this->amount),
+            get: fn() => NumberHelper::currency($this->cheque_amount),
         );
     }
 
@@ -61,9 +61,9 @@ class Crf extends Model
                 'crfs.crf',
                 'crfs.company_office',
                 'crfs.no',
-                'crfs.paid_to',
+                'crfs.payee',
                 'crfs.particulars',
-                'crfs.amount',
+                'crfs.cheque_amount',
                 'crfs.cheque_number'
             ], 'LIKE', '%' . $search . '%');
         })
@@ -102,8 +102,8 @@ class Crf extends Model
             DB::raw('COALESCE(cheque_number, resolved_cheque_number) as cheque_number'),
             'crfs.resolved_cheque_date as cheque_date',
             'business_units.name as company_name',
-            'crfs.amount',
-            'paid_to as payee',
+            'crfs.cheque_amount',
+            'crfs.payee',
             'tagged_at',
             'tag_locations.location',
             DB::raw("'crf' as type"),

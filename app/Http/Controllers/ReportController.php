@@ -56,6 +56,8 @@ class ReportController extends Controller
             'columns' => 'required | array | min:1',
             'columns.*' => 'string',
         ]);
+
+       
         $result = [];
 
         foreach ($validated['columns'] as $column) {
@@ -69,6 +71,8 @@ class ReportController extends Controller
                 }
             }
         }
+
+         dd($result);
 
         $cvColumns = isset($result['cv'])
             ? ColumnResolver::transformColumn($result['cv'])

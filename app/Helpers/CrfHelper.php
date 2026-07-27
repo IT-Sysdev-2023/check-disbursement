@@ -159,8 +159,8 @@ class CrfHelper
             'bank' => $this->bank,
             'cheque_number' => $this->ckNo,
             'prepared_by' => $this->preparedBy,
-            'paid_to' => $this->paidTo,
-            'amount' => $this->amount,
+            'payee' => $this->paidTo,
+            'cheque_amount' => $this->amount,
             'particulars' => $this->particular,
             'created_at' => now(),
             'updated_at' => now()
@@ -174,8 +174,8 @@ class CrfHelper
             return (!empty($item['company_office']) && !empty($item['no'])
                 && !empty($item['crf_location']) && !empty($item['date'])
                 && !empty($item['bank']) && !empty($item['cheque_number'])
-                && !empty($item['prepared_by']) && !empty($item['paid_to'])
-                && !empty($item['amount']) && !empty($item['particulars'])) 
+                && !empty($item['prepared_by']) && !empty($item['payee'])
+                && !empty($item['cheque_amount']) && !empty($item['particulars'])) 
                 // &&
                 // (Str::contains($item['company_office'], $bu, ignoreCase: true))
                 ; // disable case sensitivity

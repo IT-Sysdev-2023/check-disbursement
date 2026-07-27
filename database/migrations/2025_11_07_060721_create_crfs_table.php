@@ -19,11 +19,11 @@ return new class extends Migration {
             $table->unsignedBigInteger('no');
             $table->string('crf_location');
             $table->date('date')->nullable();
-            $table->string('paid_to');
+            $table->string('payee');
             $table->string('particulars');
-            $table->decimal('amount', 20);
-            $table->string('bank');
+            $table->decimal('cheque_amount', 20);
             $table->string('cheque_number');
+            $table->string('bank');
             $table->string('prepared_by');
 
             $table->string('resolved_cheque_number')->nullable();

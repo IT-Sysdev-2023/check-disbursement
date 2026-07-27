@@ -74,7 +74,6 @@ class ProcessChequeJob implements ShouldQueue
                 'checkable',
                 [Crf::class, Cv::class],
                 function ($q, $type) use ($chequeNumber, $amount) {
-                    $amountColumn = $type === Crf::class ? 'amount' : 'cheque_amount';
                     $q->where(function ($query) use ($chequeNumber) {
                         $query->where('cheque_number', $chequeNumber)
                             ->orWhere(function ($query) use ($chequeNumber) {
@@ -85,7 +84,7 @@ class ProcessChequeJob implements ShouldQueue
                                     ->where('resolved_cheque_number', $chequeNumber);
                             });
                     })
-                        ->where($amountColumn, $amount);
+                        ->where('cheque_amount', $amount);
                 }
             )->whereNotNull(['approved_at', 'approver_id'])->value('id');
 

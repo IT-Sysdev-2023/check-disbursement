@@ -28,10 +28,10 @@ class ColumnResolver
         ],
         'crf' => [
             'crf',
-            'amount',
-            'paid to',
-            'bank',
+            'cheque amount',
             'cheque number',
+            'payee',
+            'bank',
             'prepared by',
 
         ],

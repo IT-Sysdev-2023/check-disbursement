@@ -187,7 +187,6 @@ class ScannedRecordsController extends Controller
 
         $dbChequeDate = $cheque->cheque_date ?: $cheque->resolved_cheque_date;
         $dbAmount = $id->checkable_type == 'crf' ? $cheque->amount : $cheque->cheque_amount;
-        $payee = $id->checkable_type == 'crf' ? $cheque->paid_to : $cheque->payee;
 
         // Normalize before comparison
         if ((string) $dbChequeNo !== (string) $validated['chequeNumber']) {
@@ -208,7 +207,7 @@ class ScannedRecordsController extends Controller
             ]);
         }
 
-        if ($payee !== $validated['payee']) {
+        if ($cheque->payee !== $validated['payee']) {
             throw ValidationException::withMessages([
                 'payee' => 'Payee mismatch.',
             ]);
