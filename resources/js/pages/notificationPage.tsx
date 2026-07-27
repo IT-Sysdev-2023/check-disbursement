@@ -1,6 +1,6 @@
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
-import { readNotifications } from '@/routes';
+import { deleteNotification, readNotifications } from '@/routes';
 import { BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/react';
 import {
@@ -30,14 +30,6 @@ import { useState } from 'react';
 
 // type NotificationType = 'info' | 'success' | 'warning' | 'error';
 
-interface NotificationItem {
-    id: string;
-    title: string;
-    message: string;
-    time: string;
-    read: boolean;
-}
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Notifications',
@@ -45,80 +37,27 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// const typeConfig: Record<
-//     NotificationType,
-//     { icon: React.ReactNode; color: string }
-// > = {
-//     info: { icon: <InfoIcon />, color: '#0288d1' },
-//     success: { icon: <CheckCircleIcon />, color: '#2e7d32' },
-//     warning: { icon: <WarningIcon />, color: '#ed6c02' },
-//     error: { icon: <ErrorIcon />, color: '#d32f2f' },
-// };
-
-const initialNotifications: NotificationItem[] = [
-    {
-        id: '1',
-        title: 'Payment received',
-        message: 'Your invoice #1042 has been paid in full.',
-        time: '5 minutes ago',
-        read: false,
-    },
-    {
-        id: '2',
-        title: 'New comment',
-        message: 'Sarah left a comment on your project "Website Redesign".',
-        time: '1 hour ago',
-        read: false,
-    },
-    {
-        id: '3',
-        title: 'Storage almost full',
-        message: 'You are using 92% of your available storage space.',
-        time: '3 hours ago',
-        read: true,
-    },
-    {
-        id: '4',
-        title: 'Sync failed',
-        message: 'We could not sync your latest changes. Please try again.',
-        time: 'Yesterday',
-        read: true,
-    },
-    {
-        id: '5',
-        title: 'New team member',
-        message: 'Alex Johnson has joined your workspace.',
-        time: '2 days ago',
-        read: true,
-    },
-];
-
-export default function NotificationPage({ auth, records }) {
-    const [notifications, setNotifications] =
-        useState<NotificationItem[]>(initialNotifications);
+export default function NotificationPage({ records }) {
     const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
     const [activeId, setActiveId] = useState<string | null>(null);
-    
-  
 
     const unreadCount = records.filter((n) => !n.read).length;
 
     const markAsRead = (id: string) => {
         router.put(readNotifications(), {
             id: id,
-            markAll: false
+            markAll: false,
         });
     };
 
     const markAllAsRead = () => {
         router.put(readNotifications(), {
-            markAll: true
+            markAll: true,
         });
     };
 
-
     const removeNotification = (id: string) => {
-        setNotifications((prev) => prev.filter((n) => n.id !== id));
+         router.delete(deleteNotification(id));
         setMenuAnchor(null);
     };
 
@@ -284,7 +223,7 @@ export default function NotificationPage({ auth, records }) {
                                                             variant="caption"
                                                             color="text.disabled"
                                                         >
-                                                            {notification.time}
+                                                            {notification.created_at}
                                                         </Typography>
                                                     </>
                                                 }
@@ -293,12 +232,14 @@ export default function NotificationPage({ auth, records }) {
                                         {index < records.length - 1 && (
                                             <Divider component="li" />
                                         )}
+                                        
                                     </Box>
                                 );
                             })}
-                        </List>
+                            </List>
+                            
                     )}
-
+                   
                     <Menu
                         anchorEl={menuAnchor}
                         open={Boolean(menuAnchor)}

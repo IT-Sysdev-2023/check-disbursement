@@ -7,6 +7,7 @@ use App\Models\Cv;
 use App\Notifications\NavitionNotification;
 use App\Services\GenerateCvService;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -44,5 +45,10 @@ class NotificationController extends Controller
             ->findOrFail($request->id);
 
         $notification->markAsRead();
+    }
+
+    public function delete(DatabaseNotification $id)
+    {
+        $id->delete();
     }
 }

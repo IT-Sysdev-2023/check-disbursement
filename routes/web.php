@@ -96,8 +96,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('sync-missing-data', [RetrievedChecksController::class, 'syncMissingData'])->name('sync-missing-data');
         });
 
-        Route::get('notifications', [NotificationController::class, 'index'])->name('notifications');
-        Route::put('read', [NotificationController::class, 'read'])->name('read-notifications');
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index'])->name('notifications');
+            Route::put('read', [NotificationController::class, 'read'])->name('read-notifications');
+            Route::delete('delete/{id}', [NotificationController::class, 'delete'])->name('delete-notification');
+        });
     });
 
 
