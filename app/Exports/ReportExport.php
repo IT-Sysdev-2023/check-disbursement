@@ -12,21 +12,17 @@ class ReportExport implements WithMultipleSheets
      */
 
     protected array $data;
-    protected ?array $cvColumns;
-    protected ?array $crfColumns;
 
 
-    public function __construct($cvColumns, $crfColumns, $data)
+    public function __construct($data)
     {
-        $this->cvColumns = $cvColumns;
-        $this->crfColumns = $crfColumns;
         $this->data = $data;
     }
     public function sheets(): array
     {
         return [
-            new CvReportExport($this->cvColumns, $this->data),
-            new CrfReportExport($this->crfColumns, $this->data),
+            new CvReportExport($this->data),
+            // new CrfReportExport($this->crfColumns, $this->data),
         ];
     }
 }

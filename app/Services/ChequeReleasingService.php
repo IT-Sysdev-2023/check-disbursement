@@ -79,7 +79,7 @@ class ChequeReleasingService
                     ->create([
                         'transaction_no' => $transactionNo,
                         'status' => Str::lower($label),
-                        'receivers_name' => $validated['receiversName'],
+                        'receiver_name' => $validated['receiversName'],
                         'image' => $handleFiles->imagePath,
                         'signature' => $handleFiles->signaturePath,
                         'caused_by' => $request->user()->id,

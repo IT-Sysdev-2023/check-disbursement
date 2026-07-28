@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('transaction_no')->nullable();
             $table->enum('status', ['released', 'forwarded', 'deposited', 'staled', 'cancelled'])->nullable();
-            $table->string('receivers_name')->nullable();
+            $table->string('receiver_name')->nullable();
             $table->string('image')->nullable();
             $table->string('signature')->nullable();
             $table->string('cancelled_reason')->nullable();

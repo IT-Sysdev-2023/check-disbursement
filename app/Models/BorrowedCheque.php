@@ -18,12 +18,12 @@ class BorrowedCheque extends Model
 
     }
 
-     protected function approver(): Attribute
-    {
-        return new Attribute(
-            get: fn() => $this->secondary_approver_id ? $this->secondaryApprover?->name : $this->primaryApprover?->name,
-        );
-    }
+    //  protected function approver(): Attribute
+    // {
+    //     return new Attribute(
+    //         get: fn() => $this->secondary_approver_id ? $this->secondaryApprover?->name : $this->primaryApprover?->name,
+    //     );
+    // }
 
     public function scopeFilter(Builder $builder, array $filters): Builder
     {
@@ -53,14 +53,18 @@ class BorrowedCheque extends Model
         return $this->belongsTo(Borrower::class);
     }
 
-    public function primaryApprover()
+    public function approver()
     {
-        return $this->belongsTo(Approver::class, 'primary_approver_id');
+        return $this->belongsTo(Approver::class);
     }
-    public function secondaryApprover()
-    {
-        return $this->belongsTo(Approver::class, 'secondary_approver_id');
-    }
+    // public function primaryApprover()
+    // {
+    //     return $this->belongsTo(Approver::class, 'primary_approver_id');
+    // }
+    // public function secondaryApprover()
+    // {
+    //     return $this->belongsTo(Approver::class, 'secondary_approver_id');
+    // }
 
     public function checkable()
     {

@@ -4,30 +4,34 @@ namespace App\Exports;
 
 
 use App\Models\ChequeStatus;
+use App\Models\Crf;
+use App\Models\Cv;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class CvReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoSize
+class CvReportExport implements FromCollection, WithHeadings, WithTitle, ShouldAutoSize
 {
     /**
      * @return \Illuminate\Support\Collection
      */
 
     protected array $columns;
-    protected array $validated;
-    public function __construct(array $columns, array $validated)
+    protected array $data;
+    public function __construct(array $data)
     {
-        $this->columns = $columns;
-        $this->validated = $validated;
+        $this->data = $data;
+        $this->columns = collect($data['columns'])->prepend('status')->all();
     }
 
-      public function title(): string
+    public function title(): string
     {
-        return 'Cv Report';
+        return 'Cv/Crf Report';
     }
 
     public function headings(): array
@@ -38,64 +42,73 @@ class CvReportExport implements FromQuery, WithHeadings, WithTitle, ShouldAutoSi
         );
     }
 
-    public function query()
+    public function collection()
     {
-        $validated = $this->validated;
+        $res = $this->getRecords()->map(function ($item) {
+            $checkable = $item->checkable;
+            return [
+                'receiver_name' => $item->receiver_name,
+                'status' => $item->status,
+                'checkable_type' => $item->checkable_type,
 
-        $columns = $this->columns;
+                'no' => $item->checkable_type === 'cv' ? $checkable?->cv_no : $checkable?->crf,
+                'cheque_number' => $checkable?->cheque_number,
+                'cheque_amount' => $checkable?->cheque_amount,
+                'cheque_date' => $checkable?->cheque_date,
+                'payee' => $checkable?->payee,
+                'approver_name' => $checkable?->borrowedCheque?->approver->name,
+                'borrower_name' => $checkable?->borrowedCheque?->borrower_name,
+                'borrower_no' => $checkable?->borrowedCheque?->borrower_no,
+                'location' => $checkable?->tagLocation->location,
+                'business_unit' => $checkable?->businessUnit->name,
+            ];
+        });
+        return $res->map(fn($item) => Arr::only($item, $this->columns));
+    }
 
-        $doesIncludeCN = in_array('cheque_number', $columns);
-        $doesIncludeCD = in_array('cheque_date', $columns);
-
-        if ($doesIncludeCN) {
-            $columns = array_map(fn($col) => $col === 'cheque_number' ? DB::raw('CASE WHEN cheque_number != 0 THEN cheque_number ELSE resolved_cheque_number END as cheque_number') : $col, $columns);
-        }
-
-        if ($doesIncludeCD) {
-            $columns = array_map(fn($col) => $col === 'cheque_date' ? DB::raw('CASE WHEN cheque_date IS NOT NULL THEN cheque_date ELSE resolved_cheque_date END as cheque_date') : $col, $columns);
-        }
-
-        if (in_array('status', $columns)) { //select the 'check_forwarded_statuses' status if there is a relationship there otherwise use the 
-            $columns = array_map(
-                fn($col) => $col === 'status'
-                ? DB::raw('COALESCE(check_forwarded_statuses.status, check_statuses.status) AS status')
-                : $col,
-                $columns
-            );
-        }
-
-        return ChequeStatus::select($columns)
-            ->join('cv_check_payments', 'cv_check_payments.id', '=', 'check_statuses.checkable_id')
-              ->join('borrowed_checks', function ($join) {
-                $join->on('cv_check_payments.id', '=', 'borrowed_checks.checkable_id')
-                    ->where('borrowed_checks.checkable_type', 'cv');
-            })
-            ->leftJoin('cv_headers', 'cv_check_payments.cv_header_id', '=', 'cv_headers.id')
-            ->join('companies', 'cv_check_payments.company_id', '=', 'companies.id')
-            ->join('borrowers', 'borrowed_checks.borrower_id', '=', 'borrowers.id')
-            ->join('tag_locations', 'cv_check_payments.tag_location_id', '=', 'tag_locations.id')
-            ->leftJoin('approvers', 'borrowed_checks.secondary_approver_id', '=', 'approvers.id')
-            ->leftJoin('check_forwarded_statuses', 'check_forwarded_statuses.check_status_id', '=', 'check_statuses.id')
-            ->where('check_statuses.checkable_type', 'cv')
+    private function getRecords()
+    {
+        return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit']])
+            ->select('receiver_name', 'status', 'checkable_id', 'checkable_type')
             ->when(
-                !empty($validated['status']),
+                !empty($this->data['status']),
                 fn($query) =>
-                $query->whereIn(DB::raw('COALESCE(check_forwarded_statuses.status, check_statuses.status)'), $validated['status'])
+                $query->where(function ($q) {
+                    $q->whereHas('chequeForwardedStatus', function ($q) {
+                        $q->whereIn('status', $this->data['status']);
+                    })
+                        ->orWhere(function ($q) {
+                            $q->whereDoesntHave('chequeForwardedStatus')
+                                ->whereIn('status', $this->data['status']);
+                        });
+                })
             )
             ->when(
-                !empty($validated['bu']),
-                fn($query) =>
-                $query->whereIn('companies.name', $validated['bu'])
+                !empty($this->data['bu']),
+                fn($outerQuery) =>
+                $outerQuery->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    function (Builder $query) {
+                        $query->whereHas('businessUnit.company', function (Builder $query) {
+                            $query->whereIn('name', $this->data['bu']);
+                        });
+                    }
+                )
             )
             ->when(
-                !empty($validated['borrower']),
-                fn($query) =>
-                $query->whereIn('borrowers.name', $validated['borrower'])
+                !empty($this->data['location']),
+                fn($outerQuery) =>
+                $outerQuery->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    function (Builder $query) {
+                        $query->whereHas('tagLocation', function (Builder $query) {
+                            $query->whereIn('location', $this->data['location']);
+                        });
+                    }
+                )
             )
-            ->when(
-                !empty($validated['location']),
-                fn($query) =>
-                $query->whereIn('tag_locations.location', $validated['location'])
-            );
+            ->get();
     }
 }

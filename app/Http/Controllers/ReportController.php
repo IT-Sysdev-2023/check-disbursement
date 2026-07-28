@@ -6,8 +6,10 @@ use App\Exports\ReportExport;
 use App\Helpers\ColumnResolver;
 use App\Helpers\FileHandler;
 use App\Models\Borrower;
+use App\Models\ChequeStatus;
 use App\Models\TagLocation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -37,8 +39,8 @@ class ReportController extends Controller
         $location = TagLocation::locationSelection();
         return Inertia::render('report/report', [
             'columns' => $columns,
-            'cvColumns' => ColumnResolver::TYPE_COLUMNS['cv'],
-            'crfColumns' => ColumnResolver::TYPE_COLUMNS['crf'],
+            // 'cvColumns' => ColumnResolver::TYPE_COLUMNS['cv'],
+            // 'crfColumns' => ColumnResolver::TYPE_COLUMNS['crf'],
             'statuses' => ColumnResolver::statusColumnEnums(),
             'borrower' => $borrower,
             'location' => $location,
@@ -55,38 +57,19 @@ class ReportController extends Controller
             'selectedChecks.*' => 'string',
             'columns' => 'required | array | min:1',
             'columns.*' => 'string',
+
+            'borrower' => 'array',
+            'location' => 'array',
+            'status' => 'array',
+            'bu' => 'array',
         ]);
-
-       
-        $result = [];
-
-        foreach ($validated['columns'] as $column) {
-            foreach ($validated['selectedChecks'] as $check) {
-                if (in_array($column, ColumnResolver::TYPE_COLUMNS[$check], true)) {
-                    $result[$check][] = $column;
-                }
-
-                if (in_array($column, ColumnResolver::DEFAULT_COLUMNS, true)) {
-                    $result[$check][] = $column;
-                }
-            }
-        }
-
-         dd($result);
-
-        $cvColumns = isset($result['cv'])
-            ? ColumnResolver::transformColumn($result['cv'])
-            : [];
-
-        $crfColumns = isset($result['crf'])
-            ? ColumnResolver::transformColumn($result['crf'])
-            : [];
-
+        $validated['columns'] = ColumnResolver::transformColumn($validated['columns']);
+        
         $role = $this->userType;
         $date = now()->format('Ymd_His');
 
         $filename = "reports/{$role}/report-{$request->user()->id}-{$date}.xlsx";
-        Excel::store(new ReportExport($cvColumns, $crfColumns, $request->all()), $filename, 'public');
+        Excel::store(new ReportExport($validated), $filename, 'public');
 
         return redirect()->back()->with(['status' => true, 'message' => 'Report generated Generated']);
     }

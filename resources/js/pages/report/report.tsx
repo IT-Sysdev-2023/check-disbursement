@@ -16,11 +16,11 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { generateReport } from '@/routes';
 import { BreadcrumbItem, SelectionType } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { ChangeEvent, ReactNode, useEffect } from 'react';
+import { ChangeEvent, ReactNode } from 'react';
 import PermissionSelection from '../admin/components/permissionSelection';
 
 const SectionCard = ({
@@ -71,16 +71,12 @@ const CHECK_OPTIONS = {
 };
 export default function EmployeeReportFilters({
     columns,
-    cvColumns,
-    crfColumns,
     statuses,
     borrower,
     location,
     bu,
 }: {
     columns: string[];
-    cvColumns: string[];
-    crfColumns: string[];
     statuses: SelectionType[];
     borrower: SelectionType[];
     location: SelectionType[];
@@ -110,24 +106,9 @@ export default function EmployeeReportFilters({
             }
         };
 
-    const CV_COLUMNS = new Set(cvColumns);
-    const CRF_COLUMNS = new Set(crfColumns);
-
-    const getLabelColor = (label: string) => {
-        if (CV_COLUMNS.has(label)) return 'info.main';
-        if (CRF_COLUMNS.has(label)) return 'success.main';
-        return 'text.primary';
-    };
-    
-    useEffect(() => {
-        router.reload({
-            data: {
-                check: data.selectedChecks,
-            },
-        });
-    }, [data.selectedChecks]);
-
     const onGenerate = () => {
+
+        // console.log(data);
         post(generateReport().url, {
             preserveScroll: true,
             preserveState: true,
@@ -213,12 +194,6 @@ export default function EmployeeReportFilters({
                                             />
                                         }
                                         label={label}
-                                        sx={{
-                                            '& .MuiFormControlLabel-label': {
-                                                color: getLabelColor(label),
-                                                fontWeight: 500,
-                                            },
-                                        }}
                                     />
                                 ))}
                             </FormControl>
@@ -263,7 +238,7 @@ export default function EmployeeReportFilters({
                                 />
                             </FormControl>
 
-                            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+                            {/* <FormControl fullWidth size="small" sx={{ mb: 2 }}>
                                 <InputLabel>Borrower Name</InputLabel>
                                 <PermissionSelection
                                     permissions={borrower}
@@ -272,10 +247,20 @@ export default function EmployeeReportFilters({
                                         handleChangeSelection(e, 'borrower')
                                     }
                                 />
-                            </FormControl>
+                            </FormControl> */}
 
                             <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <InputLabel>Tag Location</InputLabel>
+                                <PermissionSelection
+                                    permissions={location}
+                                    selectedPermission={data.location}
+                                    handleChange={(e) =>
+                                        handleChangeSelection(e, 'location')
+                                    }
+                                />
+                            </FormControl>
+                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+                                <InputLabel>Is Closed</InputLabel>
                                 <PermissionSelection
                                     permissions={location}
                                     selectedPermission={data.location}

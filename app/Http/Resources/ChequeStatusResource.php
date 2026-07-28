@@ -20,7 +20,7 @@ class ChequeStatusResource extends JsonResource
         return [
             "id" => $this->id,
             "status" => $this->status,
-            "receiversName" => $this->receivers_name,
+            "receiversName" => $this->receiver_name,
             "receivedBy" => $this->received_by,
             'image' => $this->image
                 ? asset('storage/' . $this->image)
