@@ -1,18 +1,24 @@
 // CameraCapture.tsx
 import React, { useRef, useState, useCallback, useEffect } from 'react';
+import { Box, Button, Stack, Alert, Paper } from '@mui/material';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import ReplayIcon from '@mui/icons-material/Replay';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 interface CameraCaptureProps {
-  onUploadSuccess?: (url: string) => void;
+  onCapture?: (imageDataUrl: string) => void;
 }
 
-const CameraCapture: React.FC<CameraCaptureProps> = ({ token, onUploadSuccess }) => {
+const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
   const [isStreaming, setIsStreaming] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
 
   // Start camera stream
   const startCamera = useCallback(async () => {
@@ -27,6 +33,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ token, onUploadSuccess })
         await videoRef.current.play();
       }
       setIsStreaming(true);
+      setCapturedImage(null);
       setError(null);
     } catch (err) {
       setError('Unable to access camera. Check permissions.');
@@ -38,14 +45,28 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ token, onUploadSuccess })
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     setIsStreaming(false);
+    setCapturedImage(null);
   }, []);
+
+  // Discard the captured still and go back to the live feed
+  const retake = useCallback(() => {
+    setCapturedImage(null);
+  }, []);
+
+  // Hand the captured image back to the parent and stop the camera
+  const handleBack = useCallback(() => {
+    if (capturedImage) {
+      onCapture?.(capturedImage);
+    }
+    stopCamera();
+  }, [capturedImage, onCapture, stopCamera]);
 
   useEffect(() => {
     return () => stopCamera(); // cleanup on unmount
   }, [stopCamera]);
 
-  // Capture a frame and upload it
-  const captureAndUpload = useCallback(async () => {
+  // Capture a still frame from the video
+  const captureFrame = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
 
     const video = videoRef.current;
@@ -57,66 +78,123 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ token, onUploadSuccess })
     if (!ctx) return;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-    canvas.toBlob(
-      async (blob) => {
-        if (!blob) return;
-        setIsUploading(true);
-        setError(null);
-
-        try {
-          const formData = new FormData();
-          formData.append('image', blob, `capture-${Date.now()}.jpg`);
-
-          // Get CSRF cookie first if using Sanctum SPA auth
-          // await axios.get('/sanctum/csrf-cookie');
-
-          const response = await fetch('/captures', {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': token,
-              // Authorization: `Bearer ${token}`, // if using token auth
-            },
-            body: formData,
-            credentials: 'include', // needed for Sanctum cookie auth
-          });
-
-          if (!response.ok) throw new Error('Upload failed');
-
-          const data = await response.json();
-          onUploadSuccess?.(data.url);
-        } catch (err) {
-          setError('Failed to upload image.');
-          console.error(err);
-        } finally {
-          setIsUploading(false);
-        }
-      },
-      'image/jpeg',
-      0.9 // quality
-    );
-  }, [onUploadSuccess, token]);
+    // Freeze the frame in place of the live camera view
+    setCapturedImage(canvas.toDataURL('image/jpeg', 0.9));
+    setError(null);
+  }, []);
 
   return (
-    <div className="camera-capture">
-      <video ref={videoRef} muted playsInline className="w-full rounded" />
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 2,
+        maxWidth: 640,
+        mx: 'auto',
+        borderRadius: 2,
+      }}
+    >
+      <Box
+        sx={{
+          position: 'relative',
+          width: '100%',
+          bgcolor: 'grey.900',
+          borderRadius: 1,
+          overflow: 'hidden',
+          aspectRatio: '16 / 9',
+        }}
+      >
+        <Box
+          component="video"
+          ref={videoRef}
+          muted
+          playsInline
+          sx={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: isStreaming && !capturedImage ? 'block' : 'none',
+          }}
+        />
 
-      <div className="mt-2 flex gap-2">
+        {capturedImage && (
+          <Box
+            component="img"
+            src={capturedImage}
+            alt="Captured preview"
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+            }}
+          />
+        )}
+
+        {!isStreaming && !capturedImage && (
+          <Stack
+            alignItems="center"
+            justifyContent="center"
+            sx={{ width: '100%', height: '100%', color: 'grey.500' }}
+          >
+            <CameraAltIcon fontSize="large" />
+          </Stack>
+        )}
+      </Box>
+
+      <Box component="canvas" ref={canvasRef} sx={{ display: 'none' }} />
+
+      <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
         {!isStreaming ? (
-          <button onClick={startCamera}>Start Camera</button>
+          <Button
+            variant="contained"
+            startIcon={<CameraAltIcon />}
+            onClick={startCamera}
+          >
+            Start Camera
+          </Button>
+        ) : capturedImage ? (
+          <>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<ArrowBackIcon />}
+              onClick={handleBack}
+            >
+              Back
+            </Button>
+            <Button variant="outlined" startIcon={<ReplayIcon />} onClick={retake}>
+              Retake
+            </Button>
+          </>
         ) : (
           <>
-            <button onClick={captureAndUpload} disabled={isUploading}>
-              {isUploading ? 'Uploading...' : 'Capture & Upload'}
-            </button>
-            <button onClick={stopCamera}>Stop Camera</button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<PhotoCameraIcon />}
+              onClick={captureFrame}
+            >
+              Capture
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<StopCircleIcon />}
+              onClick={stopCamera}
+            >
+              Stop Camera
+            </Button>
           </>
         )}
-      </div>
+      </Stack>
 
-      {error && <p className="text-red-500">{error}</p>}
-    </div>
+      {error && (
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {error}
+        </Alert>
+      )}
+    </Paper>
   );
 };
 

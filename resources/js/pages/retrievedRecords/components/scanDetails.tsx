@@ -128,6 +128,16 @@ export default function ScanDetails({
                         <Grid size={{ xs: 12, sm: 4 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
+                                    Amount in Words
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.amountInWords}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
                                     Payee
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>

@@ -34,13 +34,13 @@ export default function CheckReleasing({
     company,
     filter,
     businessUnits,
-    receiverNames
+    receiverNames,
 }: {
     cheques: InertiaPagination<ChequeResourceType>;
     filter: FilterType;
     company: SelectionType[];
-        businessUnits: SelectionType[];
-    receiverNames: Option[]
+    businessUnits: SelectionType[];
+    receiverNames: Option[];
 }) {
     const [open, setOpen] = useState(false);
     const [openReleasing, setOpenReleasing] = useState(false);
@@ -89,9 +89,7 @@ export default function CheckReleasing({
         proceed(selectedItems);
     };
 
-    const proceed = (
-        items: { id: number; status: string }[]
-    ) => {
+    const proceed = (items: { id: number; status: string }[]) => {
         setSelectedCheques(items);
         setOpenReleasing(true);
         // router.post(releaseCheck().url, {
@@ -169,7 +167,7 @@ export default function CheckReleasing({
 
                 <ReleasingModal
                     cheques={selectedCheques}
-                    receiverNames= {receiverNames}
+                    receiverNames={receiverNames}
                     open={openReleasing}
                     handleClose={() => {
                         setOpenReleasing(false);

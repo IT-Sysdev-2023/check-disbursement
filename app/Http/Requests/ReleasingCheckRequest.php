@@ -16,7 +16,8 @@ class ReleasingCheckRequest extends FormRequest
     {
         return [
             'receiversName' => 'required|string|max:255',
-            'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'file' => 'required|string',
+            // 'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
             'signature' => 'required|string',
             'cheques' => ['required', 'array'],
         ];

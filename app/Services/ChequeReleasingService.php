@@ -27,6 +27,7 @@ class ChequeReleasingService
         $chequeRecords = ChequeService::manageChecks($filters);
 
         $receiverNames = ReceiverName::select('id', 'name as label')->get();
+
         // dd(
         //     (new ChequeCollection($chequeRecords))
         //         ->response()

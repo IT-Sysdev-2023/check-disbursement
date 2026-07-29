@@ -8,20 +8,15 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import { CloudUploadIcon, Plus, Trash2 } from 'lucide-react';
-import {
-    ChangeEvent,
-    SyntheticEvent,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
+import { Camera, CloudUploadIcon, Plus, Trash2 } from 'lucide-react';
+import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import AutocompleteUser from './autocomplete-user';
+import SignatureModal from './signature-modal';
 
 interface MyFormData {
     receiversName: string;
-    file: File | null;
+    file: string | null;
     signature: string | null;
 }
 
@@ -36,6 +31,7 @@ export default function ReleasingModal({
     handleClose: () => void;
     receiverNames: Option[];
 }) {
+    const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
@@ -110,10 +106,17 @@ export default function ReleasingModal({
     //     }
     // };
 
-    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setData('file', e.target.files[0]);
-        }
+    const handleFileChange = () => {
+        setSignatureModalOpen(true);
+        // if (e.target.files && e.target.files[0]) {
+        //     setData('file', e.target.files[0]);
+        // }
+    };
+
+    const onCaptureImage = (image: string) => {
+        setData('file', image);
+        setSignatureModalOpen(false);
+        // console.log(image);
     };
 
     return (
@@ -180,14 +183,10 @@ export default function ReleasingModal({
                                         variant="contained"
                                         component="label"
                                         color="secondary"
-                                        startIcon={<CloudUploadIcon />}
+                                        onClick={handleFileChange}
+                                        startIcon={<Camera />}
                                     >
-                                        Image
-                                        <input
-                                            type="file"
-                                            hidden
-                                            onChange={handleFileChange}
-                                        />
+                                        Capture Image
                                     </Button>
 
                                     {/* Show selected file name */}
@@ -201,7 +200,7 @@ export default function ReleasingModal({
                                             }}
                                         >
                                             <Typography variant="body2">
-                                                {data.file.name}
+                                               1 selected image
                                             </Typography>
 
                                             <IconButton
@@ -264,6 +263,11 @@ export default function ReleasingModal({
                     </form>
                 </Box>
             </Modal>
+            <SignatureModal
+                onCapture={onCaptureImage}
+                open={signatureModalOpen}
+                handleClose={() => setSignatureModalOpen(false)}
+            />
         </>
     );
 }
