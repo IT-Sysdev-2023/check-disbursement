@@ -38,6 +38,7 @@ export default function ScanDetails({
 
         getRecord();
     }, [id, open]);
+    console.log(record);
 
     return (
         <Modal
@@ -53,30 +54,48 @@ export default function ScanDetails({
 
                 <Box sx={{ flexGrow: 1, width: '100%', mt: 2 }}>
                     <Grid container spacing={1} sx={{ width: '100%' }}>
-                        {record?.bankAccount && (
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Paper sx={{ px: 2, py: 1 }}>
-                                    <Typography variant="overline">
-                                        Bank:
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ mb: 1 }}>
-                                        {record?.bankAccount?.bank.acronym}
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                        )}
-
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
-                                    Check Number
+                                    Bank:
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.bank}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Bank Account:
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.bankAccountNumber}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Bank Address:
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.bankAddress}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Cheque Number
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
                                     {record?.chequeNo}
                                 </Typography>
                             </Paper>
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
                                     Check Date
@@ -86,19 +105,27 @@ export default function ScanDetails({
                                 </Typography>
                             </Paper>
                         </Grid>
-                        {record?.bankAccount && (
-                            <Grid size={{ xs: 12, sm: 6 }}>
-                                <Paper sx={{ px: 2, py: 1 }}>
-                                    <Typography variant="overline">
-                                        Account Number
-                                    </Typography>
-                                    <Typography variant="body1" sx={{ mb: 1 }}>
-                                        {record?.bankAccount?.account_no}
-                                    </Typography>
-                                </Paper>
-                            </Grid>
-                        )}
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Account Number
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.bankAccountNumber}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
+                            <Paper sx={{ px: 2, py: 1 }}>
+                                <Typography variant="overline">
+                                    Amount
+                                </Typography>
+                                <Typography variant="body1" sx={{ mb: 1 }}>
+                                    {record?.amount}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                        <Grid size={{ xs: 12, sm: 4 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
                                     Payee
@@ -108,13 +135,13 @@ export default function ScanDetails({
                                 </Typography>
                             </Paper>
                         </Grid>
-                        <Grid size={{ xs: 12, sm: 6 }}>
+                          <Grid size={{ xs: 12, sm: 4 }}>
                             <Paper sx={{ px: 2, py: 1 }}>
                                 <Typography variant="overline">
-                                    Amount
+                                    Serial Code
                                 </Typography>
                                 <Typography variant="body1" sx={{ mb: 1 }}>
-                                    {record?.amount}
+                                    {record?.serialCode}
                                 </Typography>
                             </Paper>
                         </Grid>

@@ -17,19 +17,19 @@ class ScannedRecordResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'accountNo' => $this->account_no,
-            'bank' =>$this->bank,
+            'bankAddress' => $this->bank_address,
+            'bankAccountNumber' => $this->account_number,
+            'micr' => $this->micr_number,
+            'serialCode' => $this->serial_code,
+            'bank' =>$this->bank_account_name,
             "amount" => NumberHelper::currency($this->amount),
             'chequeDate' => $this->cheque_date ? $this->cheque_date->toFormattedDateString() : 'N/A',
-            'branchCode' => $this->branch_code,
-            "branchName" => $this->branch_name,
             'bu' => $this->bu,
             'chequeNo' => $this->cheque_no,
+            'amountInWords' => $this->amount_in_words,
             'payee' => $this->payee,
             'postedDate' =>  $this->posted_date ? $this->posted_date->toFormattedDateString() : 'N/A',
             'seq' => $this->seq,
-
-            'bankAccount' => $this->whenLoaded('bankAccount')
         ];
     }
 }

@@ -355,23 +355,19 @@ export interface FileReport {
 
 export interface ScannedRecords {
     id: number;
-    accountNo: string;
-    amount: number;
-    checkDate: string;
     bank: string;
-    branchCode: string;
-    branchName: string;
-    bu: string;
-    checkNo: string;
+    bankAccountNumber: string;
+    amountInWords: string;
+    amount: number;
+    bankAddress: string;
+    bu?: string;
+    chequeNo: string;
+    chequeDate: string;
+    micr: string;
     payee: string;
-    postedDate: string;
-    seq: string;
-    bankAccount: {
-        account_no: string;
-        bank: {
-            acronym;
-        };
-    };
+    postedDate?: string;
+    serialCode?: string;
+    seq?: string;
 }
 
 export interface CheckScannedDetails {
