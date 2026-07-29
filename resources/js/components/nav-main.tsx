@@ -1,3 +1,4 @@
+import { Badge } from '@/components/ui/badge';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -5,7 +6,6 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { Badge } from "@/components/ui/badge";
 import {
     about,
     bankAccountSetup,
@@ -16,6 +16,7 @@ import {
     chequeRequests,
     chequeStatus,
     closingCheque,
+    eodRecords,
     forwardedChequeReleasing,
     forwardedReleasing,
     notifications,
@@ -41,6 +42,7 @@ import {
     PackageOpen,
     Pen,
     Rocket,
+    Sunset,
     Tickets,
     Users,
 } from 'lucide-react';
@@ -93,6 +95,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           title: 'Retrieved CV/CRF',
                           href: retrievedRecords(),
                           icon: PackageOpen,
+                      },
+                      {
+                          title: 'End of Day',
+                          href: eodRecords(),
+                          icon: Sunset,
                       },
                       {
                           title: 'Notifications',
@@ -288,14 +295,15 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                         {item.icon && <item.icon />}
                                         <span>{item.title}</span>
 
-                                        {(item.title === 'Notifications' && notificationCount > 0) && (
-                                            <Badge
-                                                variant="destructive"
-                                                className="h-5 px-1.5"
-                                            >
-                                               {notificationCount}
-                                            </Badge>
-                                         )}
+                                        {item.title === 'Notifications' &&
+                                            notificationCount > 0 && (
+                                                <Badge
+                                                    variant="destructive"
+                                                    className="h-5 px-1.5"
+                                                >
+                                                    {notificationCount}
+                                                </Badge>
+                                            )}
                                     </Link>
                                 )}
                             </SidebarMenuButton>

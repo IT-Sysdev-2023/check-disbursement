@@ -79,7 +79,6 @@ export default function CheckReleasing({
     };
 
     const proceed = (items: {id: number, status: string}[], status: string) => {
-        console.log(selectedRows);
         router.post(releaseCheck().url, {
             cheques: items,
             status: status,

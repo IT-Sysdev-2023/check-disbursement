@@ -31,8 +31,6 @@ class CvResource extends JsonResource
 
             'id' => $this->id,
 
-            'cvHeaderId' => $this->cv_header_id,
-
             'chequeNumber' => $this->cheque_number,
             'chequeDate' => $chequeDate ? $chequeDate->toFormattedDateString() : 'N/A',
 

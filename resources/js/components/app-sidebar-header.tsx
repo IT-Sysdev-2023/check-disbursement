@@ -3,7 +3,6 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { generatedReport } from '@/routes';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { router } from '@inertiajs/react';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import { Badge, Box, IconButton, Popover, Typography } from '@mui/material';
 import { Download } from 'lucide-react';
 import { useState } from 'react';

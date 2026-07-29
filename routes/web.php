@@ -11,6 +11,7 @@ use App\Http\Controllers\ClosingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EodController;
 use App\Http\Controllers\ForwardedCheckController;
 use App\Http\Controllers\ForwardedChequeController;
 use App\Http\Controllers\NotificationController;
@@ -100,6 +101,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [NotificationController::class, 'index'])->name('notifications');
             Route::put('read', [NotificationController::class, 'read'])->name('read-notifications');
             Route::delete('delete/{id}', [NotificationController::class, 'delete'])->name('delete-notification');
+        });
+        Route::prefix('eod')->group(function () {
+            Route::get('/', [EodController::class, 'index'])->name('eod-records');
+            Route::post('generate-eod', [EodController::class, 'generateEod'])->name('generate-eod');
         });
     });
 

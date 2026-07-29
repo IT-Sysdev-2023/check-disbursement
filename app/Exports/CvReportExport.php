@@ -71,6 +71,11 @@ class CvReportExport implements FromCollection, WithHeadings, WithTitle, ShouldA
         return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit']])
             ->select('receiver_name', 'status', 'checkable_id', 'checkable_type')
             ->when(
+                !empty($this->data['date']),
+                fn($query) =>
+                $query->whereDate('created_at', $this->data['date'])
+            )
+            ->when(
                 !empty($this->data['status']),
                 fn($query) =>
                 $query->where(function ($q) {
