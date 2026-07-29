@@ -30,6 +30,7 @@ Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home')->middleware('guest');
 
+ Route::post('/captures', [CheckReleasingController::class, 'cameraCapture'])->name('camera-capture');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
@@ -148,7 +149,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
         });
     });
-
+    
+   
     //! REGIONAL OFFICER
     //Cebu & Manila
     Route::prefix('forwarded-cheque')->middleware('role:regional_officer|admin')->group(function () {

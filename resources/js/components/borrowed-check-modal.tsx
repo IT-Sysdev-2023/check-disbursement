@@ -13,16 +13,16 @@ import AutocompleteUser from './autocomplete-user';
 
 const reasons = [
     {
-        value: 'Reason for borrowing 1',
-        label: 'Reason for borrowing 1',
+        value: 'For Signature 1',
+        label: 'For Signature 1',
     },
     {
-        value: 'Reason for borrowing 2',
-        label: 'Reason for borrowing 2',
+        value: 'For Signature 2',
+        label: 'For Signature 2',
     },
     {
-        value: 'Reason for borrowing 3',
-        label: 'Reason for borrowing 3',
+        value: 'For Signature 3',
+        label: 'For Signature 3',
     },
 ];
 export default function BorrowedCheckModal({
