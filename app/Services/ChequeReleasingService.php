@@ -10,6 +10,7 @@ use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
 use App\Models\ChequeStatus;
+use App\Models\ReceiverName;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ class ChequeReleasingService
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
         $chequeRecords = ChequeService::manageChecks($filters);
 
+        $receiverNames = ReceiverName::select('id', 'name as label')->get();
         // dd(
         //     (new ChequeCollection($chequeRecords))
         //         ->response()
@@ -32,6 +34,7 @@ class ChequeReleasingService
         // );
         return Inertia::render('checkReleasing', [
             'cheques' => new ChequeCollection($chequeRecords),
+            'receiverNames' => $receiverNames,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',

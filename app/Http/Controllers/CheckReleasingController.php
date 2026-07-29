@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\FileHandler;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Models\BorrowedCheque;
+use App\Models\ReceiverName;
 use App\Services\ChequeReleasingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -48,6 +49,17 @@ class CheckReleasingController extends Controller
             'url' => asset('storage/' . $filename),
             'path' => $path,
         ], 201);
+    }
+
+    public function storeReceiverName(Request $request){
+        $validated = $request->validate([
+            'name' => 'string|required'
+        ]);
+        $response = ReceiverName::create(['name' => $validated['name']]);
+
+        $isSuccess = $response->wasRecentlyCreated;
+
+         return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Saved' : 'Failed to Save']);
     }
 
 }

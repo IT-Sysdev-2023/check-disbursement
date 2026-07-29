@@ -9,6 +9,7 @@ import {
     ChequeResourceType,
     FilterType,
     InertiaPagination,
+    Option,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
@@ -33,11 +34,13 @@ export default function CheckReleasing({
     company,
     filter,
     businessUnits,
+    receiverNames
 }: {
     cheques: InertiaPagination<ChequeResourceType>;
     filter: FilterType;
     company: SelectionType[];
-    businessUnits: SelectionType[];
+        businessUnits: SelectionType[];
+    receiverNames: Option[]
 }) {
     const [open, setOpen] = useState(false);
     const [openReleasing, setOpenReleasing] = useState(false);
@@ -69,7 +72,7 @@ export default function CheckReleasing({
             return;
         }
 
-        proceed([items], value);
+        proceed([items]);
     };
 
     const multipleRelease = () => {
@@ -83,12 +86,11 @@ export default function CheckReleasing({
                       : 'Release',
         }));
 
-        proceed(selectedItems, 'Release');
+        proceed(selectedItems);
     };
 
     const proceed = (
-        items: { id: number; status: string }[],
-        status: string,
+        items: { id: number; status: string }[]
     ) => {
         setSelectedCheques(items);
         setOpenReleasing(true);
@@ -167,6 +169,7 @@ export default function CheckReleasing({
 
                 <ReleasingModal
                     cheques={selectedCheques}
+                    receiverNames= {receiverNames}
                     open={openReleasing}
                     handleClose={() => {
                         setOpenReleasing(false);

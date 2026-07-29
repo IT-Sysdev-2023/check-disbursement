@@ -10,9 +10,13 @@ interface Employee {
 
 export default function AutocompleteUser({
     handleTextChange,
-    label = "Users",
+    label = 'Users',
+    sxWidth = 300,
+    recentUsers = null
 }: {
-    label?: string,
+        label?: string;
+    recentUsers?: Option[] | null;
+    sxWidth?: string | number;
     handleTextChange: (_: SyntheticEvent, item: Option) => void;
 }) {
     const [options, setOptions] = useState<Option[]>([]);
@@ -57,13 +61,21 @@ export default function AutocompleteUser({
         };
     }, [inputValue]);
 
+    const handleFocus = () => {
+  
+        if (!inputValue) {
+            setOptions(recentUsers ?? []);
+        }
+    };
+
     return (
         <Autocomplete
             freeSolo
             disableClearable
-            sx={{ width: 300 }}
+            sx={{ width: sxWidth }}
             options={options}
             loading={loading}
+            onFocus={handleFocus}
             filterOptions={(x) => x}
             getOptionLabel={(option) =>
                 typeof option === 'string' ? option : (option?.label ?? '')

@@ -1,13 +1,14 @@
+import { storeReceiverName } from '@/actions/App/Http/Controllers/CheckReleasingController';
 import { modalMediumStyle } from '@/lib/modalStyle';
 import { storeReleaseCheck } from '@/routes';
 import { Option } from '@/types';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { FormControl, FormHelperText, Grid, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import { CloudUploadIcon, Trash2 } from 'lucide-react';
+import { CloudUploadIcon, Plus, Trash2 } from 'lucide-react';
 import {
     ChangeEvent,
     SyntheticEvent,
@@ -28,10 +29,12 @@ export default function ReleasingModal({
     cheques,
     open,
     handleClose,
+    receiverNames,
 }: {
     cheques: { id: number; status: string }[];
     open: boolean;
     handleClose: () => void;
+    receiverNames: Option[];
 }) {
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
@@ -72,7 +75,7 @@ export default function ReleasingModal({
 
     const sigPadRef = useRef<SignatureCanvas>(null);
     const sigContainerRef = useRef<HTMLDivElement>(null);
-    const [canvasSize, setCanvasSize] = useState({ width: 600, height: 300 });
+    const [canvasSize, setCanvasSize] = useState({ width: 600, height: 180 });
 
     useEffect(() => {
         const updateCanvasSize = () => {
@@ -88,6 +91,12 @@ export default function ReleasingModal({
         window.addEventListener('resize', updateCanvasSize);
         return () => window.removeEventListener('resize', updateCanvasSize);
     }, []);
+
+    const addUser = () => {
+        router.post(storeReceiverName(), {
+            name: data.receiversName,
+        });
+    };
 
     // const handleClearSignature = () => {
     //     sigPadRef.current?.clear();
@@ -140,10 +149,29 @@ export default function ReleasingModal({
                             alignItems="center"
                         >
                             <Grid size={{ xs: 12, md: 8 }}>
-                                <AutocompleteUser
-                                    label='Reciever Name'
-                                    handleTextChange={handleTextChange}
-                                />
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                    }}
+                                >
+                                    <Box sx={{ flexGrow: 1 }}>
+                                        <AutocompleteUser
+                                            recentUsers={receiverNames}
+                                            sxWidth={'100%'}
+                                            label="Receiver Name"
+                                            handleTextChange={handleTextChange}
+                                        />
+                                    </Box>
+
+                                    <IconButton
+                                        color="primary"
+                                        onClick={addUser}
+                                    >
+                                        <Plus size={20} />
+                                    </IconButton>
+                                </Box>
                             </Grid>
 
                             <Grid size={{ xs: 12, md: 4 }}>
@@ -201,10 +229,11 @@ export default function ReleasingModal({
                                         sx={{
                                             border: '1px solid #ccc',
                                             borderRadius: 1,
-                                            height: 300,
+                                            // height: 300,
                                             width: '100%',
                                         }}
                                     >
+                                        <Typography>Signature</Typography>
                                         <SignatureCanvas
                                             ref={sigPadRef}
                                             penColor="black"
