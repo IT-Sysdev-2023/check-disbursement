@@ -161,7 +161,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onCapture }) => {
               startIcon={<ArrowBackIcon />}
               onClick={handleBack}
             >
-              Back
+              Done
             </Button>
             <Button variant="outlined" startIcon={<ReplayIcon />} onClick={retake}>
               Retake

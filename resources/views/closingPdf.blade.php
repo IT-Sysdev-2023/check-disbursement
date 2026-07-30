@@ -105,7 +105,7 @@
 
 <div class="document-container">
     <div class="header">
-        <h1>Closing Check</h1>
+        <h1>Closing Cheque</h1>
     </div>
 
     <div class="form-content">

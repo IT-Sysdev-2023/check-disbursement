@@ -1,6 +1,6 @@
 import { storeReceiverName } from '@/actions/App/Http/Controllers/CheckReleasingController';
 import { modalMediumStyle } from '@/lib/modalStyle';
-import { storeReleaseCheck } from '@/routes';
+import { storeReleaseCheckForwarded } from '@/routes';
 import { Option } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import { FormControl, FormHelperText, Grid, IconButton } from '@mui/material';
@@ -20,16 +20,14 @@ interface MyFormData {
     signature: string | null;
 }
 
-export default function ReleasingModal({
+export default function ForwardedReleasingModal({
     cheques,
     open,
     handleClose,
-    receiverNames,
 }: {
     cheques: { id: number; status: string }[];
     open: boolean;
     handleClose: () => void;
-    receiverNames: Option[];
 }) {
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
     const { data, setData, post, errors, reset, processing, transform } =
@@ -50,7 +48,7 @@ export default function ReleasingModal({
                 signature: canvas.toDataURL('image/png'),
             }));
 
-            post(storeReleaseCheck().url, {
+            post(storeReleaseCheckForwarded().url, {
                 preserveScroll: true,
                 preserveState: true,
                 onError: (e) => {
@@ -94,29 +92,13 @@ export default function ReleasingModal({
         });
     };
 
-    // const handleClearSignature = () => {
-    //     sigPadRef.current?.clear();
-    //     setData('signature', null);
-    // };
-
-    // const handleSaveSignature = () => {
-    //     if (sigPadRef.current && !sigPadRef.current.isEmpty()) {
-    //         const canvas = sigPadRef.current.getCanvas();
-    //         setData('signature', canvas.toDataURL('image/png'));
-    //     }
-    // };
-
     const handleFileChange = () => {
         setSignatureModalOpen(true);
-        // if (e.target.files && e.target.files[0]) {
-        //     setData('file', e.target.files[0]);
-        // }
     };
 
     const onCaptureImage = (image: string) => {
         setData('file', image);
         setSignatureModalOpen(false);
-        // console.log(image);
     };
 
     return (
@@ -141,7 +123,7 @@ export default function ReleasingModal({
                         variant="h6"
                         component="h2"
                     >
-                        Release Cheque
+                        Forwarded Releasing Cheque
                     </Typography>
 
                     <form onSubmit={handleSubmit}>
@@ -161,7 +143,6 @@ export default function ReleasingModal({
                                 >
                                     <Box sx={{ flexGrow: 1 }}>
                                         <AutocompleteUser
-                                            recentUsers={receiverNames}
                                             sxWidth={'100%'}
                                             label="Receiver Name"
                                             handleTextChange={handleTextChange}
@@ -200,7 +181,7 @@ export default function ReleasingModal({
                                             }}
                                         >
                                             <Typography variant="body2">
-                                               1 selected image
+                                                1 selected image
                                             </Typography>
 
                                             <IconButton

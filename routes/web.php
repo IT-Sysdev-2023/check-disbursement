@@ -157,7 +157,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('forwarded-cheque')->middleware('role:regional_officer|admin')->group(function () {
         Route::get('index', [ForwardedChequeController::class, 'index'])->name('forwarded-cheque-releasing');
         Route::get('release-check/{id}/{status}', [ForwardedChequeController::class, 'showForwarded'])->name('release-check-forwarded');
-        Route::post('store-release-check/{id}', [ForwardedChequeController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
+        Route::post('store-release-check', [ForwardedChequeController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');
         Route::put('update-receiver-{id}', [ForwardedChequeController::class, 'update'])->name('receiver-forwarded');
 
         Route::get('releasing', [ForwardedChequeController::class, 'forwardedReleasing'])->name('forwarded-releasing');

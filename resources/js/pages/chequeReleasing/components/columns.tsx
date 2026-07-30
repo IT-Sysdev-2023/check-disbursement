@@ -270,7 +270,10 @@ export const createForwardedColumns = (
 ];
 
 export const createForwardedReleasingColumns = (
-    handleStatusChange: (id: number, value: string) => void,
+    handleStatusChange: (
+        checkId: { id: number; status: string },
+        value: string,
+    ) => void,
 ): GridColDef[] => [
     {
         field: 'chequeNumber',
@@ -347,13 +350,18 @@ export const createForwardedReleasingColumns = (
         sortable: false,
         renderCell: ({ row }) => {
             const { id } = row;
+
             return (
                 <Select
                     size="small"
                     value={null}
                     onChange={(e) => {
                         if (!e.target.value) return;
-                        handleStatusChange(id, e.target.value);
+                        const selectedItem = {
+                            id: id,
+                            status: e.target.value,
+                        };
+                        handleStatusChange(selectedItem, e.target.value);
                     }}
                 >
                     <MenuItem value="released">

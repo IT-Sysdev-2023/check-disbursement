@@ -104,7 +104,7 @@
 
 <div class="document-container">
     <div class="header">
-        <h1>Borrower Check Details</h1>
+        <h1>Borrower Cheque Details</h1>
         <p>{{ $data['company'] }}</p>
     </div>
 
@@ -141,14 +141,14 @@
         </div>
 
         <div class="form-group">
-            <div class="form-label">Number of Check:</div>
+            <div class="form-label">Number of Cheques:</div>
             <div class="form-box">
                 {{ $data['noOfChecks'] ?? '-' }}
             </div>
         </div>
 
         <div class="form-group">
-            <div class="form-label">Check Number:</div>
+            <div class="form-label">Cheque Number:</div>
             <div class="form-box">
                 @php
                     $chunks = array_chunk($data['chequeNumbers'] ?? [], 4);

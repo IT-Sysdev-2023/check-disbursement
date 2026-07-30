@@ -91,7 +91,7 @@ class ChequeReleasingService
 
                 $companies[] = $chequeStatus->checkable->getCompany;
 
-                $locations[] = $chequeStatus->checkable?->tagLocation?->location;
+                $locations[] = $chequeStatus->checkable?->getLocation;
             }
 
             $data = [

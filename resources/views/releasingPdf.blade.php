@@ -105,7 +105,7 @@
 
 <div class="document-container">
     <div class="header">
-        <h1>Check Releasing</h1>
+        <h1>Cheque Releasing</h1>
         <p>{{ $data['company'] }}</p>
     </div>
 

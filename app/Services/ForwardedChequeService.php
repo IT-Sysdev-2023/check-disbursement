@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
+use App\Http\Requests\ReleasingCheckRequest;
 use App\Models\ChequeForwardedStatus;
 use App\Models\ChequeStatus;
 use Illuminate\Http\Request;
@@ -83,51 +84,63 @@ class ForwardedChequeService
         ]);
     }
 
-    public function storeReleaseCheck(ChequeStatus $id, Request $request)
+    public function storeReleaseCheck(ReleasingCheckRequest $request)
     {
-        $validated = $request->validate([
-            'receiversName' => 'required|string|max:255',
-            'file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
-            'signature' => 'required|string',
-            'status' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
-        if (ChequeForwardedStatus::where('cheque_status_id', $id->id)->exists()) {
-            return redirect()->back()->with(['status' => false, 'message' => 'Duplicate entry in cheque forward status']);
+        $cheques = collect($validated['cheques']);
+
+        if (
+            ChequeForwardedStatus::whereIn(
+                'cheque_status_id',
+                $cheques->pluck('id')
+            )->exists()
+        ) {
+            return redirect()->back()->with([
+                'status' => false,
+                'message' => 'Duplicate entry in cheque forward status'
+            ]);
         }
 
-        $handleFiles = $this->handleFiles($validated, $id->id);
+        $stream = DB::transaction(function () use ($cheques, $validated, $request) {
+            $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
+            $companies = [];
+            $locations = [];
 
-        $stream = DB::transaction(function () use ($id, $validated, $handleFiles, $request) {
-            $chequeStatus = $id
-                ->chequeForwardedStatus()
-                ->create([
-                    'status' => Str::lower($validated['status']),
-                    'forwarded_receivers_name' => $validated['receiversName'],
-                    'image' => $handleFiles->imagePath,
-                    'signature' => $handleFiles->signaturePath,
-                    'caused_by' => $request->user()->id,
-                ]);
 
-            $checkCompany = $chequeStatus->load('chequeStatus.checkable')->chequeStatus->checkable->getCompany;
-            $location = $chequeStatus->load('chequeStatus.checkable.tagLocation')->chequeStatus->checkable?->getLocation;
+            $handleFiles = $this->handleFiles($validated, $transactionNo);
+            foreach ($cheques as $cheque) {
+                $chequeStatus = ChequeStatus::where('id', $cheque['id'])->firstOrFail();
+                $chequeStatus->chequeForwardedStatus()
+                    ->create([
+                        'status' => Str::lower($cheque['status']),
+                        'forwarded_receivers_name' => $validated['receiversName'],
+                        'image' => $handleFiles->imagePath,
+                        'signature' => $handleFiles->signaturePath,
+                        'caused_by' => $request->user()->id,
+                    ]);
+            }
 
-            $label = StringHelper::statusPastTense($validated['status']);
+            $companies[] = $chequeStatus->checkable->getCompany;
+
+            $locations[] = $chequeStatus->checkable?->getLocation;
+
+            $label = StringHelper::statusPastTense($validated['cheques'][0]['status']);
 
             $data = [
-                'transactionNo' => NumberHelper::padLeft($chequeStatus->id),
+                'transactionNo' => $transactionNo,
 
                 'dateLabel' => 'Date ' . $label . ':',
                 'dateReleased' => $chequeStatus->created_at->format('M d, Y H:i A'),
 
                 'causedLabel' => 'Received By:',
                 'causedBy' => $validated['receiversName'],
-                
+
                 'releasedLabel' => 'Released By:',
                 'releasedBy' => auth()->user()->name,
 
-                'company' => $checkCompany,
-                'location' => $location,
+                'company' => implode(', ', array_unique($companies)),
+                'location' => implode(', ', array_unique($locations)),
 
             ];
 
@@ -146,7 +159,6 @@ class ForwardedChequeService
         $filters = $request->only(['bu', 'search', 'sort', 'date']);
         $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status')
             ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
-            // ->whereHas('checkable.chequeStatus', function ($query) {
             ->where(['status' => 'forwarded'])
             ->whereNotNull('received_by')
             ->regionalPermission()
@@ -172,18 +184,19 @@ class ForwardedChequeService
         ]);
     }
 
-    private function handleFiles(array $validated, string $id)
+    private function handleFiles(array $validated, string $transactionNo)
     {
         $userId = auth()->user()->id;
+        $uuid = Str::uuid();
 
         $signaturePath = $this->fileHandler
-            ->inFolder($validated['status'] . "/forwardedSignatures")
-            ->createFileName($id, $userId, '.png')
+            ->inFolder($transactionNo . "/forwardedSignatures")
+            ->createFileName($uuid, $userId, '.png')
             ->saveSignature($validated['signature']);
 
         $imagePath = $this->fileHandler
-            ->inFolder($validated['status'] . "/forwardedImages")
-            ->createFileName($id, $userId, '.png')
+            ->inFolder($transactionNo . "/forwardedImages")
+            ->createFileName($uuid, $userId, '.png')
             ->saveFile($validated['file']);
 
         return (object) [
