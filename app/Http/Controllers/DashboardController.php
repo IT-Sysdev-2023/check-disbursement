@@ -9,7 +9,9 @@ use App\Models\BusinessUnit;
 use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
+use App\Services\PermissionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Contracts\Database\Query\Builder;
@@ -19,16 +21,17 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $filters = $request->only(['tab', 'bu']);
+        $filters = $request->only(['tab', 'bu', 'bank', 'bankAccount']);
         return Inertia::render(
             $request->user()->hasRole('viewing') ? 'viewingDashboard' : 'dashboard',
-            $request->user()->hasRole('viewing') ? [...self::viewingDashboard($filters)] : [...self::defaultDashboard($filters)]
+            $request->user()->hasRole('viewing') ? [...self::viewingDashboard($filters)] : [...self::defaultDashboard($filters),]
         );
     }
 
     private static function defaultDashboard($filters)
     {
-        $cheques = new ChequeCollection(self::chequeRecords());
+        $cheques = new ChequeCollection(self::chequeRecords($filters));
+
         $cv = Cv::query()
             ->when(isset($filters['bu']) && $filters['bu'] !== 'all', function ($q) use ($filters) {
                 $q->whereHas('cvCheckPayment', fn($builder) => $builder->where('business_unit_id', $filters['bu']));
@@ -64,7 +67,20 @@ class DashboardController extends Controller
         $cvCount = Cv::count();
         $crfCount = Crf::count();
         $bu = BusinessUnit::businessUnits('all');
+
+        $banks = Cv::select('bank_name')
+            ->distinct()
+            ->orderBy('bank_name')
+            ->pluck('bank_name')
+            ->filter()
+            ->map(fn($bank, $index) => ['value' => $index, 'label' => $bank])
+            ->values()->prepend([
+                    'label' => 'All',
+                    'value' => 'all'
+                ]);
+
         return [
+            'company' => PermissionService::userAssignedCompany(Auth::user()),
             'cheques' => $cheques,
             'totals' => (object) [
                 'cv' => (string) $cvCount,
@@ -85,7 +101,31 @@ class DashboardController extends Controller
                 'countCv' => (string) $countCvForMonths,
                 'countCrf' => (string) $countCrfForMonths
             ],
-            'bu' => $bu
+            'bu' => $bu,
+            'banks' => $banks,
+            'businessUnits' => isset($filters['company']) ? BusinessUnit::businessUnits($filters['company']) : [],
+            'bankAccounts' => isset($filters['bank']) ? Cv::select('bank_account_no')
+                ->where('bank_name', $filters['bank'])
+                ->distinct()
+                ->orderBy('bank_account_no')
+                ->pluck('bank_account_no')
+                ->filter()
+                ->map(fn($bankAccount, $index) => ['value' => $index, 'label' => $bankAccount])
+                ->values()->prepend([
+                        'label' => 'All',
+                        'value' => 'all'
+                    ]) : [],
+
+
+            'filters' => [
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ],
+                'bank' => $filters['bank'] ?? null,
+                'bankAccount' => $filters['bankAccount'] ?? null,
+                ...$filters
+            ]
         ];
     }
 
@@ -108,12 +148,11 @@ class DashboardController extends Controller
         ];
     }
 
-    private static function chequeRecords()
+    private static function chequeRecords($filters)
     {
-        $cvQuery = Cv::baseColumns();
+        $cvQuery = Cv::filter($filters)->baseColumns();
 
-        $crfQuery = Crf::baseColumns();
-
+        $crfQuery = Crf::filter($filters)->baseColumns();
 
         $unionQuery = $cvQuery->unionAll($crfQuery);
 

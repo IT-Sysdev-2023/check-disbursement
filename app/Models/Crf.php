@@ -79,7 +79,13 @@ class Crf extends Model
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('crfs.date', [$date['start'], $date['end']]);
-            });
+            })
+            ->when(($filters['bank'] ?? null) && $filters['bank'] != 'all', function ($query) use ($filters) {
+                $query->where('bank', $filters['bank']);
+            })
+            // ->when(($filters['bankAccount'] ?? null) && $filters['bankAccount'] != 'all', function ($query) use ($filters) {
+            //     $query->where('bank_account_no', $filters['bankAccount']);
+            // });
         // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
         //     $field = Str::snake($sort['field']);
         //     $direction = $sort['sort'];
@@ -107,6 +113,7 @@ class Crf extends Model
             'tagged_at',
             'tag_locations.location',
             DB::raw("'crf' as type"),
+            'bank as bank_name',
             'crfs.created_at',
 
             DB::raw("

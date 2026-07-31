@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -72,9 +73,6 @@ class Cv extends Model
                                     ->where('cvs.resolved_cheque_number', 'LIKE', "%{$search}%");
                             });
                     });
-                // ->orWhereHas('cvHeader', function (Builder $q2) use ($search) {
-                //     $q2->where('cv_no', 'LIKE', '%' . $search . '%');
-                // });
             });
         })
             ->when(($filters['company'] ?? null) && $filters['company'] != 'all', function ($query) use ($filters) {
@@ -88,9 +86,13 @@ class Cv extends Model
                 }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                // $query->whereRelation('cvHeader', function ($q) use ($date) {
                 $query->whereBetween('cv_date', [$date['start'], $date['end']]);
-                // });
+            })
+            ->when(($filters['bank'] ?? null) && $filters['bank'] != 'All', function ($query) use ($filters) {
+                $query->where('bank_name', $filters['bank']);
+            })
+            ->when(($filters['bankAccount'] ?? null) && $filters['bankAccount'] != 'All', function ($query) use ($filters) {
+                $query->where('bank_account_no', $filters['bankAccount']);
             });
     }
 
@@ -106,6 +108,7 @@ class Cv extends Model
             'tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),
+            'bank_name',
             'cvs.created_at',
 
             DB::raw("
@@ -192,7 +195,8 @@ class Cv extends Model
         return $this->belongsTo(BusinessUnit::class);
     }
 
-    public function navHeaderTable(){
+    public function navHeaderTable()
+    {
         return $this->belongsTo(NavHeaderTable::class);
     }
 

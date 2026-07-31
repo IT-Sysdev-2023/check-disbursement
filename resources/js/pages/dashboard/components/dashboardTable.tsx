@@ -13,12 +13,12 @@ export default function CustomizedDataGrid({
             headerName: 'ID',
         },
         {
-            field: 'checkNumber',
+            field: 'chequeNumber',
             headerName: 'Cheque Number',
             flex: 1,
         },
         {
-            field: 'checkDate',
+            field: 'chequeDate',
             headerName: 'Cheque Date',
             flex: 1,
         },
@@ -55,8 +55,8 @@ export default function CustomizedDataGrid({
             flex: 1,
         },
         {
-            field: 'createdAt',
-            headerName: 'Generated At',
+            field: 'bankName',
+            headerName: 'Bank Name',
             flex: 1,
             minWidth: 150,
         },

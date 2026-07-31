@@ -3,19 +3,22 @@ import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import {
     ChequeType,
+    FilterType,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
+import { SelectChangeEvent, Stack } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import CustomizedDataGrid from './dashboard/components/dashboardTable';
 import PageViewsBarChart from './dashboard/components/PageViewsBarChart';
+import SelectItem from './dashboard/components/SelectItem';
 import SessionsChart from './dashboard/components/SessionsChart';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
-import CustomizedDataGrid from './dashboard/components/dashboardTable';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -29,8 +32,15 @@ export default function Dashboard({
     totals,
     chart,
     bu,
+    company,
+    businessUnits,
+    bankAccounts,
+    filters,
+    banks,
 }: {
     cheques: InertiaPagination<ChequeType>;
+    businessUnits: SelectionType[];
+    filters: FilterType;
     totals: {
         cv: string;
         crf: string;
@@ -43,7 +53,10 @@ export default function Dashboard({
         countCv: string;
         countCrf: string;
     };
-}) {
+    company: SelectionType[];
+    banks: SelectionType[];
+    bankAccounts: SelectionType[];
+    }) {
     useEffect(() => {
         requestNotificationPermission();
     }, []);
@@ -82,6 +95,33 @@ export default function Dashboard({
             ],
         },
     ];
+    const defaultBank = banks.find((bank) => bank.label === filters.bank);
+    const defaultBankAccount = bankAccounts.find((bankAccount) => bankAccount.label === filters.bankAccount);
+    const [selectedBank, setSelectedBank] = useState(defaultBank ? defaultBank.value : 'all');
+    const [selectedBankAccount, setSelectedBankAccount] = useState(defaultBankAccount ? defaultBankAccount.value : 'all');
+    const handleChange = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedBank(val);
+
+        const selected = banks.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bank: selected?.label,
+                bankAccount: null
+            },
+        });
+    };
+    const handleChangeBa = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedBankAccount(val);
+
+        const selected = bankAccounts.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bankAccount: selected?.label,
+            },
+        });
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -125,6 +165,37 @@ export default function Dashboard({
                     <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
                         Details
                     </Typography>
+                    {/* <TableFilter
+                        company={company}
+                        filters={filters}
+                        handleChangeCheck={() => null}
+                        businessUnits={businessUnits}
+                        resetFilterRouter={dashboard()}
+                    > */}
+                    <Stack
+                        direction="row"
+                        sx={{
+                            width: '100%',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginTop: 4,
+                            marginBottom: 2,
+                        }}
+                    >
+                        <SelectItem
+                            handleChange={handleChange}
+                            value={selectedBank}
+                            title="Bank"
+                            items={banks}
+                        />
+                        <SelectItem
+                            handleChange={handleChangeBa}
+                            value={selectedBankAccount}
+                            title="Bank Accounts"
+                            items={bankAccounts}
+                        />
+                    </Stack>
+                    {/* </TableFilter> */}
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
                             <CustomizedDataGrid cheques={cheques} />

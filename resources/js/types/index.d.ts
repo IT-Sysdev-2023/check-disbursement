@@ -112,6 +112,8 @@ export interface FilterType {
     search: string;
     date: DateFilterType;
     tab: string;
+    bank?: string
+    bankAccount?: string;
 }
 
 export interface Role {
