@@ -94,11 +94,7 @@ export type ActionHandler = (data?: ChequeType) => void;
 
 export type ActionType = 'details' | 'borrow' | 'scan' | 'asssign';
 export type ReleasingType =
-    | 'Cebu'
-    | 'Manila'
-    | 'Internal'
-    | 'Deposit'
-    | 'Tagbilaran Pick-up';
+    'Cebu' | 'Manila' | 'Internal' | 'Deposit' | 'Tagbilaran Pick-up';
 
 export interface Company {
     id: number;
@@ -204,30 +200,30 @@ export interface ManageChecks {
     cvHeader: CvHeader;
 }
 
-export interface ChequeResourceType{
-      id: number
-      chequeId: number
-      chequeNumber: string
-      borrowedCheckId: number
-      chequeDateUnformatted: string
-      chequeDate: string
-      companyName: string
-      isReturned?: bool
-      approvedAt: string
-      statusOrder: string
-      chequeDateStatus?: string
-      amount: string
-      amountUnformatted: string
-      payee: string
-      taggedAt: string
-      type: string
-      createdAt: string
-      location: string
-      taggedLocation: string
-      approversName: string
-      scannedId?: number
-      scannedPayee?: string
-      scannedAmount?: string
+export interface ChequeResourceType {
+    id: number;
+    chequeId: number;
+    chequeNumber: string;
+    borrowedCheckId: number;
+    chequeDateUnformatted: string;
+    chequeDate: string;
+    companyName: string;
+    isReturned?: bool;
+    approvedAt: string;
+    statusOrder: string;
+    chequeDateStatus?: string;
+    amount: string;
+    amountUnformatted: string;
+    payee: string;
+    taggedAt: string;
+    type: string;
+    createdAt: string;
+    location: string;
+    taggedLocation: string;
+    approversName: string;
+    scannedId?: number;
+    scannedPayee?: string;
+    scannedAmount?: string;
 }
 
 export interface AssignedCheckNumber {
@@ -344,6 +340,20 @@ export interface ProgressState {
         status: string;
         duplicates?: number;
     };
+}
+export interface SelectedChequeType {
+    id: number;
+    status: string;
+}
+
+export interface ListSelectedChequeType {
+    id: number;
+    borrowedChequeId: number;
+    amount: string;
+    chequeDate: string;
+    chequeNo: string;
+    status: string;
+    releasable: int
 }
 
 export interface FileReport {

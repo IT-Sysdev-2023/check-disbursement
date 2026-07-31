@@ -13,6 +13,7 @@ import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import AutocompleteUser from './autocomplete-user';
 import SignatureModal from './signature-modal';
+// import ScanChequeModal from './scan-cheque-modal';
 
 interface MyFormData {
     receiversName: string;
@@ -32,6 +33,7 @@ export default function ReleasingModal({
     receiverNames: Option[];
 }) {
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+    // const [scanChequeModalOpen, setScanChequeModalOpen] = useState(false);
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
@@ -59,6 +61,7 @@ export default function ReleasingModal({
                 onSuccess: () => {
                     handleClose();
                     reset();
+                    // setScanChequeModalOpen(true);
                 },
             });
         } else {
@@ -268,6 +271,7 @@ export default function ReleasingModal({
                 open={signatureModalOpen}
                 handleClose={() => setSignatureModalOpen(false)}
             />
+            {/* <ScanChequeModal onClose={() => setScanChequeModalOpen(false)} onSave={() => {}} open={scanChequeModalOpen} /> */}
         </>
     );
 }

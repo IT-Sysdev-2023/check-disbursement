@@ -35,10 +35,19 @@ export default function TableDataGrid({
     hasSelection = false,
     rowId,
     handleSelectionChange,
+    rowSelectionModel,
 }: {
     data: InertiaPagination<
-        Cv | Crf | ManageChecks | ChequeType | Borrower | ChequeStatus | User | ChequeResourceType
+        | Cv
+        | Crf
+        | ManageChecks
+        | ChequeType
+        | Borrower
+        | ChequeStatus
+        | User
+        | ChequeResourceType
     >;
+    rowSelectionModel?: GridRowSelectionModel;
     columns: GridColDef[];
     isLoading?: boolean;
     hasSelection?: boolean;
@@ -91,6 +100,9 @@ export default function TableDataGrid({
                 rowCount={data.meta.total}
                 columns={columns}
                 pagination
+                {...(rowSelectionModel !== undefined && {
+                    rowSelectionModel,
+                })}
                 sortingMode="server"
                 filterMode="server"
                 paginationMode="server"

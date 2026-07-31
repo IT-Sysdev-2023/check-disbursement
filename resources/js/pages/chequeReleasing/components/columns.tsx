@@ -117,6 +117,7 @@ export const createReleasingColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
+            console.log(row);
             const { taggedLocation, scannedId, borrowedCheckId, location } =
                 row;
 
