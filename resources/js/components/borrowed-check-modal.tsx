@@ -29,10 +29,12 @@ export default function BorrowedCheckModal({
     cheque,
     open,
     handleClose,
+    handleSuccess
 }: {
     cheque: { id: number; chequeId: number; type: string }[];
     open: boolean;
     handleClose: () => void;
+    handleSuccess: () => void;
 }) {
     const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
         [],
@@ -77,6 +79,7 @@ export default function BorrowedCheckModal({
 
                 reset();
                 handleClose();
+                handleSuccess();
 
                 if (m.status && m.stream) {
                     setStream(m.stream);

@@ -31,7 +31,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_60%,rgba(196,157,73,0.08),transparent_60%)]" />
                     <div className="flex flex-col items-center justify-center">
                         <img
-                            src="/storage/cd-logo.png"
+                            src="/logo/cd-logo.png"
                             alt="CDS Logo"
                             className="h-auto w-50 rounded object-contain"
                         />

@@ -1,6 +1,7 @@
 import BorrowedCheckModal from '@/components/borrowed-check-modal';
 import TableFilter from '@/components/tableFilter';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
+import SelectedChequeList from '@/pages/chequeReleasing/selectedChequeList';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
 import TableDataGrid from '@/pages/dashboard/components/TableDataGrid';
 import {
@@ -16,6 +17,7 @@ import {
     ChequeType,
     FilterType,
     InertiaPagination,
+    ListSelectedChequeTaggingType,
     SelectionType,
 } from '@/types';
 import { router } from '@inertiajs/react';
@@ -63,20 +65,40 @@ export default function TableView({
         { label: string; value: string }[]
     >([]);
     const [selectedRows, setSelectedRows] = useState<
-        { chequeId: number; type: string; id: number }[]
+        ListSelectedChequeTaggingType[]
     >([]);
     const [alignment, setAlignment] = useState(filter.assignments);
 
+    const rowSelectionModel: GridRowSelectionModel = {
+        type: 'include',
+        ids: new Set(selectedRows.map((row) => row.id)),
+    };
+
     const handleSelectionChange = (model: GridRowSelectionModel) => {
-        const selectedR = cheques.data
+        const currentPageIds = new Set(cheques.data.map((row) => row.id));
+
+        const previousSelections = selectedRows.filter(
+            (row) => !currentPageIds.has(row.id),
+        );
+
+        const currentSelections = cheques.data
             .filter((row) => model.ids.has(row.id))
             .map((row) => ({
                 id: row.id,
                 chequeId: row.chequeId,
                 type: row.type,
-            }));
 
-        setSelectedRows(selectedR);
+                borrowedChequeId: row.borrowedChequeId,
+                amount: row.amount,
+                chequeDate: row.chequeDate,
+                chequeNo: row.chequeNumber,
+                status: row.statusOrder,
+                releasable: true,
+            }));
+        console.log(cheques.data);
+
+        setSelectedRows([...previousSelections, ...currentSelections]);
+        // setSelectedRows(selectedR);
     };
 
     const enableButton =
@@ -88,7 +110,7 @@ export default function TableView({
         selectedRows.length > 0 &&
         cheques.data
             .filter((row) => selectedRows.some((r) => r.id === row.id))
-            .every((row) => row.taggedAt === null && row.checkNumber !== null);
+            .every((row) => row.taggedAt === null && row.chequeNumber !== null);
 
     const actionHandlers: Record<string, ActionHandler> = {
         details: (record) => {
@@ -177,6 +199,9 @@ export default function TableView({
             setAlignment(newAlignment);
         }
     };
+    const handleDelete = (id: number) => {
+        setSelectedRows((prev) => prev.filter((row) => row.id !== id));
+    };
 
     const chequeColumns = createChequeColumns(handleStatusChange);
 
@@ -212,42 +237,58 @@ export default function TableView({
                 filter={filter.search}
                 isLoading={isLoading}
                 hasSelection
+                rowSelectionModel={rowSelectionModel}
                 handleSelectionChange={handleSelectionChange}
                 pagination={handlePagination}
                 handleSearchFilter={handleSearch}
                 handleSortFilter={handleSort}
                 columns={chequeColumns}
             />
-            <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
-                <Button
-                    disabled={!enableButtonTag}
-                    variant="outlined"
-                    startIcon={<LocationOnOutlined />}
-                    onClick={listTagLocation}
-                >
-                    Tag Location
-                </Button>
-                <Button
-                    disabled={!enableButton}
-                    variant="outlined"
-                    startIcon={<CallMissedOutgoingOutlinedIcon />}
-                    onClick={() => setOpen(true)}
-                >
-                    Borrow
-                </Button>
-            </Box>
+            {alignment == 'completed' && (
+                <>
+                    <SelectedChequeList
+                        records={selectedRows}
+                        handleDelete={handleDelete}
+                    />
+
+                    <Box
+                        display="flex"
+                        justifyContent="flex-end"
+                        mt={3}
+                        gap={2}
+                    >
+                        <Button
+                            disabled={!enableButtonTag}
+                            variant="outlined"
+                            startIcon={<LocationOnOutlined />}
+                            onClick={listTagLocation}
+                        >
+                            Tag Location
+                        </Button>
+                        <Button
+                            disabled={!enableButton}
+                            variant="outlined"
+                            startIcon={<CallMissedOutgoingOutlinedIcon />}
+                            onClick={() => setOpen(true)}
+                        >
+                            Borrow
+                        </Button>
+                    </Box>
+                </>
+            )}
 
             <BorrowedCheckModal
                 cheque={selectedRows}
                 open={open}
                 handleClose={() => setOpen(false)}
+                handleSuccess={() => setSelectedRows([])}
             />
 
             <OnlySelectionModal
                 title="Tag Location"
                 open={openTagModal}
                 // onClose={() => setOpenTagModal(false)}
-                 onClose={() => {
+                onClose={() => {
                     setChequeData(null);
                     setOpenTagModal(false);
                 }}

@@ -160,11 +160,13 @@ export interface Cv {
 export interface ChequeType {
     id: number;
     type: 'cv' | 'crf';
+    borrowedChequeId: number;
     chequeId: number;
-    checkNumber: number;
-    checkDate: string;
+    chequeNumber: string;
+    chequeDate: string;
+    statusOrder: string;
     payee: string;
-    amount: number;
+    amount: string;
     companyName?: string;
     taggedAt: string | null;
     createdAt: string;
@@ -353,7 +355,19 @@ export interface ListSelectedChequeType {
     chequeDate: string;
     chequeNo: string;
     status: string;
-    releasable: int
+    releasable?: boolean;
+}
+export interface ListSelectedChequeTaggingType {
+    id: number;
+    chequeId: number;
+    type: string;
+    borrowedChequeId: number;
+    amount: string;
+    chequeDate: string;
+    chequeNo: string;
+    status: string;
+    releasable?: boolean;
+        
 }
 
 export interface FileReport {

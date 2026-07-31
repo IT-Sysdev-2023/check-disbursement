@@ -118,7 +118,7 @@ export default function CheckReleasing({
                 amount: row.amount,
                 chequeDate: row.chequeDate,
                 status: row.location,
-                releasable: row.scannedId
+                releasable: row.scannedId != null,
             }));
         setSelectedRows([...previousSelections, ...currentSelections]);
     };
@@ -133,7 +133,9 @@ export default function CheckReleasing({
         selectedRows.length > 0 &&
         cheques.data
             .filter((row) =>
-                selectedRows.some((r) => r.borrowedChequeId === row.borrowedCheckId),
+                selectedRows.some(
+                    (r) => r.borrowedChequeId === row.borrowedCheckId,
+                ),
             )
             .every((row) => row.scannedId !== null);
 
@@ -195,6 +197,7 @@ export default function CheckReleasing({
                     handleClose={() => {
                         setOpenReleasing(false);
                     }}
+                    handleSuccess={() => setSelectedRows([])}
                 />
             </PageContainer>
 

@@ -26,10 +26,12 @@ export default function ReleasingModal({
     open,
     handleClose,
     receiverNames,
+    handleSuccess,
 }: {
     cheques: { id: number; status: string }[];
     open: boolean;
     handleClose: () => void;
+    handleSuccess: () => void;
     receiverNames: Option[];
 }) {
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
@@ -61,6 +63,7 @@ export default function ReleasingModal({
                 onSuccess: () => {
                     handleClose();
                     reset();
+                    handleSuccess();
                     // setScanChequeModalOpen(true);
                 },
             });

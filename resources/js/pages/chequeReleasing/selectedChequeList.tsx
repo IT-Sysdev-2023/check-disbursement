@@ -1,4 +1,4 @@
-import { ListSelectedChequeType } from '@/types';
+import { ListSelectedChequeTaggingType, ListSelectedChequeType } from '@/types';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Box } from '@mui/material';
 import Divider from '@mui/material/Divider';
@@ -15,7 +15,7 @@ export default function SelectedChequeList({
     records,
     handleDelete,
 }: {
-    records: ListSelectedChequeType[];
+    records: ListSelectedChequeType[] | ListSelectedChequeTaggingType[];
     handleDelete: (id: number) => void;
 }) {
     return (
