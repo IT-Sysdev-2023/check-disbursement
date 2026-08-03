@@ -201,7 +201,7 @@ Route::get('/test', function () {
     $tables = DB::connection('sqlsrvCaf')
         ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
 
-    // dd($tables);
+    dd($tables);
 
 
     // $bu = Cv::select('business_unit_id')

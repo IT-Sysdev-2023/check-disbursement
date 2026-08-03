@@ -57,7 +57,8 @@ class CvDatabase implements ShouldQueue
                 $table->navHeaderTable,
                 $table->navChequePaymentTable?->name,
                 $table->business_unit_id,
-                $table->businessUnit->name
+                $table->businessUnit->name,
+                $server->host
             );
     }
 }

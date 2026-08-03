@@ -47,12 +47,14 @@ class GenerateCvService extends NavConnection
         ?NavHeaderTable $navHeaderTable,
         ?string $navChequePaymentTable,
         int $buId,
-        ?string $buName
+        ?string $buName,
+        ?string $serverHost
     ) {
         if (!$navHeaderTable) {
             return $this;
         }
 
+        $key = $this->generateKey($buName);
         try {
 
             $start = 1;
@@ -65,10 +67,10 @@ class GenerateCvService extends NavConnection
 
             $total = $headerQuery->count();
 
-            $key = $this->generateKey($buName);
+
 
             if ($total === 0) {
-                CvProgress::dispatch($this->userId, "No records found for {$buName}...", ProgressStatus::NoRecord, $tableName);
+                CvProgress::dispatch($this->userId, "No records found for {$buName}...", ProgressStatus::NoRecord, $tableName, 0, 0, 0, $key);
             }
 
             $headerQuery->chunkById(500, function ($chunk) use (&$start, &$duplicates, $total, $tableName, $tableId, $checkPaymentQuery, $buId, $buName, $key) {
@@ -174,7 +176,7 @@ class GenerateCvService extends NavConnection
                 }
             }, 'Check Voucher No_');
         } catch (Throwable $e) {
-            CvProgress::dispatch($this->userId, "No Connection for {$e->getMessage()}...", ProgressStatus::NoConnection, $tableName);
+            CvProgress::dispatch($this->userId, "No Connection for {$buName} (Server: {$serverHost})...", ProgressStatus::NoConnection, $tableName, 0, 0, 0, $key);
             throw $e; // Keep this so Laravel marks the job as failed
         }
 

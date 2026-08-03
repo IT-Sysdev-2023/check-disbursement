@@ -18,7 +18,7 @@ class BusinessUnitSeeder extends Seeder
         $bu = [
             [
                 'company_id' => 2,
-                'name' => "AGRI-FARMS (CARMEN)",
+                'name' => "CARMEN AGRI FARM",
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
