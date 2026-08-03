@@ -20,8 +20,12 @@ class ScannedRecordsController extends Controller
      * Display a listing of the resource.
      */
 
-    public function __construct(protected ScannedRecordsService $service) {}
-    public function index() {}
+    public function __construct(protected ScannedRecordsService $service)
+    {
+    }
+    public function index()
+    {
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -37,15 +41,16 @@ class ScannedRecordsController extends Controller
 
     public function scan(Request $request)
     {
+        $disk = Storage::disk('cheque_share');
 
-        $files = Storage::disk('cheque_share')->files('new');
+        $files = $disk->files('new');
 
-        $fileData = collect($files)->map(function ($file) {
+        $fileData = collect($files)->map(function ($file) use ($disk) {
             return [
                 'name' => basename($file),
                 'path' => $file,
-                'size' => Storage::disk('cheque_share')->size($file),
-                'last_modified' => Storage::disk('cheque_share')->lastModified($file),
+                'size' => $disk->size($file),
+                'last_modified' => $disk->lastModified($file),
             ];
         })->values();
 
@@ -63,33 +68,30 @@ class ScannedRecordsController extends Controller
     public function scanAnalyze()
     {
         $disk = Storage::disk('cheque_share');
-        $files = $disk->files('new');
 
+        //Get Cheque front scanned only
+        $filteredFiles = collect($disk->files('new'))
+            ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+            ->values();
 
         $count = 0;
-        $totalBatches = ceil(count($files) / 2);
-        // This will be 2 when you have 4 files
-
-        for ($i = 0; $i < count($files); $i += 2) {
-
-            // Increase by 1 per iteration (batch)
+        $totalBatches = $filteredFiles->count();
+        $filteredFiles->each(function ($item) use (&$count, $totalBatches) {
+            
             $count++;
             ProcessChequeJob::dispatch(
-                $files[$i],
+                $item,
                 Auth::user()->id,
                 $count,
                 $totalBatches
             );
-
             ScanningChequesEvent::dispatch(
                 'Scanning cheques please wait...',
                 $count,
-                $totalBatches,     // ← Now showing only 2
+                $totalBatches, 
                 Auth::user()
-            );
-        }
-
-        
+            );   
+        });
 
         return response()->json([
             'status' => 'success',

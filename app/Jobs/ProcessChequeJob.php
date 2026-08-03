@@ -64,9 +64,6 @@ class ProcessChequeJob implements ShouldQueue
             $clean = preg_replace('/```json|```/', '', $text);
             $data = json_decode(trim($clean), true);
 
-            Log::info($data);
-
-
             $amount = $data['amount'] ?? null;
             $chequeNumber = $data['cheque_no'] ?? null;
 
