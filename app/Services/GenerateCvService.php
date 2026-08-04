@@ -82,6 +82,7 @@ class GenerateCvService extends NavConnection
                     $headers = collect();
 
                     $existingCvNo = Cv::where('nav_header_table_id', $tableId)
+                        ->where('business_unit_id', $buId)
                         ->whereIn('cv_no', collect($chunk)->pluck('Check Voucher No_'))
                         ->pluck('cv_no')
                         ->flip(); // for faster lookup using isset()
@@ -177,7 +178,7 @@ class GenerateCvService extends NavConnection
             }, 'Check Voucher No_');
         } catch (Throwable $e) {
             CvProgress::dispatch($this->userId, "No Connection for {$buName} (Server: {$serverHost})...", ProgressStatus::NoConnection, $tableName, 0, 0, 0, $key);
-            throw $e; // Keep this so Laravel marks the job as failed
+            // throw $e; // Keep this so Laravel marks the job as failed
         }
 
         return $this;

@@ -9,7 +9,7 @@ import {
     Tooltip,
 } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
-import { Edit2, Eye, Notebook, NotepadText } from 'lucide-react';
+import { Eye, Notebook, NotepadText } from 'lucide-react';
 import { JSX } from 'react';
 
 const renderStatus = (
@@ -61,20 +61,25 @@ export const createChequeColumns = (
         align: 'right',
         flex: 1,
     },
-
     {
-        field: 'companyName',
+        field: 'buName',
         headerName: 'Business Unit',
         headerAlign: 'center',
         align: 'center',
         flex: 1,
     },
-
+    {
+        field: 'companyName',
+        headerName: 'Company',
+        headerAlign: 'center',
+        align: 'center',
+    },
     {
         field: 'statusOrder',
         headerName: 'Status',
         flex: 1,
         renderCell: ({ row }) => {
+            console.log(row);
             //ASSIGNMENT STATUS
             if (!row.chequeNumber || !row.chequeDate) {
                 return (
@@ -311,7 +316,6 @@ export const createManageColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-
             // const details = {
             //     'id': row.borrowedCheckId,
             //     'amount': row.amountUnformatted,
@@ -331,8 +335,6 @@ export const createManageColumns = (
                         <NotepadText />
                     </IconButton>
 
-                   
-
                     {/* {( row.isScanned === 1) && (
                         <IconButton
                             size="small"
@@ -344,7 +346,7 @@ export const createManageColumns = (
                         </IconButton>
                     )} */}
 
-                     {(row.scannedId) && (
+                    {row.scannedId && (
                         <IconButton
                             size="small"
                             color="primary"

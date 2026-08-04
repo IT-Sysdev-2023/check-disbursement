@@ -107,7 +107,8 @@ class Crf extends Model
             'crfs.id as cheque_id',
             DB::raw('COALESCE(cheque_number, resolved_cheque_number) as cheque_number'),
             'crfs.resolved_cheque_date as cheque_date',
-            'business_units.name as company_name',
+            'companies.name as company_name',
+            'business_units.name as bu_name',
             'crfs.cheque_amount',
             'crfs.payee',
             'tagged_at',
@@ -126,6 +127,7 @@ class Crf extends Model
             ")
         )
             ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
+            ->join('companies', 'companies.id', '=', 'business_units.company_id')
             ->leftJoin('tag_locations', 'tag_locations.id', '=', 'crfs.tag_location_id');
     }
     public function scopeScanRecords(Builder $builder)

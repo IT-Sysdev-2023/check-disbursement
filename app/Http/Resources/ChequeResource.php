@@ -35,6 +35,7 @@ class ChequeResource extends JsonResource
             'chequeDateUnformatted' => optional($chequeDate)->format('m-d-Y'),
             'chequeDate' => optional($chequeDate)->toFormattedDateString(),
             'companyName' => optional($this)->company_name,
+            'buName' => optional($this)->bu_name,
             'bankName' => optional($this)->bank_name,
             'isReturned' => optional($this)->is_returned,
             'approvedAt' => optional($this)->approved_at,

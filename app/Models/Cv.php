@@ -102,7 +102,8 @@ class Cv extends Model
             'cvs.id as cheque_id',
             DB::raw('CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END as cheque_number'),
             'cvs.cheque_date',
-            'business_units.name as company_name',
+            'companies.name as company_name',
+            'business_units.name as bu_name',
             'cheque_amount as amount',
             'cvs.payee',
             'tagged_at',
@@ -121,6 +122,7 @@ class Cv extends Model
             ")
         )
             ->join('business_units', 'business_units.id', '=', 'cvs.business_unit_id')
+            ->join('companies', 'companies.id', '=', 'business_units.company_id')
             ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cvs.tag_location_id');
     }
 
