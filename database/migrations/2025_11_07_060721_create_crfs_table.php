@@ -15,14 +15,14 @@ return new class extends Migration {
             $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('filename');
             $table->string('crf')->nullable();
+            $table->string('cheque_number');
+            $table->decimal('cheque_amount', 20);
+            $table->date('cheque_date')->nullable();
             $table->string('company_office');
             $table->unsignedBigInteger('no');
             $table->string('crf_location');
-            $table->date('date')->nullable();
             $table->string('payee');
             $table->string('particulars');
-            $table->decimal('cheque_amount', 20);
-            $table->string('cheque_number');
             $table->string('bank');
             $table->string('prepared_by');
 

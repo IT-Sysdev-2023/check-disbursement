@@ -51,10 +51,6 @@ class Cv extends Model
         );
     }
 
-    // public function scopeScan(Builder $builder, array $filters){
-    //     return $builder->where($this->chequeNumber, );
-    // }
-
     public function scopeFilter(Builder $builder, array $filters)
     {
         return $builder->when($filters['search'] ?? null, function ($query, $search) {

@@ -209,7 +209,7 @@ class ChequeService
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheque')
-            ->where('resolved_cheque_date', null);
+            ->where('cheque_date', null);
 
 
         return DB::query()
@@ -234,7 +234,7 @@ class ChequeService
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheque')
-            ->whereNotNull('resolved_cheque_date');
+            ->whereNotNull('cheque_date');
 
         return DB::query()
             ->fromSub(
@@ -256,13 +256,13 @@ class ChequeService
 
         if ($hasMissingField) { //ASSIGNMENT
             $cvQuery->where([['cheque_number', 0], ['resolved_cheque_number', null]]);
-            $crfQuery->where('resolved_cheque_date', null);
+            $crfQuery->where('cheque_date', null);
         } else { // COMPLETED
             $cvQuery->where(function ($q) {
                 $q->whereNotNull('resolved_cheque_number')
                     ->orWhere('cheque_number', '!=', 0);
             });
-            $crfQuery->whereNotNull('resolved_cheque_date');
+            $crfQuery->whereNotNull('cheque_date');
         }
 
         $unionQuery = $cvQuery->unionAll($crfQuery);

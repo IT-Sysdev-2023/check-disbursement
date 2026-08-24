@@ -2,16 +2,12 @@
 
 namespace App\Helpers;
 
-use App\Models\BusinessUnit;
 use App\Models\Crf;
 use App\Models\Cv;
-use App\Models\CvCheckPayment;
 use App\Models\NavDatabase;
 use App\Services\GenerateCvService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -140,7 +136,7 @@ class Calendar
     }
     private static function distinctMonths($company)
     {
-        $crf = Crf::select('date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"),  DB::raw('MAX(crfs.created_at) as created_at'))
+        $crf = Crf::select('cheque_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"),  DB::raw('MAX(crfs.created_at) as created_at'))
             ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
             ->whereNot('business_units.company_id', 13)
             ->when($company && $company != 'all', function ($q) use ($company) {

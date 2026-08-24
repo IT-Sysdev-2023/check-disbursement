@@ -22,13 +22,20 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['tab', 'bu', 'bank', 'bankAccount']);
+        if ($request->user()->hasRole('viewing')) {
+            return Inertia::render(
+                'viewingDashboard',
+                self::viewingDashboard($filters)
+            );
+        }
+
         return Inertia::render(
-            $request->user()->hasRole('viewing') ? 'viewingDashboard' : 'dashboard',
-            $request->user()->hasRole('viewing') ? [...self::viewingDashboard($filters)] : [...self::defaultDashboard($filters),]
+            'dashboard',
+            self::defaultDashboard($filters)
         );
     }
 
-    private static function defaultDashboard($filters)
+    private static function defaultDashboard(array $filters)
     {
         $cheques = new ChequeCollection(self::chequeRecords($filters));
 
@@ -51,18 +58,18 @@ class DashboardController extends Controller
             ->get();
 
         $crf = Crf::select(
-            DB::raw('MONTHNAME(date) as month'),
+            DB::raw('MONTHNAME(cheque_date) as month'),
             DB::raw('COUNT(*) as total')
         )
-            ->where('date', '>=', Date::now()->subMonths(6)->startOfMonth())
-            ->groupBy(DB::raw('MONTHNAME(date)'))
-            ->orderByDesc(DB::raw('MIN(MONTH(date))'))
+            ->where('cheque_date', '>=', Date::now()->subMonths(6)->startOfMonth())
+            ->groupBy(DB::raw('MONTHNAME(cheque_date)'))
+            ->orderByDesc(DB::raw('MIN(MONTH(cheque_date))'))
             ->get();
 
         $countCvForMonths = Cv::where('cv_date', '>=', Date::now()->subMonths(6)->startOfMonth())
             ->count();
 
-        $countCrfForMonths = Crf::where('date', '>=', Date::now()->subMonths(6)->startOfMonth())
+        $countCrfForMonths = Crf::where('cheque_date', '>=', Date::now()->subMonths(6)->startOfMonth())
             ->count();
         $cvCount = Cv::count();
         $crfCount = Crf::count();
@@ -133,8 +140,8 @@ class DashboardController extends Controller
     {
         $checks = self::chequeStatus($filters['tab'] ?? 'all');
         $total = bcadd(
-            Cv::sum('cheque_amount'),
-            Crf::sum('amount'),
+            Cv::whereHas('chequeStatus', fn($q) => $q->whereIn('status', ['released', 'forwarded']))->sum('cheque_amount'),
+            Crf::whereHas('chequeStatus', fn($q) => $q->whereIn('status', ['released', 'forwarded']))->sum('cheque_amount'),
             2
         );
         return [
@@ -243,16 +250,14 @@ class DashboardController extends Controller
     {
         return BorrowedCheque::query()
             ->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
-                $q->whereNotNull('secondary_approver_id')
-                    ->whereHasMorph(
-                        'checkable',
-                        [Cv::class, Crf::class],
-                        function (Builder $q, string $type) {
-                        $column = $type === Cv::class ? 'cvs.cheque_date' : 'resolved_cheque_date';
-                        $q->scanRecords()->where($column, '>', Date::today()->subMonths(6));
-                    }
-                    )
-                    ->whereDoesntHaveMorph(
+                $q->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    function (Builder $q, string $type) {
+                    $column = $type === Cv::class ? 'cvs.cheque_date' : 'resolved_cheque_date';
+                    $q->scanRecords()->where($column, '>', Date::today()->subMonths(6));
+                }
+                )->whereDoesntHaveMorph(
                         'checkable',
                         [Cv::class, Crf::class],
                         fn($query) => $query->has('chequeStatus')

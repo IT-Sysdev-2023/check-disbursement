@@ -21,7 +21,7 @@ class Crf extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'date',
+            'cheque_date' => 'date',
             'resolved_cheque_date' => 'date',
         ];
 
@@ -78,7 +78,7 @@ class Crf extends Model
                 }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereBetween('crfs.date', [$date['start'], $date['end']]);
+                $query->whereBetween('crfs.cheque_date', [$date['start'], $date['end']]);
             })
             ->when(($filters['bank'] ?? null) && $filters['bank'] != 'all', function ($query) use ($filters) {
                 $query->where('bank', $filters['bank']);
@@ -106,7 +106,7 @@ class Crf extends Model
         return $builder->select(
             'crfs.id as cheque_id',
             DB::raw('COALESCE(cheque_number, resolved_cheque_number) as cheque_number'),
-            'crfs.resolved_cheque_date as cheque_date',
+            'crfs.cheque_date',
             'companies.name as company_name',
             'business_units.name as bu_name',
             'crfs.cheque_amount',
@@ -120,7 +120,7 @@ class Crf extends Model
             DB::raw("
                 CASE
                     WHEN cheque_number is NULL THEN 'Assign Cheque Number'
-                    WHEN crfs.resolved_cheque_date IS NULL THEN 'Assign Cheque Date'
+                    WHEN crfs.cheque_date IS NULL THEN 'Assign Cheque Date'
                     WHEN tagged_at IS NOT NULL THEN 'For Signature'
                     ELSE 'Tagging'
                 END as status_order
