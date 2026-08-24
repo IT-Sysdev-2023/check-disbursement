@@ -228,8 +228,6 @@ class ChequeService
                 $q->whereNotNull('resolved_cheque_number')
                     ->orWhere('cheque_number', '!=', 0);
             });
-        // ->whereNotNull('resolved_check_number')
-        // ->whereNot('check_number');
 
         $crfQuery = Crf::baseColumns()
             ->filter($filters)

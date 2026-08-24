@@ -61,7 +61,7 @@ class StatusService
                                 'checkable',
                                 [Cv::class, Crf::class],
                                 function (Builder $query, string $type) {
-                                $column = $type === Cv::class ? 'cheque_date' : 'resolved_cheque_date';
+                                $column = $type === Cv::class ? 'cvs.cheque_date' : 'crfs.cheque_date';
                                 $query->where($column, '<', Date::today()->subMonths(6))
                                     ->whereDoesntHave('chequeStatus', function ($q) {
                                         $q->where('status', 'cancelled');
