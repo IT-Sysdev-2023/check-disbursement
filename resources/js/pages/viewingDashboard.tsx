@@ -1,20 +1,26 @@
 import AppLayout from '@/layouts/app-layout';
 import { dashboard, details, detailsCrf } from '@/routes';
-import { ChequeType, InertiaPagination, type BreadcrumbItem } from '@/types';
+import {
+    ChequeType,
+    FilterType,
+    InertiaPagination,
+    SelectionType,
+    type BreadcrumbItem,
+} from '@/types';
 import { Head, router } from '@inertiajs/react';
 import {
     Button,
     Chip,
     InputAdornment,
+    SelectChangeEvent,
     TextField,
-    ToggleButton,
-    ToggleButtonGroup,
 } from '@mui/material';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import { GridColDef } from '@mui/x-data-grid';
 import { SearchIcon } from 'lucide-react';
 import { ChangeEvent, useState } from 'react';
+import SelectItem from './dashboard/components/SelectItem';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
@@ -27,13 +33,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const crfColumns: GridColDef[] = [
     {
-        field: 'checkNumber',
-        headerName: 'Check Number',
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.checkNumber,
+        renderCell: ({ row }) => row.checkable.chequeNumber,
     },
     {
         field: 'payee',
@@ -55,12 +61,12 @@ const crfColumns: GridColDef[] = [
     },
     {
         field: 'issueDate',
-        headerName: 'Issue Date',
+        headerName: 'Tagged At',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable?.cvHeader?.cvDate,
+        renderCell: ({ row }) => row.checkable?.taggedAt,
     },
     {
         field: 'releasedDate',
@@ -74,8 +80,8 @@ const crfColumns: GridColDef[] = [
     {
         field: 'Status',
         headerName: 'Status',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
         minWidth: 100,
         renderCell: ({ row }) => {
@@ -102,11 +108,7 @@ const crfColumns: GridColDef[] = [
                 {
                     label: string;
                     color:
-                        | 'default'
-                        | 'primary'
-                        | 'success'
-                        | 'warning'
-                        | 'error';
+                        'default' | 'primary' | 'success' | 'warning' | 'error';
                 }
             > = {
                 closed: { label: 'Closed', color: 'primary' },
@@ -118,20 +120,29 @@ const crfColumns: GridColDef[] = [
             };
 
             return (
-                <Chip
-                    label={statusMap[status]?.label || 'For Releasing'}
-                    color={statusMap[status]?.color || 'default'}
-                />
+                <>
+                    {chequeStatus.forwardedStatus && (
+                        <Chip
+                            label="Forwarded"
+                            color="primary"
+                            variant="outlined"
+                            size="small"
+                        />
+                    )}
+                    <Chip
+                        label={statusMap[status]?.label || 'For Releasing'}
+                        color={statusMap[status]?.color || 'default'}
+                    />
+                </>
             );
         },
     },
     {
         field: 'companyName',
         headerName: 'Business Unit',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
-        minWidth: 100,
         renderCell: ({ row }) => row.checkable.company,
     },
     {
@@ -161,6 +172,9 @@ export default function ViewingDashboard({
     totals,
     checks,
     checkIssued,
+    banks,
+    bankAccounts,
+    filters,
 }: {
     checks: InertiaPagination<ChequeType>;
     checkIssued: string;
@@ -169,38 +183,37 @@ export default function ViewingDashboard({
         releasedChecks: string;
         pending: string;
     };
+    filters: FilterType;
+    banks: SelectionType[];
+    bankAccounts: SelectionType[];
 }) {
-    const [value, setValue] = useState('all');
+    const defaultBank = banks.find((bank) => bank.label === filters.bank);
+    const defaultBankAccount = bankAccounts.find(
+        (bankAccount) => bankAccount.label === filters.bankAccount,
+    );
     const [search, setSearch] = useState('');
-    const handleChange = (
-        _: React.MouseEvent<HTMLElement>,
-        newValue: string,
-    ) => {
-        if (newValue !== null) {
-            setValue(newValue);
-            router.reload({
-                only: ['checks'],
-                data: {
-                    tab: newValue,
-                },
-            });
-        }
-    };
+    const [selectedBank, setSelectedBank] = useState(
+        defaultBank ? defaultBank.value : 'all',
+    );
+    const [selectedBankAccount, setSelectedBankAccount] = useState(
+        defaultBankAccount ? defaultBankAccount.value : 'all',
+    );
+
     const data: StatCardProps[] = [
         {
             title: 'Total Cheques Amount',
             value: totals.amount,
-            interval: checkIssued + ' Checks Issued',
+            interval: checkIssued + ' Cheques Issued',
         },
         {
-            title: 'Released Checks',
+            title: 'Released Cheques',
             value: totals.releasedChecks,
-            interval: 'Checks Released',
+            interval: 'Cheques Released',
         },
         {
-            title: 'Pending Checks',
+            title: 'Pending Cheques',
             value: totals.pending,
-            interval: 'Checks for Releasing',
+            interval: 'Cheques for Releasing',
         },
     ];
 
@@ -210,6 +223,44 @@ export default function ViewingDashboard({
         router.reload({
             data: {
                 search: e.target.value,
+            },
+        });
+    };
+
+    const handleChange = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedBank(val);
+
+        const selected = banks.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bank: selected?.label,
+                bankAccount: null,
+            },
+        });
+    };
+    const handleChangeBa = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedBankAccount(val);
+
+        const selected = bankAccounts.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bankAccount: selected?.label,
+            },
+        });
+    };
+
+    const onReset = async () => {
+        setSearch('');
+        setSelectedBank('all');
+        setSelectedBankAccount('all');
+
+        router.reload({
+            data: {
+                search: '',
+                bank: '',
+                bankAccount: '',
             },
         });
     };
@@ -247,6 +298,18 @@ export default function ViewingDashboard({
                                     width: '100%',
                                 }}
                             >
+                                <SelectItem
+                                    handleChange={handleChange}
+                                    value={selectedBank}
+                                    title="Bank"
+                                    items={banks}
+                                />
+                                <SelectItem
+                                    handleChange={handleChangeBa}
+                                    value={selectedBankAccount}
+                                    title="Bank Accounts"
+                                    items={bankAccounts}
+                                />
                                 <TextField
                                     placeholder="Search borrower..."
                                     value={search}
@@ -261,8 +324,15 @@ export default function ViewingDashboard({
                                         ),
                                     }}
                                 />
+                                <Button
+                                    variant="outlined"
+                                    size="small"
+                                    onClick={onReset}
+                                >
+                                    All
+                                </Button>
 
-                                <ToggleButtonGroup
+                                {/* <ToggleButtonGroup
                                     value={value}
                                     exclusive
                                     onChange={handleChange}
@@ -284,7 +354,7 @@ export default function ViewingDashboard({
                                     <ToggleButton value="closed">
                                         Closed
                                     </ToggleButton>
-                                </ToggleButtonGroup>
+                                </ToggleButtonGroup> */}
                             </Box>
                         </Grid>
                         <Grid size={{ xs: 12, md: 12 }}>

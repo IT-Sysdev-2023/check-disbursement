@@ -47,6 +47,9 @@ class BorrowedCheque extends Model
             });
     }
 
+    public function scannedRecord(){
+        return $this->hasOne(ScannedRecords::class);
+    }
 
     public function borrower()
     {
