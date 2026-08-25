@@ -15,6 +15,7 @@ import {
     checkVoucher,
     chequeRequests,
     chequeStatus,
+    chequeStatusMonitoring,
     closingCheque,
     eodRecords,
     forwardedChequeReleasing,
@@ -154,12 +155,20 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             disbursementOfficer ||
             regionalOfficer ||
             sectionHead ||
-            closingOfficer ||
-            viewing
+            closingOfficer
                 ? [
                       {
                           title: 'Cheque Status',
                           href: chequeStatus(),
+                          icon: Activity,
+                      },
+                  ]
+                : []),
+            ...(viewing
+                ? [
+                      {
+                          title: 'Cheque Status Monitoring',
+                          href: chequeStatusMonitoring(),
                           icon: Activity,
                       },
                   ]

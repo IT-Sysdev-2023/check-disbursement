@@ -74,6 +74,9 @@ export const createStatusChequeColumns = (
                 status = 'closed';
             }
 
+            if (!row.approverId) {
+                status = 'forSignature';
+            }
             const statusMap: Record<
                 string,
                 {
@@ -87,6 +90,7 @@ export const createStatusChequeColumns = (
                 }
             > = {
                 closed: { label: 'Closed', color: 'primary' },
+                forSignature: { label: 'For Signature', color: 'success' },
                 released: { label: 'Released', color: 'default' },
                 forwarded: { label: 'Forwarded', color: 'warning' },
                 deposited: { label: 'Deposit', color: 'success' },

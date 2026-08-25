@@ -23,6 +23,7 @@ import { ChangeEvent, useState } from 'react';
 import SelectItem from './dashboard/components/SelectItem';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -191,7 +192,7 @@ export default function ViewingDashboard({
     const defaultBankAccount = bankAccounts.find(
         (bankAccount) => bankAccount.label === filters.bankAccount,
     );
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(filters.search);
     const [selectedBank, setSelectedBank] = useState(
         defaultBank ? defaultBank.value : 'all',
     );
@@ -287,6 +288,29 @@ export default function ViewingDashboard({
                             </Grid>
                         ))}
 
+                        {/* Progress Circular Bar */}
+                        {/* <Grid
+                            size={{ xs: 12 }}
+                            sx={{
+                                mt: 5,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: 10,
+                            }}
+                        >
+                            <CircularProgressDashboard value={75} title='Pending (For Claim)' />
+                            <CircularProgressDashboard
+                                value={40}
+                                color="info"
+                                title='Borrowed'
+                            />
+                            <CircularProgressDashboard
+                                value={85}
+                                color="success"
+                                title='Released'
+                            />
+                        </Grid> */}
+
                         <Grid size={{ xs: 12 }}>
                             <Box
                                 sx={{
@@ -295,7 +319,7 @@ export default function ViewingDashboard({
                                     justifyContent: 'space-between',
                                     gap: 2,
                                     mb: 2,
-                                    width: '100%',
+                                    width: ' 100%',
                                 }}
                             >
                                 <SelectItem
@@ -329,7 +353,7 @@ export default function ViewingDashboard({
                                     size="small"
                                     onClick={onReset}
                                 >
-                                    All
+                                    Reset
                                 </Button>
 
                                 {/* <ToggleButtonGroup
@@ -367,9 +391,9 @@ export default function ViewingDashboard({
 
                             <TableDataGrid
                                 data={checks}
-                                pagination={() => null}
-                                handleSearchFilter={() => null}
-                                handleSortFilter={() => null}
+                                pagination={handlePagination}
+                                handleSearchFilter={handleSearch}
+                                handleSortFilter={handleSort}
                                 columns={crfColumns}
                                 isLoading={false}
                                 density="compact"

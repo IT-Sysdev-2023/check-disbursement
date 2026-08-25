@@ -21,7 +21,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $filters = $request->only(['tab', 'bu', 'bank', 'bankAccount']);
+        $filters = $request->only(['tab', 'bu', 'bank', 'bankAccount', 'search']);
         if ($request->user()->hasRole('viewing')) {
             return Inertia::render(
                 'viewingDashboard',
@@ -265,6 +265,93 @@ class DashboardController extends Controller
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
+    }
+
+    public function chequeStatusMonitoring(Request $request)
+    {
+        $filters = $request->only(['company', 'search', 'sort', 'date', 'tab']);
+        $tab = $filters['tab'] ?? 'for_signature';
+
+        $cheque = BorrowedCheque::query()
+            ->filter($filters)
+            ->with('checkable.chequeStatus.chequeForwardedStatus')
+
+            ->where(function (Builder $q) use ($tab) {
+
+                if ($tab === 'for_signature') {
+                    $q->where('approver_id', null)->whereDoesntHaveMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        fn($query) => $query->has('chequeStatus')
+                    );
+                } else if ($tab === 'for_releasing') {
+                    $q->has('scannedRecord')->whereNotNull('approver_id')->whereDoesntHaveMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        fn($query) => $query->has('chequeStatus')
+                    );
+                } else if ($tab === 'staled') {
+                    $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
+                        $q->whereNotNull('approver_id')
+                            ->whereHas(
+                                'checkable',
+                                fn(Builder $q) => $q->scanRecords()
+                            )
+                            ->whereHasMorph(
+                                'checkable',
+                                [Cv::class, Crf::class],
+                                function (Builder $query, string $type) {
+                                $column = $type === Cv::class ? 'cvs.cheque_date' : 'crfs.cheque_date';
+                                $query->where($column, '<', Date::today()->subMonths(6))
+                                    ->whereDoesntHave('chequeStatus', function ($q) {
+                                        $q->where('status', 'cancelled');
+                                    });
+                            }
+                            )
+                        ;
+
+                    });
+
+                } else if ($tab === 'closed') {
+                    $q->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        fn(Builder $q) => $q->whereRelation('chequeStatus', 'is_closed', 1)
+                    );
+                } else {
+                    $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
+                        $q->whereHasMorph(
+                            'checkable',
+                            [Cv::class, Crf::class],
+                            fn(Builder $q) =>
+                            $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', $tab)
+                                ->orWhereRelation('chequeStatus', 'status', $tab)
+                        );
+                    });
+                }
+
+            })
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
+        $company = $filters['company'] ?? 'all';
+        return Inertia::render('chequeStatusMonitoring', [
+            'cheques' => $cheque,
+            'filter' => (object) [
+                'selectedBu' => $company,
+                'search' => $filters['search'] ?? '',
+                'tab' => $tab,
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ]
+            ],
+            'businessUnits' => BusinessUnit::businessUnits($company),
+            'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
+                'label' => 'All',
+                'value' => 'all'
+            ]),
+        ]);
     }
     private static function countForReleasing()
     {
