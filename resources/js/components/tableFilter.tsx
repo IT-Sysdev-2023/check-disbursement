@@ -87,7 +87,8 @@ export default function ({
 
     const handleReset = () => {
         if (!resetFilterRouter) return;
-
+        setSelectedBu('all');
+        setSelectedCompany('all');
         router.get(
             resetFilterRouter,
             {},

@@ -82,11 +82,7 @@ export const createStatusChequeColumns = (
                 {
                     label: string;
                     color:
-                        | 'default'
-                        | 'primary'
-                        | 'success'
-                        | 'warning'
-                        | 'error';
+                        'default' | 'primary' | 'success' | 'warning' | 'error';
                 }
             > = {
                 closed: { label: 'Closed', color: 'primary' },
@@ -153,6 +149,112 @@ export const createStatusChequeColumns = (
                         {row.checkable?.status && (
                             <MenuItem value="cancel">Cancelled Check</MenuItem>
                         )}
+                    </Select>
+                </Box>
+            );
+        },
+    },
+];
+export const createCancelledChequeColumns = (
+    handleStatusChange: (value: string, record: CheckScannedDetails) => void,
+): GridColDef[] => [
+    {
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        renderCell: ({ row }) => row.checkable.chequeNumber,
+    },
+    {
+        field: 'chequeAmount',
+        headerName: 'Cheque Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: ({ row }) => row.checkable.amount,
+    },
+
+    {
+        field: 'bankName',
+        headerName: 'Payee',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+        renderCell: ({ row }) => row.checkable.payee,
+    },
+    {
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+        renderCell: ({ row }) => row.checkable.chequeDate,
+    },
+    {
+        field: 'createdAt',
+        headerName: 'Cancelled Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'status',
+        headerName: 'Status',
+        minWidth: 120,
+        flex: 1,
+        renderCell: () => {
+            return <Chip label="Cancelled" color="error" />;
+        },
+    },
+    {
+        field: 'stat',
+        headerName: 'Business Unit',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: ({ row }) => {
+            console.log(row);
+            return row.checkable.businessUnit.name;
+        },
+    },
+    {
+        field: 'actions',
+        headerName: 'Action',
+        width: 100,
+        align: 'center',
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        renderCell: ({ row }) => {
+            const record = {
+                borrowedId: row.id,
+                id: row.checkable.id,
+                type: row.check,
+                amount: row.checkable.unformattedAmount,
+                checkNumber: row.checkable.chequeNumber,
+            };
+            return (
+                <Box sx={{ width: '100%' }}>
+                    <Select
+                        size="small"
+                        value={status ?? ''}
+                        onChange={(e) =>
+                            handleStatusChange(e.target.value, record)
+                        }
+                    >
+                        <MenuItem value="details">
+                            Check Request Form Details
+                        </MenuItem>
+
+                        <MenuItem value="scannedDetails">
+                            Scanned Check Details
+                        </MenuItem>
                     </Select>
                 </Box>
             );

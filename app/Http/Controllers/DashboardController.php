@@ -269,7 +269,7 @@ class DashboardController extends Controller
 
     public function chequeStatusMonitoring(Request $request)
     {
-        $filters = $request->only(['company', 'search', 'sort', 'date', 'tab']);
+        $filters = $request->only(['company', 'search', 'sort', 'date', 'tab', 'bu']);
         $tab = $filters['tab'] ?? 'for_signature';
 
         $cheque = BorrowedCheque::query()
@@ -338,7 +338,8 @@ class DashboardController extends Controller
         return Inertia::render('chequeStatusMonitoring', [
             'cheques' => $cheque,
             'filter' => (object) [
-                'selectedBu' => $company,
+                'selectedCompany' => $company,
+                'selectedBu' => $filters['bu'] ?? 'all',
                 'search' => $filters['search'] ?? '',
                 'tab' => $tab,
                 'date' => $filters['date'] ?? (object) [
@@ -351,6 +352,26 @@ class DashboardController extends Controller
                 'label' => 'All',
                 'value' => 'all'
             ]),
+        ]);
+    }
+
+    public function cancelledCheques(Request $request)
+    {
+        $filters = $request->only(['company', 'search', 'sort', 'date', 'tab', 'bu']);
+        $cancelledCheques = ChequeStatus::with('checkable')
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('viewing/cancelledCheques', [
+            'cheques' => $cancelledCheques,
+            'filter' => (object) [
+                'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ]
+            ],
         ]);
     }
     private static function countForReleasing()

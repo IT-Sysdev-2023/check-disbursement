@@ -27,10 +27,14 @@ Route::get('/', function () {
     return Inertia::render('auth/login');
 })->name('home')->middleware('guest');
 
- Route::post('/captures', [CheckReleasingController::class, 'cameraCapture'])->name('camera-capture');
+Route::post('/captures', [CheckReleasingController::class, 'cameraCapture'])->name('camera-capture');
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
- Route::get('cheque-status-monitoring', [DashboardController::class, 'chequeStatusMonitoring'])->name('cheque-status-monitoring');
+
+    Route::prefix('viewing')->group(function () {
+        Route::get('cheque-status-monitoring', [DashboardController::class, 'chequeStatusMonitoring'])->name('cheque-status-monitoring');
+        Route::get('cancelled-cheques', [DashboardController::class, 'cancelledCheques'])->name('cancelled-cheques');
+    });
 
     Route::prefix('admin')->middleware('role:admin')->group(function () {
         Route::get('users', [AdminController::class, 'users'])->name('users');
@@ -148,8 +152,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
         });
     });
-    
-   
+
+
     //! REGIONAL OFFICER
     //Cebu & Manila
     Route::prefix('forwarded-cheque')->middleware('role:regional_officer|admin')->group(function () {

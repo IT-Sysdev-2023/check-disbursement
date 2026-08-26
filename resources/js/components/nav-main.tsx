@@ -10,6 +10,7 @@ import {
     about,
     bankAccountSetup,
     bankSetup,
+    cancelledCheques,
     checkReleasing,
     checkRequestForm,
     checkVoucher,
@@ -169,6 +170,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Cheque Status Monitoring',
                           href: chequeStatusMonitoring(),
+                          icon: Activity,
+                      },
+                      {
+                          title: 'Cancelled Cheques',
+                          href: cancelledCheques(),
                           icon: Activity,
                       },
                   ]

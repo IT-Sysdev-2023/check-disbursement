@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import {
     cancelStaleCheck,
-    chequeStatus,
+    chequeStatusMonitoring,
     detailsCrf,
     signatureDetails,
 } from '@/routes';
@@ -126,7 +126,7 @@ export default function ChequeStatusMonitoring({
                         company={company}
                         filters={filter}
                         businessUnits={businessUnits}
-                        resetFilterRouter={chequeStatus()}
+                        resetFilterRouter={chequeStatusMonitoring()}
                     />
                     <TableDataGrid
                         data={cheques}
