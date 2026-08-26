@@ -359,6 +359,8 @@ class DashboardController extends Controller
     {
         $filters = $request->only(['company', 'search', 'sort', 'date', 'tab', 'bu']);
         $cancelledCheques = ChequeStatus::with('checkable')
+            ->where('is_closed', 1)
+            ->filter($filters)
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
