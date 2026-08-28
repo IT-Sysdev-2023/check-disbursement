@@ -1,3 +1,4 @@
+import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
@@ -30,36 +31,56 @@ export default function EodPage({
     records: InertiaPagination<ChequeStatus>;
     filter: FilterType;
 }) {
+    const notifications = useNotifications();
+
     const extractEod = async () => {
-        const response = await axios.post(
-            generateEod().url,
-            {},
-            {
-                responseType: 'blob',
-            },
-        );
+        try {
+            const response = await axios.post(
+                generateEod().url,
+                {},
+                {
+                    responseType: 'blob',
+                },
+            );
 
-        console.log(response);
+            console.log(response);
 
-        const disposition = response.headers['content-disposition'];
+            const disposition = response.headers['content-disposition'];
 
-        let filename = 'report.xlsx';
+            let filename = 'report.xlsx';
 
-        if (disposition) {
-            const match = disposition.match(/filename="?([^"]+)"?/);
-            if (match) {
-                filename = match[1];
+            if (disposition) {
+                const match = disposition.match(/filename="?([^"]+)"?/);
+                if (match) {
+                    filename = match[1];
+                }
+            }
+
+            const url = window.URL.createObjectURL(response.data);
+
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+
+            window.URL.revokeObjectURL(url);
+        } catch (error: any) {
+            if (error.response?.status === 404) {
+                const blob = error.response.data;
+
+                const text = await blob.text();
+                const data = JSON.parse(text);
+                notifications.show(data.message, {
+                    severity: 'error',
+                    autoHideDuration: 3000,
+                });
+            } else {
+                notifications.show('Something went wrong.', {
+                    severity: 'error',
+                    autoHideDuration: 3000,
+                });
             }
         }
-
-        const url = window.URL.createObjectURL(response.data);
-
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = filename;
-        link.click();
-
-        window.URL.revokeObjectURL(url);
     };
     const chequeColumn = eodColumns();
     return (

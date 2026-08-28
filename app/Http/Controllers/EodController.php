@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Exports\ReportExport;
 use App\Helpers\FileHandler;
 use App\Models\ChequeStatus;
+use App\Models\Crf;
+use App\Models\Cv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Facades\Excel;
 
 use Inertia\Inertia;
@@ -51,6 +54,11 @@ class EodController extends Controller
             'business_unit'
         ];
         $data['date'] = now()->format('Y-m-d');
+
+        if (self::validateFilter($data['date'])) {
+            return response()->json(['message' => 'No records found for today'], 404);
+        }
+
         $role = $this->userType;
         $date = now()->format('Ymd_His');
 
@@ -63,4 +71,13 @@ class EodController extends Controller
         );
         //  return redirect()->back()->with(['status' => true, 'message' => 'EOD generated successfully',   'url' => Storage::disk('public')->get($filename)]);
     }
+
+    private static function validateFilter($date)
+    {
+        return ChequeStatus::
+            whereDate('created_at', $date)
+            ->doesntExist();
+    }
+
+
 }
