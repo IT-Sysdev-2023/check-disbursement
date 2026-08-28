@@ -3,7 +3,6 @@ import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import {
-    cancelStaleCheck,
     chequeStatusMonitoring,
     detailsCrf,
     signatureDetails,
@@ -53,10 +52,7 @@ export default function ChequeStatusMonitoring({
     const [scannedRecord, setScannedRecord] = useState<CheckScannedDetails>();
 
     const handleStatusChange = (value: string, record: CheckScannedDetails) => {
-        if (value === 'cancel') {
-            //borrowedId
-            router.post(cancelStaleCheck(record.borrowedId));
-        } else if (value === 'details') {
+        if (value === 'details') {
             if (record.type === 'cv') router.visit(signatureDetails(record.id));
             else router.visit(detailsCrf(record.id));
         } else {

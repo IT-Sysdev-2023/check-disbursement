@@ -72,17 +72,17 @@ const CHECK_OPTIONS = {
 export default function EmployeeReportFilters({
     columns,
     statuses,
-    borrower,
+    // borrower,
     location,
     bu,
 }: {
     columns: string[];
     statuses: SelectionType[];
-    borrower: SelectionType[];
+    // borrower: SelectionType[];
     location: SelectionType[];
     bu: SelectionType[];
 }) {
-    const { data, setData, post, errors, reset } =
+    const { data, setData, post, errors } =
         useForm({
             bu: [] as string[],
             borrower: [] as string[],
@@ -112,9 +112,6 @@ export default function EmployeeReportFilters({
         post(generateReport().url, {
             preserveScroll: true,
             preserveState: true,
-            onSuccess: () => {
-                reset();
-            },
         });
     };
 

@@ -7,7 +7,6 @@ use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Illuminate\Database\Eloquent\Builder;

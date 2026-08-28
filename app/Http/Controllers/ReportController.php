@@ -7,9 +7,12 @@ use App\Helpers\ColumnResolver;
 use App\Helpers\FileHandler;
 use App\Models\Borrower;
 use App\Models\ChequeStatus;
+use App\Models\Crf;
+use App\Models\Cv;
 use App\Models\TagLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -63,8 +66,13 @@ class ReportController extends Controller
             'status' => 'array',
             'bu' => 'array',
         ]);
+
         $validated['columns'] = ColumnResolver::transformColumn($validated['columns']);
-        
+
+        if (self::validateFilter($validated)) {
+            return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
+        }
+
         $role = $this->userType;
         $date = now()->format('Ymd_His');
 
@@ -72,6 +80,58 @@ class ReportController extends Controller
         Excel::store(new ReportExport($validated), $filename, 'public');
 
         return redirect()->back()->with(['status' => true, 'message' => 'Report generated Generated']);
+    }
+
+    private static function validateFilter(array $columns)
+    {
+        return ChequeStatus::
+            when(
+                !empty($columns['date']),
+                fn($query) =>
+                $query->whereDate('created_at', $columns['date'])
+            )
+            ->when(
+                !empty($columns['status']),
+                fn($query) =>
+                $query->where(function ($q) use ($columns) {
+                    $q->whereHas('chequeForwardedStatus', function ($q) use ($columns) {
+                        $q->whereIn('status', $columns['status']);
+                    })
+                        ->orWhere(function ($q) use ($columns) {
+                            $q->whereDoesntHave('chequeForwardedStatus')
+                                ->whereIn('status', $columns['status']);
+                        });
+                })
+            )
+            ->when(
+                !empty($columns['bu']),
+                fn($outerQuery) =>
+                $outerQuery->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    fn(Builder $query) =>
+                    $query->whereHas(
+                        'businessUnit.company',
+                        fn(Builder $query) =>
+                        $query->whereIn('name', $columns['bu'])
+                    )
+                )
+            )
+            ->when(
+                !empty($columns['location']),
+                fn($outerQuery) =>
+                $outerQuery->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    fn(Builder $query) =>
+                    $query->whereHas(
+                        'tagLocation',
+                        fn(Builder $query) =>
+                        $query->whereIn('location', $columns['location'])
+                    )
+
+                )
+            )->doesntExist();
     }
 
     public function generatedReports(Request $request)
