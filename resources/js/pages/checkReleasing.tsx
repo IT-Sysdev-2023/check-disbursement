@@ -3,10 +3,8 @@ import PdfReader from '@/components/pdf-reader';
 import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import ReleasingModal from '@/components/releasing-modal';
 import AppLayout from '@/layouts/app-layout';
-import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { checkReleasing } from '@/routes';
 import {
-    ChequeResourceType,
     FilterType,
     InertiaPagination,
     ListSelectedChequeType,
@@ -17,13 +15,23 @@ import {
 } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
-import { Box, Button } from '@mui/material';
+import {
+    Box,
+    Button,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
+import ChequeReleasingBatch from './chequeReleasing/chequeReleasingBatch';
 import { createReleasingColumns } from './chequeReleasing/components/columns';
 import SelectedChequeList from './chequeReleasing/selectedChequeList';
-import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,7 +47,7 @@ export default function CheckReleasing({
     businessUnits,
     receiverNames,
 }: {
-    cheques: InertiaPagination<ChequeResourceType>;
+    cheques: InertiaPagination<any>;
     filter: FilterType;
     company: SelectionType[];
     businessUnits: SelectionType[];
@@ -101,27 +109,27 @@ export default function CheckReleasing({
         setOpenReleasing(true);
     };
 
-    const handleSelectionChange = (model: GridRowSelectionModel) => {
-        const currentPageIds = new Set(cheques.data.map((row) => row.id));
+    // const handleSelectionChange = (model: GridRowSelectionModel) => {
+    //     const currentPageIds = new Set(cheques.data.map((row) => row.id));
 
-        // Keep selections that aren't on the current page/filter
-        const previousSelections = selectedRows.filter(
-            (row) => !currentPageIds.has(row.id),
-        );
-        // Current selections from the visible rows
-        const currentSelections = cheques.data
-            .filter((row) => model.ids.has(row.id))
-            .map((row) => ({
-                id: row.id,
-                borrowedChequeId: row.borrowedCheckId,
-                chequeNo: row.chequeNumber,
-                amount: row.amount,
-                chequeDate: row.chequeDate,
-                status: row.location,
-                releasable: row.scannedId != null,
-            }));
-        setSelectedRows([...previousSelections, ...currentSelections]);
-    };
+    //     // Keep selections that aren't on the current page/filter
+    //     const previousSelections = selectedRows.filter(
+    //         (row) => !currentPageIds.has(row.id),
+    //     );
+    //     // Current selections from the visible rows
+    //     const currentSelections = cheques.data
+    //         .filter((row) => model.ids.has(row.id))
+    //         .map((row) => ({
+    //             id: row.id,
+    //             borrowedChequeId: row.borrowedCheckId,
+    //             chequeNo: row.chequeNumber,
+    //             amount: row.amount,
+    //             chequeDate: row.chequeDate,
+    //             status: row.location,
+    //             releasable: row.scannedId != null,
+    //         }));
+    //     setSelectedRows([...previousSelections, ...currentSelections]);
+    // };
 
     const handleDelete = (borrowedCheckId: number) => {
         setSelectedRows((prev) =>
@@ -129,15 +137,16 @@ export default function CheckReleasing({
         );
     };
 
-    const enableButton =
-        selectedRows.length > 0 &&
-        cheques.data
-            .filter((row) =>
-                selectedRows.some(
-                    (r) => r.borrowedChequeId === row.borrowedCheckId,
-                ),
-            )
-            .every((row) => row.scannedId !== null);
+    const enableButton = true;
+    // const enableButton =
+    //     selectedRows.length > 0 &&
+    //     cheques.data
+    //         .filter((row) =>
+    //             selectedRows.some(
+    //                 (r) => r.borrowedChequeId === row.borrowedCheckId,
+    //             ),
+    //         )
+    //         .every((row) => row.scannedId !== null);
 
     const columns = createReleasingColumns(handleStatusChange);
 
@@ -153,7 +162,37 @@ export default function CheckReleasing({
                     resetFilterRouter={checkReleasing()}
                 />
 
-                <TableDataGrid
+                <TableContainer component={Paper}>
+                    <Table aria-label="collapsible table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell />
+                                <TableCell>Batch Reference</TableCell>
+                                <TableCell>Total Cheques</TableCell>
+                                <TableCell align='center'>Action</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {cheques?.data?.length ? (
+                                cheques.data.map((row) => (
+                                    <ChequeReleasingBatch
+                                        receiverNames= {receiverNames}
+                                        key={row.borrowerNo}
+                                        row={row}
+                                        isVisible
+                                    />
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={7} align="center">
+                                        No records found
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                {/* <TableDataGrid
                     data={cheques}
                     filter={filter.search}
                     hasSelection
@@ -163,7 +202,7 @@ export default function CheckReleasing({
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
                     columns={columns}
-                />
+                /> */}
 
                 <SelectedChequeList
                     records={selectedRows}

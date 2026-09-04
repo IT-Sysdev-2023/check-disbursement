@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('scanned_records', function (Blueprint $table) {
             $table->id();
+            $table->string('batch_reference')->unique();
             $table->foreignId('borrowed_cheque_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('bank_account_name')->nullable();
             $table->string('bu')->nullable();

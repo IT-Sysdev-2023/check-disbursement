@@ -135,7 +135,8 @@ class ChequeService
                 // 'borrowed_cheques.is_returned',
                 // 'borrowed_cheques.secondary_borrower',
                 'borrowed_cheques.approved_at',
-                DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
+                'approvers.name as approver_name',
+                // DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'
@@ -153,7 +154,8 @@ class ChequeService
                 // 'borrowed_cheques.is_returned',
                 // 'borrowed_cheques.secondary_borrower',
                 'borrowed_cheques.approved_at',
-                DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
+                'approvers.name as approver_name',
+                // DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'

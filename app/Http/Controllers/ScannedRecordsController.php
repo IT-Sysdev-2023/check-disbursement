@@ -8,6 +8,7 @@ use App\Jobs\ProcessChequeJob;
 use App\Models\BorrowedCheque;
 use App\Models\ScannedRecords;
 use App\Services\ScannedRecordsService;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,27 +77,33 @@ class ScannedRecordsController extends Controller
 
         $count = 0;
         $totalBatches = $filteredFiles->count();
-        $filteredFiles->each(function ($item) use (&$count, $totalBatches) {
-            
+        $referenceBatch = self::generateBatchReference();
+        $filteredFiles->each(function ($item) use (&$count, $totalBatches, $referenceBatch) {
+
             $count++;
             ProcessChequeJob::dispatch(
                 $item,
                 Auth::user()->id,
                 $count,
+                $referenceBatch,
                 $totalBatches
             );
             ScanningChequesEvent::dispatch(
                 'Scanning cheques please wait...',
                 $count,
-                $totalBatches, 
+                $totalBatches,
                 Auth::user()
-            );   
+            );
         });
 
         return response()->json([
             'status' => 'success',
             // 'records' => $files
         ]);
+    }
+    public static function generateBatchReference(): string
+    {
+        return 'BATCH-' . now()->format('Ymd-His') . '-' . strtoupper(Str::random(4));
     }
 
     public function getScannedCheques(Request $request)

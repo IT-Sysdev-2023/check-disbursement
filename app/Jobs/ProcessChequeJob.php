@@ -24,7 +24,9 @@ class ProcessChequeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public string $imagePath, public int $id, public int $count, public int $totalcount) {}
+    public function __construct(public string $imagePath, public int $id, public int $count, public string $referenceBatch, public int $totalcount)
+    {
+    }
     public $tries = 5;
 
     public function backoff(): array
@@ -86,8 +88,12 @@ class ProcessChequeJob implements ShouldQueue
             )->whereNotNull(['approved_at', 'approver_id'])->value('id');
 
             if ($borrowedIChequeId) {
+
+                $batchReference = $this->referenceBatch; //self::getBatchReference($this->imagePath);
+
                 $result = ScannedRecords::create([
                     'payee' => $data['payee'] ?? null,
+                    'batch_reference' => $batchReference,
                     'borrowed_cheque_id' => $borrowedIChequeId,
                     'amount' => $amount,
                     'account_number' => $data['account_no'] ?? null,
@@ -150,6 +156,17 @@ Rules:
 - Return valid JSON only, with no leading or trailing text.";
     }
 
+    private static function getBatchReference(string $file)
+    {
+        $file = basename($file);
+
+        $parts = explode('_', pathinfo($file, PATHINFO_FILENAME));
+
+        $batchReference = $parts[0] . '_' . $parts[1];
+
+        return $batchReference;
+    }
+
     public function payLayoadFunction($bytes)
     {
         return
@@ -171,11 +188,11 @@ Rules:
     }
     private function httpResponseFunction($payload)
     {
-        return  Http::timeout(60)
+        return Http::timeout(60)
             ->retry(3, 2000)
             ->post(
                 "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" .
-                    config('app.GEMINI_API_KEY'),
+                config('app.GEMINI_API_KEY'),
                 $payload
             );
     }

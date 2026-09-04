@@ -688,6 +688,9 @@ export default function ScanCheques({ files }: Props) {
                                                         Bank Name
                                                     </TableCell>
                                                     <TableCell align="right">
+                                                        Batch Reference
+                                                    </TableCell>
+                                                    <TableCell align="right">
                                                         Date
                                                     </TableCell>
                                                     <TableCell align="right">
@@ -754,6 +757,14 @@ export default function ScanCheques({ files }: Props) {
                                                                 row?.bank_account_name
                                                             }
                                                         </TableCell>
+                                                        <TableCell
+                                                            component="th"
+                                                            scope="row"
+                                                        >
+                                                            {
+                                                                row?.batch_reference
+                                                            }
+                                                        </TableCell>
                                                         <TableCell>
                                                             {dayjs(
                                                                 row?.cheque_date,
@@ -770,9 +781,7 @@ export default function ScanCheques({ files }: Props) {
                                                             }
                                                         </TableCell>
                                                         <TableCell align="left">
-                                                            {
-                                                                row?.account_name
-                                                            }
+                                                            {row?.account_name}
                                                         </TableCell>
                                                         <TableCell align="left">
                                                             {new Intl.NumberFormat(
