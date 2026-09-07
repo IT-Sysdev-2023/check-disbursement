@@ -6,14 +6,13 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import { GridRowId } from '@mui/x-data-grid';
 
 export default function ReasonCancellationModal({
     id,
     open,
     handleClose,
 }: {
-    id: GridRowId[] | number;
+    id: number[];
     open: boolean;
     handleClose: () => void;
 }) {

@@ -1,4 +1,5 @@
 import PageContainer from '@/components/pageContainer';
+import ReasonCancellationModal from '@/components/reason-cancellation-modal';
 import ReleasingModal from '@/components/releasing-modal';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
@@ -36,17 +37,16 @@ export default function IndividualCheques({
     filter,
 }: {
     cheques: InertiaPagination<any>;
-    receiverNames: Option[];
+    receiversName: Option[];
     filter: {
         selectedBu: string;
         search: string;
         date: DateFilterType;
     };
-}) {
-    // const { data, setData, put, transform } = useForm<FormData>({
-    //     type: 'include',
-    //     borrowedNo: [],
-    // });
+    }) {
+    
+    const [ids, setIds] = useState<number[]>([]);
+    const [openCancel, setOpenCancel] = useState(false);
     const [selectedCheques, setSelectedCheques] = useState<
         SelectedChequeType[]
     >([]);
@@ -90,6 +90,13 @@ export default function IndividualCheques({
         setOpenReleasing(true);
     };
 
+    const cancelCheque = () => {
+        const selectedItems = selectedRows.map((item) => item.borrowedChequeId);
+        setIds(selectedItems);
+        setOpenCancel(true);
+    };
+
+    const enableButton = selectedRows.length > 0;
     const columns = createRequestsChequeColumns();
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -108,41 +115,44 @@ export default function IndividualCheques({
 
                 <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
                     <Button
+                        disabled={!enableButton}
                         variant="outlined"
                         startIcon={<Handshake />}
-                        // onClick={handleSubmit}
                         onClick={multipleRelease}
                     >
                         Release
                     </Button>
                     <Button
+                        disabled={!enableButton}
                         color="error"
                         variant="outlined"
                         startIcon={<X />}
-                        onClick={() => setOpenCancel(true)}
+                        onClick={cancelCheque}
                     >
                         Cancel
                     </Button>
-
-                    {/* <CancellationBorrowedModal
-                        id={data.borrowedNo}
-                        type={data.type}
-                        open={openCancel}
-                        handleClose={() => {
-                            setOpenCancel(false);
-                        }}
-                    /> */}
                 </Box>
             </PageContainer>
             <ReleasingModal
                 cheques={selectedCheques}
                 receiverNames={receiversName}
                 open={openReleasing}
-                handleClose={() => {
-                    setOpenReleasing(false);
+                handleClose={() => setOpenReleasing(false)}
+                handleSuccess={() => {
+                    setSelectedRows([]);
                 }}
-                handleSuccess={() => setSelectedRows([])}
             />
+
+            {ids && (
+                <ReasonCancellationModal
+                    id={ids}
+                    open={openCancel}
+                    handleClose={() => {
+                        setSelectedRows([]);
+                        setOpenCancel(false);
+                    }}
+                />
+            )}
         </AppLayout>
     );
 }

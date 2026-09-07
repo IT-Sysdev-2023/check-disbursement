@@ -213,7 +213,7 @@ class ChequeReleasingService
             ];
         })->values()->all();
 
-        $validatedInputs = $request->safe()->only(['status', 'signature', 'file']);
+        $validatedInputs = $validated;
         $stream = DB::transaction(function () use ($cheques, $validated, $validatedInputs, $request) {
 
             $transactionNo = now()->format('YmdHis') . '-' . auth()->id();

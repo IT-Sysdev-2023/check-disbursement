@@ -1,23 +1,16 @@
 import PageContainer from '@/components/pageContainer';
 import PdfReader from '@/components/pdf-reader';
-import ReasonCancellationModal from '@/components/reason-cancellation-modal';
-import ReleasingModal from '@/components/releasing-modal';
 import AppLayout from '@/layouts/app-layout';
 import { checkReleasing } from '@/routes';
 import {
     FilterType,
     InertiaPagination,
-    ListSelectedChequeType,
     Option,
-    SelectedChequeType,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
-import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import {
-    Box,
-    Button,
     Paper,
     Table,
     TableBody,
@@ -26,12 +19,9 @@ import {
     TableHead,
     TableRow,
 } from '@mui/material';
-import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
 import ChequeReleasingBatch from './chequeReleasing/chequeReleasingBatch';
-import { createReleasingColumns } from './chequeReleasing/components/columns';
-import SelectedChequeList from './chequeReleasing/selectedChequeList';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -53,25 +43,25 @@ export default function CheckReleasing({
     businessUnits: SelectionType[];
     receiverNames: Option[];
 }) {
-    const [selectedCheques, setSelectedCheques] = useState<
-        SelectedChequeType[]
-    >([]);
-    const [selectedRows, setSelectedRows] = useState<ListSelectedChequeType[]>(
-        [],
-    );
-    const [openReleasing, setOpenReleasing] = useState(false);
-    const [id, setId] = useState<number | undefined>(undefined);
-    const [open, setOpen] = useState(false);
+    // const [selectedCheques, setSelectedCheques] = useState<
+    //     SelectedChequeType[]
+    // >([]);
+    // const [selectedRows, setSelectedRows] = useState<ListSelectedChequeType[]>(
+    //     [],
+    // );
+    // const [openReleasing, setOpenReleasing] = useState(false);
+    // const [id, setId] = useState<number | undefined>(undefined);
+    // const [open, setOpen] = useState(false);
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
 
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string; stream?: string };
     };
-    const rowSelectionModel: GridRowSelectionModel = {
-        type: 'include',
-        ids: new Set(selectedRows.map((row) => row.id)),
-    };
+    // const rowSelectionModel: GridRowSelectionModel = {
+    //     type: 'include',
+    //     ids: new Set(selectedRows.map((row) => row.id)),
+    // };
 
     useEffect(() => {
         if (flash?.status && flash?.stream) {
@@ -80,34 +70,34 @@ export default function CheckReleasing({
         }
     }, [flash]);
 
-    const handleStatusChange = (items: SelectedChequeType, value: string) => {
-        if (value === 'cancel') {
-            setId(items.id);
-            setOpen(true);
-            return;
-        }
+    // const handleStatusChange = (items: SelectedChequeType, value: string) => {
+    //     if (value === 'cancel') {
+    //         setId(items.id);
+    //         setOpen(true);
+    //         return;
+    //     }
 
-        proceed([items]);
-    };
+    //     proceed([items]);
+    // };
 
-    const multipleRelease = () => {
-        const selectedItems = selectedRows.map((item) => ({
-            id: item.borrowedChequeId,
-            status:
-                item.status == 'Manila' || item.status == 'Cebu'
-                    ? 'Forward'
-                    : item.status == 'Deposit'
-                      ? 'Deposit'
-                      : 'Release',
-        }));
+    // const multipleRelease = () => {
+    //     const selectedItems = selectedRows.map((item) => ({
+    //         id: item.borrowedChequeId,
+    //         status:
+    //             item.status == 'Manila' || item.status == 'Cebu'
+    //                 ? 'Forward'
+    //                 : item.status == 'Deposit'
+    //                   ? 'Deposit'
+    //                   : 'Release',
+    //     }));
 
-        proceed(selectedItems);
-    };
+    //     proceed(selectedItems);
+    // };
 
-    const proceed = (items: SelectedChequeType[]) => {
-        setSelectedCheques(items);
-        setOpenReleasing(true);
-    };
+    // const proceed = (items: SelectedChequeType[]) => {
+    //     setSelectedCheques(items);
+    //     setOpenReleasing(true);
+    // };
 
     // const handleSelectionChange = (model: GridRowSelectionModel) => {
     //     const currentPageIds = new Set(cheques.data.map((row) => row.id));
@@ -131,13 +121,12 @@ export default function CheckReleasing({
     //     setSelectedRows([...previousSelections, ...currentSelections]);
     // };
 
-    const handleDelete = (borrowedCheckId: number) => {
-        setSelectedRows((prev) =>
-            prev.filter((row) => row.id !== borrowedCheckId),
-        );
-    };
+    // const handleDelete = (borrowedCheckId: number) => {
+    //     setSelectedRows((prev) =>
+    //         prev.filter((row) => row.id !== borrowedCheckId),
+    //     );
+    // };
 
-    const enableButton = true;
     // const enableButton =
     //     selectedRows.length > 0 &&
     //     cheques.data
@@ -148,7 +137,7 @@ export default function CheckReleasing({
     //         )
     //         .every((row) => row.scannedId !== null);
 
-    const columns = createReleasingColumns(handleStatusChange);
+    // const columns = createReleasingColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -204,11 +193,11 @@ export default function CheckReleasing({
                     columns={columns}
                 /> */}
 
-                <SelectedChequeList
+                {/* <SelectedChequeList
                     records={selectedRows}
                     handleDelete={handleDelete}
-                />
-                <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
+                /> */}
+                {/* <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
                     <Button
                         disabled={!enableButton}
                         variant="outlined"
@@ -217,9 +206,9 @@ export default function CheckReleasing({
                     >
                         Release
                     </Button>
-                </Box>
+                </Box> */}
 
-                {id && (
+                {/* {id && (
                     <ReasonCancellationModal
                         id={[id]}
                         open={open}
@@ -227,9 +216,9 @@ export default function CheckReleasing({
                             setOpen(false);
                         }}
                     />
-                )}
+                )} */}
 
-                <ReleasingModal
+                {/* <ReleasingModal
                     cheques={selectedCheques}
                     receiverNames={receiverNames}
                     open={openReleasing}
@@ -237,7 +226,7 @@ export default function CheckReleasing({
                         setOpenReleasing(false);
                     }}
                     handleSuccess={() => setSelectedRows([])}
-                />
+                /> */}
             </PageContainer>
 
             <PdfReader
