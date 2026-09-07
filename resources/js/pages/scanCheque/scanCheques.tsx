@@ -27,7 +27,8 @@ import TableRow from '@mui/material/TableRow';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
-import React, { useEffect, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
+import ScanMethod from './scanMethod';
 
 interface FileItem {
     name: string;
@@ -46,7 +47,7 @@ function formatSize(bytes: number) {
     return Math.round(bytes / 1024) + ' KB';
 }
 
-export default function ScanCheques({ files }: Props) {
+export default function ScanCheques({ files }: int) {
     const [dateValue, setValue] = useState<Dayjs | null>(dayjs());
     const [searchData, setSearchData] = useState<string>('');
     const page = usePage<any>().props.auth;
@@ -65,6 +66,7 @@ export default function ScanCheques({ files }: Props) {
         amount: '',
         payee: '',
     });
+    const [openTagModal, setOpenTagModal] = useState(false);
 
     const handleOpenModal = (row: any) => {
         setSelectedRow({ ...row });
@@ -119,25 +121,16 @@ export default function ScanCheques({ files }: Props) {
 
     const [search, setSearch] = useState('');
     const [getScanned, setScannedCheques] = useState<any>([]);
+    const [selectedChoice, setSelectedChoice] = useState('');
 
-    const filtered = files.filter((f) =>
-        f.name.toLowerCase().includes(search.toLowerCase()),
-    );
+    // const filtered = files.filter((f) =>
+    //     f.name.toLowerCase().includes(search.toLowerCase()),
+    // );
+    const filtered = files;
 
     const analyzeScanned = async () => {
-        setLoading(true);
-
-        try {
-            const { data } = await axios.post(
-                '/retrieved-checks/scan-analyze/',
-            );
-
-            if (data.status == 'success') {
-                router.reload();
-            }
-        } finally {
-            // setLoading(false);
-        }
+        setOpenTagModal(true);
+       
     };
 
     const clearCache = async () => {
@@ -146,6 +139,8 @@ export default function ScanCheques({ files }: Props) {
             router.reload();
         }
     };
+
+    const [inputValue, setInputValue] = useState('');
 
     const getScannedCheques = async (date: any, search: string) => {
         const { data } = await axios.post(
@@ -158,6 +153,15 @@ export default function ScanCheques({ files }: Props) {
 
         setScannedCheques(data.records);
     };
+
+    // const openDrawer = async () => {
+    //     try {
+    //         const { data } = await axios.get(viewScannedCheques().url);
+    //         console.log(data);
+    //     } finally {
+    //         toggleDrawer(true);
+    //     }
+    // };
 
     useEcho(
         `scanning-cheques.${page.user.id}`,
@@ -187,6 +191,35 @@ export default function ScanCheques({ files }: Props) {
             setAlreadyScanned((prev: any[]) => [...prev, e.records]);
         },
     );
+
+    const handleChoiceSubmit = async(e: FormEvent) => {
+        e.preventDefault();
+
+
+         setLoading(true);
+
+        try {
+            const { data } = await axios.post(
+                '/retrieved-checks/scan-analyze/',
+                {
+                    scanMethod: selectedChoice,
+                    supplierName: inputValue
+                }
+            );
+
+            if (data.status == 'success') {
+                router.reload();
+            }
+        } finally {
+             setOpenTagModal(false);
+            // setLoading(false);
+        }
+    };
+
+    const items = [
+        { label: 'Batch', value: 'Batch' },
+        { label: 'Individual', value: 'Individual' },
+    ];
 
     useEffect(() => {
         getScannedCheques(dateValue, searchData);
@@ -274,8 +307,8 @@ export default function ScanCheques({ files }: Props) {
                                     </div>
 
                                     <span className="ml-4 text-sm font-medium whitespace-nowrap">
-                                        {filtered.length} file
-                                        {filtered.length !== 1 ? 's' : ''}
+                                        {filtered} file
+                                        {filtered !== 0 ? 's' : ''}
                                     </span>
                                 </div>
 
@@ -291,72 +324,31 @@ export default function ScanCheques({ files }: Props) {
                                             </p>
                                         </div>
                                     ) : (
-                                        <div className="divide-y">
-                                            {filtered.map((file) => (
-                                                <div
-                                                    key={file.path}
-                                                    className="group flex items-center gap-4 px-6 py-4 transition-all duration-150"
-                                                >
-                                                    {/* Icon */}
-                                                    <div className="text-3xl">
-                                                        {file.mime?.startsWith(
-                                                            'image/',
-                                                        )
-                                                            ? '🖼️'
-                                                            : '📄'}
-                                                    </div>
-
-                                                    {/* Name */}
-                                                    <div className="min-w-0 flex-1">
-                                                        <p className="truncate font-medium transition-colors group-hover:text-blue-600">
-                                                            {file.name}
-                                                        </p>
-                                                        <p className="mt-0.5 text-xs">
-                                                            {file.path}
-                                                        </p>
-                                                    </div>
-
-                                                    {/* Type */}
-                                                    {/* <div>
-                                                    <FileTypeIcon mime={file.mime} />
-                                                </div> */}
-
-                                                    {/* Size */}
-                                                    <div className="w-20 text-right">
-                                                        <p className="text-sm font-medium">
-                                                            {formatSize(
-                                                                file.size,
-                                                            )}
-                                                        </p>
-                                                    </div>
-
-                                                    {/* Action */}
-                                                </div>
-                                            ))}
-                                        </div>
+                                        <div className="divide-y"></div>
                                     )}
                                 </div>
                             </div>
                         </Drawer>
                         <div className="mb-6 flex w-full gap-4">
                             <Badge
-                                badgeContent={filtered?.length}
+                                badgeContent={filtered}
                                 color="error"
                                 max={999}
                             >
+                                {/* DUGAY ANG LOADING OG E SHOW ANG FILES */}
                                 <Button
                                     variant="contained"
-                                    onClick={toggleDrawer(true)}
-                                    className="flex-1"
+                                    // onClick={openDrawer}
+                                    // className="flex-1"
                                 >
-                                    Open Scanned Cheques
+                                    Total Scanned Cheques: {filtered}
                                 </Button>
                             </Badge>
 
                             <Button
                                 variant="outlined"
                                 onClick={analyzeScanned}
-                                disabled={filtered.length === 0 || loading}
+                                disabled={filtered === 0 || loading}
                                 className="flex-1"
                             >
                                 {loading
@@ -847,6 +839,26 @@ export default function ScanCheques({ files }: Props) {
                         </div>
                     </div>
                 </div>
+
+                <ScanMethod
+                    title="Select Scan Method"
+                    open={openTagModal}
+                    // onClose={() => setOpenTagModal(false)}
+                    onClose={() => {
+                        // setChequeData(null);
+                        setOpenTagModal(false);
+                    }}
+                    handleSubmit={handleChoiceSubmit}
+                    handleSelectedItem={(event) =>
+                        setSelectedChoice(event.target.value)
+                    }
+                    selectedItem={selectedChoice}
+                    item={items}
+                    inputValue={inputValue}
+                    onChangeInput={(e) => setInputValue(e.target.value)}
+                    disabled= {selectedChoice == ''}
+                    // loading={tagLoading}
+                />
             </PageContainer>
         </AppLayout>
     );

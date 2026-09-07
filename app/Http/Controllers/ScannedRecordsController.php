@@ -43,6 +43,18 @@ class ScannedRecordsController extends Controller
     public function scan(Request $request)
     {
         $disk = Storage::disk('cheque_share');
+        $count = collect($disk->files('new'))
+            ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+            ->count();
+
+        return inertia('scanCheque/scanCheques', [
+            'files' => $count,
+        ]);
+    }
+
+    public function viewScannedCheques()
+    {
+        $disk = Storage::disk('cheque_share');
 
         $files = $disk->files('new');
 
@@ -55,18 +67,10 @@ class ScannedRecordsController extends Controller
             ];
         })->values();
 
-        $data = [];
-
-        for ($i = 0; $i < count($fileData); $i += 2) {
-            $data[] = $fileData[$i];
-        }
-
-        return inertia('scanCheque/scanCheques', [
-            'files' => $data,
-        ]);
+        return response()->json(['files' => $fileData]);
     }
 
-    public function scanAnalyze()
+    public function scanAnalyze(Request $request)
     {
         $disk = Storage::disk('cheque_share');
 
@@ -78,10 +82,12 @@ class ScannedRecordsController extends Controller
         $count = 0;
         $totalBatches = $filteredFiles->count();
         $referenceBatch = self::generateBatchReference();
-        $filteredFiles->each(function ($item) use (&$count, $totalBatches, $referenceBatch) {
+        $filteredFiles->each(function ($item) use (&$count, $totalBatches, $referenceBatch, $request) {
 
             $count++;
             ProcessChequeJob::dispatch(
+                $request->scanMethod,
+                $request->supplierName,
                 $item,
                 Auth::user()->id,
                 $count,

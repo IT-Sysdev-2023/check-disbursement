@@ -24,8 +24,15 @@ class ProcessChequeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public string $imagePath, public int $id, public int $count, public string $referenceBatch, public int $totalcount)
-    {
+    public function __construct(
+        public string $scanMethod,
+        public string $supplierName,
+        public string $imagePath,
+        public int $id,
+        public int $count,
+        public string $referenceBatch,
+        public int $totalcount
+    ) {
     }
     public $tries = 5;
 
@@ -93,6 +100,8 @@ class ProcessChequeJob implements ShouldQueue
 
                 $result = ScannedRecords::create([
                     'payee' => $data['payee'] ?? null,
+                    'scan_method' => $this->scanMethod,
+                    'supplier' => $this->supplierName,
                     'batch_reference' => $batchReference,
                     'borrowed_cheque_id' => $borrowedIChequeId,
                     'amount' => $amount,

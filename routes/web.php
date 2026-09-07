@@ -83,6 +83,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('pending-details/{id}', [BorrowedCheckController::class, 'pendingDetails'])->name('pending-details');
             Route::get('scan', [ScannedRecordsController::class, 'scan'])->name('scan');
+            Route::get('view-cheque-scanned', [ScannedRecordsController::class, 'viewScannedCheques'])->name('view-scanned-cheques');
             Route::post('scan-analyze', [ScannedRecordsController::class, 'scanAnalyze'])->name('scanAnalyze');
             Route::post('get-scanned-cheques', [ScannedRecordsController::class, 'getScannedCheques'])->name('getScannedCheques');
             Route::get('get-scanned-records/{id}', [ScannedRecordsController::class, 'getScannedRecords'])->name('get-scanned-records');

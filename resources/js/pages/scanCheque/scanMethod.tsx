@@ -1,0 +1,100 @@
+import { modalMediumStyle } from '@/lib/modalStyle';
+import { SelectionType } from '@/types';
+import {
+    Box,
+    Button,
+    Grid,
+    Modal,
+    SelectChangeEvent,
+    TextField,
+    Typography,
+} from '@mui/material';
+import SelectItem from '../dashboard/components/SelectItem';
+
+export default function ({
+    title,
+    open,
+    onClose,
+    handleSubmit,
+    handleSelectedItem,
+    selectedItem,
+    children,
+    item,
+    loading = false,
+    inputValue,
+    onChangeInput,
+    disabled,
+}: {
+    title: string;
+    open: boolean;
+    onClose: () => void;
+    handleSubmit: (e: React.FormEvent) => void;
+    handleSelectedItem: (value: SelectChangeEvent) => void;
+    selectedItem: string;
+    children?: React.ReactNode;
+    item: SelectionType[];
+    loading?: boolean;
+    inputValue: string;
+    onChangeInput: (e) => void;
+    disabled: boolean;
+}) {
+    return (
+        <Modal
+            open={open}
+            onClose={onClose}
+            aria-labelledby="modal-modal-title"
+            aria-describedby="modal-modal-description"
+        >
+            <Box sx={modalMediumStyle}>
+                <Typography id="modal-modal-title" variant="h6" component="h2">
+                    {title}
+                </Typography>
+
+                <form onSubmit={handleSubmit}>
+                    <Grid
+                        container
+                        spacing={2}
+                        sx={{ mb: 2, width: '100%', mt: 3 }}
+                    >
+                        {/* Selection */}
+                        <Grid size={{ xs: 12, sm: 12 }}>
+                            <SelectItem
+                                handleChange={handleSelectedItem}
+                                value={selectedItem}
+                                title="Select"
+                                items={item}
+                            />
+                        </Grid>
+
+                        {/* Input below selection */}
+                        {selectedItem == 'Batch' && (
+                            <Grid size={{ xs: 12, sm: 12 }}>
+                                <TextField
+                                    fullWidth
+                                    label="Supplier"
+                                    value={inputValue}
+                                    onChange={(e) => onChangeInput(e)}
+                                />
+                            </Grid>
+                        )}
+
+                        {children}
+                    </Grid>
+
+                    <Box sx={{ textAlign: 'right', mt: 2 }}>
+                        <Button
+                            type="submit"
+                            variant="outlined"
+                            color="secondary"
+                            size="large"
+                            loading={loading}
+                            disabled={disabled}
+                        >
+                            Save
+                        </Button>
+                    </Box>
+                </form>
+            </Box>
+        </Modal>
+    );
+}
