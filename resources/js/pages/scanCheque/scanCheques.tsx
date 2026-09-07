@@ -217,8 +217,8 @@ export default function ScanCheques({ files }: int) {
     };
 
     const items = [
-        { label: 'Batch', value: 'Batch' },
-        { label: 'Individual', value: 'Individual' },
+        { label: 'Batch Scan', value: 'Batch' },
+        { label: 'Single Scan', value: 'Single' },
     ];
 
     useEffect(() => {

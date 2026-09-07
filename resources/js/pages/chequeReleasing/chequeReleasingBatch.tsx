@@ -86,6 +86,12 @@ export default function ChequeReleasingBatch(props: {
                     {row.batch_reference}
                 </TableCell>
                 <TableCell component="th" scope="row">
+                    {row.supplier}
+                </TableCell>
+                <TableCell component="th" scope="row">
+                    {row.method}
+                </TableCell>
+                <TableCell component="th" scope="row">
                     {row.cheque_count}
                 </TableCell>
                 {isVisible && (

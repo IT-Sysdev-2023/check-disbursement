@@ -157,6 +157,8 @@ export default function CheckReleasing({
                             <TableRow>
                                 <TableCell />
                                 <TableCell>Batch Reference</TableCell>
+                                <TableCell>Supplier</TableCell>
+                                <TableCell>Scan Method</TableCell>
                                 <TableCell>Total Cheques</TableCell>
                                 <TableCell align='center'>Action</TableCell>
                             </TableRow>

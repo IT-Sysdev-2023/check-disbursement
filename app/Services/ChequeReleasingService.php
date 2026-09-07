@@ -31,7 +31,9 @@ class ChequeReleasingService
         $chequeRecords = BorrowedCheque::
             select(
                 'scanned_records.batch_reference',
-                DB::raw('COUNT(scanned_records.id) as cheque_count')
+                DB::raw('COUNT(scanned_records.id) as cheque_count'),
+                DB::raw('MIN(scanned_records.supplier) as supplier'),
+                DB::raw('MIN(scanned_records.scan_method) as method')
             )
             ->whereNot('approver_id', null)
             ->join('scanned_records', 'borrowed_cheques.id', 'scanned_records.borrowed_cheque_id')
