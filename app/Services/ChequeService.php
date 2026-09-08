@@ -37,6 +37,7 @@ class ChequeService
 
         $records = self::chequeRecords($tab, $filters, $assignment);
         $notScannedCheque = self::notScannedCheques();
+
         return Inertia::render('retrievedRecords', [
             'records' => $records,
             'notScannedCheques' => $notScannedCheque,
@@ -86,11 +87,8 @@ class ChequeService
                 }
             ])
             ->get()
-            ->map(fn($cheque) => [
-                'id' => $cheque->checkable?->id,
-                'chequeNumber' => $cheque->checkable?->cheque_number,
-            ])
-            ->values();
+            ->pluck('checkable.cheque_number')
+            ->implode(', ');
 
     }
 

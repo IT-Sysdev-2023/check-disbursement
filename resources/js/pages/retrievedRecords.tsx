@@ -49,7 +49,7 @@ export default function RetrievedRecords({
     businessUnits: SelectionType[];
     records: InertiaPagination<any>;
     company: SelectionType[];
-    notScannedCheques: any[];
+    notScannedCheques: string;
     auth: Auth;
 }) {
     const [openProgress, setOpenProgress] = useState(false);

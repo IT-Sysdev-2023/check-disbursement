@@ -10,17 +10,16 @@ import {
 } from '@/types';
 import { router } from '@inertiajs/react';
 import { DocumentScanner } from '@mui/icons-material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-    Alert,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Box,
     Button,
-    List,
-    ListItem,
-    ListItemText,
     Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import AssignScanDetailsModal from './assignScanDetailsModal';
 import { createManageColumns } from './columns';
 import ScanDetails from './scanDetails';
 
@@ -32,30 +31,16 @@ export default function ManageCheques({
     filter,
 }: {
     cheques: InertiaPagination<ManageChecks>;
-    notScan: any[];
+    notScan: string;
     company: SelectionType[];
     businessUnits: SelectionType[];
     filter: FilterType;
 }) {
     const [scannedId, setScannedId] = useState<number>();
-    const [checkRecords, setCheckRecords] = useState({});
     const [scannedDetailsModal, setScannedDetailsModal] = useState(false);
-    const [openInputDetails, setOpenInputDetails] = useState(false);
-    const [sync, setSync] = useState(false);
 
     const handleSyncScanned = () => {
-        // setSync(true);
         router.get(scan());
-    };
-
-    const handleUpdateScanned = (details: any) => {
-        if (!sync) {
-            alert('Please Sync Cheque Scan first');
-            return;
-        }
-        setOpenInputDetails(true);
-
-        if (details) setCheckRecords(details);
     };
     const handleScanDetails = (id: number) => {
         setScannedDetailsModal(true);
@@ -68,7 +53,6 @@ export default function ManageCheques({
     };
     const manageCvColumns = createManageColumns(
         handleDetails,
-        handleUpdateScanned,
         handleScanDetails,
     );
 
@@ -81,25 +65,18 @@ export default function ManageCheques({
                 resetFilterRouter={retrievedRecords()}
                 businessUnits={businessUnits}
             />
-            {cheques.data.some((item) => item.scannedId) && (
-                <Alert sx={{ width: '100%' }}>
-                    <Typography
-                        variant="subtitle2"
-                        fontWeight="bold"
-                        gutterBottom
-                    >
-                        The following cheque numbers have not been scanned:
+            <Accordion>
+                <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls={`1-panel1-content`}
+                    id={`1-panel1-header`}
+                >
+                    <Typography component="span">
+                        Expand to view cheque numbers that have not been scanned:
                     </Typography>
-
-                    <List dense disablePadding>
-                        {notScan.map((item) => (
-                            <ListItem key={item.id} sx={{ py: 0 }}>
-                                <ListItemText primary={item.chequeNumber} />
-                            </ListItem>
-                        ))}
-                    </List>
-                </Alert>
-            )}
+                </AccordionSummary>
+                <AccordionDetails>{notScan}</AccordionDetails>
+            </Accordion>
             <TableDataGrid
                 data={cheques}
                 filter={filter.search}
@@ -114,7 +91,6 @@ export default function ManageCheques({
                     variant="outlined"
                     startIcon={<DocumentScanner />}
                     onClick={handleSyncScanned}
-                    disabled={sync}
                 >
                     Sync Cheque Scanned
                 </Button>
@@ -129,14 +105,14 @@ export default function ManageCheques({
                     onClose={() => setScannedDetailsModal(false)}
                 />
             )}
-            {checkRecords && (
+            {/* {checkRecords && (
                 <AssignScanDetailsModal
                     borrowedCheckId={checkRecords}
                     title="Input Check Details"
                     open={openInputDetails}
                     onClose={() => setOpenInputDetails(false)}
                 />
-            )}
+            )} */}
         </>
     );
 }

@@ -235,7 +235,6 @@ export const createPendingChequeColumns = (
 
 export const createManageColumns = (
     handleDetails: (id: number, type: 'cv' | 'crf') => void,
-    handleAction: (details: any) => void,
     handleScanDetails: (id: number) => void,
 ): GridColDef[] => [
     {
@@ -334,18 +333,6 @@ export const createManageColumns = (
                     >
                         <NotepadText />
                     </IconButton>
-
-                    {/* {( row.isScanned === 1) && (
-                        <IconButton
-                            size="small"
-                            color="primary"
-                            disabled={!isSync}
-                            onClick={() => handleAction(details)}
-                        >
-                            <Edit2 />
-                        </IconButton>
-                    )} */}
-
                     {row.scannedId && (
                         <IconButton
                             size="small"
