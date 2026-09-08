@@ -26,11 +26,13 @@ import ScanDetails from './scanDetails';
 
 export default function ManageCheques({
     cheques,
+    notScan,
     company,
     businessUnits,
     filter,
 }: {
     cheques: InertiaPagination<ManageChecks>;
+    notScan: any[];
     company: SelectionType[];
     businessUnits: SelectionType[];
     filter: FilterType;
@@ -70,10 +72,6 @@ export default function ManageCheques({
         handleScanDetails,
     );
 
-    const notScannedCheques = cheques.data.filter(
-        (cheque) => !cheque.scannedId,
-    );
-
     return (
         <>
             <TableFilter
@@ -94,7 +92,7 @@ export default function ManageCheques({
                     </Typography>
 
                     <List dense disablePadding>
-                        {notScannedCheques.map((item) => (
+                        {notScan.map((item) => (
                             <ListItem key={item.id} sx={{ py: 0 }}>
                                 <ListItemText primary={item.chequeNumber} />
                             </ListItem>

@@ -133,8 +133,6 @@ class Cv extends Model
     {
         return $builder
             ->join('borrowed_cheques', 'borrowed_cheques.checkable_id', '=', 'cvs.id')
-            // ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_cheques.primary_approver_id')
-            // ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_cheques.secondary_approver_id')
             ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
             ->where('borrowed_cheques.checkable_type', 'cv')
             ->whereNotNull('borrowed_cheques.approved_at')

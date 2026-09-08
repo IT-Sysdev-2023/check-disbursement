@@ -36,9 +36,10 @@ class ChequeService
         $tab = $filters['tab'] ?? 'calendar';
 
         $records = self::chequeRecords($tab, $filters, $assignment);
-
+        $notScannedCheque = self::notScannedCheques();
         return Inertia::render('retrievedRecords', [
             'records' => $records,
+            'notScannedCheques' => $notScannedCheque,
             'filter' => (object) [
                 'selectedCompany' => $company,
                 'assignments' => $assignment,
@@ -70,6 +71,27 @@ class ChequeService
         };
 
         return $records;
+    }
+
+    private static function notScannedCheques()
+    {
+        return BorrowedCheque::whereDoesntHaveMorph(
+            'checkable',
+            [Cv::class, Crf::class],
+            fn($query) => $query->has('chequeStatus')
+        )->doesntHave('scannedRecord')->whereNotNull('approver_id')
+            ->with([
+                'checkable' => function ($query) {
+                    $query->select('id', 'cheque_number');
+                }
+            ])
+            ->get()
+            ->map(fn($cheque) => [
+                'id' => $cheque->checkable?->id,
+                'chequeNumber' => $cheque->checkable?->cheque_number,
+            ])
+            ->values();
+
     }
 
     public function syncData(Request $request)
@@ -132,18 +154,14 @@ class ChequeService
             ->filter($filters)
             ->addSelect(
                 'borrowed_cheques.id as borrowedCheckId',
-                // 'borrowed_cheques.is_returned',
-                // 'borrowed_cheques.secondary_borrower',
                 'borrowed_cheques.approved_at',
                 'approvers.name as approver_name',
-                // DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'
             );
 
         $crf = Crf::
-            // whereHas('borrowedCheque', fn(Builder $builder) => $builder->whereNotNull('approver_id'))
             baseColumns()
             ->doesntHave('chequeStatus')
             ->leftJoinScanRecords()
@@ -151,11 +169,8 @@ class ChequeService
             ->filter($filters)
             ->addSelect(
                 'borrowed_cheques.id as borrowedCheckId',
-                // 'borrowed_cheques.is_returned',
-                // 'borrowed_cheques.secondary_borrower',
                 'borrowed_cheques.approved_at',
                 'approvers.name as approver_name',
-                // DB::raw('COALESCE(approvers.name, approvers.name) as approver_name'),
                 'scanned_records.id as scanned_id',
                 'scanned_records.payee as scanned_payee',
                 'scanned_records.amount as scanned_amount'

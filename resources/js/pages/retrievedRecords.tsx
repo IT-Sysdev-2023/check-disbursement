@@ -2,12 +2,8 @@ import AppLayout from '@/layouts/app-layout';
 import { retrievedRecords } from '@/routes';
 import {
     Auth,
-    Borrower,
-    BuType,
-    ChequeType,
     FilterType,
     InertiaPagination,
-    ManageChecks,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
@@ -42,6 +38,7 @@ export default function RetrievedRecords({
     company,
     counts,
     businessUnits,
+    notScannedCheques,
     auth,
 }: {
     filter: FilterType;
@@ -50,8 +47,9 @@ export default function RetrievedRecords({
         completed: string;
     };
     businessUnits: SelectionType[];
-    records: InertiaPagination<ChequeType | ManageChecks | Borrower | BuType>;
+    records: InertiaPagination<any>;
     company: SelectionType[];
+    notScannedCheques: any[];
     auth: Auth;
 }) {
     const [openProgress, setOpenProgress] = useState(false);
@@ -134,6 +132,7 @@ export default function RetrievedRecords({
                         {filter.tab === 'manageChecks' && (
                             <ManageCheques
                                 cheques={records}
+                                notScan={notScannedCheques}
                                 company={company}
                                 businessUnits={businessUnits}
                                 filter={filter}
@@ -142,16 +141,6 @@ export default function RetrievedRecords({
                     </Box>
                 </Box>
             </PageContainer>
-
-            {/* 
-            {pendingId && (
-                <PendingDetails
-                    id={pendingId}
-                    title="Check Details"
-                    open={pendingModal}
-                    onClose={() => setPendingModal(false)}
-                />
-            )} */}
             <ProgressModal
                 userId={auth.user.id}
                 open={openProgress}
