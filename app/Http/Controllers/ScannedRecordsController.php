@@ -58,14 +58,16 @@ class ScannedRecordsController extends Controller
 
         $files = $disk->files('new');
 
-        $fileData = collect($files)->map(function ($file) use ($disk) {
-            return [
-                'name' => basename($file),
-                'path' => $file,
-                'size' => $disk->size($file),
-                'last_modified' => $disk->lastModified($file),
-            ];
-        })->values();
+        $fileData = collect($files)
+            ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+            ->map(function ($file) use ($disk) {
+                return [
+                    'name' => basename($file),
+                    'path' => $file,
+                    'size' => $disk->size($file),
+                    'last_modified' => $disk->lastModified($file),
+                ];
+            })->values();
 
         return response()->json(['files' => $fileData]);
     }

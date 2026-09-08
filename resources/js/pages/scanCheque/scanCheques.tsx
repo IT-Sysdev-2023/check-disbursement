@@ -1,6 +1,6 @@
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
-import { retrievedRecords } from '@/routes';
+import { retrievedRecords, viewScannedCheques } from '@/routes';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -123,9 +123,7 @@ export default function ScanCheques({ files }: int) {
     const [getScanned, setScannedCheques] = useState<any>([]);
     const [selectedChoice, setSelectedChoice] = useState('');
 
-    // const filtered = files.filter((f) =>
-    //     f.name.toLowerCase().includes(search.toLowerCase()),
-    // );
+    const [scannedFiles, setScannedFiles] = useState([]);
     const filtered = files;
 
     const analyzeScanned = async () => {
@@ -154,14 +152,15 @@ export default function ScanCheques({ files }: int) {
         setScannedCheques(data.records);
     };
 
-    // const openDrawer = async () => {
-    //     try {
-    //         const { data } = await axios.get(viewScannedCheques().url);
-    //         console.log(data);
-    //     } finally {
-    //         toggleDrawer(true);
-    //     }
-    // };
+    const openDrawer = async () => {
+        setOpen(true);
+        try {
+            const { data } = await axios.get(viewScannedCheques().url);
+            setScannedFiles(data.files);
+        } finally {
+            toggleDrawer(true);
+        }
+    };
 
     useEcho(
         `scanning-cheques.${page.user.id}`,
@@ -324,7 +323,49 @@ export default function ScanCheques({ files }: int) {
                                             </p>
                                         </div>
                                     ) : (
-                                        <div className="divide-y"></div>
+                                            <div className="divide-y">
+                                                {scannedFiles.map((file) => (
+                                                <div
+                                                    key={file.path}
+                                                    className="group flex items-center gap-4 px-6 py-4 transition-all duration-150"
+                                                >
+                                                    {/* Icon */}
+                                                    <div className="text-3xl">
+                                                        {file.mime?.startsWith(
+                                                            'image/',
+                                                        )
+                                                            ? '🖼️'
+                                                            : '📄'}
+                                                    </div>
+
+                                                    {/* Name */}
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="truncate font-medium transition-colors group-hover:text-blue-600">
+                                                            {file.name}
+                                                        </p>
+                                                        <p className="mt-0.5 text-xs">
+                                                            {file.path}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Type */}
+                                                    {/* <div>
+                                                    <FileTypeIcon mime={file.mime} />
+                                                </div> */}
+
+                                                    {/* Size */}
+                                                    <div className="w-20 text-right">
+                                                        <p className="text-sm font-medium">
+                                                            {formatSize(
+                                                                file.size,
+                                                            )}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Action */}
+                                                </div>
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -338,10 +379,10 @@ export default function ScanCheques({ files }: int) {
                                 {/* DUGAY ANG LOADING OG E SHOW ANG FILES */}
                                 <Button
                                     variant="contained"
-                                    // onClick={openDrawer}
-                                    // className="flex-1"
+                                    onClick={openDrawer}
+                                    className="flex-1"
                                 >
-                                    Total Scanned Cheques: {filtered}
+                                    Scanned Cheques
                                 </Button>
                             </Badge>
 
