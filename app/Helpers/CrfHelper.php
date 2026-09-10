@@ -5,6 +5,7 @@ use App\Models\Company;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 class CrfHelper
@@ -39,9 +40,14 @@ class CrfHelper
         // Extract possible company/office name
         preg_match('/x0\s*([A-Za-z0-9\s&.-]+?)(?=\s+No\.)/', $this->fileContents, $officeMatch);
 
+        // Company not found — tell the caller to skip this file
+        if (empty($officeMatch[1])) {
+            return false;
+        }
+
         $this->company = Str::trim($officeMatch[1]);
 
-        return $this;
+        return true;
     }
     public function extractNo()
     {
@@ -83,20 +89,35 @@ class CrfHelper
     {
         //Particulars
         preg_match('/Particulars\s*:(.*?)(?:[-]{5,}|$)/s', $this->fileContents, $blockMatch);
+        if (!isset($blockMatch[1])) {
+            return null;
+        }
+
         $particularsBlock = Str::trim($blockMatch[1]);
 
-        if ($particularsBlock) {
-            // Extract the amount
-            preg_match('/\*{2,}\s*([\d,]+\.\d{2})\s*\*{2,}/', $particularsBlock, $amountMatch);
-            $amount = $amountMatch[1];
-
-            // Clean the particulars text
-            $particular = preg_replace('/\*{2,}\s*[\d,]+\.\d{2}\s*\*{2,}/', '', $particularsBlock);
-            $particular = preg_replace('/\|+/', ' ', $particular);
-            $particular = preg_replace('/\s{2,}/', ' ', $particular);
-
-            $particularsText = Str::trim($particular);
+        if (!$particularsBlock) {
+            return null;
         }
+
+        // Extract the amount
+        preg_match(
+            '/\*+([\d,]+\.\d{2})\*+/',
+            $particularsBlock,
+            $amountMatch
+        );
+
+        if (!isset($amountMatch[1])) {
+            return null;
+        }
+
+        $amount = $amountMatch[1];
+
+        // Clean the particulars text
+        $particular = preg_replace('/\*{2,}\s*[\d,]+\.\d{2}\s*\*{2,}/', '', $particularsBlock);
+        $particular = preg_replace('/\|+/', ' ', $particular);
+        $particular = preg_replace('/\s{2,}/', ' ', $particular);
+
+        $particularsText = Str::trim($particular);
 
         $this->amount = Number::parseFloat($amount);
         $this->particular = $particularsText;
@@ -107,7 +128,7 @@ class CrfHelper
     public function extractCrf()
     {
         //Extract CRF# in Particular
-        preg_match('/CRF#\d+/', $this->particular, $match);
+        preg_match('/CRF#?(\d+)/', $this->particular, $match);
 
         $this->crf = $match[0];
         return $this;
@@ -143,7 +164,7 @@ class CrfHelper
     public function getRecords(int $userId)
     {
 
-      
+
         $extractedCompany = explode(' ', $this->company);
         // $companyId = Company::whereIn('name', $extractedCompany)->first()->id;
         // $companyId = 
@@ -175,10 +196,10 @@ class CrfHelper
                 && !empty($item['crf_location']) && !empty($item['cheque_date'])
                 && !empty($item['bank']) && !empty($item['cheque_number'])
                 && !empty($item['prepared_by']) && !empty($item['payee'])
-                && !empty($item['cheque_amount']) && !empty($item['particulars'])) 
+                && !empty($item['cheque_amount']) && !empty($item['particulars']))
                 // &&
                 // (Str::contains($item['company_office'], $bu, ignoreCase: true))
-                ; // disable case sensitivity
+            ; // disable case sensitivity
         });
     }
 

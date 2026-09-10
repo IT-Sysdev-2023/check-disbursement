@@ -31,7 +31,7 @@ class CrfProgress implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('cv-progress.' . $this->userId),
+            new PrivateChannel('crf-progress.' . $this->userId),
         ];
     }
 

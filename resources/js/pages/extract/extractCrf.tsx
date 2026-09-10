@@ -4,10 +4,10 @@ import {
     Auth,
     EventType,
     FlashReponse,
-    ProgressState,
+    SingleProgressState,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
@@ -28,6 +28,7 @@ import {
     Typography,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import axios from 'axios';
 // import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
@@ -60,14 +61,14 @@ export default function ExtractCrf({
     auth: Auth;
     bu: { label: string; value: number }[];
 }) {
-    const [progress, setProgress] = useState<ProgressState>({});
+    const [progress, setProgress] = useState<SingleProgressState>();
     const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
         status: false,
         message: '',
         duplicates: [],
     });
     const [files, setFiles] = useState<File[]>([]);
-    const [permissionList, setPermissionList] = useState<string[]>([]);
+    const [loading, setLoading] = useState(false);
     // const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
@@ -76,63 +77,43 @@ export default function ExtractCrf({
         setFiles(Array.from(event.target.files));
     };
 
-    useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
+    useEcho(`crf-progress.${auth.user.id}`, 'CrfProgress', (e: EventType) => {
         const { percentage, message, status } = e;
-
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
-        setProgress((prev) => ({
-            ...prev,
-            [message]: {
-                progress: percentage,
-                buffer,
-                message,
-                status,
-            },
-        }));
+        setProgress({
+            progress: percentage,
+            buffer,
+            message,
+            status,
+        });
     });
 
-    const simulateDataRetrieval = () => {
-        // if (!startDate || !endDate) {
-        //     alert('Please select both start and end dates');
-        //     return;
-        // }
-
-        router.post(
-            extractCrf(),
-            {
-                files,
-                bu: permissionList,
-                // start_date: startDate.format('YYYY-MM-DD'),
-                // end_date: endDate.format('YYYY-MM-DD'),
-            },
-            {
-                onSuccess: (page) => {
-                    const flash = page.props.flash as {
-                        message?: string;
-                        status?: boolean;
-                        duplicates?: string[];
-                    };
-                    setUploadResponse({
-                        status: flash.status ?? false,
-                        message: flash?.message ?? '',
-                        duplicates: flash?.duplicates ?? [],
-                    });
-                    setFiles([]);
+    const simulateDataRetrieval = async () => {
+        setLoading(true);
+        try {
+            const { data } = await axios.post(
+                extractCrf().url,
+                {
+                    files: files,
                 },
-            },
-        );
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                },
+            );
+            console.log(data);
+            // if (data.status && progress?.progress == 100) {
+            //     setUploadResponse({
+            //         status: data.status ?? false,
+            //         message: data?.message ?? '',
+            //         duplicates: data?.duplicates ?? [],
+            //     });
+            // }
+        } finally {
+            setFiles([]);
+        }
     };
-
-    // const handleChange = (event: SelectChangeEvent<typeof permissionList>) => {
-    //     const {
-    //         target: { value },
-    //     } = event;
-
-    //     setPermissionList(
-    //         // On autofill we get a stringified value.
-    //         typeof value === 'string' ? value.split(',') : value,
-    //     );
-    // };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -258,7 +239,14 @@ export default function ExtractCrf({
                         >
                             "This File Upload is Intended for Head Office Only"
                         </Typography>
-                        {files.length > 0 && (
+                        {loading && !progress && (
+                            <Typography
+                                variant="h6" // makes it larger than "caption"
+                            >
+                                ...Uploading Files
+                            </Typography>
+                        )}
+                        {files.length > 0 && !loading && (
                             <>
                                 <List
                                     sx={{ mt: 2, width: '100%', maxWidth: 360 }}
@@ -306,24 +294,26 @@ export default function ExtractCrf({
                             </>
                         )}
 
-                        {Object.entries(progress).map(([key, item]) => (
-                            <Box key={key} sx={{ mb: 3 }}>
+                        {progress && (
+                            <Box sx={{ mb: 3, width: '100%' }}>
                                 <Typography variant="body2" sx={{ mb: 1 }}>
-                                    {item.message}
+                                    {progress.message}
                                 </Typography>
+
                                 <LinearProgress
                                     variant="buffer"
-                                    value={item.progress}
-                                    valueBuffer={item.buffer}
+                                    value={progress.progress}
+                                    valueBuffer={progress.buffer}
                                 />
+
                                 <Typography
                                     variant="caption"
                                     color="text.secondary"
                                 >
-                                    {item.progress}%
+                                    {progress.progress}%
                                 </Typography>
                             </Box>
-                        ))}
+                        )}
 
                         {uploadResponse.message && (
                             <>

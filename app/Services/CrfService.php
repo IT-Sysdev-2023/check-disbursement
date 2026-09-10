@@ -33,6 +33,7 @@ class CrfService
         $records = collect();
 
         $files = collect($request->file('files'));
+        // dd($files);
         $total = $files->count();
         $start = 1;
 
@@ -40,9 +41,24 @@ class CrfService
             $contents = $item->get();
             $fileName = $item->getClientOriginalName();
 
-            $contentRecords = (new CrfHelper($contents))
-                ->setFilename($fileName)
-                ->extractCompany()
+            $helper = (new CrfHelper($contents))
+                ->setFilename($fileName);
+
+            // If company cannot be extracted, skip this file
+            if (!$helper->extractCompany()) {
+                CrfProgress::dispatch(
+                    "Skipping Crf Filename " . $fileName . " - Company not found.",
+                    $start,
+                    $total,
+                    $userId
+                );
+
+                $start++;
+
+                return;
+            }
+
+            $contentRecords = $helper
                 ->extractNo()
                 ->extractLocation()
                 ->extractDate()
@@ -63,7 +79,7 @@ class CrfService
         $validated = CrfHelper::checkProperties($records, []);
 
         if (!$validated) {
-            return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);
+            return response()->json(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);
         }
 
         // $isDateValid = $records->every(function ($item) use ($request) {
@@ -80,22 +96,14 @@ class CrfService
 
         // $hasExisting = !empty($existing) ? 'Duplicates are listed below and were ignored.' : '';
 
-        return redirect()->back()->with([
+        return response()->json([
             'status' => true,
             'message' => ' Files Successfully uploaded. ',
             'duplicates' => []
             // 'duplicates' => $existing //retrieve duplicated files
         ]);
     }
-
-    // public function retrievedCrf(Request $request)
-    // {
-    //     $records = Crf::filter($request->only('search'))->paginate();
-    //     return Inertia::render('retrievedCrf', [
-    //         'crf' => $records
-    //     ]);
-    // }
-
+    
     public function detailsCrf(Crf $id)
     {
         return Inertia::render('retrievedRecords/checkDetailsCrf', [

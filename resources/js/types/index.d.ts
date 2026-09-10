@@ -346,6 +346,13 @@ export interface ProgressState {
         duplicates?: number;
     };
 }
+export interface SingleProgressState {
+    progress: number;
+    buffer?: number;
+    message: string;
+    status: string;
+    duplicates?: number;
+}
 export interface SelectedChequeType {
     id: number;
     status: string;
