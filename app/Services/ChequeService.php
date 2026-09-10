@@ -291,6 +291,27 @@ class ChequeService
             $crfQuery->whereNotNull('cheque_date');
         }
 
+        // COMBINE
+        if (($filters['documentType'] ?? null) === 'combine') {
+
+            $cvQuery->whereExists(function ($q) {
+                $q->selectRaw('1')
+                    ->from('crfs')
+                    ->whereColumn('crfs.crf', 'cvs.cv_no')
+                    ->whereColumn('crfs.payee', 'cvs.payee')
+                    ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
+                ;
+            });
+
+            $crfQuery->whereExists(function ($q) {
+                $q->selectRaw('1')
+                    ->from('cvs')
+                    ->whereColumn('cvs.cv_no', 'crfs.crf')
+                    ->whereColumn('crfs.payee', 'cvs.payee')
+                    ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
+            });
+        }
+
         $unionQuery = $cvQuery->unionAll($crfQuery);
 
         return DB::query()
@@ -301,7 +322,7 @@ class ChequeService
                 }
             })
             ->when(
-                ($filters['documentType'] ?? null) && $filters['documentType'] != 'all',
+                ($filters['documentType'] ?? null) && !in_array($filters['documentType'], ['all', 'combine']),
                 function (Builder $builder) use ($filters) {
                     $builder->where('type', $filters['documentType']);
                 }

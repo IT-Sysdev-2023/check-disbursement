@@ -103,7 +103,7 @@ class CrfService
             // 'duplicates' => $existing //retrieve duplicated files
         ]);
     }
-    
+
     public function detailsCrf(Crf $id)
     {
         return Inertia::render('retrievedRecords/checkDetailsCrf', [

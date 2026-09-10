@@ -221,6 +221,10 @@ export default function TableView({
             label: 'CRF',
             value: 'crf',
         },
+        {
+            label: 'Match',
+            value: 'combine',
+        },
     ];
 
     const handleChangeDocument = async (event: SelectChangeEvent) => {
