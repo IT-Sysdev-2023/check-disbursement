@@ -3,6 +3,7 @@ import TableFilter from '@/components/tableFilter';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import SelectedChequeList from '@/pages/chequeReleasing/selectedChequeList';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
+import SelectItem from '@/pages/dashboard/components/SelectItem';
 import TableDataGrid from '@/pages/dashboard/components/TableDataGrid';
 import {
     details,
@@ -27,6 +28,7 @@ import {
     Badge,
     Box,
     Button,
+    SelectChangeEvent,
     ToggleButton,
     ToggleButtonGroup,
 } from '@mui/material';
@@ -95,10 +97,8 @@ export default function TableView({
                 status: row.statusOrder,
                 releasable: true,
             }));
-        console.log(cheques.data);
 
         setSelectedRows([...previousSelections, ...currentSelections]);
-        // setSelectedRows(selectedR);
     };
 
     const enableButton =
@@ -205,6 +205,35 @@ export default function TableView({
 
     const chequeColumns = createChequeColumns(handleStatusChange);
 
+    const [selectedDocumentType, setSelectedDocumentType] = useState<string>(
+        filter.documentType,
+    );
+    const documentType = [
+        {
+            label: 'All',
+            value: 'all',
+        },
+        {
+            label: 'CV',
+            value: 'cv',
+        },
+        {
+            label: 'CRF',
+            value: 'crf',
+        },
+    ];
+
+    const handleChangeDocument = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedDocumentType(val);
+
+        router.reload({
+            data: {
+                documentType: event.target.value,
+            },
+        });
+    };
+
     return (
         <>
             <TableFilter
@@ -214,6 +243,12 @@ export default function TableView({
                 resetFilterRouter={retrievedRecords()}
                 filters={filter}
             >
+                <SelectItem
+                    handleChange={handleChangeDocument}
+                    value={selectedDocumentType}
+                    title="Document Type"
+                    items={documentType}
+                />
                 <ToggleButtonGroup
                     value={alignment}
                     exclusive

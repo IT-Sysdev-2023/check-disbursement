@@ -30,7 +30,7 @@ class ChequeService
 
     public function records(Request $request)
     {
-        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page']);
+        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page', 'documentType']);
         $assignment = $filters['assignment'] ?? 'toAssign';
         $company = $filters['company'] ?? 'all';
         $tab = $filters['tab'] ?? 'calendar';
@@ -50,6 +50,7 @@ class ChequeService
                     'start' => null,
                     'end' => null
                 ],
+                'documentType' => $filters['documentType'] ?? 'all',
                 'tab' => $tab
             ],
             'company' => PermissionService::userAssignedCompany($request->user()),
@@ -232,6 +233,12 @@ class ChequeService
                 $cvQuery->unionAll($crfQuery),
                 'to_assign'
             )
+            ->when(
+                ($filters['documentType'] ?? null) && $filters['documentType'] != 'all',
+                function (Builder $builder) use ($filters) {
+                    $builder->where('type', $filters['documentType']);
+                }
+            )
             ->count();
     }
     private function countCompleted(array $filters)
@@ -253,6 +260,12 @@ class ChequeService
             ->fromSub(
                 $cvQuery->unionAll($crfQuery),
                 'completed'
+            )
+            ->when(
+                ($filters['documentType'] ?? null) && $filters['documentType'] != 'all',
+                function (Builder $builder) use ($filters) {
+                    $builder->where('type', $filters['documentType']);
+                }
             )
             ->count();
     }
@@ -287,9 +300,15 @@ class ChequeService
                     $q->orderBy(Str::snake($sort['field']), $sort['sort']);
                 }
             })
+            ->when(
+                ($filters['documentType'] ?? null) && $filters['documentType'] != 'all',
+                function (Builder $builder) use ($filters) {
+                    $builder->where('type', $filters['documentType']);
+                }
+            )
+
             ->paginate(10)
             ->withQueryString();
-
     }
 
 

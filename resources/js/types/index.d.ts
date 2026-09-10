@@ -112,8 +112,9 @@ export interface FilterType {
     search: string;
     date: DateFilterType;
     tab: string;
-    bank?: string
+    bank?: string;
     bankAccount?: string;
+    documentType: string;
 }
 
 export interface Role {
@@ -369,7 +370,6 @@ export interface ListSelectedChequeTaggingType {
     chequeNo: string;
     status: string;
     releasable?: boolean;
-        
 }
 
 export interface FileReport {
