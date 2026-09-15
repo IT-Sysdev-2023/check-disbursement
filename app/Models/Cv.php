@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 #[ScopedBy([BusinessUnitAssignedScope::class])]
 class Cv extends Model
 {
-
     protected $guarded = [];
 
 

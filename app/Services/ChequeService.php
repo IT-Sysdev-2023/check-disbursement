@@ -281,7 +281,24 @@ class ChequeService
             ->doesntHave('borrowedCheque');
 
         if ($hasMissingField) { //ASSIGNMENT
-            $cvQuery->where([['cheque_number', 0], ['resolved_cheque_number', null]]);
+
+            // Exclude a CV only when cheque_number is NULL AND a matching CRF exists.
+            $cvQuery
+                ->where([
+                    ['cheque_number', 0],
+                    ['resolved_cheque_number', null],
+                ])
+                ->whereNotExists(function ($query) {
+                    $query->selectRaw(1)
+                        ->from('crfs')
+                        ->whereRaw("
+                    REPLACE(crfs.crf, '#', '') =
+                    REPLACE(cvs.cv_no, '#', '')
+                ")
+                        ->whereColumn('crfs.payee', 'cvs.payee')
+                        ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
+                });
+            // $cvQuery->where([['cheque_number', 0], ['resolved_cheque_number', null]]);
             $crfQuery->where('cheque_date', null);
         } else { // COMPLETED
             $cvQuery->where(function ($q) {
@@ -297,7 +314,7 @@ class ChequeService
             $cvQuery->whereExists(function ($q) {
                 $q->selectRaw('1')
                     ->from('crfs')
-                    ->whereColumn('crfs.crf', 'cvs.cv_no')
+                    ->whereRaw("REPLACE(crfs.crf, '#', '') = REPLACE(cvs.cv_no, '#', '')")
                     ->whereColumn('crfs.payee', 'cvs.payee')
                     ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
                 ;
@@ -306,7 +323,7 @@ class ChequeService
             $crfQuery->whereExists(function ($q) {
                 $q->selectRaw('1')
                     ->from('cvs')
-                    ->whereColumn('cvs.cv_no', 'crfs.crf')
+                    ->whereRaw("REPLACE(cvs.cv_no, '#', '') = REPLACE(crfs.crf, '#', '')")
                     ->whereColumn('crfs.payee', 'cvs.payee')
                     ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
             });
