@@ -5,11 +5,7 @@ namespace App\Models;
 use App\Models\Scopes\BusinessUnitAssignedScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -81,7 +77,7 @@ class Cv extends Model
                 }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereBetween('cheque_date', [$date['start'], $date['end']]);
+                $query->whereBetween('cvs.cheque_date', [$date['start'], $date['end']]);
             })
             ->when(($filters['bank'] ?? null) && $filters['bank'] != 'All', function ($query) use ($filters) {
                 $query->where('bank_name', $filters['bank']);
