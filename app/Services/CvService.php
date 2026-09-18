@@ -62,6 +62,7 @@ class CvService
             when(!in_array('All', $request->bu), function ($q) use ($request) {
                 $q->whereIn('name', $request->bu);
             })
+            ->whereHas('company', fn($q) => $q->whereIn('name', $request->company))
             ->pluck('id', 'name')->values();
 
         $nav = NavServer::select('id', 'host', 'username', 'password', 'port')
@@ -118,7 +119,7 @@ class CvService
             ->whereHas(
                 'company',
                 fn($q) =>
-                $q->whereIn('name', $request->companies)
+                    $q->whereIn('name', $request->companies)
             )
             ->pluck('name', 'id')
             ->map(fn($label, $value) => compact('label', 'value'))

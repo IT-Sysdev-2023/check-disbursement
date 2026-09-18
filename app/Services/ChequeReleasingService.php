@@ -200,6 +200,11 @@ class ChequeReleasingService
             'batch_reference',
             $validated['cheques']
         )
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )
             ->get();
 
         $cheques = $getCheques->map(function ($cheque) {

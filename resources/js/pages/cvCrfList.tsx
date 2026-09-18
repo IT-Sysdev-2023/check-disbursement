@@ -64,7 +64,8 @@ export default function CvCrfList({
         // else router.visit(detailsCrf(id));
     };
     const handleMarkClose = () => {
-        if (recordDetails)
+        try {
+             if (recordDetails)
             router.post(
                 markAsClose(recordDetails.id),
                 {},
@@ -77,12 +78,22 @@ export default function CvCrfList({
                             setStream(m.stream);
                             setOpenModalPdf(true);
                         }
+
+                      
                     },
                 },
             );
+        } finally {
+            setOpenScan(true);
+        }
+       
     };
 
     const columns = createClosingCvColumns(handleStatusChange);
+
+    const [openScan, setOpenScan] = useState(false);
+
+    const handleCloseScan = () => setOpenScan(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -182,6 +193,64 @@ export default function CvCrfList({
                             frameBorder={0}
                         />
                     )}
+                </Box>
+            </Modal>
+
+            <Modal
+                open={openScan}
+                onClose={handleCloseScan}
+                aria-labelledby="scan-modal-title"
+            >
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: 500,
+                        bgcolor: 'background.paper',
+                        borderRadius: 2,
+                        boxShadow: 24,
+                        p: 3,
+                    }}
+                >
+                    <Typography
+                        id="scan-modal-title"
+                        variant="h6"
+                        fontWeight={600}
+                        mb={2}
+                    >
+                        Scan Document
+                    </Typography>
+
+                    <Box
+                        sx={{
+                            height: 300,
+                            border: '2px dashed',
+                            borderColor: 'divider',
+                            borderRadius: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }}
+                    >
+                        <Typography color="text.secondary">
+                            Scan area
+                        </Typography>
+                    </Box>
+
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'flex-end',
+                            gap: 1,
+                            mt: 3,
+                        }}
+                    >
+                        <Button onClick={handleCloseScan}>Cancel</Button>
+
+                        <Button variant="contained">Start Scan</Button>
+                    </Box>
                 </Box>
             </Modal>
         </AppLayout>
