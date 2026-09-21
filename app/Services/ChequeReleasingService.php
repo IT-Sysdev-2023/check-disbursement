@@ -279,19 +279,19 @@ class ChequeReleasingService
         $userId = auth()->user()->id;
         $uuid = Str::uuid();
 
-        $signaturePath = $this->fileHandler
-            ->inFolder($transactionNo . "/signatures")
-            ->createFileName($uuid, $userId, '.png')
-            ->saveSignature($validated['signature']);
+        // $signaturePath = $this->fileHandler
+        //     ->inFolder($transactionNo . "/signatures")
+        //     ->createFileName($uuid, $userId, '.png')
+        //     ->saveSignature($validated['signature']);
 
-        $imagePath = $this->fileHandler
-            ->inFolder($transactionNo . "/images")
-            ->createFileName($uuid, $userId, '.png')
-            ->saveFile($validated['file']);
+        // $imagePath = $this->fileHandler
+        //     ->inFolder($transactionNo . "/images")
+        //     ->createFileName($uuid, $userId, '.png')
+        //     ->saveFile($validated['file']);
 
         return (object) [
-            'signaturePath' => $signaturePath,
-            'imagePath' => $imagePath
+            'signaturePath' => '$signaturePath',
+            'imagePath' => '$imagePath'
         ];
     }
 }

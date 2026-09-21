@@ -21,27 +21,52 @@ class EodController extends Controller
     {
         $this->userType = auth()->user()->roles->first()->name;
     }
-    public function index()
+    public function index(Request $request)
     {
+        $statuses = ChequeStatus::select('status')
+            ->distinct()
+            ->pluck('status')
+            ->map(fn($status) => [
+                'value' => $status,
+                'label' => ucwords(str_replace('_', ' ', $status)),
+            ])
+            ->prepend([
+                'value' => 'closed',
+                'label' => 'Closed',
+            ])
+            ->prepend([
+                'value' => 'all',
+                'label' => 'All Status',
+            ]);
+        $filters = $request->only('default');
         $data = ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit'], 'chequeForwardedStatus'])
             ->whereDate('created_at', now())
+            ->when(($filters['default'] ?? null) && $filters['default'] != 'all', function ($query) use ($filters) {
+                if ($filters['default'] == 'closed') {
+                    $query->where('is_closed', 1);
+                    return;
+                }
+                $query->where('status', $filters['default']);
+            })
             ->paginate()
             ->toResourceCollection();
 
         return Inertia::render('eodPage', [
             'records' => $data,
             'filter' => (object) [
-                'search' => $filters['search'] ?? '',
-                'date' => $filters['date'] ?? (object) [
-                    'start' => null,
-                    'end' => null
-                ]
+                'closedOnly' => $filters['closedOnly'] ?? false,
+                'default' => $filters['default'] ?? 'all'
             ],
+            'statuses' => $statuses,
+
         ]);
     }
 
     public function generateEod(Request $request)
     {
+        // dd($request->all());
+        $data['filter'] = $request->filterStatus;
+
         $data['columns'] = [
             'no',
             'cheque_number',

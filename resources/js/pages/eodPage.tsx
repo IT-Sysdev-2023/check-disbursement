@@ -9,9 +9,12 @@ import {
     FilterType,
     InertiaPagination,
 } from '@/types';
+import { router } from '@inertiajs/react';
 import { Box, Button } from '@mui/material';
 import axios from 'axios';
 import { Sunset } from 'lucide-react';
+import { useState } from 'react';
+import SelectItem from './dashboard/components/SelectItem';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import { eodColumns } from './eod/columns';
 
@@ -27,23 +30,26 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function EodPage({
     records,
     filter,
+    statuses,
 }: {
     records: InertiaPagination<ChequeStatus>;
     filter: FilterType;
+    statuses: any;
 }) {
     const notifications = useNotifications();
+    const [defaultFilter, setDefaultFilter] = useState(filter.default);
 
     const extractEod = async () => {
         try {
             const response = await axios.post(
                 generateEod().url,
-                {},
+                {
+                    filterStatus: defaultFilter,
+                },
                 {
                     responseType: 'blob',
                 },
             );
-
-            console.log(response);
 
             const disposition = response.headers['content-disposition'];
 
@@ -82,6 +88,18 @@ export default function EodPage({
             }
         }
     };
+
+    const handleChange = (e) => {
+        router.reload({
+            data: {
+                default: e.target.value,
+            },
+            // only: [check === 'cv' ? 'cv' : 'crf'],
+            replace: true,
+        });
+        setDefaultFilter(e.target.value);
+    };
+
     const chequeColumn = eodColumns();
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -93,6 +111,13 @@ export default function EodPage({
                         businessUnits={businessUnits}
                         resetFilterRouter={chequeStatus()}
                     /> */}
+                    {/* <Stack direction="row" sx={{ gap: 1 }} alignItems="center"> */}
+                    <SelectItem
+                        handleChange={handleChange}
+                        value={defaultFilter}
+                        title="Status"
+                        items={statuses}
+                    />
 
                     <TableDataGrid
                         data={records}

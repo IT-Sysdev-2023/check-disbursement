@@ -115,6 +115,7 @@ export interface FilterType {
     bank?: string;
     bankAccount?: string;
     documentType: string;
+    default?: string
 }
 
 export interface Role {

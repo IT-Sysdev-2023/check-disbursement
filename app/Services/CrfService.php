@@ -90,8 +90,9 @@ class CrfService
         //     return redirect()->back()->with(['status' => false, 'message' => 'Upload failed. One or more records have dates outside the selected range.']);
         // }
 
-        DB::transaction(function () use ($records) {
-            Crf::insertOrIgnore($records->toArray());
+
+        $inserted = DB::transaction(function () use ($records) {
+            return Crf::insertOrIgnore($records->toArray());
         });
 
         // $hasExisting = !empty($existing) ? 'Duplicates are listed below and were ignored.' : '';
@@ -99,6 +100,7 @@ class CrfService
         return response()->json([
             'status' => true,
             'message' => ' Files Successfully uploaded. ',
+            'inserted' => $inserted,
             'duplicates' => []
             // 'duplicates' => $existing //retrieve duplicated files
         ]);

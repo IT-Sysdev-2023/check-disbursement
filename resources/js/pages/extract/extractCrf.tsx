@@ -87,6 +87,7 @@ export default function ExtractCrf({
             status,
         });
     });
+    const [totalInserted, setTotalInserted] = useState(0);
 
     const simulateDataRetrieval = async () => {
         setLoading(true);
@@ -102,7 +103,8 @@ export default function ExtractCrf({
                     },
                 },
             );
-            console.log(data);
+
+            setTotalInserted(data.inserted);
             // if (data.status && progress?.progress == 100) {
             //     setUploadResponse({
             //         status: data.status ?? false,
@@ -239,6 +241,11 @@ export default function ExtractCrf({
                         >
                             "This File Upload is Intended for Head Office Only"
                         </Typography>
+                       {totalInserted !== 0 &&  <Typography
+                            variant="h6" // makes it larger than "caption"
+                        >
+                            Total Files: {totalInserted}
+                        </Typography> }
                         {loading && !progress && (
                             <Typography
                                 variant="h6" // makes it larger than "caption"

@@ -189,19 +189,19 @@ class ForwardedChequeService
         $userId = auth()->user()->id;
         $uuid = Str::uuid();
 
-        $signaturePath = $this->fileHandler
-            ->inFolder($transactionNo . "/forwardedSignatures")
-            ->createFileName($uuid, $userId, '.png')
-            ->saveSignature($validated['signature']);
+        // $signaturePath = $this->fileHandler
+        //     ->inFolder($transactionNo . "/forwardedSignatures")
+        //     ->createFileName($uuid, $userId, '.png')
+        //     ->saveSignature($validated['signature']);
 
-        $imagePath = $this->fileHandler
-            ->inFolder($transactionNo . "/forwardedImages")
-            ->createFileName($uuid, $userId, '.png')
-            ->saveFile($validated['file']);
+        // $imagePath = $this->fileHandler
+        //     ->inFolder($transactionNo . "/forwardedImages")
+        //     ->createFileName($uuid, $userId, '.png')
+        //     ->saveFile($validated['file']);
 
         return (object) [
-            'signaturePath' => $signaturePath,
-            'imagePath' => $imagePath
+            'signaturePath' => '$signaturePath',
+            'imagePath' => '$imagePath'
         ];
     }
 }

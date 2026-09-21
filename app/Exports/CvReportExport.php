@@ -72,46 +72,56 @@ class CvReportExport implements FromCollection, WithHeadings, WithTitle, ShouldA
             ->when(
                 !empty($this->data['date']),
                 fn($query) =>
-                $query->whereDate('created_at', $this->data['date'])
+                    $query->whereDate('created_at', $this->data['date'])
+            )
+            ->when(
+                (!empty($this->data['filter'])) && ($this->data['filter'] != 'all'),
+                function ($query) {
+                    if ($this->data['filter']) {
+                        $query->where('is_closed', 1);
+                        return;
+                    }
+                    $query->where('status', $this->data['filter']);
+                }
             )
             ->when(
                 !empty($this->data['status']),
                 fn($query) =>
-                $query->where(function ($q) {
-                    $q->whereHas('chequeForwardedStatus', function ($q) {
-                        $q->whereIn('status', $this->data['status']);
+                    $query->where(function ($q) {
+                        $q->whereHas('chequeForwardedStatus', function ($q) {
+                            $q->whereIn('status', $this->data['status']);
+                        })
+                            ->orWhere(function ($q) {
+                                $q->whereDoesntHave('chequeForwardedStatus')
+                                    ->whereIn('status', $this->data['status']);
+                            });
                     })
-                        ->orWhere(function ($q) {
-                            $q->whereDoesntHave('chequeForwardedStatus')
-                                ->whereIn('status', $this->data['status']);
-                        });
-                })
             )
             ->when(
                 !empty($this->data['bu']),
                 fn($outerQuery) =>
-                $outerQuery->whereHasMorph(
-                    'checkable',
-                    [Cv::class, Crf::class],
-                    function (Builder $query) {
-                        $query->whereHas('businessUnit.company', function (Builder $query) {
-                            $query->whereIn('name', $this->data['bu']);
-                        });
-                    }
-                )
+                    $outerQuery->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        function (Builder $query) {
+                            $query->whereHas('businessUnit.company', function (Builder $query) {
+                                $query->whereIn('name', $this->data['bu']);
+                            });
+                        }
+                    )
             )
             ->when(
                 !empty($this->data['location']),
                 fn($outerQuery) =>
-                $outerQuery->whereHasMorph(
-                    'checkable',
-                    [Cv::class, Crf::class],
-                    function (Builder $query) {
-                        $query->whereHas('tagLocation', function (Builder $query) {
-                            $query->whereIn('location', $this->data['location']);
-                        });
-                    }
-                )
+                    $outerQuery->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        function (Builder $query) {
+                            $query->whereHas('tagLocation', function (Builder $query) {
+                                $query->whereIn('location', $this->data['location']);
+                            });
+                        }
+                    )
             )
             ->get();
     }
