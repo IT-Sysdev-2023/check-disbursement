@@ -1,4 +1,3 @@
-
 import { Chip } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
@@ -54,17 +53,13 @@ export const eodColumns = (): GridColDef[] => [
         flex: 1,
         renderCell: ({ row }) => {
             const { status } = row;
-            
+
             const statusMap: Record<
                 string,
                 {
                     label: string;
                     color:
-                        | 'default'
-                        | 'primary'
-                        | 'success'
-                        | 'warning'
-                        | 'error';
+                        'default' | 'primary' | 'success' | 'warning' | 'error';
                 }
             > = {
                 closed: { label: 'Closed', color: 'primary' },
@@ -76,10 +71,16 @@ export const eodColumns = (): GridColDef[] => [
             };
 
             return (
-                <Chip
-                    label={statusMap[status]?.label || 'For Releasing'}
-                    color={statusMap[status]?.color || 'default'}
-                />
+                <>
+                    <Chip
+                        label={statusMap[status]?.label || 'For Releasing'}
+                        color={statusMap[status]?.color || 'default'}
+                    />
+                    {row.isClosed == 1 && <Chip
+                        label='Closed'
+                        color='error'
+                    />}
+                </>
             );
         },
     },
