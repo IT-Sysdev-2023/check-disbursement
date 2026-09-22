@@ -24,6 +24,7 @@ import {
     notifications,
     report,
     retrievedRecords,
+    scannedDocuments,
     users,
 } from '@/routes';
 import { SharedData, type NavItem } from '@/types';
@@ -134,6 +135,15 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'CV/ CRF List',
                           href: closingCheque(),
+                          icon: BookmarkX,
+                      },
+                  ]
+                : []),
+            ...(isAdmin || closingOfficer
+                ? [
+                      {
+                          title: 'Scanned Documents',
+                          href: scannedDocuments(),
                           icon: BookmarkX,
                       },
                   ]

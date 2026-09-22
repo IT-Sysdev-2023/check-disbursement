@@ -176,6 +176,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('mark-close/{id}', [ClosingController::class, 'close'])->name('mark-as-close');
 
         Route::post('submit-documents/', [ClosingController::class, 'submitDocuments'])->name('submit-documents');
+        Route::get('scanned-documents', [ClosingController::class, 'scannedDocuments'])->name('scanned-documents');
+        Route::get('document-images', [ClosingController::class, 'documentImages'])->name('document-images');
+        Route::get(
+            '/cheques/{id}/{chequeNumber}/documents/{filename}',
+            [ClosingController::class, 'document']
+        )->name('cheques.document'); //DONT REMOVE THIS ITS THE SOURCE OF SUPPORTING DOCUMENTS
+
     });
 
     Route::get('cheque-status', [StatusController::class, 'chequeStatus'])->name('cheque-status');

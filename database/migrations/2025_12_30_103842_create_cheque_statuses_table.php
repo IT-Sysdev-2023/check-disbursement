@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('received_by')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete(); //this is for check_forward_statuses
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->boolean('is_closed')->default(false);
+            $table->boolean('has_document')->default(false);
 
             $table->morphs('checkable');
             $table->unique(['checkable_id', 'checkable_type']);

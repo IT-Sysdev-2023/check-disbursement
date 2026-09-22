@@ -6,6 +6,7 @@ use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Models\ChequeStatus;
 use App\Services\PermissionService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +27,7 @@ class ClosingService
 
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
-            ->where('is_closed', false)
+            ->where(['is_closed' => false, 'has_document' => 0])
             ->whereNot('status', 'cancel')
             ->where(function ($query) {
                 $query->where(function ($q) {
@@ -96,20 +97,95 @@ class ClosingService
 
     public function documents($chequeNumber, $id)
     {
-        $disk = Storage::disk('cheque_share');
-        $destination = "Documents/{$chequeNumber}-{$id}";
+        try {
+            $disk = Storage::disk('cheque_share');
+            $destination = "Documents/{$chequeNumber}-{$id}";
 
-        $disk->makeDirectory($destination);
+            $disk->makeDirectory($destination);
 
-        foreach ($disk->files('Pending Documents') as $file) {
-            $filename = basename($file);
+            foreach ($disk->files('Pending Documents') as $file) {
+                $filename = basename($file);
 
-            $disk->move(
-                $file,
-                "{$destination}/{$filename}"
-            );
+                $disk->move(
+                    $file,
+                    "{$destination}/{$filename}"
+                );
+            }
+            ChequeStatus::findOrFail($id)->update(['has_document' => 1]);
+            return response()->json(['status' => 'success', 'message' => "Files Successfully Assigned to $chequeNumber"]);
+        } catch (Exception $e) {
+
         }
 
-        return response()->json(['status' => 'success', 'message' => "Files Successfully Assigned to $chequeNumber"]);
+    }
+
+    public function scannedDocuments()
+    {
+        //  $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
+
+        $cheques = ChequeStatus::
+            with(['checkable' => ['borrowedCheque', 'tagLocation']])
+            ->where(['is_closed' => 1, 'has_document' => 1])
+            ->whereNot('status', 'cancel')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('status', 'forwarded')
+                        ->has('chequeForwardedStatus');
+                })
+                    ->orWhere('status', '!=', 'forwarded');
+            })
+            ->orderByDesc('created_at')
+            ->paginate(10)
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('scannedCheques', [
+            'cheques' => $cheques,
+            'filter' => (object) [
+                'selectedBu' => $filters['bu'] ?? '0',
+                'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ]
+            ],
+        ]);
+    }
+
+    public function documentImages($id, $chequeNumber)
+    {
+        $disk = Storage::disk('cheque_share');
+
+        $folderName = "Documents/{$chequeNumber}-{$id}";
+
+        $files = $disk->files($folderName);
+
+        $images = collect($files)
+            ->map(function ($file) use ($id, $chequeNumber) {
+                return [
+                    'name' => basename($file),
+                    'url' => route('cheques.document', [
+                        'id' => $id,
+                        'chequeNumber' => $chequeNumber,
+                        'filename' => basename($file),
+                    ]),
+                ];
+            })
+            ->values();
+
+        return response()->json([
+            'images' => $images,
+        ]);
+    }
+
+    public function document($id, $chequeNumber, $filename)
+    {
+        $disk = Storage::disk('cheque_share');
+
+        $path = "Documents/{$chequeNumber}-{$id}/{$filename}";
+
+        abort_unless($disk->exists($path), 404);
+
+        return $disk->response($path);
     }
 }
