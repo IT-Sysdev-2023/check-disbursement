@@ -24,6 +24,7 @@ import {
     ListItemIcon,
     ListItemText,
     ListSubheader,
+    Paper,
     Stack,
     Typography,
 } from '@mui/material';
@@ -241,11 +242,13 @@ export default function ExtractCrf({
                         >
                             "This File Upload is Intended for Head Office Only"
                         </Typography>
-                       {totalInserted !== 0 &&  <Typography
-                            variant="h6" // makes it larger than "caption"
-                        >
-                            Total Files: {totalInserted}
-                        </Typography> }
+                        {totalInserted !== 0 && (
+                            <Typography
+                                variant="h6" // makes it larger than "caption"
+                            >
+                                Total Files: {totalInserted}
+                            </Typography>
+                        )}
                         {loading && !progress && (
                             <Typography
                                 variant="h6" // makes it larger than "caption"
@@ -255,45 +258,85 @@ export default function ExtractCrf({
                         )}
                         {files.length > 0 && !loading && (
                             <>
-                                <List
-                                    sx={{ mt: 2, width: '100%', maxWidth: 360 }}
+                                <Box
+                                    sx={{
+                                        mt: 2,
+                                        width: '100%',
+                                        display: 'grid',
+                                        gridTemplateColumns: {
+                                            xs: '1fr',
+                                            sm: 'repeat(2, 1fr)',
+                                            md: 'repeat(3, 1fr)',
+                                            lg: 'repeat(4, 1fr)',
+                                        },
+                                        gap: 1.5,
+                                    }}
                                 >
                                     {files.map((file, index) => (
-                                        <ListItem
+                                        <Paper
                                             key={index}
-                                            secondaryAction={
-                                                <IconButton
-                                                    edge="end"
-                                                    aria-label="delete"
-                                                    color="error"
-                                                    onClick={() =>
-                                                        setFiles((prev) =>
-                                                            prev.filter(
-                                                                (_, i) =>
-                                                                    i !== index,
-                                                            ),
-                                                        )
-                                                    }
-                                                >
-                                                    <Trash />
-                                                </IconButton>
-                                            }
+                                            variant="outlined"
+                                            sx={{
+                                                p: 1.5,
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1.5,
+                                                minWidth: 0,
+                                            }}
                                         >
-                                            <ListItemIcon>
-                                                <InsertDriveFileIcon color="action" />
-                                            </ListItemIcon>
-                                            <ListItemText
-                                                primary={file.name}
-                                                secondary={`${(file.size / 1024).toFixed(1)} KB`}
+                                            <InsertDriveFileIcon
+                                                color="action"
+                                                sx={{ flexShrink: 0 }}
                                             />
-                                        </ListItem>
+
+                                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                                                <Typography
+                                                    variant="body2"
+                                                    fontWeight={500}
+                                                    noWrap
+                                                    title={file.name}
+                                                >
+                                                    {file.name}
+                                                </Typography>
+
+                                                <Typography
+                                                    variant="caption"
+                                                    color="text.secondary"
+                                                >
+                                                    {(file.size / 1024).toFixed(
+                                                        1,
+                                                    )}{' '}
+                                                    KB
+                                                </Typography>
+                                            </Box>
+
+                                            <IconButton
+                                                size="small"
+                                                color="error"
+                                                aria-label={`Delete ${file.name}`}
+                                                onClick={() =>
+                                                    setFiles((prev) =>
+                                                        prev.filter(
+                                                            (_, i) =>
+                                                                i !== index,
+                                                        ),
+                                                    )
+                                                }
+                                                sx={{ flexShrink: 0 }}
+                                            >
+                                                <Trash size={18} />
+                                            </IconButton>
+                                        </Paper>
                                     ))}
-                                </List>
+                                </Box>
 
                                 <Button
                                     variant="contained"
                                     size="large"
-                                    sx={{ minWidth: 'fit-content' }}
+                                    sx={{
+                                        mt: 2,
+                                        minWidth: 'fit-content',
+                                    }}
                                     onClick={simulateDataRetrieval}
                                 >
                                     Get Data
