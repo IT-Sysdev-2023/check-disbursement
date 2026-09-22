@@ -8,6 +8,7 @@ use App\Models\ChequeStatus;
 use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ClosingService
@@ -19,13 +20,9 @@ class ClosingService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
+        $disk = Storage::disk('cheque_share');
 
-        // $cheques = ChequeStatus::
-        //     with(['checkable' => ['borrowedCheque', 'tagLocation']])
-        //     ->where('is_closed', false)
-        //     ->whereNot('status', 'cancel')
-        //     ->has('chequeForwardedStatus')
-        //     ->get();
+        $files = $disk->files('Pending Documents');
 
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
@@ -34,9 +31,9 @@ class ClosingService
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->where('status', 'forwarded')
-                    ->has('chequeForwardedStatus');
+                        ->has('chequeForwardedStatus');
                 })
-                ->orWhere('status', '!=', 'forwarded');
+                    ->orWhere('status', '!=', 'forwarded');
             })
             ->filter($filters)
             ->orderByDesc('created_at')
@@ -44,7 +41,6 @@ class ClosingService
             ->withQueryString()
             ->toResourceCollection();
 
-        // dd($cheques);
         return Inertia::render('cvCrfList', [
             'cheques' => $cheques,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
@@ -56,6 +52,7 @@ class ClosingService
                     'end' => null
                 ]
             ],
+            'totalDocuments' => count($files),
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
                 'value' => '0'
@@ -95,5 +92,24 @@ class ClosingService
 
         return redirect()->back()->with(['status' => true, 'stream' => $stream]);
 
+    }
+
+    public function documents($chequeNumber, $id)
+    {
+        $disk = Storage::disk('cheque_share');
+        $destination = "Documents/{$chequeNumber}-{$id}";
+
+        $disk->makeDirectory($destination);
+
+        foreach ($disk->files('Pending Documents') as $file) {
+            $filename = basename($file);
+
+            $disk->move(
+                $file,
+                "{$destination}/{$filename}"
+            );
+        }
+
+        return response()->json(['status' => 'success', 'message' => "Files Successfully Assigned to $chequeNumber"]);
     }
 }

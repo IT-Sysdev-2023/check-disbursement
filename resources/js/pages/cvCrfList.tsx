@@ -1,8 +1,9 @@
+import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { markAsClose } from '@/routes';
+import { markAsClose, submitDocuments } from '@/routes';
 import {
     ChequeStatus,
     ClosingCheckDetailsType,
@@ -13,7 +14,18 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { Box, Button, Grid, Modal, Typography } from '@mui/material';
+import {
+    Box,
+    Button,
+    Grid,
+    IconButton,
+    Modal,
+    TextField,
+    Tooltip,
+    Typography,
+} from '@mui/material';
+import axios from 'axios';
+import { RefreshCwIcon } from 'lucide-react';
 import { useState } from 'react';
 import { createClosingCvColumns } from './closing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
@@ -39,6 +51,7 @@ export default function CvCrfList({
     cheques,
     company,
     filter,
+    totalDocuments,
 }: {
     cheques: InertiaPagination<ChequeStatus>;
     company: SelectionType[];
@@ -48,6 +61,7 @@ export default function CvCrfList({
         search: string;
         date: DateFilterType;
     };
+    totalDocuments: number;
 }) {
     const [openModal, setOpenModal] = useState(false);
     const [recordDetails, setRecordDetails] =
@@ -65,28 +79,25 @@ export default function CvCrfList({
     };
     const handleMarkClose = () => {
         try {
-             if (recordDetails)
-            router.post(
-                markAsClose(recordDetails.id),
-                {},
-                {
-                    onSuccess: ({ props }) => {
-                        const m = props.flash as FlashReponse;
+            if (recordDetails)
+                router.post(
+                    markAsClose(recordDetails.id),
+                    {},
+                    {
+                        onSuccess: ({ props }) => {
+                            const m = props.flash as FlashReponse;
 
-                        setOpenModal(false);
-                        if (m.status) {
-                            setStream(m.stream);
-                            setOpenModalPdf(true);
-                        }
-
-                      
+                            setOpenModal(false);
+                            if (m.status) {
+                                setStream(m.stream);
+                                setOpenModalPdf(true);
+                            }
+                        },
                     },
-                },
-            );
+                );
         } finally {
             setOpenScan(true);
         }
-       
     };
 
     const columns = createClosingCvColumns(handleStatusChange);
@@ -95,6 +106,24 @@ export default function CvCrfList({
 
     const handleCloseScan = () => setOpenScan(false);
 
+    const handleRefreshTotalFiles = () => {
+        router.reload({ only: ['totalDocuments'] });
+    };
+    const notifications = useNotifications();
+    const handleGetFiles = async () => {
+        const { data } = await axios.post(submitDocuments().url, {
+            chequeNumber: recordDetails?.checkNo,
+            id: recordDetails?.id
+        });
+
+        if (data.status === 'success') {
+            notifications.show(data.message, {
+                severity: 'success',
+                autoHideDuration: 3000,
+            });
+            setOpenScan(false);
+        }
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -198,7 +227,12 @@ export default function CvCrfList({
 
             <Modal
                 open={openScan}
-                onClose={handleCloseScan}
+                onClose={(event, reason) => {
+                    if (reason === 'backdropClick') {
+                        return;
+                    }
+                    handleCloseScan();
+                }}
                 aria-labelledby="scan-modal-title"
             >
                 <Box
@@ -225,18 +259,50 @@ export default function CvCrfList({
 
                     <Box
                         sx={{
-                            height: 300,
-                            border: '2px dashed',
-                            borderColor: 'divider',
-                            borderRadius: 2,
                             display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
+                            gap: 2,
+                            mb: 2,
                         }}
                     >
-                        <Typography color="text.secondary">
-                            Scan area
-                        </Typography>
+                        <TextField
+                            label="Cheque Number"
+                            value={recordDetails?.checkNo}
+                            size="small"
+                            disabled
+                            fullWidth
+                        />
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                minWidth: 160,
+                                px: 2,
+                                borderRadius: 1,
+                                bgcolor: 'action.hover',
+                            }}
+                        >
+                            <Box sx={{ flexGrow: 1 }}>
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Total Files
+                                </Typography>
+                                <Typography variant="body1" fontWeight={600}>
+                                    {totalDocuments}
+                                </Typography>
+                            </Box>
+                            <Tooltip title="Refresh">
+                                <IconButton
+                                    size="small"
+                                    onClick={handleRefreshTotalFiles}
+                                >
+                                    <RefreshCwIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        </Box>
                     </Box>
 
                     <Box
@@ -247,9 +313,11 @@ export default function CvCrfList({
                             mt: 3,
                         }}
                     >
-                        <Button onClick={handleCloseScan}>Cancel</Button>
+                        {/* <Button onClick={handleCloseScan}>Cancel</Button> */}
 
-                        <Button variant="contained">Start Scan</Button>
+                        <Button variant="contained" onClick={handleGetFiles}>
+                            Get Files
+                        </Button>
                     </Box>
                 </Box>
             </Modal>

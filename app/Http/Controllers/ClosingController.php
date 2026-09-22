@@ -16,11 +16,19 @@ class ClosingController extends Controller
     {
         return $this->service->index($request);
     }
-
-
     public function close(ChequeStatus $id)
     {
         return $this->service->close($id);
 
+    }
+
+    public function submitDocuments(Request $request)
+    {
+        $request->validate([
+            'chequeNumber' => 'required',
+            'id' => 'required'
+        ]);
+
+        return $this->service->documents($request->chequeNumber, $request->id);
     }
 }

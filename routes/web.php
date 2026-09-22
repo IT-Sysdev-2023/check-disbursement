@@ -174,6 +174,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('closing-cheque')->group(function () {
         Route::get('index', [ClosingController::class, 'index'])->name('closing-cheque');
         Route::post('mark-close/{id}', [ClosingController::class, 'close'])->name('mark-as-close');
+
+        Route::post('submit-documents/', [ClosingController::class, 'submitDocuments'])->name('submit-documents');
     });
 
     Route::get('cheque-status', [StatusController::class, 'chequeStatus'])->name('cheque-status');
