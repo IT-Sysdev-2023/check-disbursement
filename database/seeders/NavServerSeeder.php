@@ -17,7 +17,7 @@ class NavServerSeeder extends Seeder
     {
         $servers = [
             [
-                'name' => '172.16.161.11',
+                'host' => '172.16.161.11',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -25,7 +25,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.161.7',
+                'host' => '172.16.161.7',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -33,7 +33,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.98.215',
+                'host' => '172.16.98.215',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -41,7 +41,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.217.112',
+                'host' => '172.16.217.112',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -49,7 +49,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.220.2',
+                'host' => '172.16.220.2',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -57,7 +57,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.161.123',
+                'host' => '172.16.161.123',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -65,7 +65,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.161.127',
+                'host' => '172.16.161.127',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -73,7 +73,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.104.1',
+                'host' => '172.16.104.1',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -81,7 +81,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.192.4',
+                'host' => '172.16.192.4',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -89,7 +89,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.192.1',
+                'host' => '172.16.192.1',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
@@ -97,7 +97,7 @@ class NavServerSeeder extends Seeder
                 'updated_at' => now()
             ],
             [
-                'name' => '172.16.105.11',
+                'host' => '172.16.105.11',
                 'username' => 'super',
                 'password' => 'fsasya1941',
                 'port' => '1433',
