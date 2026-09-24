@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
             $table->string('module');
+            $table->boolean('status')->default(1);
             $table->timestamps();
         });
     }
