@@ -567,6 +567,6 @@ class NavCpSeeder extends Seeder
 
         ];
 
-        DB::table('nav_check_payment_tables')->insert($cp);
+        DB::table('nav_cheque_payment_tables')->insert($cp);
     }
 }
