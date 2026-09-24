@@ -1,6 +1,6 @@
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
-import { retrievedRecords, viewScannedCheques } from '@/routes';
+import { retrievedRecords, scanAnalyze, viewScannedCheques } from '@/routes';
 import { Head, router, usePage } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -199,7 +199,7 @@ export default function ScanCheques({ files }: int) {
 
         try {
             const { data } = await axios.post(
-                '/retrieved-checks/scan-analyze/',
+                scanAnalyze().url,
                 {
                     scanMethod: selectedChoice,
                     supplierName: inputValue
