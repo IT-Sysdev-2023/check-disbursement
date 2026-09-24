@@ -21,6 +21,7 @@ class NavConnection
     protected static array $cache = [];
     public function setConnection(NavServer $server, string $database)
     {
+       
         $key = "{$server->host}_{$database}";
         if (!isset(self::$cache[$key])) {
             $connectionName = 'nav_' . $key;
@@ -34,8 +35,11 @@ class NavConnection
                 'password' => $server->password,
                 'charset' => 'utf8',
                 'prefix' => '',
+                'encrypt' => 'yes',
                 'trust_server_certificate' => true,
-                'odbc_driver' => 'ODBC Driver 17 for SQL Server',
+                'options' => [
+                    'Driver' => 'ODBC Driver 17 for SQL Server',
+                ],
             ];
 
             // Apply configuration to the runtime
