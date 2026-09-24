@@ -108,8 +108,9 @@ return [
             'charset' => env('DB_CHARSET', 'utf8'),
             'prefix' => '',
             'prefix_indexes' => true,
-            // 'encrypt' => env('DB_ENCRYPT_CAF', 'yes'),
+            'encrypt' => 'yes',
             'trust_server_certificate' => true,
+            'odbc_driver' => 'ODBC Driver 17 for SQL Server',
         ],
 
     ],

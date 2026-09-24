@@ -35,6 +35,7 @@ class NavConnection
                 'charset' => 'utf8',
                 'prefix' => '',
                 'trust_server_certificate' => true,
+                'odbc_driver' => 'ODBC Driver 17 for SQL Server',
             ];
 
             // Apply configuration to the runtime
