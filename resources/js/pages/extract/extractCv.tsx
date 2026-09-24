@@ -92,7 +92,7 @@ export default function ExtractCv({
             },
         });
 
-        if(res.data.status === 'error') {
+        if (res.data.status === 'error') {
             alert(res.data.message);
             setLoading(false);
             return;
@@ -272,7 +272,13 @@ export default function ExtractCv({
                                     <Alert
                                         variant="filled"
                                         severity="error"
-                                        sx={{ mb: 2 }}
+                                        sx={{
+                                            mb: 2,
+                                            '&.MuiAlert-filledError': {
+                                                backgroundColor: '#D32F2F',
+                                                color: '#FFFFFF',
+                                            },
+                                        }}
                                     >
                                         {item.message}
                                     </Alert>
