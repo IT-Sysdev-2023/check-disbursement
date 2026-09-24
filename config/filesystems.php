@@ -65,10 +65,10 @@ return [
             'report' => false,
         ],
 
-        'cheque_share' => PHP_OS_FAMILY === 'Windows'
+        'cheque_share' => env('APP_ENV') === 'production'
             ? [
                 'driver' => 'local',
-                'root' => '/home/ken/Documents/checkscanned'
+                'root' => 'E:/ChequeDocuments/ChequeScanner',
             ]
             : [
                 'driver' => 'smb',
@@ -78,6 +78,19 @@ return [
                 'password' => env('SMB_PASSWORD'),
                 'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
             ],
+        // 'cheque_share' => PHP_OS_FAMILY === 'Windows'
+        //     ? [
+        //         'driver' => 'local',
+        //         'root' => '/home/ken/Documents/checkscanned'
+        //     ]
+        //     : [
+        //         'driver' => 'smb',
+        //         'host' => '172.16.42.91',
+        //         'path' => 'scanned',
+        //         'username' => env('SMB_USERNAME'),
+        //         'password' => env('SMB_PASSWORD'),
+        //         'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
+        //     ],
 
     ],
 
