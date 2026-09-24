@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('nav_check_payment_tables', function (Blueprint $table) {
+        Schema::create('nav_cheque_payment_tables', function (Blueprint $table) {
             $table->id();
             $table->foreignId('nav_database_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
@@ -24,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('nav_check_payment_tables');
+        Schema::dropIfExists('nav_cheque_payment_tables');
     }
 };
