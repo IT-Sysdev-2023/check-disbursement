@@ -89,12 +89,12 @@ class ScannedRecordsController extends Controller
             $count++;
             ProcessChequeJob::dispatch(
                 $request->scanMethod,
-                $request->supplierName,
                 $item,
                 Auth::user()->id,
                 $count,
                 $referenceBatch,
-                $totalBatches
+                $totalBatches,
+                $request->input('supplierName'),
             );
             ScanningChequesEvent::dispatch(
                 'Scanning cheques please wait...',

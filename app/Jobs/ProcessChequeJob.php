@@ -26,12 +26,12 @@ class ProcessChequeJob implements ShouldQueue
 
     public function __construct(
         public string $scanMethod,
-        public string $supplierName,
         public string $imagePath,
         public int $id,
         public int $count,
         public string $referenceBatch,
-        public int $totalcount
+        public int $totalcount,
+        public ?string $supplierName = null,
     ) {
     }
     public $tries = 5;
@@ -92,7 +92,10 @@ class ProcessChequeJob implements ShouldQueue
                     })
                         ->where('cheque_amount', $amount);
                 }
-            )->whereNotNull(['approved_at', 'approver_id'])->value('id');
+            )->whereNotNull(['approved_at', 'approver_id'])
+                ->whereDoesntHave('scannedRecord')
+                ->orderBy('id')
+                ->value('id');
 
             if ($borrowedIChequeId) {
 
@@ -116,6 +119,7 @@ class ProcessChequeJob implements ShouldQueue
                     'cheque_date' => Carbon::createFromFormat('m-d-Y', $data['date']) ?? null,
                     'bank_account_name' => $data['bank_name'] ?? null,
                     'caused_by' => $this->id,
+                    'doc_filename' => basename($this->imagePath)
                 ]);
                 ScannedRecordEvent::dispatch($result, $this->id);
             }
