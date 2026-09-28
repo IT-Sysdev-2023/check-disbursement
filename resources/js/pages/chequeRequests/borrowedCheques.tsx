@@ -37,10 +37,12 @@ type FormData = {
 export default function BorrowedCheques({
     cheques,
     approvers,
+    borrowerId,
     filter,
 }: {
     cheques: InertiaPagination<Borrower>;
     approvers: SelectionType[];
+    borrowerId: number;
     filter: {
         selectedBu: string;
         search: string;
@@ -59,7 +61,6 @@ export default function BorrowedCheques({
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const id = Array.from(model.ids);
-
         setData({
             borrowedNo: id,
             type: model.type,
@@ -71,6 +72,7 @@ export default function BorrowedCheques({
 
         transform((data) => ({
             ...data,
+            borrowerId: borrowerId,
             approver: selectedApprover,
         }));
 

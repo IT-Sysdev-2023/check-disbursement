@@ -63,13 +63,14 @@ class ChequeRequestService
                 Rule::requiredIf(fn() => $request->type === 'include'),
             ],
             'approver' => ['required', 'integer'],
+            'borrowerId' => ['required', 'integer']
         ]);
         $ids = $request->borrowedNo ?? [];
 
         $isSuccess = BorrowedCheque::
             when(
                 $request->type == 'exclude',
-                fn($q) => $q->whereNotIn('id', $ids)
+                fn($q) => $q->where('borrower_no', $request->borrowerId)
                 ,
                 fn($q) => $q->whereIn('id', $ids)
             )
@@ -102,6 +103,7 @@ class ChequeRequestService
         return Inertia::render('chequeRequests/borrowedCheques', [
             'cheques' => $record,
             'approvers' => $selection,
+            'borrowerId' => $id,
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
