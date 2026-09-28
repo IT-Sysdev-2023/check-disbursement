@@ -84,12 +84,19 @@ export default function TableView({
         );
 
         const currentSelections = cheques.data
-            .filter((row) => model.ids.has(row.id))
+            .filter((row) => {
+                if (model.type === 'include') {
+                    return model.ids.has(row.id);
+                }
+
+                // MUI exclude model:
+                // everything is selected except IDs in model.ids
+                return !model.ids.has(row.id);
+            })
             .map((row) => ({
                 id: row.id,
                 chequeId: row.chequeId,
                 type: row.type,
-
                 borrowedChequeId: row.borrowedChequeId,
                 amount: row.amount,
                 chequeDate: row.chequeDate,
