@@ -21,9 +21,9 @@ class ClosingService
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
 
-        $disk = Storage::disk('cheque_share');
+        $disk = Storage::disk('cheque_doc');
 
-        $files = $disk->files('Pending Documents');
+        $files = $disk->files('new');
 
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
@@ -98,12 +98,12 @@ class ClosingService
     public function documents($chequeNumber, $id)
     {
         try {
-            $disk = Storage::disk('cheque_share');
-            $destination = "Documents/{$chequeNumber}-{$id}";
+            $disk = Storage::disk('cheque_doc');
+            $destination = "scanned/{$chequeNumber}-{$id}";
 
             $disk->makeDirectory($destination);
 
-            foreach ($disk->files('Pending Documents') as $file) {
+            foreach ($disk->files('new') as $file) {
                 $filename = basename($file);
 
                 $disk->move(
@@ -154,9 +154,9 @@ class ClosingService
 
     public function documentImages($id, $chequeNumber)
     {
-        $disk = Storage::disk('cheque_share');
+        $disk = Storage::disk('cheque_doc');
 
-        $folderName = "Documents/{$chequeNumber}-{$id}";
+        $folderName = "scanned/{$chequeNumber}-{$id}";
 
         $files = $disk->files($folderName);
 
@@ -180,9 +180,9 @@ class ClosingService
 
     public function document($id, $chequeNumber, $filename)
     {
-        $disk = Storage::disk('cheque_share');
+        $disk = Storage::disk('cheque_doc');
 
-        $path = "Documents/{$chequeNumber}-{$id}/{$filename}";
+        $path = "scanned/{$chequeNumber}-{$id}/{$filename}";
 
         abort_unless($disk->exists($path), 404);
 
