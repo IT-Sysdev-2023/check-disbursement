@@ -28,7 +28,8 @@ class ChequeResource extends JsonResource
         }
 
         return [
-            'id' => $this->cheque_id,
+            'id' => "{$this->type}-{$this->cheque_id}",
+            'cvNo' => $this->cv_no,
             'chequeId' => $this->cheque_id,
             'chequeNumber' => $this->cheque_number,
             'borrowedCheckId' => optional($this)->borrowedCheckId,

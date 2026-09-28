@@ -17,10 +17,11 @@ class CrfHelper
     private string $paidTo;
     private string $company;
     private ?string $location;
-    private ?Carbon $date;
+    private ?Carbon $crfDate;
+    private ?Carbon $chequeDate;
     private ?float $amount;
     private ?string $particular;
-    private ?string $crf;
+    private ?string $crfNo;
     private string $bank;
     private ?int $ckNo;
     private string $preparedBy;
@@ -68,11 +69,11 @@ class CrfHelper
         return $this;
     }
 
-    public function extractDate()
+    public function extractCrfDate()
     {
         // Extract date (e.g., "Date: 11/06/2025" or "Date : 11/06/2025")
         preg_match('/Date\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/', $this->fileContents, $dateMatches);
-        $this->date = Date::parse($dateMatches[1]);
+        $this->crfDate = Date::parse($dateMatches[1]);
 
         return $this;
     }
@@ -130,7 +131,7 @@ class CrfHelper
         //Extract CRF# in Particular
         preg_match('/CRF#?(\d+)/', $this->particular, $match);
 
-        $this->crf = $match[0];
+        $this->crfNo = $match[0];
         return $this;
     }
 
@@ -145,9 +146,20 @@ class CrfHelper
 
     public function extractCkNo()
     {
-        // Extract Ck #
-        preg_match('/Ck\s*#\s*:\s*(\d+)/', $this->fileContents, $ckMatches);
-        $this->ckNo = Number::parseInt($ckMatches[1]);
+        // Extract Ck # and Check Date
+        preg_match(
+            '/Ck\s*#\s*:\s*(\d+)\s*\/\s*(?:(\d{2}\/\d{2}\/\d{4}))?/',
+            $this->fileContents,
+            $matches
+        );
+
+        $this->ckNo = isset($matches[1])
+            ? Number::parseInt($matches[1])
+            : null;
+
+        $this->chequeDate = isset($matches[2])
+            ? Date::parse($matches[2])
+            : null;
 
         return $this;
     }
@@ -165,18 +177,19 @@ class CrfHelper
     {
 
 
-        $extractedCompany = explode(' ', $this->company);
+        // $extractedCompany = explode(' ', $this->company);
         // $companyId = Company::whereIn('name', $extractedCompany)->first()->id;
         // $companyId = 
         return [
             'causer_id' => $userId,
             'filename' => $this->filename,
-            'crf' => $this->crf,
+            'crf_no' => $this->crfNo,
+            'crf_date' => $this->crfDate,
             'business_unit_id' => 91, // HO
             'company_office' => $this->company,
             'no' => $this->no,
             'crf_location' => $this->location,
-            'cheque_date' => $this->date,
+            'cheque_date' => $this->chequeDate,
             'bank' => $this->bank,
             'cheque_number' => $this->ckNo,
             'prepared_by' => $this->preparedBy,
@@ -193,9 +206,11 @@ class CrfHelper
     {
         return $records->every(function ($item) use ($bu) {
             return (!empty($item['company_office']) && !empty($item['no'])
-                && !empty($item['crf_location']) && !empty($item['cheque_date'])
+                && !empty($item['crf_location'])
+                // && !empty($item['cheque_date'])
                 && !empty($item['bank']) && !empty($item['cheque_number'])
-                && !empty($item['prepared_by']) && !empty($item['payee'])
+                // && !empty($item['prepared_by']) 
+                && !empty($item['payee'])
                 && !empty($item['cheque_amount']) && !empty($item['particulars']))
                 // &&
                 // (Str::contains($item['company_office'], $bu, ignoreCase: true))

@@ -14,7 +14,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('filename');
-            $table->string('crf')->nullable();
+            $table->string('crf_no')->nullable();
+            $table->date('crf_date')->nullable();
             $table->string('cheque_number');
             $table->decimal('cheque_amount', 20);
             $table->date('cheque_date')->nullable();

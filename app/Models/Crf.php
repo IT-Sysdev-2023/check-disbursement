@@ -58,7 +58,7 @@ class Crf extends Model
     {
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->whereAny([
-                'crfs.crf',
+                'crfs.crf_no',
                 'crfs.company_office',
                 'crfs.no',
                 'crfs.payee',
@@ -111,6 +111,7 @@ class Crf extends Model
             'business_units.name as bu_name',
             'crfs.cheque_amount',
             'crfs.payee',
+            'crfs.crf_no as cv_no',
             'tagged_at',
             'tag_locations.location',
             DB::raw("'crf' as type"),

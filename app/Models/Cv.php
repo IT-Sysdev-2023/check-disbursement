@@ -97,6 +97,7 @@ class Cv extends Model
             'business_units.name as bu_name',
             'cheque_amount as amount',
             'cvs.payee',
+            'cvs.cv_no',
             'tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),

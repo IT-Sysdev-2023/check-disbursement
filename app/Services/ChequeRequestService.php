@@ -23,6 +23,7 @@ class ChequeRequestService
 
         $borrowedRecords = self::borrowedRecords($filters);
 
+        // dd($borrowedRecords);
         return Inertia::render('checkReceiving', [
             'cheques' => $borrowedRecords,
             'filter' => (object) [

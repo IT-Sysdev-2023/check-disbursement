@@ -36,6 +36,11 @@ export const createChequeColumns = (
     handleStatusChange: (value: ActionType, type: ChequeType) => void,
 ): GridColDef[] => [
     {
+        field: 'cvNo',
+        headerName: 'Cv No',
+        flex: 1,
+    },
+    {
         field: 'chequeNumber',
         headerName: 'Cheque Number',
         flex: 1,

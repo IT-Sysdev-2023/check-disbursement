@@ -26,7 +26,7 @@ return new class extends Migration {
             $table->id();
             $table->string('scan_method')->nullable();
             $table->string('supplier')->nullable();
-            $table->string('batch_reference')->unique();
+            $table->string('batch_reference');
             $table->foreignId('borrowed_cheque_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('bank_account_name')->nullable();
             $table->string('account_number')->nullable();

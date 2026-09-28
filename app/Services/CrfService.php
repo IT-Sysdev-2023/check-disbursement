@@ -33,7 +33,7 @@ class CrfService
         $records = collect();
 
         $files = collect($request->file('files'));
-        // dd($files);
+
         $total = $files->count();
         $start = 1;
 
@@ -61,7 +61,7 @@ class CrfService
             $contentRecords = $helper
                 ->extractNo()
                 ->extractLocation()
-                ->extractDate()
+                ->extractCrfDate()
                 ->extractPaidTo()
                 ->extractParticularsAndAmount()
                 ->extractCrf()
@@ -81,7 +81,6 @@ class CrfService
         if (!$validated) {
             return response()->json(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);
         }
-
         // $isDateValid = $records->every(function ($item) use ($request) {
         //     return $item['date']->between($request->start_date, $request->end_date);
         // });

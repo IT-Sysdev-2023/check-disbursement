@@ -292,7 +292,7 @@ class ChequeService
                     $query->selectRaw(1)
                         ->from('crfs')
                         ->whereRaw("
-                    REPLACE(crfs.crf, '#', '') =
+                    REPLACE(crfs.crf_no, '#', '') =
                     REPLACE(cvs.cv_no, '#', '')
                 ")
                         ->whereColumn('crfs.payee', 'cvs.payee')
@@ -308,13 +308,13 @@ class ChequeService
             $crfQuery->whereNotNull('cheque_date');
         }
 
-        // COMBINE
+        // // COMBINE
         if (($filters['documentType'] ?? null) === 'combine') {
 
             $cvQuery->whereExists(function ($q) {
                 $q->selectRaw('1')
                     ->from('crfs')
-                    ->whereRaw("REPLACE(crfs.crf, '#', '') = REPLACE(cvs.cv_no, '#', '')")
+                    ->whereRaw("REPLACE(crfs.crf_no, '#', '') = REPLACE(cvs.cv_no, '#', '')")
                     ->whereColumn('crfs.payee', 'cvs.payee')
                     ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
                 ;
@@ -323,7 +323,7 @@ class ChequeService
             $crfQuery->whereExists(function ($q) {
                 $q->selectRaw('1')
                     ->from('cvs')
-                    ->whereRaw("REPLACE(cvs.cv_no, '#', '') = REPLACE(crfs.crf, '#', '')")
+                    ->whereRaw("REPLACE(cvs.cv_no, '#', '') = REPLACE(crfs.crf_no, '#', '')")
                     ->whereColumn('crfs.payee', 'cvs.payee')
                     ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
             });
