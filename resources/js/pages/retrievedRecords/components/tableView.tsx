@@ -168,6 +168,8 @@ export default function TableView({
                 onSuccess: () => {
                     setTagLoading(false);
                     setSelectedLocation('');
+                    setSelectedRows([]);
+                    setChequeData(null);
                     setOpenTagModal(false);
                 },
             },
