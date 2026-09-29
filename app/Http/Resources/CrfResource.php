@@ -41,7 +41,7 @@ class CrfResource extends JsonResource
             'particulars' => $this->particulars,
             'amount' => $this->formattedAmount,
             'unformattedAmount' => $this->cheque_amount,
-            'checkNumber' => $this->cheque_number,
+            'chequeNumber' => $this->cheque_number,
             'preparedBy' => $this->prepared_by,
             'taggedAt' => $this->tagged_at,
             'borrowedCheque' => $this->whenLoaded('borrowedCheque'),

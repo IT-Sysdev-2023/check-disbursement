@@ -27,6 +27,14 @@ class Crf extends Model
 
     }
 
+    protected function chequeNumber(): Attribute //temporary change ky mag error ssa resolved
+    {
+        return new Attribute(
+            get: fn($value, $attributes) =>
+                $attributes['cheque_number'] ?? $attributes['resolved_cheque_number'] ?? null,
+        );
+    }
+
     protected function chequeDate(): Attribute
     {
         return new Attribute(
@@ -86,18 +94,18 @@ class Crf extends Model
             // ->when(($filters['bankAccount'] ?? null) && $filters['bankAccount'] != 'all', function ($query) use ($filters) {
             //     $query->where('bank_account_no', $filters['bankAccount']);
             // });
-        // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
-        //     $field = Str::snake($sort['field']);
-        //     $direction = $sort['sort'];
+            // ->when($filters['sort'] ?? null, function (Builder $query, $sort) {
+            //     $field = Str::snake($sort['field']);
+            //     $direction = $sort['sort'];
 
-        //     $table = $query->getModel()->getTable();
+            //     $table = $query->getModel()->getTable();
 
-        //     if (Schema::hasColumn($table, $field)) {
-        //         return $query->orderBy($field, $direction);
-        //     }
+            //     if (Schema::hasColumn($table, $field)) {
+            //         return $query->orderBy($field, $direction);
+            //     }
 
-        //     return $query;
-        // });
+            //     return $query;
+            // });
         ;
     }
 
