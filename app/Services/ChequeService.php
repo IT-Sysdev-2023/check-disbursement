@@ -225,7 +225,7 @@ class ChequeService
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheque')
-            ->where('cheque_date', null);
+            ->where([['cheque_date', null], ['resolved_cheque_date', null]]);
 
 
         return DB::query()
@@ -254,7 +254,10 @@ class ChequeService
         $crfQuery = Crf::baseColumns()
             ->filter($filters)
             ->doesntHave('borrowedCheque')
-            ->whereNotNull('cheque_date');
+            ->where(function ($query) {
+                $query->whereNotNull('cheque_date')
+                    ->orWhereNotNull('resolved_cheque_date');
+            });
 
         return DB::query()
             ->fromSub(
@@ -298,14 +301,18 @@ class ChequeService
                         ->whereColumn('crfs.payee', 'cvs.payee')
                         ->whereColumn('crfs.cheque_amount', 'cvs.cheque_amount');
                 });
-            // $cvQuery->where([['cheque_number', 0], ['resolved_cheque_number', null]]);
-            $crfQuery->where('cheque_date', null);
+
+            $crfQuery->where([['cheque_date', null], ['resolved_cheque_date', null]]);
+            // $crfQuery->where('cheque_date', null);
         } else { // COMPLETED
             $cvQuery->where(function ($q) {
                 $q->whereNotNull('resolved_cheque_number')
                     ->orWhere('cheque_number', '!=', 0);
             });
-            $crfQuery->whereNotNull('cheque_date');
+            $crfQuery->where(function ($query) {
+                $query->whereNotNull('cheque_date')
+                    ->orWhereNotNull('resolved_cheque_date');
+            });
         }
 
         // // COMBINE
