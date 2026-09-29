@@ -100,29 +100,13 @@ export default function ReleasingModal({
         });
     };
 
-    // const handleClearSignature = () => {
-    //     sigPadRef.current?.clear();
-    //     setData('signature', null);
-    // };
-
-    // const handleSaveSignature = () => {
-    //     if (sigPadRef.current && !sigPadRef.current.isEmpty()) {
-    //         const canvas = sigPadRef.current.getCanvas();
-    //         setData('signature', canvas.toDataURL('image/png'));
-    //     }
-    // };
-
     const handleFileChange = () => {
         setSignatureModalOpen(true);
-        // if (e.target.files && e.target.files[0]) {
-        //     setData('file', e.target.files[0]);
-        // }
     };
 
     const onCaptureImage = (image: string) => {
         setData('file', image);
         setSignatureModalOpen(false);
-        // console.log(image);
     };
 
     return (

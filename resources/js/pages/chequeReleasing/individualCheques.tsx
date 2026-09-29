@@ -70,7 +70,7 @@ export default function IndividualCheques({
                 chequeNo: row.checkable.chequeNumber,
                 amount: row.checkable.amount,
                 chequeDate: row.checkable.chequeDate,
-                status: row.location,
+                status: row.checkable.location,
             }));
         setSelectedRows([...previousSelections, ...currentSelections]);
     };
