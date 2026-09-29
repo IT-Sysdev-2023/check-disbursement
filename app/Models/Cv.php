@@ -26,10 +26,18 @@ class Cv extends Model
 
     }
 
-    protected function chequeNumber(): Attribute
+    // protected function chequeNumber(): Attribute
+    // {
+    //     return new Attribute(
+    //         get: fn($value, $attributes) => $attributes['cheque_number'] ?: $attributes['resolved_cheque_number'],
+    //     );
+    // }
+
+    protected function chequeNumber(): Attribute //temporary change ky mag error ssa resolved
     {
         return new Attribute(
-            get: fn($value, $attributes) => $attributes['cheque_number'] ?: $attributes['resolved_cheque_number'],
+            get: fn($value, $attributes) =>
+                $attributes['cheque_number'] ?? $attributes['resolved_cheque_number'] ?? null,
         );
     }
 
