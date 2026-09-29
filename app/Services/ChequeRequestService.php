@@ -67,23 +67,33 @@ class ChequeRequestService
         ]);
         $ids = $request->borrowedNo ?? [];
 
-        $isSuccess = BorrowedCheque::
-            when(
-                $request->type == 'exclude',
-                fn($q) => $q->where('borrower_no', $request->borrowerId)
-                ,
-                fn($q) => $q->whereIn('id', $ids)
-            )
-            ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
+        $query = BorrowedCheque::where('borrower_no', $request->borrowerId);
 
-        $message = $isSuccess
+        $updateData = [
+            'approved_at' => now(),
+            'approver_id' => $request->approver,
+        ];
+
+        if ($request->type === 'exclude') {
+            if (empty($ids)) {
+                // Everything is selected
+                $query->update($updateData);
+            } else {
+                $query->whereNotIn('id', $ids)->update($updateData);
+            }
+        } else {
+            $query->whereIn('id', $ids)->update($updateData);
+
+        }
+
+        $message = $query
             ? 'Successfully Approved'
             : 'Failed to Approve';
 
         return redirect()
             ->route('cheque-requests')
             ->with([
-                'status' => $isSuccess,
+                'status' => true,
                 'message' => $message,
             ]);
         // return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
@@ -142,7 +152,7 @@ class ChequeRequestService
             $request->borrowerId
         );
 
-        if ($request->type == 'exclude') {
+        if ($request->type === 'exclude') {
             if (empty($ids)) { //everything is selected
                 $query->chunkById(100, function ($checks) use ($request) {
                     foreach ($checks as $check) {
@@ -180,7 +190,7 @@ class ChequeRequestService
                 });
         }
 
-         return redirect()
+        return redirect()
             ->route('cheque-requests')
             ->with([
                 'status' => true,
