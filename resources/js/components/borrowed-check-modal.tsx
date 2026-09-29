@@ -13,16 +13,8 @@ import AutocompleteUser from './autocomplete-user';
 
 const reasons = [
     {
-        value: 'For Signature 1',
-        label: 'For Signature 1',
-    },
-    {
-        value: 'For Signature 2',
-        label: 'For Signature 2',
-    },
-    {
-        value: 'For Signature 3',
-        label: 'For Signature 3',
+        value: 'For Signature',
+        label: 'For Signature',
     },
 ];
 export default function BorrowedCheckModal({

@@ -84,6 +84,7 @@ export default function BorrowedCheques({
             onSuccess: () => {
                 setOnSaveLoading(false);
                 setOpenApproval(false);
+
             },
         });
     };
@@ -131,6 +132,7 @@ export default function BorrowedCheques({
                     </Button>
 
                     <CancellationBorrowedModal
+                        borrowerId={borrowerId}
                         id={data.borrowedNo}
                         type={data.type}
                         open={openCancel}

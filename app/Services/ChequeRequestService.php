@@ -76,7 +76,17 @@ class ChequeRequestService
             )
             ->update(['approved_at' => Date::now(), 'approver_id' => $request->approver]);
 
-        return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
+        $message = $isSuccess
+            ? 'Successfully Approved'
+            : 'Failed to Approve';
+
+        return redirect()
+            ->route('cheque-requests')
+            ->with([
+                'status' => $isSuccess,
+                'message' => $message,
+            ]);
+        // return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
     }
 
     public function approver()
@@ -125,28 +135,58 @@ class ChequeRequestService
                 Rule::requiredIf(fn() => $request->type === 'include'),
             ],
         ]);
-
         $ids = $request->ids ?? [];
-  
-        BorrowedCheque::
-            when(
-                isset($request->type) &&
-                $request->type == 'exclude',
-                fn($q) => $q->whereNotIn('id', $ids)
-                ,
-                fn($q) => $q->whereIn('id', $ids)
-            )
-            ->chunkById(100, function ($checks) use ($request) {
-                foreach ($checks as $check) {
-                    $check->checkable?->chequeStatus()->create([
-                        'status' => 'cancelled',
-                        'cancelled_reason' => $request->reason,
-                        'caused_by' => $request->user()->id,
-                    ]);
-                }
-            });
 
-        return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
+        $query = BorrowedCheque::where(
+            'borrower_no',
+            $request->borrowerId
+        );
+
+        if ($request->type == 'exclude') {
+            if (empty($ids)) { //everything is selected
+                $query->chunkById(100, function ($checks) use ($request) {
+                    foreach ($checks as $check) {
+                        $check->checkable?->chequeStatus()->create([
+                            'status' => 'cancelled',
+                            'cancelled_reason' => $request->reason,
+                            'caused_by' => $request->user()->id,
+                        ]);
+                    }
+                });
+            } else {
+                $query
+                    ->whereNotIn('id', $ids)
+                    ->chunkById(100, function ($checks) use ($request) {
+                        foreach ($checks as $check) {
+                            $check->checkable?->chequeStatus()->create([
+                                'status' => 'cancelled',
+                                'cancelled_reason' => $request->reason,
+                                'caused_by' => $request->user()->id,
+                            ]);
+                        }
+                    });
+            }
+        } else { //include type
+            $query
+                ->whereIn('id', $ids)
+                ->chunkById(100, function ($checks) use ($request) {
+                    foreach ($checks as $check) {
+                        $check->checkable?->chequeStatus()->create([
+                            'status' => 'cancelled',
+                            'cancelled_reason' => $request->reason,
+                            'caused_by' => $request->user()->id,
+                        ]);
+                    }
+                });
+        }
+
+         return redirect()
+            ->route('cheque-requests')
+            ->with([
+                'status' => true,
+                'message' => 'Successfully Updated',
+            ]);
+        // return redirect()->back()->with(['status' => true, 'message' => 'Successfully Updated']);
     }
 
     public static function borrowedRecords(array $filters)

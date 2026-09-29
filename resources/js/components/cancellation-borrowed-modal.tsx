@@ -1,6 +1,6 @@
 import { modalMediumStyle } from '@/lib/modalStyle';
-import { cancelCheck } from '@/routes';
-import { useForm } from '@inertiajs/react';
+import { borrowedNumberCheques, cancelCheck } from '@/routes';
+import { router, useForm } from '@inertiajs/react';
 import { Grid, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,10 +13,12 @@ export default function CancellationBorrowedModal({
     type,
     open,
     handleClose,
+    borrowerId,
 }: {
     id: GridRowId[] | number;
     type: 'exclude' | 'include';
     open: boolean;
+    borrowerId: number;
     handleClose: () => void;
 }) {
     const { setData, post, processing, errors, reset, transform } = useForm({
@@ -27,8 +29,9 @@ export default function CancellationBorrowedModal({
 
         transform((data) => ({
             ...data,
+            borrowerId: borrowerId,
             ids: id,
-            type: type
+            type: type,
         }));
 
         post(cancelCheck().url, {
@@ -37,6 +40,7 @@ export default function CancellationBorrowedModal({
             onSuccess: () => {
                 reset();
                 handleClose();
+
             },
         });
     };

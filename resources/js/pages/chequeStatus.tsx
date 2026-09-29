@@ -28,7 +28,7 @@ import {
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import { createStatusChequeColumns } from './checkStatus/components/columns';
+import { chequeStatusColumns } from './checkStatus/components/columns';
 import ScannedDetails from './checkStatus/components/scannedDetails';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -85,7 +85,7 @@ export default function ChequeStatus({
     const isRegional = auth.user.roles.some(
         (role) => role.name === 'regional_officer',
     );
-    const chequeColumn = createStatusChequeColumns(handleStatusChange);
+    const chequeColumn = chequeStatusColumns(handleStatusChange);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
