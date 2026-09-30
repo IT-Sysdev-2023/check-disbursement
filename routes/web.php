@@ -142,7 +142,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         //!Viewing Forwarded in Section Head
         Route::prefix('forwarded-viewing')->group(function () {
-            Route::get('forwarded-releasing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
+            Route::get('forwarded-releasing-viewing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
             Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
             Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
             Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
