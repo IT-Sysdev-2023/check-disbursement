@@ -76,6 +76,7 @@ class CheckReleasingController extends Controller
     {
         $records = BorrowedCheque::with('checkable')
             ->whereRelation('scannedRecord', 'batch_reference', $request->batchReference)
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
@@ -90,6 +91,7 @@ class CheckReleasingController extends Controller
 
         $records = BorrowedCheque::with('checkable')
             ->whereRelation('scannedRecord', 'batch_reference', $reference)
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],

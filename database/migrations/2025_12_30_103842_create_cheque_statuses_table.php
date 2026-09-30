@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('signature')->nullable();
             $table->string('cancelled_reason')->nullable();
             $table->string('received_by')->nullable()->constrained('users')->cascadeOnUpdate()->cascadeOnDelete(); //this is for check_forward_statuses
+            $table->timestamp('received_at')->nullable();
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->boolean('is_closed')->default(false);
             $table->boolean('has_document')->default(false);

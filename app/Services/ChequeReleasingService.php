@@ -35,8 +35,10 @@ class ChequeReleasingService
                 DB::raw('MIN(scanned_records.supplier) as supplier'),
                 DB::raw('MIN(scanned_records.scan_method) as method')
             )
+
             ->whereNot('approver_id', null)
             ->join('scanned_records', 'borrowed_cheques.id', 'scanned_records.borrowed_cheque_id')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],

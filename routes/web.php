@@ -140,11 +140,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('change-approver', [CheckRequestController::class, 'changeApprover'])->name('change-approver');
         });
 
-        // Route::prefix('check-borrowing')->group(function () {
-        //     Route::get('index', [CheckBorrowingController::class, 'index'])->name('check-borrowing');
-        //     Route::put('secondary-borrow', [CheckBorrowingController::class, 'borrow'])->name('secondary-borrow-check');
-        //     Route::put('return-check', [CheckBorrowingController::class, 'returnCheck'])->name('return-checks');
-        // });
+        //!Viewing Forwarded in Section Head
+        Route::prefix('forwarded-viewing')->group(function () {
+            Route::get('forwarded-receiving', [CheckRequestController::class, 'receiving'])->name('forwarded-receiving');
+            Route::get('forwarded-received', [CheckRequestController::class, 'received'])->name('forwarded-received');
+            Route::get('forwarded-released', [CheckRequestController::class, 'released'])->name('forwarded-released');
+        });
 
         Route::prefix('check-releasing')->group(function () {
             Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
@@ -190,10 +191,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('cheque-status', [StatusController::class, 'chequeStatus'])->name('cheque-status');
     Route::post('cancel-stale-check/{id}', [StatusController::class, 'cancelStale'])->name('cancel-stale-check');
 
-    Route::prefix('cebu-manila-clerk')->group(function () {
-        Route::get('for-receiving', [CebuManilaClerkController::class, 'index'])->name('for-receiving'); 
-        Route::get('for-received', [CebuManilaClerkController::class, 'forReceived'])->name('for-received'); 
-        Route::get('status', [CebuManilaClerkController::class, 'status'])->name('cm-disbursement-clerk-status'); 
+    Route::middleware('role:cm_dibursement_clerk|admin')->prefix('cebu-manila-clerk')->group(function () {
+        Route::get('for-receiving', [CebuManilaClerkController::class, 'index'])->name('for-receiving');
+        Route::get('for-received', [CebuManilaClerkController::class, 'forReceived'])->name('for-received');
+        Route::get('status', [CebuManilaClerkController::class, 'status'])->name('cm-disbursement-clerk-status');
     });
 
     Route::prefix('reports')->group(function () {

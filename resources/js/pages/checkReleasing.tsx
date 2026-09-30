@@ -183,52 +183,6 @@ export default function CheckReleasing({
                         </TableBody>
                     </Table>
                 </TableContainer>
-                {/* <TableDataGrid
-                    data={cheques}
-                    filter={filter.search}
-                    hasSelection
-                    rowSelectionModel={rowSelectionModel}
-                    handleSelectionChange={handleSelectionChange}
-                    pagination={handlePagination}
-                    handleSearchFilter={handleSearch}
-                    handleSortFilter={handleSort}
-                    columns={columns}
-                /> */}
-
-                {/* <SelectedChequeList
-                    records={selectedRows}
-                    handleDelete={handleDelete}
-                /> */}
-                {/* <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
-                    <Button
-                        disabled={!enableButton}
-                        variant="outlined"
-                        startIcon={<CallMissedOutgoingOutlinedIcon />}
-                        onClick={multipleRelease}
-                    >
-                        Release
-                    </Button>
-                </Box> */}
-
-                {/* {id && (
-                    <ReasonCancellationModal
-                        id={[id]}
-                        open={open}
-                        handleClose={() => {
-                            setOpen(false);
-                        }}
-                    />
-                )} */}
-
-                {/* <ReleasingModal
-                    cheques={selectedCheques}
-                    receiverNames={receiverNames}
-                    open={openReleasing}
-                    handleClose={() => {
-                        setOpenReleasing(false);
-                    }}
-                    handleSuccess={() => setSelectedRows([])}
-                /> */}
             </PageContainer>
 
             <PdfReader

@@ -23,6 +23,9 @@ import {
     forReceived,
     forReceiving,
     forwardedChequeReleasing,
+    forwardedReceived,
+    forwardedReceiving,
+    forwardedReleased,
     forwardedReleasing,
     notifications,
     report,
@@ -45,7 +48,9 @@ import {
     FolderCheck,
     Forward,
     Landmark,
+    PackageCheck,
     PackageOpen,
+    PackageX,
     Pen,
     Rocket,
     Sunset,
@@ -122,15 +127,37 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           href: chequeRequests(),
                           icon: FolderCheck,
                       },
-                      //   {
-                      //       title: 'Check/Docs Borrowing',
-                      //       href: checkBorrowing(),
-                      //       icon: FolderCheck,
-                      //   },
                       {
                           title: 'Cheque Releasing',
                           href: checkReleasing(),
                           icon: Check,
+                      },
+                      {
+                          title: 'Forwarded Cheques',
+                          href: '#',
+                          icon: Forward,
+                          submenu: [
+                              {
+                                  title: 'Receiving',
+                                  href: forwardedReceiving(),
+                                  icon: PackageCheck,
+                              },
+                              {
+                                  title: 'Received',
+                                  href: forwardedReceived(),
+                                  icon: PackageOpen,
+                              },
+                              {
+                                  title: 'Released',
+                                  href: forwardedReleased(),
+                                  icon: PackageCheck,
+                              },
+                              {
+                                  title: 'Return',
+                                  href: checkRequestForm(),
+                                  icon: PackageX,
+                              },
+                          ],
                       },
                   ]
                 : []),
@@ -273,6 +300,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         regionalOfficer,
         sectionHead,
         viewing,
+        isCmDc,
     ]);
 
     // Automatically open submenu if current page belongs to it

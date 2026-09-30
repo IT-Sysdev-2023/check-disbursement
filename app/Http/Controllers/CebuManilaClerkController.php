@@ -53,7 +53,7 @@ class CebuManilaClerkController extends Controller
         $filters = $request->only(['search', 'date', 'bu', 'company']);
         $company = $filters['company'] ?? 'all';
 
-        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at')
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at', 'received_at')
             ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
             ->regionalPermission()
             ->where(['status' => 'forwarded'])

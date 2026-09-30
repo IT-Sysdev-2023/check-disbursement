@@ -37,6 +37,7 @@ class ChequeStatusResource extends JsonResource
             'forwardedStatus' => $this->whenLoaded('chequeForwardedStatus'),
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
             "createdAt" => $this->created_at ? $this->created_at->toFormattedDateString() : 'N/A',
+            "receivedAt" => $this->received_at ? $this->received_at->toFormattedDateString() : 'N/A',
             "updatedAt" => $this->updated_at,
         ];
     }

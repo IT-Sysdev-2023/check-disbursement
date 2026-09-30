@@ -141,7 +141,7 @@ export const forReceivedColumn = (): GridColDef[] => [
     },
     {
         field: 'createdAt',
-        headerName: 'Date Forwarded',
+        headerName: 'Date Received',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
