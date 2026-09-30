@@ -152,6 +152,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
             Route::post('store-release-check-all', [CheckReleasingController::class, 'storeAll'])->name('store-release-check-all');
             Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
+            Route::post('cancel', [CheckReleasingController::class, 'cancelCheck'])->name('cancel-releasing');
 
             Route::get('get-cheques-for-releasing', [CheckReleasingController::class, 'chequesToRelease'])->name('cheques-to-release');
             Route::get('release-cheque/{reference}', [CheckReleasingController::class, 'releaseCheque'])->name('release-cheque');

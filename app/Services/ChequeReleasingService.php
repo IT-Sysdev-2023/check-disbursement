@@ -46,8 +46,6 @@ class ChequeReleasingService
             ->paginate(10)
             ->withQueryString();
 
-        // dd($chequeRecords);
-
         $receiverNames = ReceiverName::select('id', 'name as label')->get();
 
         // dd(
@@ -190,7 +188,7 @@ class ChequeReleasingService
     {
         $validated = $request->validate([
             'receiversName' => 'required|string|max:255',
-            'file' => 'required|string',
+            // 'file' => 'required|string',
             'signature' => 'required|string',
             'cheques' => 'required|string',
         ]);
@@ -279,19 +277,19 @@ class ChequeReleasingService
         $userId = auth()->user()->id;
         $uuid = Str::uuid();
 
-        $signaturePath = $this->fileHandler
-            ->inFolder($transactionNo . "/signatures")
-            ->createFileName($uuid, $userId, '.png')
-            ->saveSignature($validated['signature']);
+        // $signaturePath = $this->fileHandler
+        //     ->inFolder($transactionNo . "/signatures")
+        //     ->createFileName($uuid, $userId, '.png')
+        //     ->saveSignature($validated['signature']);
 
-        $imagePath = $this->fileHandler
-            ->inFolder($transactionNo . "/images")
-            ->createFileName($uuid, $userId, '.png')
-            ->saveFile($validated['file']);
+        // $imagePath = $this->fileHandler
+        //     ->inFolder($transactionNo . "/images")
+        //     ->createFileName($uuid, $userId, '.png')
+        //     ->saveFile($validated['file']);
 
         return (object) [
-            'signaturePath' => $signaturePath,
-            'imagePath' => $imagePath
+            'signaturePath' => '$signaturePath',
+            'imagePath' => '$imagePath'
         ];
     }
 }

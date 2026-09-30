@@ -1,9 +1,9 @@
+import ForwardedReleasingModal from '@/components/forwarded-releasing-modal';
 import PageContainer from '@/components/pageContainer';
 import PdfReader from '@/components/pdf-reader';
 import AppLayout from '@/layouts/app-layout';
 import { modalStyle } from '@/lib/modalStyle';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import { cancelForwarded } from '@/routes';
 import {
     Crf,
@@ -14,13 +14,13 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
 import { createForwardedReleasingColumns } from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import ForwardedReleasingModal from '@/components/forwarded-releasing-modal';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -48,8 +48,8 @@ export default function ForwardedChequeReleasing({
     const [openReleasing, setOpenReleasing] = useState(false);
     const [selectedRows, setSelectedRows] = useState<
         { id: number; status: string }[]
-        >([]);
-     const [selectedCheques, setSelectedCheques] = useState<
+    >([]);
+    const [selectedCheques, setSelectedCheques] = useState<
         { id: number; status: string }[]
     >([]);
 
@@ -74,7 +74,10 @@ export default function ForwardedChequeReleasing({
         }
     }, [flash]);
 
-    const handleStatusChange = (items: { id: number; status: string }, value: string) => {
+    const handleStatusChange = (
+        items: { id: number; status: string },
+        value: string,
+    ) => {
         if (value === 'cancel') {
             setChequeStatusId(items.id);
             setOpen(true);
@@ -110,7 +113,7 @@ export default function ForwardedChequeReleasing({
     };
 
     const multipleRelease = () => {
-       proceed(selectedRows);
+        proceed(selectedRows);
     };
 
     const proceed = (items: { id: number; status: string }[]) => {
@@ -120,7 +123,12 @@ export default function ForwardedChequeReleasing({
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const selectedR = cheques.data
-            .filter((row) => model.ids.has(row.id))
+            .filter((row) => {
+                if (model.type === 'include') {
+                    return model.ids.has(row.id);
+                }
+                return !model.ids.has(row.id);
+            })
             .map((row) => ({
                 id: row.id,
                 status: 'released', //not dynamic, change this if new status added
@@ -208,12 +216,12 @@ export default function ForwardedChequeReleasing({
                 </Modal>
             </PageContainer>
             <ForwardedReleasingModal
-                                cheques={selectedCheques}
-                                open={openReleasing}
-                                handleClose={() => {
-                                    setOpenReleasing(false);
-                                }}
-                            />
+                cheques={selectedCheques}
+                open={openReleasing}
+                handleClose={() => {
+                    setOpenReleasing(false);
+                }}
+            />
             <PdfReader
                 open={openModalPdf}
                 handleClose={() => setOpenModalPdf(false)}

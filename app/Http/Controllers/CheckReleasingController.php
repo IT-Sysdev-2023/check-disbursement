@@ -13,6 +13,7 @@ use App\Services\ChequeReleasingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class CheckReleasingController extends Controller
@@ -113,6 +114,39 @@ class CheckReleasingController extends Controller
             ],
         ]);
 
+    }
+
+    public function cancelCheck(Request $request)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:255',
+            // 'type' => ['required', 'in:include,exclude'],
+            'ids' => [
+                'array',
+                Rule::requiredIf(fn() => $request->type === 'include'),
+            ],
+        ]);
+        $ids = $request->ids ?? [];
+
+        BorrowedCheque::whereIn(
+            'id',
+            $ids
+        )->chunkById(100, function ($checks) use ($request) {
+            foreach ($checks as $check) {
+                $check->checkable?->chequeStatus()->create([
+                    'status' => 'cancelled',
+                    'cancelled_reason' => $request->reason,
+                    'caused_by' => $request->user()->id,
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('check-releasing')
+            ->with([
+                'status' => true,
+                'message' => 'Successfully Updated',
+            ]);
     }
 
 

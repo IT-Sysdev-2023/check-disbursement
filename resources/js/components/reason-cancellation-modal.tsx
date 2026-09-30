@@ -1,5 +1,5 @@
 import { modalMediumStyle } from '@/lib/modalStyle';
-import { cancelCheck } from '@/routes';
+import { cancelCheck, cancelReleasing } from '@/routes';
 import { useForm } from '@inertiajs/react';
 import { Grid, TextField } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -27,7 +27,7 @@ export default function ReasonCancellationModal({
             ids: id,
         }));
 
-        post(cancelCheck().url, {
+        post(cancelReleasing().url, {
             preserveScroll: true,
             preserveState: true,
             onError: (e) => {
