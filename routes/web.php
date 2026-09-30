@@ -142,9 +142,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         //!Viewing Forwarded in Section Head
         Route::prefix('forwarded-viewing')->group(function () {
-            Route::get('forwarded-receiving', [CheckRequestController::class, 'receiving'])->name('forwarded-receiving');
-            Route::get('forwarded-received', [CheckRequestController::class, 'received'])->name('forwarded-received');
-            Route::get('forwarded-released', [CheckRequestController::class, 'released'])->name('forwarded-released');
+            Route::get('forwarded-releasing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
+            Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
+            Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
+            Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
+
+            Route::get('cheques-for-forwarded-releasing', [CheckReleasingController::class, 'chequesForwardedToRelease'])->name('cheques-forwarded-to-release');
+            Route::get('release-forwarded-cheque/{reference}', [CheckReleasingController::class, 'releaseForwardedCheque'])->name('release-forwarded-cheque');
+
         });
 
         Route::prefix('check-releasing')->group(function () {

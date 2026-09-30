@@ -27,6 +27,7 @@ import {
     forwardedReceiving,
     forwardedReleased,
     forwardedReleasing,
+    forwardedReleasingViewing,
     notifications,
     report,
     retrievedRecords,
@@ -53,6 +54,7 @@ import {
     PackageX,
     Pen,
     Rocket,
+    Send,
     Sunset,
     Tickets,
     Users,
@@ -138,6 +140,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           icon: Forward,
                           submenu: [
                               {
+                                  title: 'Releasing',
+                                  href: forwardedReleasingViewing(),
+                                  icon: Send,
+                              },
+                              {
                                   title: 'Receiving',
                                   href: forwardedReceiving(),
                                   icon: PackageCheck,
@@ -152,11 +159,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                   href: forwardedReleased(),
                                   icon: PackageCheck,
                               },
-                              {
-                                  title: 'Return',
-                                  href: checkRequestForm(),
-                                  icon: PackageX,
-                              },
+                            //   {
+                            //       title: 'Return',
+                            //       href: checkRequestForm(),
+                            //       icon: PackageX,
+                            //   },
                           ],
                       },
                   ]

@@ -9,6 +9,7 @@ use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
+use App\Models\ChequeStatus;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Crf;
 use App\Models\Cv;
@@ -191,6 +192,7 @@ class ChequeReleasingService
         $validated = $request->validate([
             'receiversName' => 'required|string|max:255',
             // 'file' => 'required|string',
+            'isForwarded' => 'required',
             'signature' => 'required|string',
             'cheques' => 'required|string',
         ]);
@@ -205,6 +207,17 @@ class ChequeReleasingService
                 [Cv::class, Crf::class],
                 fn($query) => $query->has('chequeStatus')
             )
+            ->when($request->isForwarded, function ($builder) {
+                $builder->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    fn($query) => $query->whereIn('tag_location_id', [1, 2])
+                );
+            }, fn($builder) => $builder->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    fn($query) => $query->whereNotIn('tag_location_id', [1, 2])
+                ))
             ->get();
 
         $cheques = $getCheques->map(function ($cheque) {
@@ -273,6 +286,169 @@ class ChequeReleasingService
 
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
     }
+
+    public function forwardedReleasing(Request $request)
+    {
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
+        // $chequeRecords = self::releasingCheques($filters);
+
+        $chequeRecords = BorrowedCheque::
+            select(
+                'scanned_records.batch_reference',
+                DB::raw('COUNT(scanned_records.id) as cheque_count'),
+                DB::raw('MIN(scanned_records.supplier) as supplier'),
+                DB::raw('MIN(scanned_records.scan_method) as method')
+            )
+
+            ->whereNot('approver_id', null)
+            ->join('scanned_records', 'borrowed_cheques.id', 'scanned_records.borrowed_cheque_id')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereIn('tag_location_id', [1, 2])) // include Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )
+            ->groupBy('batch_reference')
+            ->paginate(10)
+            ->withQueryString();
+
+        $receiverNames = ReceiverName::select('id', 'name as label')->get();
+
+        // dd(
+        //     (new ChequeCollection($chequeRecords))
+        //         ->response()
+        //         ->getData(true)
+        // );
+        return Inertia::render('forwardedCheques/forwardedReleasing', [
+            'cheques' => $chequeRecords,
+            'receiverNames' => $receiverNames,
+            'filter' => (object) [
+                'selectedBu' => $filters['bu'] ?? '0',
+                'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ]
+            ],
+            'businessUnits' => isset($filters['company']) ? BusinessUnit::businessUnits($filters['company']) : [],
+            'company' => PermissionService::userAssignedCompany($request->user())
+        ]);
+    }
+
+    public function receiving(Request $request)
+    {
+        $filters = $request->only(['search', 'date', 'bu', 'company']);
+        $company = $filters['company'] ?? 'all';
+
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at')
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
+            ->regionalPermission()
+            ->where(['status' => 'forwarded', 'received_by' => null])
+            ->where(function ($query) {
+                $query->whereDoesntHave('chequeForwardedStatus')
+                    ->orWhereRelation(
+                        'chequeForwardedStatus',
+                        'status',
+                        '!=',
+                        'cancelled'
+                    );
+            })
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('cebuManilaClerk/forReceiving', [
+            'cheques' => $chequeRecords,
+            'filter' => (object) [
+                'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ],
+                'selectedCompany' => $company,
+                'selectedBu' => $filters['bu'] ?? 'all',
+
+            ],
+            'company' => PermissionService::userAssignedCompany($request->user()),
+            'businessUnits' => BusinessUnit::businessUnits($company),
+        ]);
+    }
+    public function received(Request $request)
+    {
+        $filters = $request->only(['search', 'date', 'bu', 'company']);
+        $company = $filters['company'] ?? 'all';
+
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at', 'received_at')
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
+            ->regionalPermission()
+            ->where(['status' => 'forwarded'])
+            ->where(function ($query) {
+                $query->whereDoesntHave('chequeForwardedStatus')
+                    ->orWhereRelation(
+                        'chequeForwardedStatus',
+                        'status',
+                        '!=',
+                        'cancelled'
+                    );
+            })
+            ->whereNotNull('received_by')
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('cebuManilaClerk/forReceived', [
+            'cheques' => $chequeRecords,
+            'filter' => (object) [
+                'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ],
+                'selectedCompany' => $company,
+                'selectedBu' => $filters['bu'] ?? 'all',
+
+            ],
+            'company' => PermissionService::userAssignedCompany($request->user()),
+            'businessUnits' => BusinessUnit::businessUnits($company),
+        ]);
+    }
+    public function released(Request $request)
+    {
+        $filters = $request->only(['search', 'date', 'bu', 'company']);
+        $company = $filters['company'] ?? 'all';
+
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at')
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
+            ->regionalPermission()
+            ->where(['status' => 'forwarded'])
+            ->whereRelation(
+                'chequeForwardedStatus',
+                'status',
+                '!=',
+                'cancelled'
+            )
+            ->whereNotNull('received_by')
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('cebuManilaClerk/cmStatus', [
+            'cheques' => $chequeRecords,
+            'filter' => (object) [
+                'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ],
+                'selectedCompany' => $company,
+                'selectedBu' => $filters['bu'] ?? 'all',
+
+            ],
+            'company' => PermissionService::userAssignedCompany($request->user()),
+            'businessUnits' => BusinessUnit::businessUnits($company),
+        ]);
+    }
+
 
     private function handleFiles(array $validated, string $transactionNo)
     {

@@ -1,6 +1,6 @@
 import { storeReceiverName } from '@/actions/App/Http/Controllers/CheckReleasingController';
 import { modalMediumStyle } from '@/lib/modalStyle';
-import { storeReleaseCheck, storeReleaseCheckAll } from '@/routes';
+import { storeReleaseCheckAll } from '@/routes';
 import { Option } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import { FormControl, FormHelperText, Grid, IconButton } from '@mui/material';
@@ -22,6 +22,7 @@ interface MyFormData {
 }
 
 export default function ReleasingModalAll({
+    isForwarded = false,
     cheques,
     open,
     handleClose,
@@ -29,6 +30,7 @@ export default function ReleasingModalAll({
 }: {
     cheques: string;
     open: boolean;
+    isForwarded?: boolean;
     handleClose: () => void;
     receiverNames: Option[];
 }) {
@@ -48,6 +50,7 @@ export default function ReleasingModalAll({
 
             transform((data) => ({
                 ...data,
+                isForwarded: isForwarded,
                 cheques: cheques,
                 signature: canvas.toDataURL('image/png'),
             }));
@@ -202,7 +205,7 @@ export default function ReleasingModalAll({
                                             }}
                                         >
                                             <Typography variant="body2">
-                                               1 selected image
+                                                1 selected image
                                             </Typography>
 
                                             <IconButton

@@ -32,7 +32,7 @@ class CebuManilaClerkController extends Controller
             ->withQueryString()
             ->toResourceCollection();
 
-        return Inertia::render('CebuManilaClerk/forReceiving', [
+        return Inertia::render('cebuManilaClerk/forReceiving', [
             'cheques' => $chequeRecords,
             'filter' => (object) [
                 'search' => $filters['search'] ?? '',
@@ -71,7 +71,7 @@ class CebuManilaClerkController extends Controller
             ->withQueryString()
             ->toResourceCollection();
 
-        return Inertia::render('CebuManilaClerk/forReceived', [
+        return Inertia::render('cebuManilaClerk/forReceived', [
             'cheques' => $chequeRecords,
             'filter' => (object) [
                 'search' => $filters['search'] ?? '',
@@ -107,7 +107,7 @@ class CebuManilaClerkController extends Controller
             ->withQueryString()
             ->toResourceCollection();
 
-        return Inertia::render('CebuManilaClerk/cmStatus', [
+        return Inertia::render('cebuManilaClerk/cmStatus', [
             'cheques' => $chequeRecords,
             'filter' => (object) [
                 'search' => $filters['search'] ?? '',

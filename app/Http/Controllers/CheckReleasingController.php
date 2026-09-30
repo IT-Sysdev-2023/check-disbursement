@@ -27,6 +27,11 @@ class CheckReleasingController extends Controller
         return $this->service->index($request);
     }
 
+    public function forwardedReleasing(Request $request)
+    {
+        return $this->service->forwardedReleasing($request);
+    }
+
     public function show(Request $request)
     {
         return $this->service->getReleaseCheck($request->cheques, $request->status);
@@ -39,6 +44,21 @@ class CheckReleasingController extends Controller
     public function storeAll(Request $request)
     {
         return $this->service->storeReleaseCheckAll($request);
+    }
+
+     public function receiving(Request $request)
+    {
+        return $this->service->receiving($request);
+    }
+
+    public function received(Request $request)
+    {
+        return $this->service->received($request);
+    }
+
+    public function released(Request $request)
+    {
+        return $this->service->released($request);
     }
 
     public function cameraCapture(Request $request)
@@ -86,12 +106,57 @@ class CheckReleasingController extends Controller
         return response()->json(BorrowedChequeResource::collection($records));
     }
 
+    public function chequesForwardedToRelease(Request $request)
+    {
+        $records = BorrowedCheque::with('checkable')
+            ->whereRelation('scannedRecord', 'batch_reference', $request->batchReference)
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )
+            ->get();
+        return response()->json(BorrowedChequeResource::collection($records));
+    }
+
     public function releaseCheque(string $reference)
     {
 
         $records = BorrowedCheque::with('checkable')
             ->whereRelation('scannedRecord', 'batch_reference', $reference)
             ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )
+            ->paginate(5)
+            ->withQueryString()
+            ->toResourceCollection();
+
+        $receiverNames = ReceiverName::select('id', 'name as label')->get();
+
+        return Inertia::render('chequeReleasing/individualCheques', [
+            'cheques' => $records,
+            'receiversName' => $receiverNames,
+            'filter' => (object) [
+                'selectedBu' => $filters['bu'] ?? '0',
+                'search' => $filters['search'] ?? '',
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ]
+            ],
+        ]);
+
+    }
+    public function releaseForwardedCheque(string $reference)
+    {
+
+        $records = BorrowedCheque::with('checkable')
+            ->whereRelation('scannedRecord', 'batch_reference', $reference)
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],

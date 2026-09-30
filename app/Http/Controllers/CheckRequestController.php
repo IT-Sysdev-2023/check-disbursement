@@ -47,18 +47,5 @@ class CheckRequestController extends Controller
         return $this->service->changeApprover($request);
     }
 
-    public function receiving(Request $request)
-    {
-        return $this->service->receiving($request);
-    }
-
-    public function received(Request $request)
-    {
-        return $this->service->received($request);
-    }
-
-    public function released(Request $request)
-    {
-        return $this->service->released($request);
-    }
+   
 }
