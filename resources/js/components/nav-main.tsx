@@ -51,7 +51,6 @@ import {
     Landmark,
     PackageCheck,
     PackageOpen,
-    PackageX,
     Pen,
     Rocket,
     Send,
