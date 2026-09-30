@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
             NavDatabaseSeeder::class,
             NavCpSeeder::class,
             NavHeaderSeeder::class,
-            // NavLineSeeder::class,
+                // NavLineSeeder::class,
             BorrowerNameSeeder::class,
             BankSeeder::class
         ]);
@@ -77,6 +77,7 @@ class DatabaseSeeder extends Seeder
         Role::create(['name' => 'section_head']); //section head
         Role::create(['name' => 'admin']);
         Role::create(['name' => 'viewing']);
+        Role::create(['name' => 'cm_dibursement_clerk']);
 
         Permission::create(['name' => 'access cebu']);
         Permission::create(['name' => 'access manila']);

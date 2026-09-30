@@ -18,7 +18,10 @@ import {
     chequeStatus,
     chequeStatusMonitoring,
     closingCheque,
+    cmDisbursementClerkStatus,
     eodRecords,
+    forReceived,
+    forReceiving,
     forwardedChequeReleasing,
     forwardedReleasing,
     notifications,
@@ -61,6 +64,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         [user?.roles],
     );
     const isAdmin = roles.includes('admin');
+    const isCmDc = roles.includes('cm_dibursement_clerk');
     // const releasing = roles.includes('releasing');
     const disbursementOfficer = roles.includes('disbursement_officer');
     const regionalOfficer = roles.includes('regional_officer');
@@ -185,6 +189,25 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Cancelled Cheques',
                           href: cancelledCheques(),
+                          icon: Activity,
+                      },
+                  ]
+                : []),
+            ...(isCmDc
+                ? [
+                      {
+                          title: 'For Receiving',
+                          href: forReceiving(),
+                          icon: Activity,
+                      },
+                      {
+                          title: 'Received Cheques',
+                          href: forReceived(),
+                          icon: Activity,
+                      },
+                      {
+                          title: 'Status',
+                          href: cmDisbursementClerkStatus(),
                           icon: Activity,
                       },
                   ]

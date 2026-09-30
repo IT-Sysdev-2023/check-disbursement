@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssignedCheckNumberController;
 use App\Http\Controllers\BankController;
 use App\Http\Controllers\BorrowedCheckController;
+use App\Http\Controllers\CebuManilaClerkController;
 use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CheckRequestController;
 use App\Http\Controllers\ClosingController;
@@ -188,6 +189,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('cheque-status', [StatusController::class, 'chequeStatus'])->name('cheque-status');
     Route::post('cancel-stale-check/{id}', [StatusController::class, 'cancelStale'])->name('cancel-stale-check');
+
+    Route::prefix('cebu-manila-clerk')->group(function () {
+        Route::get('for-receiving', [CebuManilaClerkController::class, 'index'])->name('for-receiving'); 
+        Route::get('for-received', [CebuManilaClerkController::class, 'forReceived'])->name('for-received'); 
+        Route::get('status', [CebuManilaClerkController::class, 'status'])->name('cm-disbursement-clerk-status'); 
+    });
 
     Route::prefix('reports')->group(function () {
         Route::get('report', [ReportController::class, 'index'])->name('report');
