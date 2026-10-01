@@ -89,7 +89,6 @@ export default function TableView({
                     return model.ids.has(row.id);
                 }
 
-                // MUI exclude model:
                 // everything is selected except IDs in model.ids
                 return !model.ids.has(row.id);
             })

@@ -14,6 +14,7 @@ import {
     checkReleasing,
     checkRequestForm,
     checkVoucher,
+    chequeRegister,
     chequeRequests,
     chequeStatus,
     chequeStatusMonitoring,
@@ -131,6 +132,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Cheque Releasing',
                           href: checkReleasing(),
+                          icon: Check,
+                      },
+                      {
+                          title: 'Cheque Register',
+                          href: chequeRegister(),
                           icon: Check,
                       },
                       {

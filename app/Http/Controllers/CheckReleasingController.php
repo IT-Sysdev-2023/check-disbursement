@@ -27,6 +27,15 @@ class CheckReleasingController extends Controller
         return $this->service->index($request);
     }
 
+    public function chequeRegister(Request $request)
+    {
+        return $this->service->chequeRegistration($request);
+    }
+    public function chequeRegisterStore(Request $request)
+    {
+        return $this->service->chequeRegistrationStore($request);
+    }
+
     public function forwardedReleasing(Request $request)
     {
         return $this->service->forwardedReleasing($request);

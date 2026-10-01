@@ -340,6 +340,15 @@ class ChequeService
 
         return DB::query()
             ->fromSub($unionQuery, 'merged')
+            ->leftJoin('cheque_registers', function ($join) {
+                $join->whereRaw(
+                    'CAST(merged.cheque_number AS UNSIGNED) BETWEEN cheque_registers.cheque_number_from AND cheque_registers.cheque_number_to'
+                );
+            })
+            ->addSelect([
+                'merged.*',
+                'cheque_registers.id as cheque_range',
+            ])
             ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
                 if ($sort['field'] !== 'scannedId') { // Manage Check Column Sorting
                     $q->orderBy(Str::snake($sort['field']), $sort['sort']);

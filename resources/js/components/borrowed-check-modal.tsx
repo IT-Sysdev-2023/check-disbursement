@@ -31,9 +31,6 @@ export default function BorrowedCheckModal({
     const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
         [],
     );
-    // const [approverSelection, setApproverSelection] = useState<SelectionType[]>(
-    //     [],
-    // );
 
     const { data, setData, post, processing, transform, reset } = useForm({
         // approver: '',

@@ -154,6 +154,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::prefix('check-releasing')->group(function () {
             Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
+            Route::get('cheque-register', [CheckReleasingController::class, 'chequeRegister'])->name('cheque-register');
+            Route::post('cheque-register-store', [CheckReleasingController::class, 'chequeRegisterStore'])->name('cheque-register-store');
 
             // Route::post('release-check', [CheckReleasingController::class, 'show'])->name('release-check');
             Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');

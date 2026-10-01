@@ -43,25 +43,13 @@ export default function CheckReleasing({
     businessUnits: SelectionType[];
     receiverNames: Option[];
 }) {
-    // const [selectedCheques, setSelectedCheques] = useState<
-    //     SelectedChequeType[]
-    // >([]);
-    // const [selectedRows, setSelectedRows] = useState<ListSelectedChequeType[]>(
-    //     [],
-    // );
-    // const [openReleasing, setOpenReleasing] = useState(false);
-    // const [id, setId] = useState<number | undefined>(undefined);
-    // const [open, setOpen] = useState(false);
+    
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
 
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string; stream?: string };
     };
-    // const rowSelectionModel: GridRowSelectionModel = {
-    //     type: 'include',
-    //     ids: new Set(selectedRows.map((row) => row.id)),
-    // };
 
     useEffect(() => {
         if (flash?.status && flash?.stream) {
@@ -69,75 +57,6 @@ export default function CheckReleasing({
             setOpenModalPdf(true);
         }
     }, [flash]);
-
-    // const handleStatusChange = (items: SelectedChequeType, value: string) => {
-    //     if (value === 'cancel') {
-    //         setId(items.id);
-    //         setOpen(true);
-    //         return;
-    //     }
-
-    //     proceed([items]);
-    // };
-
-    // const multipleRelease = () => {
-    //     const selectedItems = selectedRows.map((item) => ({
-    //         id: item.borrowedChequeId,
-    //         status:
-    //             item.status == 'Manila' || item.status == 'Cebu'
-    //                 ? 'Forward'
-    //                 : item.status == 'Deposit'
-    //                   ? 'Deposit'
-    //                   : 'Release',
-    //     }));
-
-    //     proceed(selectedItems);
-    // };
-
-    // const proceed = (items: SelectedChequeType[]) => {
-    //     setSelectedCheques(items);
-    //     setOpenReleasing(true);
-    // };
-
-    // const handleSelectionChange = (model: GridRowSelectionModel) => {
-    //     const currentPageIds = new Set(cheques.data.map((row) => row.id));
-
-    //     // Keep selections that aren't on the current page/filter
-    //     const previousSelections = selectedRows.filter(
-    //         (row) => !currentPageIds.has(row.id),
-    //     );
-    //     // Current selections from the visible rows
-    //     const currentSelections = cheques.data
-    //         .filter((row) => model.ids.has(row.id))
-    //         .map((row) => ({
-    //             id: row.id,
-    //             borrowedChequeId: row.borrowedCheckId,
-    //             chequeNo: row.chequeNumber,
-    //             amount: row.amount,
-    //             chequeDate: row.chequeDate,
-    //             status: row.location,
-    //             releasable: row.scannedId != null,
-    //         }));
-    //     setSelectedRows([...previousSelections, ...currentSelections]);
-    // };
-
-    // const handleDelete = (borrowedCheckId: number) => {
-    //     setSelectedRows((prev) =>
-    //         prev.filter((row) => row.id !== borrowedCheckId),
-    //     );
-    // };
-
-    // const enableButton =
-    //     selectedRows.length > 0 &&
-    //     cheques.data
-    //         .filter((row) =>
-    //             selectedRows.some(
-    //                 (r) => r.borrowedChequeId === row.borrowedCheckId,
-    //             ),
-    //         )
-    //         .every((row) => row.scannedId !== null);
-
-    // const columns = createReleasingColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

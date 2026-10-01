@@ -9,6 +9,7 @@ use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
+use App\Models\ChequeRegister;
 use App\Models\ChequeStatus;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Crf;
@@ -70,6 +71,26 @@ class ChequeReleasingService
             'businessUnits' => isset($filters['company']) ? BusinessUnit::businessUnits($filters['company']) : [],
             'company' => PermissionService::userAssignedCompany($request->user())
         ]);
+    }
+    public function chequeRegistration(Request $request)
+    {
+        return Inertia::render('chequeRegister');
+    }
+
+    public function chequeRegistrationStore(Request $request)
+    {
+        $validated = $request->validate([
+            'min' => ['required', 'numeric', 'min:0'],
+            'max' => ['required', 'numeric', 'min:0', 'gte:min'],
+        ]);
+
+        ChequeRegister::create([
+            'cheque_number_from' => $validated['min'],
+            'cheque_number_to' => $validated['max'],
+            'caused_by' => $request->user()->id
+        ]);
+        return redirect()->back()->with(['status' => 'success', ',message' => 'Range Added!']);
+
     }
 
     public static function releasingCheques(array $filters = [])
