@@ -50,7 +50,6 @@ class ChequeResource extends JsonResource
             'createdAt' => $this->created_at,
             'location' => $this->location,
             'taggedLocation' => StringHelper::statusLocation($this->location),
-            'chequeRange' => optional($this)->cheque_range,
 
             'approversName' => optional($this)->approver_name,
             'scannedId' => optional($this)->scanned_id,

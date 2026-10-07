@@ -18,6 +18,7 @@ import {
     chequeRequests,
     chequeStatus,
     chequeStatusMonitoring,
+    chequeStatusRange,
     closingCheque,
     cmDisbursementClerkStatus,
     eodRecords,
@@ -109,6 +110,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           title: 'Retrieved CV/CRF',
                           href: retrievedRecords(),
                           icon: PackageOpen,
+                      },
+                      {
+                          title: 'Cheque Status Monitoring',
+                          href: chequeStatusRange(),
+                          icon: Sunset,
                       },
                       {
                           title: 'End of Day',

@@ -85,8 +85,8 @@ class ChequeReleasingService
         ]);
 
         ChequeRegister::create([
-            'cheque_number_from' => $validated['min'],
-            'cheque_number_to' => $validated['max'],
+            'cheque_from' => $validated['min'],
+            'cheque_to' => $validated['max'],
             'caused_by' => $request->user()->id
         ]);
         return redirect()->back()->with(['status' => 'success', ',message' => 'Range Added!']);

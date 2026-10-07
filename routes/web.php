@@ -7,6 +7,7 @@ use App\Http\Controllers\BorrowedCheckController;
 use App\Http\Controllers\CebuManilaClerkController;
 use App\Http\Controllers\CheckReleasingController;
 use App\Http\Controllers\CheckRequestController;
+use App\Http\Controllers\ChequeStatusMonitoringController;
 use App\Http\Controllers\ClosingController;
 use App\Http\Controllers\CrfController;
 use App\Http\Controllers\CvController;
@@ -111,6 +112,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('/', [EodController::class, 'index'])->name('eod-records');
             Route::post('generate-eod', [EodController::class, 'generateEod'])->name('generate-eod');
         });
+
+        Route::get('cheque-status-range', [ChequeStatusMonitoringController::class, 'index'])->name('cheque-status-range');
     });
 
 

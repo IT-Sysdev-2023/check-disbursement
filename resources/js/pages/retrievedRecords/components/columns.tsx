@@ -79,28 +79,7 @@ export const createChequeColumns = (
         headerAlign: 'center',
         align: 'center',
     },
-    {
-        field: 'range',
-        headerName: 'Usage',
-        headerAlign: 'center',
-        align: 'center',
-        renderCell: ({ row }) => {
-            if (row.chequeRange) {
-                return (
-                    <Chip
-                        label='Used'
-                        color="success"
-                        size="small"
-                    />
-                );
-            }
-            return  <Chip
-                        label='Unuse'
-                        color="default"
-                        size="small"
-                    />
-        },
-    },
+  
     {
         field: 'statusOrder',
         headerName: 'Status',

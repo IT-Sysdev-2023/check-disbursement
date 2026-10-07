@@ -96,3 +96,67 @@ export const eodColumns = (): GridColDef[] => [
         },
     },
 ];
+export const chequeStatusRangeColumn = (): GridColDef[] => [
+    {
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        renderCell: ({ row }) => row.cheque_number,
+    },
+    {
+        field: 'cheque_amount',
+        headerName: 'Cheque Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+    },
+    {
+        field: 'cheque_date',
+        headerName: 'Cheque Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+     {
+        field: 'payee',
+        headerName: 'Payee',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'document_type',
+        headerName: 'Cheque Type',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+      {
+        field: 'range',
+        headerName: 'Usage',
+        headerAlign: 'center',
+        align: 'center',
+        renderCell: ({ row }) => {
+            if (row.document_id) {
+                return (
+                    <Chip
+                        label='Used'
+                        color="success"
+                        size="small"
+                    />
+                );
+            }
+            return  <Chip
+                        label='Unuse'
+                        color="default"
+                        size="small"
+                    />
+        },
+    },
+];
