@@ -17,9 +17,17 @@ class ChequeStatusResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $status = $this->when(
+            $this->chequeForwardedStatus,
+            fn() => match (true) {
+                $this->chequeForwardedStatus->status === 'cancelled' => 'returned',
+                default => $this->chequeForwardedStatus->status,
+            },
+            fn() => $this->status === 'forwarded' && is_null($this->chequeForwardedStatus) ? 'received' : $this->status
+        );
         return [
             "id" => $this->id,
-            "status" => $this->status,
+            "status" => $status,
             "receiversName" => $this->receiver_name,
             "receivedBy" => $this->received_by,
             'image' => $this->image
@@ -34,7 +42,7 @@ class ChequeStatusResource extends JsonResource
             "checkableType" => Str::upper($this->checkable_type),
             "checkableId" => $this->checkable_id,
             'isClosed' => $this->is_closed,
-            'forwardedStatus' => $this->whenLoaded('chequeForwardedStatus'),
+            'forwardedStatus' => new ChequeForwardedStatusResource($this->whenLoaded('chequeForwardedStatus')),
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
             "createdAt" => $this->created_at ? $this->created_at->toFormattedDateString() : 'N/A',
             "receivedAt" => $this->received_at ? $this->received_at->toFormattedDateString() : 'N/A',

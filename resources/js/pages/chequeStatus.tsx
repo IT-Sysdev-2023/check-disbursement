@@ -98,6 +98,10 @@ export default function ChequeStatus({
                         onChange={handleChangeTab}
                         aria-label="Platform"
                     >
+                        <ToggleButton value="for_releasing">
+                            <CreditScoreOutlined sx={{ mr: 1, fontSize: 18 }} />
+                            For Releasing
+                        </ToggleButton>
                         <ToggleButton value="deposited">
                             <CreditScoreOutlined sx={{ mr: 1, fontSize: 18 }} />
                             Deposited

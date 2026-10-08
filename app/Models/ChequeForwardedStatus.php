@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 class ChequeForwardedStatus extends Model
 {
     protected $guarded = [];
 
-    public function chequeStatus(){
+    public function chequeStatus()
+    {
         return $this->belongsTo(ChequeStatus::class);
     }
 }

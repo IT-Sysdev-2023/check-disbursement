@@ -210,18 +210,11 @@ export const chequeStatusColumns = (
         flex: 1,
         renderCell: ({ row }) => {
             const { chequeStatus } = row.checkable;
-
+console.log(chequeStatus);
             let status = null;
-
-            if (row.checkable?.status) {
-                status = row.checkable.status;
-            }
 
             if (chequeStatus?.status) {
                 status = chequeStatus.status;
-            }
-            if (chequeStatus?.forwardedStatus?.status) {
-                status = chequeStatus.forwardedStatus.status;
             }
 
             if (chequeStatus?.isClosed) {
@@ -238,10 +231,12 @@ export const chequeStatusColumns = (
             > = {
                 closed: { label: 'Closed', color: 'primary' },
                 forSignature: { label: 'For Signature', color: 'success' },
-                released: { label: 'Released', color: 'default' },
+                released: { label: 'Released', color: 'success' },
                 forwarded: { label: 'Forwarded', color: 'warning' },
                 deposited: { label: 'Deposit', color: 'success' },
+                received: { label: 'Received', color: 'default' },
                 cancelled: { label: 'Cancelled', color: 'error' },
+                returned: { label: 'Returned', color: 'error' },
                 staled: { label: 'Staled', color: 'warning' },
             };
 
