@@ -170,7 +170,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('get-cheques-for-releasing', [CheckReleasingController::class, 'chequesToRelease'])->name('cheques-to-release');
             Route::get('release-cheque/{reference}', [CheckReleasingController::class, 'releaseCheque'])->name('release-cheque');
         });
-        
+
         Route::get('voucher-status-summary', [VoucherSummaryController::class, 'index'])->name('status-summary');
 
     });
@@ -212,7 +212,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::prefix('reports')->group(function () {
-        Route::get('report', [ReportController::class, 'index'])->name('report');
+        Route::get('index', [ReportController::class, 'index'])->name('report');
         Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
         Route::get('generated-reports', [ReportController::class, 'generatedReports'])->name('generatedReport');
 

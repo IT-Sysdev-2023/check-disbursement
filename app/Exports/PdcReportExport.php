@@ -14,7 +14,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithTitle;
 
-class CvReportExport implements FromCollection, WithHeadings, WithTitle, ShouldAutoSize
+class PdcReportExport implements FromCollection, WithHeadings, WithTitle, ShouldAutoSize
 {
     /**
      * @return \Illuminate\Support\Collection
@@ -30,7 +30,7 @@ class CvReportExport implements FromCollection, WithHeadings, WithTitle, ShouldA
 
     public function title(): string
     {
-        return 'Cv/Crf Report';
+        return 'PDC Report';
     }
 
     public function headings(): array
@@ -50,7 +50,7 @@ class CvReportExport implements FromCollection, WithHeadings, WithTitle, ShouldA
                 'status' => $item->status,
                 'checkable_type' => $item->checkable_type,
 
-                'no' => $item->checkable_type === 'cv' ? $checkable?->cv_no : $checkable?->crf,
+                'no' => $item->checkable_type === 'cv' ? $checkable?->cv_no : $checkable?->crf_no,
                 'cheque_number' => $checkable?->cheque_number,
                 'cheque_amount' => $checkable?->cheque_amount,
                 'cheque_date' => $checkable?->cheque_date,
@@ -69,6 +69,13 @@ class CvReportExport implements FromCollection, WithHeadings, WithTitle, ShouldA
     {
         return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit']])
             ->select('receiver_name', 'status', 'checkable_id', 'checkable_type')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
+                if ($type === Cv::class) {
+                    $q->whereColumn('cheque_date', '>', 'cv_date');
+                } elseif ($type === Crf::class) {
+                    $q->whereColumn('cheque_date', '>', 'crf_date');
+                }
+            })
             ->when(
                 !empty($this->data['date']),
                 fn($query) =>

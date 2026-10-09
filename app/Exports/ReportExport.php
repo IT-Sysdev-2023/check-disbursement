@@ -20,9 +20,28 @@ class ReportExport implements WithMultipleSheets
     }
     public function sheets(): array
     {
-        return [
-            new CvReportExport($this->data),
-            // new CrfReportExport($this->crfColumns, $this->data),
-        ];
+        $data = collect($this->data);
+        $sheets = [];
+
+        $hasPdc = $data->contains(
+            fn($item) => ($item->selectedReport ?? null) === 'pdc'
+        );
+
+        $hasVss = $data->contains(
+            fn($item) => ($item->selectedReport ?? null) === 'vss'
+        );
+
+        if ($hasPdc) {
+            $sheets[] = new PdcReportExport($this->data);
+        }
+
+        if ($hasVss) {
+            $sheets[] = new VoucherStatusSummaryExport($this->data);
+        }
+
+        return $sheets;
+
+
     }
+
 }

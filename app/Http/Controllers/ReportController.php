@@ -38,13 +38,27 @@ class ReportController extends Controller
                 'label' => $permission->company->name,
                 'value' => $permission->company->id,
             ]);
+
+        $excluded = ['staled', 'cancelled'];
+        $excludedCheque = ['forwarded', 'released', 'deposited'];
+
+        $settlementStatuses = ColumnResolver::statusColumnEnums()->reject(function ($item) use ($excluded) {
+            return in_array($item['label'], $excluded, true);
+        })->values();
+
+
+        $chequeStatuses = ColumnResolver::statusColumnEnums()->reject(function ($item) use ($excludedCheque) {
+            return in_array($item['label'], $excludedCheque, true);
+        })->values();
+
         $borrower = Borrower::borrowerSelection();
         $location = TagLocation::locationSelection();
         return Inertia::render('report/report', [
             'columns' => $columns,
             // 'cvColumns' => ColumnResolver::TYPE_COLUMNS['cv'],
             // 'crfColumns' => ColumnResolver::TYPE_COLUMNS['crf'],
-            'statuses' => ColumnResolver::statusColumnEnums(),
+            'settlementStatuses' => $settlementStatuses,
+            'chequeStatuses' => $chequeStatuses,
             'borrower' => $borrower,
             'location' => $location,
             'bu' => $bu
@@ -56,8 +70,11 @@ class ReportController extends Controller
     {
         // return Excel::download(new ReportExport, 'report.xlsx');
         $validated = $request->validate([
-            'selectedChecks' => 'required | array | min:1',
-            'selectedChecks.*' => 'string',
+            // 'selectedChecks' => 'required | array | min:1',
+            // 'selectedChecks.*' => 'string',
+            'date' => ['nullable', 'date_format:Y-m-d'],
+            'selectedReport' => 'required | array | min:1',
+            'selectedReport.*' => 'string',
             'columns' => 'required | array | min:1',
             'columns.*' => 'string',
 
@@ -88,49 +105,49 @@ class ReportController extends Controller
             when(
                 !empty($columns['date']),
                 fn($query) =>
-                $query->whereDate('created_at', $columns['date'])
+                    $query->whereDate('created_at', $columns['date'])
             )
             ->when(
                 !empty($columns['status']),
                 fn($query) =>
-                $query->where(function ($q) use ($columns) {
-                    $q->whereHas('chequeForwardedStatus', function ($q) use ($columns) {
-                        $q->whereIn('status', $columns['status']);
+                    $query->where(function ($q) use ($columns) {
+                        $q->whereHas('chequeForwardedStatus', function ($q) use ($columns) {
+                            $q->whereIn('status', $columns['status']);
+                        })
+                            ->orWhere(function ($q) use ($columns) {
+                                $q->whereDoesntHave('chequeForwardedStatus')
+                                    ->whereIn('status', $columns['status']);
+                            });
                     })
-                        ->orWhere(function ($q) use ($columns) {
-                            $q->whereDoesntHave('chequeForwardedStatus')
-                                ->whereIn('status', $columns['status']);
-                        });
-                })
             )
             ->when(
                 !empty($columns['bu']),
                 fn($outerQuery) =>
-                $outerQuery->whereHasMorph(
-                    'checkable',
-                    [Cv::class, Crf::class],
-                    fn(Builder $query) =>
-                    $query->whereHas(
-                        'businessUnit.company',
+                    $outerQuery->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
                         fn(Builder $query) =>
-                        $query->whereIn('name', $columns['bu'])
+                            $query->whereHas(
+                                'businessUnit.company',
+                                fn(Builder $query) =>
+                                    $query->whereIn('name', $columns['bu'])
+                            )
                     )
-                )
             )
             ->when(
                 !empty($columns['location']),
                 fn($outerQuery) =>
-                $outerQuery->whereHasMorph(
-                    'checkable',
-                    [Cv::class, Crf::class],
-                    fn(Builder $query) =>
-                    $query->whereHas(
-                        'tagLocation',
+                    $outerQuery->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
                         fn(Builder $query) =>
-                        $query->whereIn('location', $columns['location'])
-                    )
+                            $query->whereHas(
+                                'tagLocation',
+                                fn(Builder $query) =>
+                                    $query->whereIn('location', $columns['location'])
+                            )
 
-                )
+                    )
             )->doesntExist();
     }
 

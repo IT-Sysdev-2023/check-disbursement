@@ -20,8 +20,12 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function VoucherSummary({
     cheques,
+    filter
 }: {
     cheques: any;
+    filter: {
+            search: string;
+        };
 }) {
     const chequeColumn = voucherSummaryColumn();
     return (
@@ -30,7 +34,7 @@ export default function VoucherSummary({
                 <Box sx={{ width: '100%', typography: 'body1' }}>
                     <TableDataGrid
                         data={cheques}
-                        // filter={filter.search}
+                        filter={filter.search}
                         pagination={handlePagination}
                         handleSearchFilter={handleSearch}
                         handleSortFilter={handleSort}

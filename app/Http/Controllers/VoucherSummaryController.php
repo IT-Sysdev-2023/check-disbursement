@@ -16,8 +16,9 @@ class VoucherSummaryController extends Controller
 {
     public function index(Request $request)
     {
-
+        $filters = $request->only(['search']);
         $cheques = BorrowedCheque::query()
+            ->filter($filters)
             ->with('checkable.chequeStatus.chequeForwardedStatus')
             ->where(function (Builder $q) {
                 $q->whereHasMorph(
@@ -58,12 +59,7 @@ class VoucherSummaryController extends Controller
         return Inertia::render('voucherSummary', [
             'cheques' => BorrowedChequeResource::collection($cheques),
             'filter' => (object) [
-                'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
-                'date' => $filters['date'] ?? (object) [
-                    'start' => null,
-                    'end' => null
-                ]
             ],
         ]);
     }
