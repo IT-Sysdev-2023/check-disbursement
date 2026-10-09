@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\ChequeCollection;
 use App\Http\Resources\ScannedRecordResource;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
@@ -13,6 +14,7 @@ use App\Services\PermissionService;
 use Date;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 class StatusService
 {
@@ -23,76 +25,84 @@ class StatusService
         $staleThreshold = Date::today()->subMonths(6);
 
         //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
-        $cheque = BorrowedCheque::query()
-            ->filter($filters)
-            ->with('checkable.chequeStatus.chequeForwardedStatus')
 
-            ->where(function (Builder $q) use ($tab) {
-                if ($tab === 'for_releasing') { // "For Releasing Tab"
-                    $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
-                        $q->whereNotNull('approver_id')
-                            ->has('scannedRecord')
-                            ->whereDoesntHaveMorph(
-                                'checkable',
-                                [Cv::class, Crf::class],
-                                fn($query) => $query->has('chequeStatus')
-                            )
+        if ($tab === 'pdc' || $tab == 'staled') {
+            $cheque = new ChequeCollection(self::pdcStale($tab));
+        } else {
+            $cheque = BorrowedCheque::query()
+                ->filter($filters)
+                ->with('checkable.chequeStatus.chequeForwardedStatus')
 
-                        ;
-
-                    });
-                } else if ($tab === 'staled') {
-                    $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
-                        $q->whereNotNull('approver_id')
-                            ->has('scannedRecord')
-                            ->whereHasMorph(
-                                'checkable',
-                                [Cv::class, Crf::class],
-                                function (Builder $query, string $type) {
-                                $column = $type === Cv::class ? 'cvs.cheque_date' : 'crfs.cheque_date';
-                                $query->where($column, '<', Date::today()->subMonths(6))
-                                    ->whereDoesntHave('chequeStatus', function ($q) {
-                                        $q->where('status', 'cancelled');
-                                    });
-                            }
-                            )
-                        ;
-
-                    });
-
-                } else {
-                    $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
-                        $q->whereHasMorph(
-                            'checkable',
-                            [Cv::class, Crf::class],
-                            fn(Builder $q) =>
-                                $q->when(
-                                    auth()->user()->hasRole('regional_officer'),
-
-                                    function ($query) use ($tab) { // CEBU/ MANILA tabs
-                                    $query->has('chequeStatus.chequeForwardedStatus')
-                                        ->when($tab === 'released', fn($q) =>
-                                            $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'released'), fn($query) =>
-                                                $query->whereRelation('chequeStatus', 'status', $tab));
-                                },
-                                    function ($query) use ($tab) {
-                                    $query->whereRelation('chequeStatus', 'status', $tab)
-                                        ->where(function ($q) use ($tab) {
-                                            $q->whereRelation('chequeStatus', 'status', $tab)
-                                                ->when($tab === 'forwarded', fn($q) =>
-                                                    $q->whereHas('chequeStatus', fn($q) => $q->whereNotNull('received_by')));
-                                        });
-                                }
+                ->where(function (Builder $q) use ($tab) {
+                    if ($tab === 'for_releasing') { // "For Releasing Tab"
+                        $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
+                            $q->whereNotNull('approver_id')
+                                ->has('scannedRecord')
+                                ->whereDoesntHaveMorph(
+                                    'checkable',
+                                    [Cv::class, Crf::class],
+                                    fn($query) => $query->has('chequeStatus')
                                 )
-                                    ->has('chequeStatus')
-                        );
-                    });
-                }
 
-            })
-            ->paginate(10)
-            ->withQueryString()
-            ->toResourceCollection();
+                            ;
+
+                        });
+                    }
+                    //  else if ($tab === 'staled') {
+                    //     $q->where(function (Builder $q) { // GET THE CHEQUES FROM (STALE CHECKS)
+                    //         $q->whereNotNull('approver_id')
+                    //             ->has('scannedRecord')
+                    //             ->whereHasMorph(
+                    //                 'checkable',
+                    //                 [Cv::class, Crf::class],
+                    //                 function (Builder $query, string $type) {
+                    //                 $column = $type === Cv::class ? 'cvs.cheque_date' : 'crfs.cheque_date';
+                    //                 $query->where($column, '<', Date::today()->subMonths(6))
+                    //                     ->whereDoesntHave('chequeStatus', function ($q) {
+                    //                         $q->where('status', 'cancelled');
+                    //                     });
+                    //             }
+                    //             )
+                    //         ;
+    
+                    //     });
+    
+                    // } 
+                    else {
+                        $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
+                            $q->whereHasMorph(
+                                'checkable',
+                                [Cv::class, Crf::class],
+                                fn(Builder $q) =>
+                                    $q->when(
+                                        auth()->user()->hasRole('regional_officer'),
+
+                                        function ($query) use ($tab) { // CEBU/ MANILA tabs
+                                        $query->has('chequeStatus.chequeForwardedStatus')
+                                            ->when($tab === 'released', fn($q) =>
+                                                $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'released'), fn($query) =>
+                                                    $query->whereRelation('chequeStatus', 'status', $tab));
+                                    },
+                                        function ($query) use ($tab) {
+                                        $query->whereRelation('chequeStatus', 'status', $tab)
+                                            ->where(function ($q) use ($tab) {
+                                                $q->whereRelation('chequeStatus', 'status', $tab)
+                                                    ->when($tab === 'forwarded', fn($q) =>
+                                                        $q->whereHas('chequeStatus', fn($q) => $q->whereNotNull('received_by')));
+                                            });
+                                    }
+                                    )
+                                        ->has('chequeStatus')
+                            );
+                        });
+                    }
+
+                })
+                ->paginate(10)
+                ->withQueryString()
+                ->toResourceCollection();
+        }
+
         $company = $filters['company'] ?? 'all';
         return Inertia::render('chequeStatus', [
             'cheques' => $cheque,
@@ -111,6 +121,31 @@ class StatusService
                 'value' => 'all'
             ]),
         ]);
+    }
+
+    private static function pdcStale($tab)
+    {
+        $cvQuery = Cv::baseColumns()
+            ->when(
+                $tab == 'pdc',
+                fn($q) =>
+                    $q->whereColumn('cheque_date', '>', 'cv_date'),
+                fn($q) => $q->where('cheque_date', '<', now()->subMonths(6)) //STALED
+            );
+
+        $crfQuery = Crf::baseColumns()
+            ->when(
+                $tab == 'pdc',
+                fn($q) =>
+                    $q->whereColumn('cheque_date', '>', 'crf_date'),
+                fn($q) => $q->where('cheque_date', '<', now()->subMonths(6)) //STALED
+            );
+
+        $unionQuery = $cvQuery->unionAll($crfQuery);
+        return DB::query()
+            ->fromSub($unionQuery, 'merged')
+            ->paginate(10)
+            ->withQueryString();
     }
 
     public function scannedRecordsAmountCheckNo(Request $request)

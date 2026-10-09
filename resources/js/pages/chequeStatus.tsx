@@ -26,9 +26,9 @@ import {
     SwipeRightOutlined,
 } from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useMemo, useState } from 'react';
 import TableDataGrid from './dashboard/components/TableDataGrid';
-import { chequeStatusColumns } from './checkStatus/components/columns';
+import { chequeStatusColumns, pdcColumn } from './checkStatus/components/columns';
 import ScannedDetails from './checkStatus/components/scannedDetails';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -71,7 +71,7 @@ export default function ChequeStatus({
     const [tab, setTab] = useState(filter.tab);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
-        setTab(newValue);
+        
         router.reload({
             only: ['cheques'],
             data: {
@@ -79,13 +79,19 @@ export default function ChequeStatus({
             },
             onBefore: () => setLoading(true),
             onFinish: () => setLoading(false),
+            onSuccess: () => setTab(newValue),
         });
+        
     };
 
     const isRegional = auth.user.roles.some(
         (role) => role.name === 'regional_officer',
     );
-    const chequeColumn = chequeStatusColumns(handleStatusChange);
+
+    const columns =
+    tab === 'pdc'
+        ? pdcColumn(handleStatusChange)
+        : chequeStatusColumns(handleStatusChange);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -111,6 +117,12 @@ export default function ChequeStatus({
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Released
+                        </ToggleButton>
+                        <ToggleButton value="pdc">
+                            <DownloadDoneOutlined
+                                sx={{ mr: 1, fontSize: 18 }}
+                            />
+                            Post Dated Cheques
                         </ToggleButton>
                         <ToggleButton value="cancelled">
                             <CancelPresentationOutlined
@@ -146,7 +158,7 @@ export default function ChequeStatus({
                         pagination={handlePagination}
                         handleSearchFilter={handleSearch}
                         handleSortFilter={handleSort}
-                        columns={chequeColumn}
+                        columns={columns}
                     />
 
                     {scannedRecord && (

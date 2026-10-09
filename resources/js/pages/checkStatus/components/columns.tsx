@@ -165,7 +165,7 @@ export const chequeStatusColumns = (
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        renderCell: ({ row }) => row.checkable.chequeNumber,
+        renderCell: ({ row }) => row.checkable?.chequeNumber,
     },
     {
         field: 'chequeAmount',
@@ -174,7 +174,7 @@ export const chequeStatusColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.checkable.amount,
+        renderCell: ({ row }) => row.checkable?.amount,
     },
 
     {
@@ -184,7 +184,7 @@ export const chequeStatusColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable.bank,
+        renderCell: ({ row }) => row.checkable?.bank,
     },
     {
         field: 'chequeDate',
@@ -193,7 +193,7 @@ export const chequeStatusColumns = (
         align: 'right',
         flex: 1,
         minWidth: 100,
-        renderCell: ({ row }) => row.checkable.chequeDate,
+        renderCell: ({ row }) => row.checkable?.chequeDate,
     },
     {
         field: 'check',
@@ -209,8 +209,7 @@ export const chequeStatusColumns = (
         minWidth: 120,
         flex: 1,
         renderCell: ({ row }) => {
-            const { chequeStatus } = row.checkable;
-console.log(chequeStatus);
+            const chequeStatus = row.checkable?.chequeStatus;
             let status = null;
 
             if (chequeStatus?.status) {
@@ -256,7 +255,7 @@ console.log(chequeStatus);
         flex: 1,
         minWidth: 80,
         renderCell: ({ row }) => {
-            return row.checkable.location;
+            return row.checkable?.location;
         },
     },
     {
@@ -270,10 +269,10 @@ console.log(chequeStatus);
         renderCell: ({ row }) => {
             const record = {
                 borrowedId: row.id,
-                id: row.checkable.id,
+                id: row.checkable?.id,
                 type: row.check,
-                amount: row.checkable.unformattedAmount,
-                checkNumber: row.checkable.chequeNumber,
+                amount: row.checkable?.unformattedAmount,
+                checkNumber: row.checkable?.chequeNumber,
             };
             return (
                 <Box sx={{ width: '100%' }}>
@@ -295,6 +294,87 @@ console.log(chequeStatus);
                         {row.checkable?.status && (
                             <MenuItem value="cancel">Cancelled Check</MenuItem>
                         )}
+                    </Select>
+                </Box>
+            );
+        },
+    },
+];
+export const pdcColumn = (
+    handleStatusChange: (value: string, record: CheckScannedDetails) => void,
+): GridColDef[] => [
+    {
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+    },
+    {
+        field: 'amount',
+        headerName: 'Cheque Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        },
+    {
+        field: 'bankName',
+        headerName: 'Bank Name',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'cvDate',
+        headerName: 'CV Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'chequeDate',
+        headerName: 'Cheque Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'type',
+        headerName: 'Cheque Type',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+    },
+    {
+        field: 'actions',
+        headerName: 'Action',
+        width: 100,
+        align: 'center',
+        flex: 1,
+        headerAlign: 'center',
+        sortable: false,
+        renderCell: ({ row }) => {
+            const record = {
+                id: row.chequeId,
+                type: row.type,
+            };
+            return (
+                <Box sx={{ width: '100%' }}>
+                    <Select
+                        size="small"
+                        value={status ?? ''}
+                        onChange={(e) =>
+                            handleStatusChange(e.target.value, record)
+                        }
+                    >
+                        <MenuItem value="details">
+                            Check Request Form Details
+                        </MenuItem>
                     </Select>
                 </Box>
             );

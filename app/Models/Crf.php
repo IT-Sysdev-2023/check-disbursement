@@ -125,6 +125,7 @@ class Crf extends Model
             DB::raw("'crf' as type"),
             'bank as bank_name',
             'crfs.created_at',
+            'crfs.crf_date as cv_date',
 
             DB::raw("
                 CASE

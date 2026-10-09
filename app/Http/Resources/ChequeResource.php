@@ -18,6 +18,7 @@ class ChequeResource extends JsonResource
     public function toArray(Request $request): array
     {
         $chequeDate = $this->cheque_date ? Date::parse($this->cheque_date) : null;
+        $cvDate = $this->cv_date ? Date::parse($this->cv_date) : null;
         $staleThreshold = Date::today()->subMonths(6);
 
         $status = null;
@@ -49,6 +50,7 @@ class ChequeResource extends JsonResource
             'type' => $this->type,
             'createdAt' => $this->created_at,
             'location' => $this->location,
+            'cvDate' => optional($cvDate)->toFormattedDateString(),
             'taggedLocation' => StringHelper::statusLocation($this->location),
 
             'approversName' => optional($this)->approver_name,

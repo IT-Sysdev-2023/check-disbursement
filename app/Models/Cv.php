@@ -111,6 +111,7 @@ class Cv extends Model
             DB::raw("'cv' as type"),
             'bank_name',
             'cvs.created_at',
+            'cvs.cv_date',
 
             DB::raw("
                 CASE
