@@ -112,6 +112,20 @@ return [
             'trust_server_certificate' => true,
             'odbc_driver' => 'ODBC Driver 17 for SQL Server',
         ],
+        'brs' => [
+            'driver' => 'mysql',
+            'host' => env('BRS_DB_HOST'),
+            'port' => env('BRS_DB_PORT', '3306'),
+            'database' => env('BRS_DB_DATABASE'),
+            'username' => env('BRS_DB_USERNAME'),
+            'password' => env('BRS_DB_PASSWORD'),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => false,
+            'engine' => null,
+        ],
 
     ],
 
@@ -148,7 +162,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 

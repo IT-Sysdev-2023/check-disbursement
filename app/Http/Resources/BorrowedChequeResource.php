@@ -28,6 +28,7 @@ class BorrowedChequeResource extends JsonResource
             'totalChecks' => $this->total_checks,
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
             'approver' => $this->whenLoaded('approver'),
+            'exists_on_remote_server' => (bool) $this->exists_on_remote_server,
             'lastBorrowedAt' => Date::parse($this->last_borrowed_at)->format('M d, Y H:i A'),
         ];
     }

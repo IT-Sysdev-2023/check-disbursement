@@ -19,6 +19,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\VoucherSummaryController;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
@@ -169,6 +170,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('get-cheques-for-releasing', [CheckReleasingController::class, 'chequesToRelease'])->name('cheques-to-release');
             Route::get('release-cheque/{reference}', [CheckReleasingController::class, 'releaseCheque'])->name('release-cheque');
         });
+        
+        Route::get('voucher-status-summary', [VoucherSummaryController::class, 'index'])->name('status-summary');
+
     });
 
 

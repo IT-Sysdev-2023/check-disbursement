@@ -34,6 +34,7 @@ import {
     report,
     retrievedRecords,
     scannedDocuments,
+    statusSummary,
     users,
 } from '@/routes';
 import { SharedData, type NavItem } from '@/types';
@@ -176,6 +177,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                             //       icon: PackageX,
                             //   },
                           ],
+                    },
+                      {
+                          title: 'Voucher Status Summary',
+                          href: statusSummary(),
+                          icon: Check,
                       },
                   ]
                 : []),

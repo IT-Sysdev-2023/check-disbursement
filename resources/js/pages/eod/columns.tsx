@@ -160,3 +160,117 @@ export const chequeStatusRangeColumn = (): GridColDef[] => [
         },
     },
 ];
+export const voucherSummaryColumn = (): GridColDef[] => [
+    {
+        field: 'chequeNumber',
+        headerName: 'Cheque Number',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        renderCell: ({ row }) => row.checkable.chequeNumber,
+    },
+    {
+        field: 'cheque_amount',
+        headerName: 'Cheque Amount',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 80,
+        renderCell: ({ row }) => row.checkable.amount,
+    },
+    {
+        field: 'cheque_date',
+        headerName: 'Cheque Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        minWidth: 100,
+        renderCell: ({ row }) => row.checkable.chequeDate,
+
+    },
+     {
+        field: 'payee',
+        headerName: 'Payee',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+         minWidth: 100,
+        renderCell: ({ row }) => row.checkable.payee,
+        
+    },
+    {
+        field: 'check',
+        headerName: 'Type',
+        headerAlign: 'right',
+        align: 'right',
+        minWidth: 100,
+    },
+    {
+            field: 'settlement_status',
+            headerName: 'Settlement Status',
+            minWidth: 120,
+            flex: 1,
+            renderCell: ({ row }) => {
+                const chequeStatus = row.checkable?.chequeStatus;
+                let status = null;
+    
+                if (chequeStatus?.status) {
+                    status = chequeStatus.status;
+                }
+    
+                if (chequeStatus?.isClosed) {
+                    status = 'closed';
+                }
+    
+                const statusMap: Record<
+                    string,
+                    {
+                        label: string;
+                        color:
+                            'default' | 'primary' | 'success' | 'warning' | 'error';
+                    }
+                > = {
+                    closed: { label: 'Closed', color: 'primary' },
+                    forSignature: { label: 'For Signature', color: 'success' },
+                    released: { label: 'Released', color: 'success' },
+                    forwarded: { label: 'Forwarded', color: 'warning' },
+                    deposited: { label: 'Deposit', color: 'success' },
+                    received: { label: 'Received', color: 'default' },
+                    cancelled: { label: 'Cancelled', color: 'error' },
+                    returned: { label: 'Returned', color: 'error' },
+                    staled: { label: 'Staled', color: 'warning' },
+                };
+    
+                return (
+                    <Chip
+                        label={statusMap[status]?.label || 'For Releasing'}
+                        color={statusMap[status]?.color || 'default'}
+                    />
+                );
+            },
+        },
+      {
+        field: 'status',
+        headerName: 'Status',
+          headerAlign: 'center',
+        flex: 1,
+        align: 'center',
+          renderCell: ({ row }) => {
+            console.log(row);
+            if (row.exists_on_remote_server) {
+                return (
+                    <Chip
+                        label='Closed-Cleared'
+                        color="success"
+                        size="small"
+                    />
+                );
+            }
+            return  <Chip
+                        label='Closed-Uncleared'
+                        color="default"
+                        size="small"
+                    />
+        },
+    },
+];
