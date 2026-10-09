@@ -84,10 +84,11 @@ class ScannedRecordsController extends Controller
         $count = 0;
         $totalBatches = $filteredFiles->count();
         $referenceBatch = self::generateBatchReference();
-        $filteredFiles->each(function ($item) use (&$count, $totalBatches, $referenceBatch, $request) {
+        $filteredFiles->each(function ($item) use (&$count, $totalBatches, $referenceBatch, $request, $disk) {
 
             $count++;
             ProcessChequeJob::dispatch(
+                $disk,
                 $request->scanMethod,
                 $item,
                 Auth::user()->id,

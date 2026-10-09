@@ -19,12 +19,14 @@ use Illuminate\Support\Facades\Log;
 use App\Models\ScannedRecords;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
+use Illuminate\Contracts\Filesystem\Filesystem;
 
 class ProcessChequeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(
+        public FileSystem $disk,
         public string $scanMethod,
         public string $imagePath,
         public int $id,
@@ -45,7 +47,7 @@ class ProcessChequeJob implements ShouldQueue
         $alreadyScanned = [];
         try {
 
-            $bytes = Storage::disk('cheque_share')->get($this->imagePath);
+            $bytes = $this->disk->get($this->imagePath);
 
             $payload = self::payLayoadFunction($bytes);
 
@@ -122,6 +124,10 @@ class ProcessChequeJob implements ShouldQueue
                     'doc_filename' => basename($this->imagePath)
                 ]);
                 ScannedRecordEvent::dispatch($result, $this->id);
+
+                $filename = basename($this->imagePath);
+
+                $this->disk->move($this->imagePath, "scanned/{$filename}");
             }
         } catch (QueryException $e) {
             if ($e->errorInfo[1] === 1062) {
