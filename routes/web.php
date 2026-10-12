@@ -154,6 +154,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('cheques-for-forwarded-releasing', [CheckReleasingController::class, 'chequesForwardedToRelease'])->name('cheques-forwarded-to-release');
             Route::get('release-forwarded-cheque/{reference}', [CheckReleasingController::class, 'releaseForwardedCheque'])->name('release-forwarded-cheque');
 
+             Route::post('generate-cebu/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-cebu');
+
         });
 
         Route::prefix('check-releasing')->group(function () {

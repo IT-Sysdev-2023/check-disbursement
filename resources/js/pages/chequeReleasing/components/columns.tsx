@@ -369,7 +369,7 @@ export const createForwardedReleasingColumns = (
                         <Chip label="Release Check" color="primary" />
                     </MenuItem>
                     <MenuItem value="cancelled">
-                        <Chip label="Cancel Check" color="info" />
+                        <Chip label="Return Check" color="info" />
                     </MenuItem>
                 </Select>
             );

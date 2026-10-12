@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ForwardedExport;
 use App\Helpers\FileHandler;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\BorrowedChequeResource;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CheckReleasingController extends Controller
 {
@@ -55,7 +57,7 @@ class CheckReleasingController extends Controller
         return $this->service->storeReleaseCheckAll($request);
     }
 
-     public function receiving(Request $request)
+    public function receiving(Request $request)
     {
         return $this->service->receiving($request);
     }
@@ -225,6 +227,15 @@ class CheckReleasingController extends Controller
             ]);
     }
 
+    public function generateCebu(Request $request, string $location)
+    {
+        $date = now()->format('Ymd_His');
+        $filename = "exports/{$location}/report-{$request->user()->id}-{$date}.xlsx";
+        Excel::store(new ForwardedExport($location), $filename, 'public');
 
+        return response()->json([
+            'download_url' => asset("storage/{$filename}"),
+        ]);
+    }
 
 }

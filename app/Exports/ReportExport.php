@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use InvalidArgumentException;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
@@ -20,15 +21,14 @@ class ReportExport implements WithMultipleSheets
     }
     public function sheets(): array
     {
-        $data = collect($this->data);
+        $data = collect($this->data['selectedReport']);
         $sheets = [];
-
         $hasPdc = $data->contains(
-            fn($item) => ($item->selectedReport ?? null) === 'pdc'
+            fn($item) => ($item ?? null) === 'pdc'
         );
 
         $hasVss = $data->contains(
-            fn($item) => ($item->selectedReport ?? null) === 'vss'
+            fn($item) => ($item ?? null) === 'vss'
         );
 
         if ($hasPdc) {
@@ -38,7 +38,12 @@ class ReportExport implements WithMultipleSheets
         if ($hasVss) {
             $sheets[] = new VoucherStatusSummaryExport($this->data);
         }
-
+        
+        if (empty($sheets)) {
+            throw new InvalidArgumentException(
+                'No valid report selected. Expected pdc or vss.'
+            );
+        }
         return $sheets;
 
 
