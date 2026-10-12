@@ -5,8 +5,11 @@ namespace App\Services;
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
 use App\Helpers\StringHelper;
+use App\Http\Controllers\DashboardController;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\ChequeCollection;
+use App\Models\Bank;
+use App\Models\BankAccount;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
 use App\Models\ChequeRegister;
@@ -74,7 +77,28 @@ class ChequeReleasingService
     }
     public function chequeRegistration(Request $request)
     {
-        return Inertia::render('chequeRegister');
+        $filters = $request->only(['bank', 'bankAccount']);
+        return Inertia::render('chequeRegister', [
+            'banks' => self::banks(),
+            'bankAccounts' => isset($filters['bank']) ? self::bankAccounts($filters['bank']) : [],
+            'filters' => [
+                'bank' => $filters['bank'] ?? null,
+                'bankAccount' => $filters['bankAccount'] ?? null,
+            ]
+        ]);
+    }
+
+    private static function banks()
+    {
+        return Bank::select('id as value', 'name as label')
+            ->orderBy('name')->get();
+    }
+
+    private static function bankAccounts($bank)
+    {
+        return BankAccount::select('account_no as label', 'id as value')
+            ->where('bank_id', $bank)
+            ->orderBy('account_no')->get();
     }
 
     public function chequeRegistrationStore(Request $request)
@@ -82,9 +106,12 @@ class ChequeReleasingService
         $validated = $request->validate([
             'min' => ['required', 'numeric', 'min:0'],
             'max' => ['required', 'numeric', 'min:0', 'gte:min'],
+            'bank' => ['required'],
+            'bank_account' => ['required']
         ]);
 
         ChequeRegister::create([
+            'bank_account_id' => $validated['bank_account'],
             'cheque_from' => $validated['min'],
             'cheque_to' => $validated['max'],
             'caused_by' => $request->user()->id

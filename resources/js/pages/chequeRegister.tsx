@@ -2,9 +2,11 @@ import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
 import AppLayout from '@/layouts/app-layout';
 import { chequeRegisterStore } from '@/routes';
-import { type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
-import { Box, Button, TextField } from '@mui/material';
+import { FilterType, SelectionType, type BreadcrumbItem } from '@/types';
+import { Head, router, useForm } from '@inertiajs/react';
+import { Box, Button, SelectChangeEvent, Stack, TextField } from '@mui/material';
+import { useState } from 'react';
+import SelectItem from './dashboard/components/SelectItem';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,10 +15,20 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function ChequeRegister() {
+export default function ChequeRegister({
+    banks,
+    bankAccounts,
+    filters,
+}: {
+    banks: SelectionType[];
+    bankAccounts: SelectionType[];
+    filters: FilterType;
+    }) {
     const { data, setData, post, processing, reset } = useForm({
         min: '',
         max: '',
+        bank:  filters.bank,
+        bank_account: filters.bankAccount,
     });
 
     const minValue = data.min === '' ? null : Number(data.min);
@@ -24,6 +36,7 @@ export default function ChequeRegister() {
 
     const rangeError =
         minValue !== null && maxValue !== null && maxValue < minValue;
+
     const notifications = useNotifications();
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -43,12 +56,35 @@ export default function ChequeRegister() {
             },
         });
     };
+    const handleChange = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setData('bank', val);
+        setData('bank_account', '');
 
+        const selected = banks.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bank: selected?.value,
+                bankAccount: null,
+            },
+        });
+    };
+    const handleChangeBa = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setData('bank_account', val);
+
+        const selected = bankAccounts.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bankAccount: selected?.value,
+            },
+        });
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="CV" />
+            <Head title="Cheque Registration" />
 
-            <PageContainer title="Cheque Releasing">
+            <PageContainer title="Cheque Registration">
                 <Box
                     component="form"
                     onSubmit={handleSubmit}
@@ -56,6 +92,7 @@ export default function ChequeRegister() {
                         display: 'flex',
                         alignItems: 'flex-start',
                         gap: 2,
+                        flexWrap: 'wrap',
                     }}
                 >
                     <TextField
@@ -65,10 +102,9 @@ export default function ChequeRegister() {
                         value={data.min}
                         onChange={(e) => setData('min', e.target.value)}
                         slotProps={{
-                            htmlInput: {
-                                min: 0,
-                            },
+                            htmlInput: { min: 0 },
                         }}
+                        required
                     />
 
                     <TextField
@@ -82,11 +118,50 @@ export default function ChequeRegister() {
                             rangeError ? 'Max should not be lower than Min' : ''
                         }
                         slotProps={{
-                            htmlInput: {
-                                min: 0,
-                            },
+                            htmlInput: { min: 0 },
                         }}
+                        required
                     />
+                    {/* <Stack
+                        direction="row"
+                        sx={{
+                            width: '100%',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginTop: 4,
+                            marginBottom: 2,
+                        }}
+                    > */}
+                        <SelectItem
+                            handleChange={handleChange}
+                            value={data.bank}
+                            title="Bank"
+                            items={banks}
+                        />
+                        <SelectItem
+                            handleChange={handleChangeBa}
+                            value={data.bank_account}
+                            title="Bank Accounts"
+                            items={bankAccounts}
+                        />
+                    {/* </Stack> */}
+                    {/* <TextField
+                        label="Bank"
+                        size="small"
+                        value={data.bank}
+                        onChange={(e) => setData('bank', e.target.value)}
+                        required
+                    />
+
+                    <TextField
+                        label="Bank Account"
+                        size="small"
+                        value={data.bank_account}
+                        onChange={(e) =>
+                            setData('bank_account', e.target.value)
+                        }
+                        required
+                    /> */}
 
                     <Button
                         type="submit"
