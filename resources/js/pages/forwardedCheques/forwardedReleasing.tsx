@@ -62,12 +62,12 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
         }
     }, [flash]);
 
-    const exportCebu = async()=> {
+    const exportRecord = async(location: string) => {
          try {
         setGeneratingCebu(true);
 
         const response = await axios.post(
-            generateCebu('cebu').url
+            generateCebu(location).url
         );
         window.location.href = response.data.download_url;
         } catch (error) {
@@ -75,9 +75,6 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
         } finally {
             setGeneratingCebu(false);
         }
-    }
-    const exportManila = () => {
-        router.post(generateCebu('manila'));
     }
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -100,7 +97,7 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
                         <Button
                             variant="outlined"
                             startIcon={<FileDown />}
-                        onClick={exportCebu}
+                        onClick={() => exportRecord('cebu')}
                         disabled={generatingCebu}
                         >
                             Export Cebu Record
@@ -108,7 +105,7 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
                         <Button
                             variant="outlined"
                             startIcon={<FileOutput />}
-                            onClick={exportManila}
+                            onClick={() => exportRecord('manila')}
                         >
                             Export Manila Record
                         </Button>
