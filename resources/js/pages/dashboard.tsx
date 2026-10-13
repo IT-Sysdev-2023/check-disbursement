@@ -198,7 +198,7 @@ export default function Dashboard({
                     {/* </TableFilter> */}
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
-                            <CustomizedDataGrid cheques={cheques} />
+                            <CustomizedDataGrid cheques={cheques} filters={filters} />
                         </Grid>
                     </Grid>
                 </Box>

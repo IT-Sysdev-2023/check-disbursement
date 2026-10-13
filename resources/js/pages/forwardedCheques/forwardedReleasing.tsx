@@ -1,8 +1,9 @@
 import PageContainer from '@/components/pageContainer';
 import PdfReader from '@/components/pdf-reader';
+import ReleasingModalAll from '@/components/releasing-modal_all';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
-import { checkReleasing, generateCebu } from '@/routes';
+import { checkReleasing } from '@/routes';
 import {
     FilterType,
     InertiaPagination,
@@ -10,7 +11,7 @@ import {
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import {
     Box,
     Button,
@@ -22,11 +23,10 @@ import {
     TableHead,
     TableRow,
 } from '@mui/material';
+import { FileDown, FileOutput } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import ForwardedChequeBatch from './components/forwardedChequeBatch';
-import { LocationOnOutlined } from '@mui/icons-material';
-import { FileDown, FileOutput } from 'lucide-react';
-import axios from 'axios';
+import ReleasingModalLocation from '@/components/releasing-modal_location';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -50,7 +50,9 @@ export default function ForwardedReleasing({
 }) {
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
-const [generatingCebu, setGeneratingCebu] = useState(false);
+    const [generating, setGenerating] = useState(false);
+    const [location, setLocation] = useState('');
+    const [openReleasing, setOpenReleasing] = useState(false);
     const { flash } = usePage().props as {
         flash?: { status?: boolean; message?: string; stream?: string };
     };
@@ -62,20 +64,32 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
         }
     }, [flash]);
 
-    const exportRecord = async(location: string) => {
-         try {
-        setGeneratingCebu(true);
+    const exportRecord = async (location: string) => {
+        setOpenReleasing(true);
+        setLocation(location);
+        // setGenerating(true);
+        // router.post(
+        //     generateLocationPdf(location),
+        //     {},
+        //     {
+        //         preserveScroll: true,
+        //         preserveState: true,
+        //         onSuccess: (page) => {
+        //             const m = page.props.flash as FlashReponse;
 
-        const response = await axios.post(
-            generateCebu(location).url
-        );
-        window.location.href = response.data.download_url;
-        } catch (error) {
-            console.error('Failed to generate Excel file', error);
-        } finally {
-            setGeneratingCebu(false);
-        }
-    }
+        //             if (m.status && m.stream) {
+        //                 setStream(m.stream);
+        //                 setOpenModalPdf(true);
+        //             }
+
+        //             setGenerating(false);
+        //         },
+        //         onError: (e) => {
+        //             console.log(e);
+        //         },
+        //     },
+        // );
+    };
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -88,27 +102,28 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
                     resetFilterRouter={checkReleasing()}
                 />
                 <Box
-                        display="flex"
-                        justifyContent="flex-end"
+                    display="flex"
+                    justifyContent="flex-end"
                     mt={3}
                     mb={3}
-                        gap={2}
-                    >
-                        <Button
-                            variant="outlined"
-                            startIcon={<FileDown />}
+                    gap={2}
+                >
+                    <Button
+                        variant="outlined"
+                        startIcon={<FileDown />}
                         onClick={() => exportRecord('cebu')}
-                        disabled={generatingCebu}
-                        >
-                            Export Cebu Record
-                        </Button>
-                        <Button
-                            variant="outlined"
-                            startIcon={<FileOutput />}
-                            onClick={() => exportRecord('manila')}
-                        >
-                            Export Manila Record
-                        </Button>
+                        disabled={generating}
+                    >
+                        Release to Cebu
+                    </Button>
+                    <Button
+                        variant="outlined"
+                        startIcon={<FileOutput />}
+                        onClick={() => exportRecord('manila')}
+                        disabled={generating}
+                    >
+                        Release to Manila
+                    </Button>
                 </Box>
                 <TableContainer component={Paper}>
                     <Table aria-label="collapsible table">
@@ -119,14 +134,14 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
                                 <TableCell>Supplier</TableCell>
                                 <TableCell>Scan Method</TableCell>
                                 <TableCell>Total Cheques</TableCell>
-                                <TableCell align='center'>Action</TableCell>
+                                {/* <TableCell align="center">Action</TableCell> */}
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {cheques?.data?.length ? (
                                 cheques.data.map((row) => (
                                     <ForwardedChequeBatch
-                                        receiverNames= {receiverNames}
+                                        receiverNames={receiverNames}
                                         key={row.borrowerNo}
                                         row={row}
                                         isVisible
@@ -148,6 +163,15 @@ const [generatingCebu, setGeneratingCebu] = useState(false);
                 open={openModalPdf}
                 handleClose={() => setOpenModalPdf(false)}
                 stream={stream}
+            />
+
+            <ReleasingModalLocation
+                location= {location}
+                receiverNames={receiverNames}
+                open={openReleasing}
+                handleClose={() => {
+                    setOpenReleasing(false);
+                }}
             />
         </AppLayout>
     );

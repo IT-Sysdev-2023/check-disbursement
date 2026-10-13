@@ -36,12 +36,13 @@ class FileHandler
         return $this;
     }
 
-    public function handlePdf(array $data, string $bladeTemplate, $paper = 'letter'){
+    public function handlePdf(array $data, string $bladeTemplate, $paper = 'letter')
+    {
         $pdf = Pdf::loadView($bladeTemplate, ['data' => $data])->setPaper($paper);
 
         // Get raw PDF output
         $output = $pdf->output();
-       $this->disk->put($this->folder() . $this->fileName, $output);
+        $this->disk->put($this->folder() . $this->fileName, $output);
 
         // Encode in Base64
         $base64 = base64_encode($output);
@@ -49,7 +50,22 @@ class FileHandler
         return "data:application/pdf;base64," . $base64;
     }
 
-    
+    public function handleSavePdf(
+        array $data,
+        string $bladeTemplate,
+        string $paper = 'letter'
+    ): void {
+        $pdf = Pdf::loadView($bladeTemplate, [
+            'data' => $data,
+        ])->setPaper($paper);
+
+        $this->disk->put(
+            $this->folder() . $this->fileName,
+            $pdf->output()
+        );
+    }
+
+
     public function saveSignature($signature)
     {
         $filteredSignature = preg_replace('/^data:image\/\w+;base64,/', '', $signature);
@@ -58,7 +74,7 @@ class FileHandler
 
         $this->disk->put($this->folder() . $this->fileName, $imageData);
 
-        return  $this->folder() . $this->fileName;
+        return $this->folder() . $this->fileName;
     }
 
     protected function folder()
@@ -77,7 +93,7 @@ class FileHandler
 
     public function saveFile($file)
     {
-            return $this->disk->putFileAs($this->folder(), $file, $this->fileName);
+        return $this->disk->putFileAs($this->folder(), $file, $this->fileName);
     }
 
     protected function saveMultiFiles(Request $request, $id, callable $callback)
@@ -122,7 +138,7 @@ class FileHandler
     {
         $filename = Str::start($file, '/');
         $fullpath = $this->folder() . $subfolder . $filename;
-        
+
         if ($this->disk->exists($fullpath)) {
             return $this->disk->download($fullpath);
         } else {

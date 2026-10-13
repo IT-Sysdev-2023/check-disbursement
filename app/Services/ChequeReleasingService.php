@@ -235,6 +235,189 @@ class ChequeReleasingService
     }
 
 
+    public function storeReleaseCheckLocation(Request $request)
+    {
+
+        $validated = $request->validate([
+            'receiversName' => 'required|string|max:255',
+            'location' => 'required',
+            // 'file' => 'required|string',
+            'signature' => 'required|string',
+        ]);
+
+        $loc = [
+            'cebu' => 1,
+            'manila' => 2
+        ];
+        $location = $loc[$validated['location']];
+        
+        $getCheques = BorrowedCheque::
+            whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )
+            ->whereHasMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->where('tag_location_id', $location)
+            )
+            ->get();
+        if ($getCheques->isEmpty()) {
+            return redirect()->back()->with(['status' => 'error', 'message' => 'No Record Found']);
+        }
+
+        $cheques = $getCheques->map(function ($cheque) {
+            $location = $cheque->checkable?->getLocation;
+
+            return [
+                'id' => $cheque->id,
+                'status' => match ($location) {
+                    'Manila', 'Cebu' => 'Forward',
+                    'Deposit' => 'Deposit',
+                    default => 'Release',
+                },
+            ];
+        })->values()->all();
+
+        $validatedInputs = $validated;
+        $data1 = self::generateCebu($location, $validated['location']);
+        
+        $stream = DB::transaction(function () use ($cheques, $validated, $validatedInputs, $request, $data1) {
+
+            $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
+            $companies = [];
+            $locations = [];
+
+            $handleFiles = $this->handleFiles($validatedInputs, $transactionNo);
+            foreach ($cheques as $cheque) {
+                $borrowedCheque = BorrowedCheque::findOrFail($cheque['id']);
+                $label = StringHelper::statusPastTense($cheque['status']);
+
+                $chequeStatus = $borrowedCheque->checkable
+                    ->chequeStatus()
+                    ->create([
+                        'transaction_no' => $transactionNo,
+                        'status' => Str::lower($label),
+                        'receiver_name' => $validated['receiversName'],
+                        'image' => $handleFiles->imagePath,
+                        'signature' => $handleFiles->signaturePath,
+                        'caused_by' => $request->user()->id,
+                    ]);
+
+                $companies[] = $chequeStatus->checkable->getCompany;
+
+                $locations[] = $chequeStatus->checkable?->getLocation;
+            }
+
+            // dd($data1);
+            $data = [
+                'cheques' => $data1,
+                'transactionNo' => $transactionNo,
+
+                'dateLabel' => 'Date ' . $label . ':',
+                'dateReleased' => now()->format('M d, Y H:i A'),
+
+                'causedLabel' => 'Released By:',
+                'causedBy' => auth()->user()->name,
+
+                'receivedLabel' => 'Received By:',
+                'receivedBy' => $validated['receiversName'],
+
+                'company' => implode(', ', array_unique($companies)),
+                'location' => implode(', ', array_unique($locations)),
+
+            ];
+
+            $this->fileHandler
+                ->inFolder('pdfs/releasing/' . $label . '/')
+                ->createFileName($chequeStatus->id, $request->user()->id, '.pdf')
+                ->handleSavePdf($data, 'releasingPdf');
+
+            return $this->fileHandler
+                ->inFolder("exports/{$validated['location']}/")
+                ->createFileName('report-', auth()->user()->id, '.pdf')
+                ->handlePdf($data, 'forwardedReleasingPdf');
+        });
+
+        return redirect()->route('forwarded-releasing-viewing')->with(['status' => true, 'stream' => $stream]);
+    }
+
+    public static function generateCebu(int $location, $locationString)
+    {
+
+        $dateRange = self::getRangeTransaction($location);
+        $data = BorrowedCheque::
+            whereNot('approver_id', null)
+            ->has('scannedRecord')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->where('tag_location_id', $location)) // Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )
+             ->with('checkable')
+            ->get()
+            ->map(fn($cheque) => [
+                'cv_number' => match (get_class($cheque->checkable)) {
+                    Cv::class => $cheque->checkable->cv_no,
+                    Crf::class => $cheque->checkable->crf_no,
+                },
+                'cheque_number' => $cheque->checkable->cheque_number,
+                'cheque_date' => $cheque->checkable->cheque_date->format('Y-m-d'),
+                'payee' => $cheque->checkable->payee,
+                'cheque_amount' => NumberHelper::currency($cheque->checkable->cheque_amount)
+            ]);
+
+        return [
+            'title' => 'List of Forwarded Cheques',
+            'location' => "($locationString)",
+            'date' => $dateRange,
+            'data' => $data
+        ];
+        // $stream = $this->download($dateRange, $location, $data->toArray());
+
+        // return $stream;
+    }
+
+    private function download(string $dateRange, string $location, array $data)
+    {
+
+        $data = [
+            'title' => 'List of Forwarded Cheques',
+            'location' => "($location)",
+            'date' => $dateRange,
+            'data' => $data
+        ];
+
+        return $this->fileHandler
+            ->inFolder("exports/{$location}/")
+            ->createFileName('report-', auth()->user()->id, '.pdf')
+            ->handlePdf($data, 'forwardedReleasingPdf');
+    }
+
+    private static function getRangeTransaction(string $location)
+    {
+        $dates = BorrowedCheque::
+            whereNot('approver_id', null)
+
+            ->has('scannedRecord')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->where('tag_location_id', $location)) // Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )->get()
+            ->pluck('checkable.tagged_at');
+
+        $oldestDate = $dates->min();
+        $latestDate = $dates->max();
+
+        return $oldestDate && $latestDate
+            ? $oldestDate->format('M d, Y') . ' - ' . $latestDate->format('M d, Y')
+            : 'No dates available';
+    }
+
     public function storeReleaseCheckAll(Request $request)
     {
         $validated = $request->validate([

@@ -87,7 +87,7 @@ export default function ForwardedChequeBatch(props: {
                 <TableCell component="th" scope="row">
                     {row.cheque_count}
                 </TableCell>
-                {isVisible && (
+                {/* {isVisible && (
                     <TableCell align="center">
                         <IconButton
                             size="small"
@@ -109,7 +109,7 @@ export default function ForwardedChequeBatch(props: {
                             <ListChecks size={18} />
                         </IconButton>
                     </TableCell>
-                )}
+                )} */}
             </TableRow>
             <TableRow>
                 <TableCell

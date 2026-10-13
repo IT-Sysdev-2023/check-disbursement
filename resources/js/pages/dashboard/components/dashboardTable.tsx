@@ -1,10 +1,13 @@
-import { handlePagination } from '@/lib/utils';
-import { ChequeType, InertiaPagination } from '@/types';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
+import { ChequeType, FilterType, InertiaPagination } from '@/types';
+import { GridColDef } from '@mui/x-data-grid';
+import TableDataGrid from './TableDataGrid';
 
 export default function CustomizedDataGrid({
+    filters,
     cheques,
 }: {
+    filters: FilterType;
     cheques: InertiaPagination<ChequeType>;
 }) {
     const columns: GridColDef[] = [
@@ -63,52 +66,61 @@ export default function CustomizedDataGrid({
     ];
 
     return (
-        <DataGrid
-            rows={cheques.data}
+        <TableDataGrid
+            data={cheques}
+            filter={filters.search}
+            hasSelection
+            pagination={handlePagination}
+            handleSearchFilter={handleSearch}
+            handleSortFilter={handleSort}
             columns={columns}
-            paginationMode="server"
-            paginationModel={{
-                page: cheques.meta.current_page - 1,
-                pageSize: cheques.meta.per_page,
-            }}
-            pagination
-            rowCount={cheques.meta.total}
-            onPaginationModelChange={handlePagination}
-            getRowClassName={(params) =>
-                params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
-            }
-            initialState={{
-                pagination: { paginationModel: { pageSize: 20 } },
-            }}
-            pageSizeOptions={[10, 20, 50]}
-            disableColumnResize
-            density="compact"
-            slotProps={{
-                filterPanel: {
-                    filterFormProps: {
-                        logicOperatorInputProps: {
-                            variant: 'outlined',
-                            size: 'small',
-                        },
-                        columnInputProps: {
-                            variant: 'outlined',
-                            size: 'small',
-                            sx: { mt: 'auto' },
-                        },
-                        operatorInputProps: {
-                            variant: 'outlined',
-                            size: 'small',
-                            sx: { mt: 'auto' },
-                        },
-                        valueInputProps: {
-                            InputComponentProps: {
-                                variant: 'outlined',
-                                size: 'small',
-                            },
-                        },
-                    },
-                },
-            }}
         />
+        // <DataGrid
+        //     rows={cheques.data}
+        //     columns={columns}
+        //     paginationMode="server"
+        //     paginationModel={{
+        //         page: cheques.meta.current_page - 1,
+        //         pageSize: cheques.meta.per_page,
+        //     }}
+        //     pagination
+        //     rowCount={cheques.meta.total}
+        //     onPaginationModelChange={handlePagination}
+        //     getRowClassName={(params) =>
+        //         params.indexRelativeToCurrentPage % 2 === 0 ? 'even' : 'odd'
+        //     }
+        //     initialState={{
+        //         pagination: { paginationModel: { pageSize: 20 } },
+        //     }}
+        //     pageSizeOptions={[10, 20, 50]}
+        //     disableColumnResize
+        //     density="compact"
+        //     slotProps={{
+        //         filterPanel: {
+        //             filterFormProps: {
+        //                 logicOperatorInputProps: {
+        //                     variant: 'outlined',
+        //                     size: 'small',
+        //                 },
+        //                 columnInputProps: {
+        //                     variant: 'outlined',
+        //                     size: 'small',
+        //                     sx: { mt: 'auto' },
+        //                 },
+        //                 operatorInputProps: {
+        //                     variant: 'outlined',
+        //                     size: 'small',
+        //                     sx: { mt: 'auto' },
+        //                 },
+        //                 valueInputProps: {
+        //                     InputComponentProps: {
+        //                         variant: 'outlined',
+        //                         size: 'small',
+        //                     },
+        //                 },
+        //             },
+        //         },
+        //     }}
+        // />
     );
 }

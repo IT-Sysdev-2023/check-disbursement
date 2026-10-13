@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\ForwardedExport;
 use App\Helpers\FileHandler;
+use App\Helpers\NumberHelper;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\BorrowedChequeResource;
 use App\Models\BorrowedCheque;
@@ -12,6 +13,7 @@ use App\Models\Cv;
 use App\Models\ReceiverName;
 use App\Services\ChequeReleasingService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -21,7 +23,7 @@ use Maatwebsite\Excel\Facades\Excel;
 class CheckReleasingController extends Controller
 {
 
-    public function __construct(protected ChequeReleasingService $service)
+    public function __construct(protected ChequeReleasingService $service, protected FileHandler $fileHandler)
     {
     }
     public function index(Request $request)
@@ -55,6 +57,10 @@ class CheckReleasingController extends Controller
     public function storeAll(Request $request)
     {
         return $this->service->storeReleaseCheckAll($request);
+    }
+    public function storeLocation(Request $request)
+    {
+        return $this->service->storeReleaseCheckLocation($request);
     }
 
     public function receiving(Request $request)
@@ -227,15 +233,102 @@ class CheckReleasingController extends Controller
             ]);
     }
 
+    private static function getRangeTransaction(string $location)
+    {
+        $dates = BorrowedCheque::
+            whereNot('approver_id', null)
+
+            ->has('scannedRecord')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->where('tag_location_id', $location)) // Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )->get()
+            ->pluck('checkable.tagged_at');
+
+        $oldestDate = $dates->min();
+        $latestDate = $dates->max();
+
+        return $oldestDate && $latestDate
+            ? $oldestDate->format('M d, Y') . ' - ' . $latestDate->format('M d, Y')
+            : 'No dates available';
+    }
+
+    private static function isEmptyRecord($locationId)
+    {
+        return BorrowedCheque::
+            whereNot('approver_id', null)
+            ->has('scannedRecord')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->where('tag_location_id', $locationId)) // Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )->doesntExist();
+    }
+
     public function generateCebu(Request $request, string $location)
     {
-        $date = now()->format('Ymd_His');
-        $filename = "exports/{$location}/report-{$request->user()->id}-{$date}.xlsx";
-        Excel::store(new ForwardedExport($location), $filename, 'public');
 
-        return response()->json([
-            'download_url' => asset("storage/{$filename}"),
-        ]);
+        // $date = now()->format('Ymd_His');
+        // $filename = "exports/{$location}/report-{$request->user()->id}-{$date}.xlsx";
+        // Excel::store(new ForwardedExport($location), $filename, 'public');
+
+        // return response()->json([
+        //     'download_url' => asset("storage/{$filename}"),
+        // ]);
+        $loc = [
+            'cebu' => 1,
+            'manila' => 2
+        ];
+        $locationId = $loc[$location];
+
+        if (self::isEmptyRecord($locationId)) {
+            return redirect()->back()->with(['status' => false, 'message' => 'No Records Found']);
+        }
+
+        $dateRange = self::getRangeTransaction($locationId);
+        $data = BorrowedCheque::
+            whereNot('approver_id', null)
+            ->has('scannedRecord')
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->where('tag_location_id', $locationId)) // Manila and Cebu
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            )->with('checkable')
+            ->get()
+            ->map(fn($cheque) => [
+                'cv_number' => match (get_class($cheque->checkable)) {
+                    Cv::class => $cheque->checkable->cv_no,
+                    Crf::class => $cheque->checkable->crf_no,
+                },
+                'cheque_number' => $cheque->checkable->cheque_number,
+                'cheque_date' => $cheque->checkable->cheque_date->format('Y-m-d'),
+                'payee' => $cheque->checkable->payee,
+                'cheque_amount' => NumberHelper::currency($cheque->checkable->cheque_amount)
+            ]);
+
+        $stream = $this->download($dateRange, $location, $data->toArray());
+
+        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
+    }
+
+    private function download(string $dateRange, string $location, array $data)
+    {
+
+        $data = [
+            'title' => 'List of Forwarded Cheques',
+            'location' => "($location)",
+            'date' => $dateRange,
+            'data' => $data
+        ];
+
+        return $this->fileHandler
+            ->inFolder("exports/{$location}/")
+            ->createFileName('report-', auth()->user()->id, '.pdf')
+            ->handlePdf($data, 'forwardedReleasingPdf');
     }
 
 }

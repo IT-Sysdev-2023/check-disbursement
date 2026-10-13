@@ -22,6 +22,7 @@ class Cv extends Model
             'cheque_date' => 'date',
             'cv_date' => 'date',
             'resolved_cheque_date' => 'date',
+            'tagged_at' => 'datetime',
         ];
 
     }
