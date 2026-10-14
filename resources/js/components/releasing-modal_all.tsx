@@ -21,7 +21,6 @@ interface MyFormData {
 }
 
 export default function ReleasingModalAll({
-    isForwarded = false,
     batch,
     open,
     handleClose,
@@ -29,7 +28,6 @@ export default function ReleasingModalAll({
 }: {
     batch: string;
     open: boolean;
-    isForwarded?: boolean;
     handleClose: () => void;
     receiverNames: Option[];
 }) {
@@ -48,7 +46,6 @@ export default function ReleasingModalAll({
 
             transform((data) => ({
                 ...data,
-                isForwarded: isForwarded,
                 batchReference: batch,
                 signature: canvas.toDataURL('image/png'),
             }));

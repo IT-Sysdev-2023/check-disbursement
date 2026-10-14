@@ -53,9 +53,9 @@ class CheckReleasingController extends Controller
     {
         return $this->service->batchRelease($request);
     }
-    public function storeLocation(Request $request)
+    public function storeForwarded(Request $request)
     {
-        return $this->service->storeReleaseCheckLocation($request);
+        return $this->service->storeForwarded($request);
     }
 
     public function receiving(Request $request)
@@ -109,20 +109,6 @@ class CheckReleasingController extends Controller
         $records = BorrowedCheque::with('checkable')
             ->whereRelation('scannedRecord', 'batch_reference', $request->batchReference)
             ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
-            ->whereDoesntHaveMorph(
-                'checkable',
-                [Cv::class, Crf::class],
-                fn($query) => $query->has('chequeStatus')
-            )
-            ->get();
-        return response()->json(BorrowedChequeResource::collection($records));
-    }
-
-    public function chequesForwardedToRelease(Request $request)
-    {
-        $records = BorrowedCheque::with('checkable')
-            ->whereRelation('scannedRecord', 'batch_reference', $request->batchReference)
-            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],

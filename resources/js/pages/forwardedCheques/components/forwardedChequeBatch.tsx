@@ -1,5 +1,5 @@
-import ReleasingModalAll from '@/components/releasing-modal_all';
-import { chequesForwardedToRelease, releaseForwardedCheque } from '@/routes';
+
+import { chequesForwardedToRelease } from '@/routes';
 import { Option } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
@@ -16,7 +16,6 @@ import {
     Typography,
 } from '@mui/material';
 import axios from 'axios';
-import { ListChecks, Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function ForwardedChequeBatch(props: {
@@ -24,11 +23,9 @@ export default function ForwardedChequeBatch(props: {
     isVisible: boolean;
     receiverNames: Option[];
 }) {
-    const { row, isVisible, receiverNames } = props;
-    const [selectedCheques, setSelectedCheques] = useState('');
+    const { row } = props;
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
-    const [openReleasing, setOpenReleasing] = useState(false);
 
     useEffect(() => {
         if (open) {
@@ -51,14 +48,6 @@ export default function ForwardedChequeBatch(props: {
         }
     }, [open, row.batch_reference]);
 
-    const releaseAll = async (batchReference: string) => {
-        setSelectedCheques(batchReference);
-        setOpenReleasing(true);
-    };
-
-    const selectToRelease = async (batchReference: string) => {
-        router.visit(releaseForwardedCheque(batchReference));
-    };
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -193,15 +182,6 @@ export default function ForwardedChequeBatch(props: {
                     </Collapse>
                 </TableCell>
             </TableRow>
-            <ReleasingModalAll
-                isForwarded={true}
-                batch={selectedCheques}
-                receiverNames={receiverNames}
-                open={openReleasing}
-                handleClose={() => {
-                    setOpenReleasing(false);
-                }}
-            />
         </>
     );
 }

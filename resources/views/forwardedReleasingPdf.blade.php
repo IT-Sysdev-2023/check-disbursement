@@ -72,6 +72,20 @@
             page-break-inside: avoid;
         }
 
+        .report-details {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 20px;
+            font-size: 12px;
+        }
+
+        .report-details td {
+            border: none;
+            text-align: left;
+            vertical-align: top;
+        }
+
         .page-break {
             page-break-before: always;
         }
@@ -81,10 +95,27 @@
 <body>
 
     <div class="report-header">
-        <h1>{{ $data['cheques']['title'] ?? '-' }}</h1>
-        <div class="location">{{ $data['cheques']['location'] ?? '-' }}</div>
-        <div class="report-date">{{ $data['cheques']['date'] ?? '-' }}</div>
+        <h1>List of Forwarded Cheques</h1>
+        <div class="location">{{ $data['location'] ?? '-' }}</div>
+        <div class="report-date">{{ $data['dateRange'] ?? '-' }}</div>
     </div>
+
+    <table class="report-details">
+        <tr>
+            <td style="width: 50%; border: none; padding: 0 0 8px 0;">
+                <strong>Transaction Number:</strong> {{ $data['transactionNo'] ?? '-' }}
+            </td>
+            <td style="width: 50%; border: none; padding: 0 0 8px 0; text-align: right;">
+                <strong>{{ $data['dateLabel'] }}</strong> {{ $data['dateReleased'] ?? '-' }}
+            </td>
+        </tr>
+        {{-- <tr>
+            <td style="border: none; padding: 0;">
+                <strong>Location:</strong> {{ $data['location'] ?? '-' }}
+            </td>
+            <td style="border: none; padding: 0;"></td>
+        </tr> --}}
+    </table>
 
     <table>
         <thead>
@@ -98,26 +129,62 @@
         </thead>
 
         <tbody>
-            @foreach ($data['cheques']['data'] as $cheque)
+            @foreach ($data['cheques'] as $cheque)
                 <tr>
-                    <td class="center">{{ $cheque['cv_number'] }}</td>
+                    <td class="center">{{ $cheque['cv_no'] }}</td>
                     <td class="center">{{ $cheque['cheque_number'] }}</td>
                     <td class="center">{{ $cheque['cheque_date'] }}</td>
                     <td>{{ $cheque['payee'] }}</td>
                     <td class="center">
-                        {{ $cheque['cheque_amount']  }}
+                        {{ $cheque['cheque_amount'] }}
                     </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    <table class="report-details signature-details">
+        <tr>
+            <td style="width: 50%; border: none; padding: 30px 0 0 0;">
+                <strong>Released By:</strong>
+            </td>
+            <td style="width: 50%; border: none; padding: 30px 0 0 0;">
+                <strong>Received By:</strong>
+            </td>
+        </tr>
 
+        <tr>
+            <td style="border: none; padding: 10px 0 0 40px;">
+                <div style="text-align: center; border-bottom: 1px solid #000; padding-bottom: 3px;">
+                    <div style="height: 50px; text-align: center;">
+                        @if (!empty($data['signature']))
+                            <img src="{{ $data['signature'] }}" alt="Signature"
+                                style="max-height: 50px; max-width: 180px;">
+                        @endif
+                    </div>
+
+                    <div style="text-align: center;">
+                        {{ Str::upper($data['causedBy'] ?? '-') }}
+                    </div>
+                </div>
+            </td>
+
+            <td style="border: none; padding: 10px 0 0 40px;">
+                <div style="text-align: center; border-bottom: 1px solid #000; padding-bottom: 3px;">
+                    <div style="height: 50px;"></div>
+
+                    <div style="text-align: center;">
+                        {{ Str::upper($data['receivedBy'] ?? '-') }}
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
     {{-- Start the included content on a new page --}}
-    <div class="page-break"></div>
+    {{-- <div class="page-break"></div>
 
     @include('releasingPdf', [
         'data' => $data,
-    ])
+    ]) --}}
 
 </body>
 

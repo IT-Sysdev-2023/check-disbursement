@@ -1,5 +1,6 @@
 import PageContainer from '@/components/pageContainer';
 import PdfReader from '@/components/pdf-reader';
+import ReleasingModalLocation from '@/components/releasing-modal_location';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { checkReleasing } from '@/routes';
@@ -14,18 +15,12 @@ import { Head, usePage } from '@inertiajs/react';
 import {
     Box,
     Button,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
 } from '@mui/material';
 import { FileDown, FileOutput } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import ForwardedChequeBatch from './components/forwardedChequeBatch';
-import ReleasingModalLocation from '@/components/releasing-modal_location';
+import TableDataGrid from '../dashboard/components/TableDataGrid';
+import { forwardColumns } from './components/forwardColumn';
+import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -66,29 +61,9 @@ export default function ForwardedReleasing({
     const exportRecord = async (location: string) => {
         setOpenReleasing(true);
         setLocation(location);
-        // setGenerating(true);
-        // router.post(
-        //     generateLocationPdf(location),
-        //     {},
-        //     {
-        //         preserveScroll: true,
-        //         preserveState: true,
-        //         onSuccess: (page) => {
-        //             const m = page.props.flash as FlashReponse;
-
-        //             if (m.status && m.stream) {
-        //                 setStream(m.stream);
-        //                 setOpenModalPdf(true);
-        //             }
-
-        //             setGenerating(false);
-        //         },
-        //         onError: (e) => {
-        //             console.log(e);
-        //         },
-        //     },
-        // );
     };
+
+    const column = forwardColumns();
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -124,38 +99,15 @@ export default function ForwardedReleasing({
                         Release to Manila
                     </Button>
                 </Box>
-                <TableContainer component={Paper}>
-                    <Table aria-label="collapsible table">
-                        <TableHead>
-                            <TableRow>
-                                <TableCell />
-                                <TableCell>Batch Reference</TableCell>
-                                <TableCell>Supplier</TableCell>
-                                <TableCell>Scan Method</TableCell>
-                                <TableCell>Total Cheques</TableCell>
-                                {/* <TableCell align="center">Action</TableCell> */}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {cheques?.data?.length ? (
-                                cheques.data.map((row) => (
-                                    <ForwardedChequeBatch
-                                        receiverNames={receiverNames}
-                                        key={row.borrowerNo}
-                                        row={row}
-                                        isVisible
-                                    />
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={7} align="center">
-                                        No records found
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
+                
+                <TableDataGrid
+                    data={cheques}
+                    filter={filter.search}
+                    pagination={handlePagination}
+                    handleSearchFilter={handleSearch}
+                    handleSortFilter={handleSort}
+                    columns={column}
+                />
             </PageContainer>
 
             <PdfReader
@@ -165,7 +117,7 @@ export default function ForwardedReleasing({
             />
 
             <ReleasingModalLocation
-                location= {location}
+                location={location}
                 receiverNames={receiverNames}
                 open={openReleasing}
                 handleClose={() => {

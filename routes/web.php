@@ -146,12 +146,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         //!Viewing Forwarded in Section Head
         Route::prefix('forwarded-viewing')->group(function () {
-            Route::get('forwarded-releasing-viewing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
+            Route::get('releasing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
             Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
             Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
             Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
 
-            Route::get('cheques-for-forwarded-releasing', [CheckReleasingController::class, 'chequesForwardedToRelease'])->name('cheques-forwarded-to-release');
             Route::get('release-forwarded-cheque/{reference}', [CheckReleasingController::class, 'releaseForwardedCheque'])->name('release-forwarded-cheque');
 
              Route::post('generate-location-pdf/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-location-pdf');
@@ -166,7 +165,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Route::post('release-check', [CheckReleasingController::class, 'show'])->name('release-check');
             Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
             Route::post('store-release-check-all', [CheckReleasingController::class, 'storeAll'])->name('store-release-check-all');
-            Route::post('store-release-check-location', [CheckReleasingController::class, 'storeLocation'])->name('store-release-check-location');
+            Route::post('store-release-check-location', [CheckReleasingController::class, 'storeForwarded'])->name('store-release-check-location');
             Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
             Route::post('cancel', [CheckReleasingController::class, 'cancelCheck'])->name('cancel-releasing');
 
