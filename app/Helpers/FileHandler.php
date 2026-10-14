@@ -77,6 +77,20 @@ class FileHandler
         return $this->folder() . $this->fileName;
     }
 
+    public function toDataUri($signaturePath)
+    {
+        $disk = $this->disk;
+        if ($disk->exists($signaturePath)) {
+            $imageData = $disk->get($signaturePath);
+
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $mime = $finfo->buffer($imageData);
+
+            return 'data:' . $mime . ';base64,'
+                . base64_encode($imageData);
+        }
+    }
+
     protected function folder()
     {
         return Str::finish($this->folderName, '/');

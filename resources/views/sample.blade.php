@@ -8,7 +8,7 @@
 
     <style>
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: 'DejaVu Sans', sans-serif;
             font-size: 12px;
             color: #222;
             margin: 30px;

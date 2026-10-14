@@ -45,11 +45,6 @@ class CheckReleasingController extends Controller
         return $this->service->forwardedReleasing($request);
     }
 
-    public function show(Request $request)
-    {
-        return $this->service->getReleaseCheck($request->cheques, $request->status);
-    }
-
     public function store(ReleasingCheckRequest $request)
     {
         return $this->service->storeReleaseCheck($request);
@@ -102,11 +97,11 @@ class CheckReleasingController extends Controller
         $validated = $request->validate([
             'name' => 'string|required'
         ]);
-        $response = ReceiverName::create(['name' => $validated['name']]);
+        $response = ReceiverName::firstOrCreate(['name' => $validated['name']]);
 
         $isSuccess = $response->wasRecentlyCreated;
 
-        return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Saved' : 'Failed to Save']);
+        return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Saved' : 'Already Saved!']);
     }
 
     public function chequesToRelease(Request $request)

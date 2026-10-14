@@ -94,10 +94,20 @@ export default function ReleasingModal({
         return () => window.removeEventListener('resize', updateCanvasSize);
     }, []);
 
+    const [loadingAddUser, setLoadingAddUser] = useState(false);
     const addUser = () => {
-        router.post(storeReceiverName(), {
-            name: data.receiversName,
-        });
+        setLoadingAddUser(true);
+        router.post(
+            storeReceiverName(),
+            {
+                name: data.receiversName,
+            },
+            {
+                onSuccess: () => {
+                    setLoadingAddUser(false);
+                },
+            },
+        );
     };
 
     const handleFileChange = () => {
@@ -161,6 +171,7 @@ export default function ReleasingModal({
                                     <IconButton
                                         color="primary"
                                         onClick={addUser}
+                                        loading={loadingAddUser}
                                     >
                                         <Plus size={20} />
                                     </IconButton>
@@ -190,7 +201,7 @@ export default function ReleasingModal({
                                             }}
                                         >
                                             <Typography variant="body2">
-                                               1 selected image
+                                                1 selected image
                                             </Typography>
 
                                             <IconButton
