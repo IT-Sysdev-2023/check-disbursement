@@ -195,7 +195,7 @@ export default function ForwardedChequeBatch(props: {
             </TableRow>
             <ReleasingModalAll
                 isForwarded={true}
-                cheques={selectedCheques}
+                batch={selectedCheques}
                 receiverNames={receiverNames}
                 open={openReleasing}
                 handleClose={() => {

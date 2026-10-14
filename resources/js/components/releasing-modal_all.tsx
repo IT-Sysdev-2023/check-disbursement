@@ -13,7 +13,6 @@ import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import AutocompleteUser from './autocomplete-user';
 import SignatureModal from './signature-modal';
-// import ScanChequeModal from './scan-cheque-modal';
 
 interface MyFormData {
     receiversName: string;
@@ -23,19 +22,18 @@ interface MyFormData {
 
 export default function ReleasingModalAll({
     isForwarded = false,
-    cheques,
+    batch,
     open,
     handleClose,
     receiverNames,
 }: {
-    cheques: string;
+    batch: string;
     open: boolean;
     isForwarded?: boolean;
     handleClose: () => void;
     receiverNames: Option[];
 }) {
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
-    // const [scanChequeModalOpen, setScanChequeModalOpen] = useState(false);
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
@@ -51,7 +49,7 @@ export default function ReleasingModalAll({
             transform((data) => ({
                 ...data,
                 isForwarded: isForwarded,
-                cheques: cheques,
+                batchReference: batch,
                 signature: canvas.toDataURL('image/png'),
             }));
 
@@ -99,29 +97,13 @@ export default function ReleasingModalAll({
         });
     };
 
-    // const handleClearSignature = () => {
-    //     sigPadRef.current?.clear();
-    //     setData('signature', null);
-    // };
-
-    // const handleSaveSignature = () => {
-    //     if (sigPadRef.current && !sigPadRef.current.isEmpty()) {
-    //         const canvas = sigPadRef.current.getCanvas();
-    //         setData('signature', canvas.toDataURL('image/png'));
-    //     }
-    // };
-
     const handleFileChange = () => {
         setSignatureModalOpen(true);
-        // if (e.target.files && e.target.files[0]) {
-        //     setData('file', e.target.files[0]);
-        // }
     };
 
     const onCaptureImage = (image: string) => {
         setData('file', image);
         setSignatureModalOpen(false);
-        // console.log(image);
     };
 
     return (
@@ -273,7 +255,6 @@ export default function ReleasingModalAll({
                 open={signatureModalOpen}
                 handleClose={() => setSignatureModalOpen(false)}
             />
-            {/* <ScanChequeModal onClose={() => setScanChequeModalOpen(false)} onSave={() => {}} open={scanChequeModalOpen} /> */}
         </>
     );
 }

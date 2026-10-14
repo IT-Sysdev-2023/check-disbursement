@@ -173,4 +173,31 @@ class FileHandler
 
         return "{$name}-{$filename}";
     }
+
+    public function handleFiles(array $validated, string $transactionNo)
+    {
+        $userId = auth()->user()->id;
+        $uuid = Str::uuid();
+
+        $signaturePath = $this
+            ->inFolder($transactionNo . "/signatures")
+            ->createFileName($uuid, $userId, '.png')
+            ->saveSignature($validated['signature']);
+
+        $uri = $this->toDataUri($signaturePath);
+
+        $imagePath = '';
+        if ($validated['file']) {
+            $imagePath = $this
+                ->inFolder($transactionNo . "/images")
+                ->createFileName($uuid, $userId, '.png')
+                ->saveFile($validated['file']);
+        }
+
+        return (object) [
+            'signaturePath' => $signaturePath,
+            'imagePath' => $imagePath,
+            'signatureUri' => $uri
+        ];
+    }
 }

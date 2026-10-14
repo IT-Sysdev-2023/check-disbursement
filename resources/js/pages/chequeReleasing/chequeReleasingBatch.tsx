@@ -25,7 +25,7 @@ export default function ChequeReleasingBatch(props: {
     receiverNames: Option[];
 }) {
     const { row, isVisible, receiverNames } = props;
-    const [selectedCheques, setSelectedCheques] = useState('');
+    const [selectedBatch, setSelectedBatch] = useState('');
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
     const [openReleasing, setOpenReleasing] = useState(false);
@@ -49,17 +49,7 @@ export default function ChequeReleasingBatch(props: {
     }, [open, row.batch_reference]);
 
     const releaseAll = async (batchReference: string) => {
-        // const selectedItems = selectedRows.map((item) => ({
-        //     id: item.borrowedChequeId,
-        //     status:
-        //         item.status == 'Manila' || item.status == 'Cebu'
-        //             ? 'Forward'
-        //             : item.status == 'Deposit'
-        //               ? 'Deposit'
-        //               : 'Release',
-        // }));
-        
-        setSelectedCheques(batchReference);
+        setSelectedBatch(batchReference);
         setOpenReleasing(true);
     };
 
@@ -201,7 +191,7 @@ export default function ChequeReleasingBatch(props: {
                 </TableCell>
             </TableRow>
             <ReleasingModalAll
-                cheques={selectedCheques}
+                batch={selectedBatch}
                 receiverNames={receiverNames}
                 open={openReleasing}
                 handleClose={() => {

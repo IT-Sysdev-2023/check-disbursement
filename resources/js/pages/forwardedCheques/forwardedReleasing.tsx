@@ -1,6 +1,5 @@
 import PageContainer from '@/components/pageContainer';
 import PdfReader from '@/components/pdf-reader';
-import ReleasingModalAll from '@/components/releasing-modal_all';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { checkReleasing } from '@/routes';

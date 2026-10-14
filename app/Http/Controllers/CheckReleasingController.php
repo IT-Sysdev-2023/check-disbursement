@@ -47,11 +47,11 @@ class CheckReleasingController extends Controller
 
     public function store(ReleasingCheckRequest $request)
     {
-        return $this->service->storeReleaseCheck($request);
+        return $this->service->individualRelease($request);
     }
     public function storeAll(Request $request)
     {
-        return $this->service->storeReleaseCheckAll($request);
+        return $this->service->batchRelease($request);
     }
     public function storeLocation(Request $request)
     {

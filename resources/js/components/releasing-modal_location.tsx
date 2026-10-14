@@ -1,6 +1,6 @@
 import { storeReceiverName } from '@/actions/App/Http/Controllers/CheckReleasingController';
 import { modalMediumStyle } from '@/lib/modalStyle';
-import { storeReleaseCheckAll, storeReleaseCheckLocation } from '@/routes';
+import { storeReleaseCheckLocation } from '@/routes';
 import { Option } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import { FormControl, FormHelperText, Grid, IconButton } from '@mui/material';
