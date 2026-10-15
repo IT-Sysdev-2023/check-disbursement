@@ -100,14 +100,22 @@ class Cv extends Model
     {
         return $builder->select(
             'cvs.id as cheque_id',
-            DB::raw('CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END as cheque_number'),
+            'crf_id',
+            DB::raw('
+            COALESCE(
+                    NULLIF(cvs.cheque_number, 0),
+                    NULLIF(cvs.resolved_cheque_number, 0),
+                    NULLIF(crfs.cheque_number, 0),
+                    crfs.resolved_cheque_number
+                ) as cheque_number
+            '),
             'cvs.cheque_date',
             'companies.name as company_name',
             'business_units.name as bu_name',
-            'cheque_amount as amount',
+            'cvs.cheque_amount as amount',
             'cvs.payee',
             'cvs.cv_no',
-            'tagged_at',
+            'cvs.tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),
             'bank_name',
@@ -116,16 +124,23 @@ class Cv extends Model
 
             DB::raw("
                 CASE
-                    WHEN (CASE WHEN cheque_number = 0 THEN resolved_cheque_number ELSE cheque_number END) IS NULL THEN 'Assign Cheque Number'
+                     WHEN COALESCE(
+                        NULLIF(cvs.cheque_number, 0),
+                        NULLIF(cvs.resolved_cheque_number, 0),
+                        NULLIF(crfs.cheque_number, 0),
+                        crfs.resolved_cheque_number
+                    ) IS NULL THEN 'Assign Cheque Number'
                     WHEN cvs.cheque_date IS NULL THEN 'Assign Cheque Date'
-                    WHEN tagged_at IS NOT NULL THEN 'For Signature'
+                     WHEN cvs.crf_id IS NOT NULL THEN 'Tagging'
+                    WHEN cvs.tagged_at IS NOT NULL THEN 'For Signature'
                     ELSE 'Tagging'
                 END as status_order
             ")
         )
             ->join('business_units', 'business_units.id', '=', 'cvs.business_unit_id')
             ->join('companies', 'companies.id', '=', 'business_units.company_id')
-            ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cvs.tag_location_id');
+            ->leftJoin('tag_locations', 'tag_locations.id', '=', 'cvs.tag_location_id')
+            ->leftJoin('crfs', 'crfs.id', '=', 'cvs.crf_id');
     }
 
     public function scopeScanRecords(Builder $builder)
@@ -144,6 +159,12 @@ class Cv extends Model
             ->whereNotNull('borrowed_cheques.approved_at')
             ->leftJoin('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id');
     }
+
+    public function crf()
+    {
+        return $this->belongsTo(Crf::class);
+    }
+
     public function businessUnit()
     {
         return $this->belongsTo(BusinessUnit::class);

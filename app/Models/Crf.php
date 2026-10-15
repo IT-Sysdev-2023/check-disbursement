@@ -114,6 +114,7 @@ class Crf extends Model
     {
         return $builder->select(
             'crfs.id as cheque_id',
+            DB::raw('NULL as crf_id'),
             DB::raw('COALESCE(crfs.cheque_number, crfs.resolved_cheque_number) as cheque_number'),
             DB::raw('COALESCE(crfs.cheque_date, crfs.resolved_cheque_date) as cheque_date'),
             'companies.name as company_name',
@@ -130,7 +131,7 @@ class Crf extends Model
 
             DB::raw("
                 CASE
-                    WHEN cheque_number is NULL THEN 'Assign Cheque Number'
+                    WHEN crfs.cheque_number is NULL THEN 'Assign Cheque Number'
                     WHEN COALESCE(crfs.cheque_date, crfs.resolved_cheque_date) IS NULL THEN 'Assign Cheque Date'
                     WHEN tagged_at IS NOT NULL THEN 'For Signature'
                     ELSE 'Tagging'
@@ -149,16 +150,15 @@ class Crf extends Model
     public function scopeLeftJoinScanRecords(Builder $builder)
     {
         return $builder->join('borrowed_cheques', 'borrowed_cheques.checkable_id', '=', 'crfs.id')
-            // ->leftJoin('approvers as primary_approver', 'primary_approver.id', '=', 'borrowed_cheques.primary_approver_id')
-            // ->leftJoin('approvers as secondary_approver', 'secondary_approver.id', '=', 'borrowed_cheques.secondary_approver_id')
             ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
             ->where('borrowed_cheques.checkable_type', 'crf')
             ->whereNotNull('borrowed_cheques.approved_at')
             ->leftJoin('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id');
-        // ->leftJoin('scanned_records', function ($join) {
-        //     $join->on('scanned_records.cheque_no', '=', 'crfs.cheque_number')
-        //         ->on('scanned_records.amount', '=', 'crfs.amount');
-        // });
+    }
+
+    public function cv()
+    {
+        return $this->hasOne(Cv::class);
     }
 
     public function tagLocation()
