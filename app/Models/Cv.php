@@ -86,7 +86,7 @@ class Cv extends Model
                 }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereBetween('cvs.cheque_date', [$date['start'], $date['end']]);
+                $query->whereBetween('cvs.cv_date', [$date['start'], $date['end']]);
             })
             ->when(($filters['bank'] ?? null) && $filters['bank'] != 'All', function ($query) use ($filters) {
                 $query->where('bank_name', $filters['bank']);

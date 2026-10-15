@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\ProgressStatus;
 use App\Events\CvProgress;
+use App\Models\Crf;
 use App\Models\Cv;
 use App\Models\NavHeaderTable;
 use Illuminate\Database\QueryException;
@@ -73,7 +74,11 @@ class GenerateCvService extends NavConnection
                 CvProgress::dispatch($this->userId, "No records found for {$buName}...", ProgressStatus::NoRecord, $tableName, 0, 0, 0, $key);
             }
 
-            $headerQuery->chunkById(500, function ($chunk) use (&$start, &$duplicates, $total, $tableName, $tableId, $checkPaymentQuery, $buId, $buName, $key) {
+            $crfs = Crf::query()
+                ->get(['id', 'crf_no', 'cheque_amount', 'payee'])
+                ->keyBy(fn($crf) => str_replace('#', '', $crf->crf_no));
+
+            $headerQuery->chunkById(500, function ($chunk) use (&$start, &$duplicates, $total, $tableName, $tableId, $checkPaymentQuery, $buId, $buName, $key, $crfs) {
 
                 DB::beginTransaction();
                 try {
@@ -144,13 +149,28 @@ class GenerateCvService extends NavConnection
                         ->get()
                         ->keyBy('CV No_');
 
-                    $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId, $now) {
+                    $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId, $now, $crfs) {
                         $payment = $otherField->get($header['cv_no']);
+
+                        $normalizedCvNo = str_replace('#', '', $header['cv_no']);
+                        $crf = $crfs->get($normalizedCvNo);
+
+                        if (
+                            $crf &&
+                            (float) $crf->cheque_amount === (float) ($payment?->{'Check Amount'} ?? 0) &&
+                            trim($crf->payee ?? '') === trim($payment?->{'Payee'} ?? '')
+                        ) {
+                            $crfId = $crf->id;
+                        } else {
+                            $crfId = null;
+                        }
+
                         return [
                             ...$header,
                             'nav_header_table_id' => $tableId,
                             'business_unit_id' => $buId,
                             'causer_id' => $this->userId,
+                            'crf_id' => $crfId,
 
                             'cheque_number' => $payment?->{'Check Number'},
                             'cheque_amount' => $payment?->{'Check Amount'},

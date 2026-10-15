@@ -87,7 +87,7 @@ class Crf extends Model
                 }
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
-                $query->whereBetween('crfs.cheque_date', [$date['start'], $date['end']]);
+                $query->whereBetween('crfs.crf_date', [$date['start'], $date['end']]);
             })
             ->when(($filters['bank'] ?? null) && $filters['bank'] != 'all', function ($query) use ($filters) {
                 $query->where('bank', $filters['bank']);

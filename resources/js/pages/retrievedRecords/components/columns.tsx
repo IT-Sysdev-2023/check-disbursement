@@ -42,12 +42,19 @@ export const createChequeColumns = (
     },
     {
         field: 'chequeNumber',
-        headerName: 'Cheque Number',
+        headerName: 'Cheque No',
         flex: 1,
     },
     {
         field: 'chequeDate',
         headerName: 'Cheque Date',
+        headerAlign: 'left',
+        align: 'left',
+        flex: 1,
+    },
+    {
+        field: 'cvDate',
+        headerName: 'Cv Date',
         headerAlign: 'left',
         align: 'left',
         flex: 1,

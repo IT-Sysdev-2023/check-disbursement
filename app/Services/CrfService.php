@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Events\CrfProgress;
 use App\Helpers\CrfHelper;
 use App\Models\Crf;
+use App\Models\Cv;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -75,12 +76,12 @@ class CrfService
             CrfProgress::dispatch("Uploading Crf Filename " . $fileName . " in progress.. ", $start, $total, $userId);
             $start++;
         });
-
         $validated = CrfHelper::checkProperties($records, []);
 
         if (!$validated) {
             return response()->json(['status' => false, 'message' => 'Upload failed. The file may be invalid or the company name doesn’t match with the select Business Unit.']);
         }
+        
         // $isDateValid = $records->every(function ($item) use ($request) {
         //     return $item['date']->between($request->start_date, $request->end_date);
         // });
@@ -91,18 +92,59 @@ class CrfService
 
 
         $inserted = DB::transaction(function () use ($records) {
-            return Crf::insertOrIgnore($records->toArray());
+
+            $insertedCount = Crf::insertOrIgnore($records->toArray());
+
+            $crfs = Crf::whereIn('crf_no', $records->pluck('crf_no'))
+                ->get();
+
+            return [
+                'inserted_count' => $insertedCount,
+                'crfs' => $crfs,
+            ];
         });
 
-        // $hasExisting = !empty($existing) ? 'Duplicates are listed below and were ignored.' : '';
+        self::updateCv($inserted['crfs']);
 
         return response()->json([
             'status' => true,
             'message' => ' Files Successfully uploaded. ',
-            'inserted' => $inserted,
+            'inserted' => $inserted['inserted_count'],
             'duplicates' => []
             // 'duplicates' => $existing //retrieve duplicated files
         ]);
+    }
+
+    private static function updateCv($crf)
+    {
+        $cheques = $crf->map(fn($item) => [
+            'id' => $item->id,
+            'crf_no' => str_replace('#', '', $item->crf_no),
+            'payee' => $item->payee,
+            'cheque_amount' => $item->cheque_amount,
+        ]);
+
+        $crfNo = $cheques->pluck('crf_no')->unique();
+
+        $cvRecords = Cv::whereIn(
+            DB::raw("REPLACE(cv_no, '#', '')"),
+            $crfNo
+        )
+            ->get()
+            ->keyBy(fn($cv) => str_replace('#', '', $cv->cv_no));
+
+        foreach ($cheques as $cheque) {
+            $cv = $cvRecords->get($cheque['crf_no']);
+            if (
+                $cv &&
+                $cv->payee === $cheque['payee'] &&
+                (float) $cv->cheque_amount === (float) $cheque['cheque_amount']
+            ) {
+                $cv->update([
+                    'crf_id' => $cheque['id'],
+                ]);
+            }
+        }
     }
 
     public function detailsCrf(Crf $id)

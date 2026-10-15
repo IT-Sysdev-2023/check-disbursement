@@ -15,6 +15,9 @@ return new class extends Migration {
             $table->foreignId('nav_header_table_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('business_unit_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             // $table->string('cv_no')->unique();
+            $table->foreignId('crf_id')
+                ->nullable()
+                ->constrained();
             $table->string('cheque_number');
             $table->decimal('cheque_amount', 20);
             $table->date('cheque_date')->nullable();
