@@ -17,8 +17,7 @@ class CrfResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
-        $chequeDate = $this->resolved_cheque_date ? Date::parse($this->resolved_cheque_date) : null;
+        $chequeDate = $this->cheque_date ? Date::parse($this->cheque_date) : null;
         $staleThreshold = Date::today()->subMonths(6);
 
         $status = null;
@@ -27,6 +26,7 @@ class CrfResource extends JsonResource
                 $status = 'staled';
             }
         }
+        
         return [
             'id' => $this->id,
             'cvNo' => $this->crf,

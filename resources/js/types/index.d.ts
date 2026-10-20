@@ -164,6 +164,7 @@ export interface Cv {
 export interface ChequeType {
     id: number;
     type: 'cv' | 'crf';
+    sourceId: number;
     borrowedChequeId: number;
     chequeId: number;
     chequeNumber: string;

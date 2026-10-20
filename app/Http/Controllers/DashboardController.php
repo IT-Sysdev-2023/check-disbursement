@@ -6,6 +6,7 @@ use App\Helpers\NumberHelper;
 use App\Http\Resources\ChequeCollection;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
+use App\Models\ChequeRecord;
 use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
@@ -174,15 +175,8 @@ class DashboardController extends Controller
 
     private static function chequeRecords($filters)
     {
-        $cvQuery = Cv::filter($filters)->baseColumns();
-
-        $crfQuery = Crf::filter($filters)->baseColumns();
-
-        $unionQuery = $cvQuery->unionAll($crfQuery);
-
-        return DB::query()
-            ->fromSub($unionQuery, 'merged')
-            ->orderByDesc('created_at')
+        return ChequeRecord::
+            orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
     }

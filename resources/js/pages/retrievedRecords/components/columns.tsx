@@ -10,27 +10,6 @@ import {
 } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { Eye, Notebook, NotepadText } from 'lucide-react';
-import { JSX } from 'react';
-
-const renderStatus = (
-    status: 'Releasing' | 'Borrowed' | 'Assign' | 'Tagged' | 'Tagging',
-) => {
-    const colors: {
-        [index: string]: 'success' | 'error' | 'info' | 'warning';
-    } = {
-        Releasing: 'success',
-        Borrowed: 'error',
-        Assign: 'error',
-        Tagged: 'success',
-        Tagging: 'info',
-    };
-
-    const label = ['Releasing', 'Assign', 'Tagging'].includes(status)
-        ? 'For ' + status
-        : status;
-
-    return <Chip label={label} color={colors[status]} size="small" />;
-};
 
 export const createChequeColumns = (
     handleStatusChange: (value: ActionType, type: ChequeType) => void,
@@ -74,7 +53,7 @@ export const createChequeColumns = (
         flex: 1,
     },
     {
-        field: 'buName',
+        field: 'businessUnit',
         headerName: 'Business Unit',
         headerAlign: 'center',
         align: 'center',
@@ -86,32 +65,18 @@ export const createChequeColumns = (
         headerAlign: 'center',
         align: 'center',
     },
-  
+
     {
         field: 'statusOrder',
         headerName: 'Status',
         flex: 1,
         renderCell: ({ row }) => {
-            console.log(row);
-            //ASSIGNMENT STATUS
-            if (!row.chequeNumber || !row.chequeDate) {
-                return (
-                    <Chip label={row.statusOrder} color="error" size="small" />
-                );
-            }
-
             if (row.taggedAt) {
                 return (
-                    <Chip
-                        label={row.statusOrder}
-                        color="success"
-                        size="small"
-                    />
+                    <Chip label="For Signature" color="success" size="small" />
                 );
             }
-
-            //COMPLETED STATUS
-            return renderStatus(row?.borrowedCheque ? 'Borrowed' : 'Tagging');
+            return <Chip label="For Tagging" color="info" size="small" />;
         },
     },
     {
@@ -123,6 +88,9 @@ export const createChequeColumns = (
         renderCell: ({ row }) => {
             const { status } = row;
 
+            const canTagLocation =
+                row.chequeDate && row.chequeNumber && !row.taggedAt;
+
             return (
                 <Box sx={{ width: '100%' }}>
                     <Select
@@ -133,39 +101,9 @@ export const createChequeColumns = (
                         }
                     >
                         <MenuItem value="details">Check Details</MenuItem>
-                        {(() => {
-                            const items: JSX.Element[] = [];
-
-                            if (!row.chequeNumber) {
-                                items.push(
-                                    <MenuItem key="assignCn" value="assignCn">
-                                        Assign Cheque Number
-                                    </MenuItem>,
-                                );
-                            }
-
-                            if (!row.chequeDate) {
-                                items.push(
-                                    <MenuItem key="assignCd" value="assignCd">
-                                        Assign Cheque Date
-                                    </MenuItem>,
-                                );
-                            }
-
-                            if (
-                                row.chequeDate &&
-                                row.chequeNumber &&
-                                !row.taggedAt
-                            ) {
-                                items.push(
-                                    <MenuItem key="tag" value="tag">
-                                        Tag Location
-                                    </MenuItem>,
-                                );
-                            }
-
-                            return items;
-                        })()}
+                        {canTagLocation && (
+                            <MenuItem value="tag">Tag Location</MenuItem>
+                        )}
                     </Select>
                 </Box>
             );

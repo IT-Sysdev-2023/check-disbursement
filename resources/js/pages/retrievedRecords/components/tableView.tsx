@@ -5,13 +5,7 @@ import SelectedChequeList from '@/pages/chequeReleasing/selectedChequeList';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import TableDataGrid from '@/pages/dashboard/components/TableDataGrid';
-import {
-    details,
-    detailsCrf,
-    getLocation,
-    retrievedRecords,
-    tagLocation,
-} from '@/routes';
+import { details, detailsCrf, getLocation, retrievedRecords, tagLocation } from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -94,7 +88,7 @@ export default function TableView({
             })
             .map((row) => ({
                 id: row.id,
-                chequeId: row.chequeId,
+                chequeId: row.sourceId,
                 type: row.type,
                 borrowedChequeId: row.borrowedChequeId,
                 amount: row.amount,
@@ -121,8 +115,8 @@ export default function TableView({
     const actionHandlers: Record<string, ActionHandler> = {
         details: (record) => {
             if (!record) return;
-            if (record.type === 'cv') router.visit(details(record.chequeId));
-            else router.visit(detailsCrf(record.chequeId));
+            if (record.type === 'cv') router.visit(details(record.sourceId));
+            else router.visit(detailsCrf(record.sourceId));
         },
         assignCn: (record) => {
             setChequeData(record || null);
@@ -148,11 +142,10 @@ export default function TableView({
 
     const handleTagSubmit = (e: FormEvent) => {
         e.preventDefault();
-
         const data = chequeData
             ? [
                   {
-                      id: chequeData.chequeId,
+                      id: chequeData.sourceId,
                       type: chequeData.type,
                   },
               ]
@@ -243,6 +236,12 @@ export default function TableView({
             data: {
                 documentType: event.target.value,
             },
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
         });
     };
 
@@ -251,6 +250,7 @@ export default function TableView({
             <TableFilter
                 handleChangeCheck={() => null}
                 company={company ?? []}
+                onLoading={(val) => setIsLoading(val)}
                 businessUnits={businessUnits}
                 resetFilterRouter={retrievedRecords()}
                 filters={filter}

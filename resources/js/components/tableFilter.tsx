@@ -22,6 +22,7 @@ export default function ({
     children,
     resetFilterRouter,
     businessUnits,
+    onLoading,
 }: {
     company: SelectionType[];
     filters: FilterType;
@@ -29,6 +30,7 @@ export default function ({
     businessUnits?: SelectionType[];
     children?: React.ReactNode;
     handleChangeCheck?: (value: SelectChangeEvent) => void;
+    onLoading?: (loading: boolean) => void;
 }) {
     const [selectedCompany, setSelectedCompany] = useState<string>(
         filters.selectedCompany ?? 'all',
@@ -49,6 +51,8 @@ export default function ({
             data: {
                 company: event.target.value,
             },
+            onStart: () => onLoading?.(true),
+            onFinish: () => onLoading?.(false),
         });
     };
 
@@ -59,6 +63,8 @@ export default function ({
             data: {
                 bu: event.target.value,
             },
+            onStart: () => onLoading?.(true),
+            onFinish: () => onLoading?.(false),
         });
     };
     const handleStartDateChange = (value: PickerValue) => {
@@ -81,6 +87,8 @@ export default function ({
                     },
                 },
                 replace: true,
+                onStart: () => onLoading?.(true),
+                onFinish: () => onLoading?.(false),
             });
         }
     };

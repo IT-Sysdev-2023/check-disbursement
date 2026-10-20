@@ -19,15 +19,7 @@ class Calendar
     {
         $page = $filters['page'] ?? 1;
         $perPage = $filters['perPage'] ?? 2; // BUs per page
-        // $data = self::distinctMonths($filters['company'] ?? null);
 
-        // if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
-        //     $navRecords = self::distinctMonthsNav($filters['monthDetails']);
-
-        //     $data = $data->map(function ($item, $key) use ($navRecords) {
-        //         return $navRecords->has($key) ? $navRecords->get($key) : $item;
-        //     });
-        // }
         if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
             //  Nav selected: use nav records only, don't merge with base
             $data = self::distinctMonthsNav($filters['monthDetails']);
