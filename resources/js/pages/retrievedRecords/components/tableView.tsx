@@ -35,8 +35,6 @@ import {
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import axios from 'axios';
 import { FormEvent, useState } from 'react';
-import AssignCdModal from './assignCdModal';
-import AssignCnModal from './assignCnModal';
 import { createChequeColumns } from './columns';
 
 export default function TableView({
@@ -61,8 +59,6 @@ export default function TableView({
     const [openTagModal, setOpenTagModal] = useState(false);
     const [tagLoading, setTagLoading] = useState(false);
     const [chequeData, setChequeData] = useState<ChequeType | null>(null);
-    const [openAssignCnModal, setOpenAssignCnModal] = useState(false);
-    const [openAssignCdModal, setOpenAssignCdModal] = useState(false);
     const [location, setLocation] = useState<
         { label: string; value: string }[]
     >([]);
@@ -123,14 +119,6 @@ export default function TableView({
             if (!record) return;
             if (record.type === 'cv') router.visit(details(record.sourceId));
             else router.visit(detailsCrf(record.sourceId));
-        },
-        assignCn: (record) => {
-            setChequeData(record || null);
-            setOpenAssignCnModal(true);
-        },
-        assignCd: (record) => {
-            setChequeData(record || null);
-            setOpenAssignCdModal(true);
         },
         tag: async (record) => {
             setChequeData(record || null);
@@ -257,7 +245,7 @@ export default function TableView({
             <TableFilter
                 handleChangeCheck={() => null}
                 company={company ?? []}
-                onLoading={(val) => setIsLoading(val)}
+                onLoading={setIsLoading}
                 businessUnits={businessUnits}
                 resetFilterRouter={retrievedRecords()}
                 filters={filter}
@@ -294,7 +282,9 @@ export default function TableView({
                 rowSelectionModel={rowSelectionModel}
                 handleSelectionChange={handleSelectionChange}
                 pagination={handlePagination}
-                handleSearchFilter={handleSearch}
+                handleSearchFilter={(model) =>
+                    handleSearch(model, setIsLoading)
+                }
                 handleSortFilter={handleSort}
                 columns={chequeColumns}
             />
@@ -341,7 +331,6 @@ export default function TableView({
             <OnlySelectionModal
                 title="Tag Location"
                 open={openTagModal}
-                // onClose={() => setOpenTagModal(false)}
                 onClose={() => {
                     setChequeData(null);
                     setOpenTagModal(false);
@@ -354,24 +343,6 @@ export default function TableView({
                 item={location}
                 loading={tagLoading}
             />
-
-            {chequeData && (
-                <AssignCnModal
-                    title="Assign Cheque Number"
-                    open={openAssignCnModal}
-                    chequeData={chequeData}
-                    onClose={() => setOpenAssignCnModal(false)}
-                />
-            )}
-
-            {chequeData && (
-                <AssignCdModal
-                    title="Assign Check Date"
-                    open={openAssignCdModal}
-                    chequeData={chequeData}
-                    onClose={() => setOpenAssignCdModal(false)}
-                />
-            )}
         </>
     );
 }

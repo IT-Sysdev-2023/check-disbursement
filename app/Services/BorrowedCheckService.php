@@ -22,10 +22,8 @@ class BorrowedCheckService
 
     public function store(Request $request)
     {
-
         $validated = $request->validate([
-            // 'approver' => 'required|exists:approvers,id',
-            // 'borrower' => 'required|exists:borrowers,id',
+            'approver' => 'required|exists:approvers,id',
             'borrower' => 'required|string',
             'reason' => 'required|string|max:255',
             'cheques' => 'required|array',
@@ -54,6 +52,7 @@ class BorrowedCheckService
             BorrowedCheque::insert(
                 collect($validated['cheques'])->map(fn($c) => [
                     'borrower_no' => $borrowerNo,
+                    'approver_id' => $validated['approver'],
                     'borrower_name' => $validated['borrower'],
                     'reason' => $validated['reason'],
                     'checkable_id' => $c['chequeId'],
@@ -75,6 +74,12 @@ class BorrowedCheckService
         $names = Approver::approverSelection();
 
         return response()->json(['borrower' => $transform, 'approver' => $names]);
+    }
+    public function approvers()
+    {
+        $names = Approver::approverSelection();
+
+        return response()->json($names);
     }
 
     private function download(int $borrowerNo, string $reason)

@@ -11,11 +11,10 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
 import { Handshake, X } from 'lucide-react';
 import { useState } from 'react';
-import OnlySelectionModal from '../dashboard/components/onlySelectionModal';
 import TableDataGrid from '../dashboard/components/TableDataGrid';
 import { createRequestsChequeColumns } from './components/columns';
 
@@ -49,10 +48,8 @@ export default function BorrowedCheques({
         date: DateFilterType;
     };
 }) {
-    const [selectedApprover, setSelectedApprover] = useState('');
     const [openApproval, setOpenApproval] = useState(false);
     const [openCancel, setOpenCancel] = useState(false);
-    const [onSaveLoading, setOnSaveLoading] = useState(false);
 
     const { data, setData, put, transform } = useForm<FormData>({
         type: 'include',
@@ -68,23 +65,14 @@ export default function BorrowedCheques({
     };
 
     const handleChangeApprover = (e) => {
-        e.preventDefault();
-
         transform((data) => ({
             ...data,
             borrowerId: borrowerId,
-            approver: selectedApprover,
         }));
 
         put(approveCheck().url, {
             onError: (e) => {
                 console.log(e);
-            },
-            onBefore: () => setOnSaveLoading(true),
-            onSuccess: () => {
-                setOnSaveLoading(false);
-                setOpenApproval(false);
-
             },
         });
     };
@@ -141,8 +129,42 @@ export default function BorrowedCheques({
                         }}
                     />
                 </Box>
+                <Dialog
+                    open={openApproval}
+                    onClose={() => setOpenApproval(false)}
+                    aria-labelledby="approve-dialog-title"
+                    aria-describedby="approve-dialog-description"
+                >
+                    <DialogTitle id="approve-dialog-title">
+                        Confirm Approval
+                    </DialogTitle>
 
-                <OnlySelectionModal
+                    <DialogContent>
+                        <DialogContentText id="approve-dialog-description">
+                            Are you sure you want to approve this request?
+                            Please verify the details before proceeding.
+                        </DialogContentText>
+                    </DialogContent>
+
+                    <DialogActions>
+                        <Button
+                            onClick={() => setOpenApproval(false)}
+                            color="inherit"
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button
+                            onClick={handleChangeApprover}
+                            variant="contained"
+                            color="primary"
+                            autoFocus
+                        >
+                            Confirm Approval
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+                {/* <OnlySelectionModal
                     title="Set Approver"
                     open={openApproval}
                     onClose={() => setOpenApproval(false)}
@@ -153,7 +175,7 @@ export default function BorrowedCheques({
                     selectedItem={selectedApprover}
                     item={approvers}
                     loading={onSaveLoading}
-                ></OnlySelectionModal>
+                ></OnlySelectionModal> */}
             </PageContainer>
         </AppLayout>
     );

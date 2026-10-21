@@ -17,7 +17,6 @@ export default function BorrowedTableGrid({
 }: {
     data: InertiaPagination<Borrower>;
 }) {
-    const [rowsPerPage, setRowsPerPage] = useState(data?.meta.per_page || 10);
     const [search, setSearch] = useState('');
     const handleChangePage = (
         _: MouseEvent<HTMLButtonElement> | null,
@@ -75,6 +74,7 @@ export default function BorrowedTableGrid({
                             <TableCell>Borrower Number</TableCell>
                             <TableCell align="right">Borrowed Date</TableCell>
                             <TableCell align="right">Borrower Name</TableCell>
+                            <TableCell align="right">Approver</TableCell>
                             <TableCell align="right">Reason</TableCell>
                             {isCheckReceiving && (
                                 <TableCell align="right">
@@ -108,7 +108,7 @@ export default function BorrowedTableGrid({
                 count={data?.meta.total ?? 0}
                 page={data?.meta.current_page - 1}
                 onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
+                rowsPerPage={data?.meta.per_page || 10}
                 onRowsPerPageChange={handleChangeRowsPerPage}
                 rowsPerPageOptions={[5, 10, 25, 50]}
             />

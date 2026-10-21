@@ -22,7 +22,6 @@ class ChequeRequestService
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
-
         $borrowedRecords = self::borrowedRecords($filters);
 
         return Inertia::render('checkReceiving', [
@@ -64,7 +63,6 @@ class ChequeRequestService
                 'array',
                 Rule::requiredIf(fn() => $request->type === 'include'),
             ],
-            'approver' => ['required', 'integer'],
             'borrowerId' => ['required', 'integer']
         ]);
         $ids = $request->borrowedNo ?? [];
@@ -73,7 +71,6 @@ class ChequeRequestService
 
         $updateData = [
             'approved_at' => now(),
-            'approver_id' => $request->approver,
         ];
 
         if ($request->type === 'exclude') {
@@ -98,7 +95,6 @@ class ChequeRequestService
                 'status' => true,
                 'message' => $message,
             ]);
-        // return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully Approved' : 'Failed to Approve']);
     }
 
     public function approver()
@@ -206,11 +202,13 @@ class ChequeRequestService
         return BorrowedCheque::select(
             'borrower_no',
             'reason',
+            'approver_id',
             'borrower_name as borrower',
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(created_at) as last_borrowed_at')
         )
-            // ->join('borrowers', 'borrowers.id', '=', 'borrowed_checks.borrower_id')
+            ->with('approver')
+            ->has('approver')
             ->when($filters['search'] ?? null, function (Builder $query, $search) {
                 $query->where(function ($q) use ($search) {
 
@@ -230,7 +228,7 @@ class ChequeRequestService
                 fn($query) => $query->has('chequeStatus')
             )
             ->whereNull('approved_at')
-            ->groupBy('borrower_no', 'borrower_name', 'reason')
+            ->groupBy('borrower_no', 'borrower_name', 'reason', 'approver_id')
             ->orderByDesc('borrower_no')
             ->paginate(5)
             ->withQueryString()
@@ -242,15 +240,15 @@ class ChequeRequestService
         $validated = $request->validate([
             // 'key' => 'required',
             'approver' => 'required|exists:approvers,id',
-            'borrower' => 'required'
+            'borrowerNo' => 'required'
         ]);
 
-        $isSuccess = BorrowedCheque::where('borrower_no', $validated['borrower'])->update(['secondary_approver_id' => $validated['approver']]);
+        $isSuccess = BorrowedCheque::where('borrower_no', $validated['borrowerNo'])->update(['approver_id' => $validated['approver']]);
         if (!$isSuccess)
             return;
 
         return redirect()->back()->with(['status' => true, 'message' => 'Approver Updated']);
     }
 
-   
+
 }

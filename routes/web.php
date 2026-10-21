@@ -57,6 +57,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 
+    Route::get('get-approvers', [BorrowedCheckController::class, 'approvers'])->name('get-approvers');
+
+
     Route::middleware('role:disbursement_officer|admin')->group(function () {
         //! EXTRACT CHECKS
         Route::prefix('extract')->group(function () {
@@ -84,10 +87,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
 
             // routes/web.php
-            Route::get('/pdf/view', [FileHandler::class, 'show'])
+            Route::get('/pdf/view', [PdfController::class, 'show'])
                 ->middleware('auth')
                 ->name('pdf.view');
-                
+
             Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
             Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
 
