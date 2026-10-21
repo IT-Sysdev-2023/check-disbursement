@@ -91,7 +91,7 @@ class ClosingService
             }
         });
 
-        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
+        return redirect()->back()->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
 
     }
 

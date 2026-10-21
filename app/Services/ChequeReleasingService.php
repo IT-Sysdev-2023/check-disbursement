@@ -204,7 +204,7 @@ class ChequeReleasingService
                 ->createFileName('released-', $userId, '.pdf')
                 ->handlePdf($data, 'releasedPdf');
         });
-        return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
+        return redirect()->route('check-releasing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
 
@@ -283,7 +283,7 @@ class ChequeReleasingService
                 ->handlePdf($data, 'forwardedReleasingPdf');
         });
 
-        return redirect()->route('forwarded-releasing-viewing')->with(['status' => true, 'stream' => $stream]);
+        return redirect()->route('forwarded-releasing-viewing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
     public function batchRelease(Request $request)
@@ -304,7 +304,7 @@ class ChequeReleasingService
                 ->handlePdf($data, 'releasedPdf');
         });
 
-        return redirect()->route('check-releasing')->with(['status' => true, 'stream' => $stream]);
+        return redirect()->route('check-releasing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
     public function forwardedReleasing(Request $request)

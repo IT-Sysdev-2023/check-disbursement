@@ -151,7 +151,7 @@ class ForwardedChequeService
         });
 
 
-        return redirect()->route('forwarded-releasing')->with(['status' => true, 'stream' => $stream]);
+        return redirect()->route('forwarded-releasing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
     public function forwardedReleasing(Request $request)

@@ -49,7 +49,7 @@ class BorrowedCheckService
 
         $borrowerNo = (BorrowedCheque::max('borrower_no') ?? 0) + 1;
 
-        $stream = DB::transaction(function () use ($borrowerNo, $validated) {
+        $path = DB::transaction(function () use ($borrowerNo, $validated) {
 
             BorrowedCheque::insert(
                 collect($validated['cheques'])->map(fn($c) => [
@@ -66,7 +66,7 @@ class BorrowedCheckService
             return $this->download($borrowerNo, $validated['reason']);
         });
 
-        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
+        return redirect()->back()->with(['status' => true, 'stream' => route('pdf.view', ['path' => $path])]);
     }
 
     public function borrower()

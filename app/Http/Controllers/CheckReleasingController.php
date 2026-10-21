@@ -293,7 +293,8 @@ class CheckReleasingController extends Controller
 
         $stream = $this->download($dateRange, $location, $data->toArray());
 
-        return redirect()->back()->with(['status' => true, 'stream' => $stream]);
+        return redirect()->back()->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
+        // return redirect()->back()->with(['status' => true, 'stream' => $stream]);
     }
 
     private function download(string $dateRange, string $location, array $data)

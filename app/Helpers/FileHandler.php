@@ -40,14 +40,38 @@ class FileHandler
     {
         $pdf = Pdf::loadView($bladeTemplate, ['data' => $data])->setPaper($paper);
 
+        $path = $this->folder() . $this->fileName;
+        $this->disk->put($path, $pdf->output());
+
+        return $path; // e.g. "pdfs/borrowed/123_4.pdf"
         // Get raw PDF output
-        $output = $pdf->output();
-        $this->disk->put($this->folder() . $this->fileName, $output);
+        // $output = $pdf->output();
+        // $this->disk->put($this->folder() . $this->fileName, $output);
 
-        // Encode in Base64
-        $base64 = base64_encode($output);
+        // // Encode in Base64
+        // $base64 = base64_encode($output);
 
-        return "data:application/pdf;base64," . $base64;
+        // return "data:application/pdf;base64," . $base64;
+    }
+
+    public function show(Request $request)
+    {
+        $path = $request->query('path');
+
+        // Security: only allow files inside the pdfs/ folder, no ../ tricks
+        abort_unless(
+            is_string($path)
+            && str_starts_with($path, 'pdfs/')
+            && !str_contains($path, '..'),
+            403
+        );
+
+        $disk = Storage::disk('public'); // use the same disk your file handler uses
+        abort_unless($disk->exists($path), 404);
+
+        return response()->file($disk->path($path), [
+            'Content-Type' => 'application/pdf',
+        ]);
     }
 
     public function handleSavePdf(

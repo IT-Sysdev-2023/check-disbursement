@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\FileHandler;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AssignedCheckNumberController;
 use App\Http\Controllers\BankController;
@@ -15,6 +16,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EodController;
 use App\Http\Controllers\ForwardedChequeController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RetrievedChecksController;
 use App\Http\Controllers\ScannedRecordsController;
@@ -81,6 +83,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrower-names');
             Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
 
+            // routes/web.php
+            Route::get('/pdf/view', [FileHandler::class, 'show'])
+                ->middleware('auth')
+                ->name('pdf.view');
+                
             Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
             Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
 
@@ -153,7 +160,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('release-forwarded-cheque/{reference}', [CheckReleasingController::class, 'releaseForwardedCheque'])->name('release-forwarded-cheque');
 
-             Route::post('generate-location-pdf/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-location-pdf');
+            Route::post('generate-location-pdf/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-location-pdf');
 
         });
 
