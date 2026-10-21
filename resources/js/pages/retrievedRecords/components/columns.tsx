@@ -76,6 +76,12 @@ export const createChequeColumns = (
                     <Chip label="For Signature" color="success" size="small" />
                 );
             }
+
+            if (row.chequeDate == null || row.chequeNumber == null) {
+                return (
+                    <Chip label='Incomplete' color="error" size="small" />
+                );
+            }
             return <Chip label="For Tagging" color="info" size="small" />;
         },
     },

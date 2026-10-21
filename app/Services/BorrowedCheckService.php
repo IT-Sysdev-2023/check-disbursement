@@ -89,7 +89,7 @@ class BorrowedCheckService
             ->implode(', ');
 
         $chequeNumbers = $borrower
-            ->map(fn($b) => $b->checkable?->chequeNumber)
+            ->map(fn($b) => $b->checkable)
             ->filter()
             ->unique();
 
@@ -101,7 +101,7 @@ class BorrowedCheckService
             'purpose' => $reason,
             'borrowedBy' => Str::upper($borrower->first()->borrower_name),
             'releasedBy' => Str::upper(auth()->user()->name),
-            'chequeNumbers' => $chequeNumbers->toArray()
+            'cheques' => $chequeNumbers->toArray()
         ];
 
         return $this->fileHandler

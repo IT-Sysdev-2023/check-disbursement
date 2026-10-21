@@ -5,7 +5,13 @@ import SelectedChequeList from '@/pages/chequeReleasing/selectedChequeList';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
 import TableDataGrid from '@/pages/dashboard/components/TableDataGrid';
-import { details, detailsCrf, getLocation, retrievedRecords, tagLocation } from '@/routes';
+import {
+    details,
+    detailsCrf,
+    getLocation,
+    retrievedRecords,
+    tagLocation,
+} from '@/routes';
 import {
     ActionHandler,
     ActionType,
@@ -176,6 +182,7 @@ export default function TableView({
     };
 
     const handleAssignment = (value: 'completed' | 'toAssign') => {
+        setSelectedRows([]);
         router.reload({
             onBefore: () => setIsLoading(true),
             onFinish: () => setIsLoading(false),
@@ -283,7 +290,7 @@ export default function TableView({
                 data={cheques}
                 filter={filter.search}
                 isLoading={isLoading}
-                hasSelection
+                hasSelection={alignment === 'completed'}
                 rowSelectionModel={rowSelectionModel}
                 handleSelectionChange={handleSelectionChange}
                 pagination={handlePagination}

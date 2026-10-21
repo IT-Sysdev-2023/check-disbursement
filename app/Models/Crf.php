@@ -39,7 +39,8 @@ class Crf extends Model
     protected function chequeDate(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->cheque_date ?? $this->resolved_cheque_date,
+            get: fn() => $this->getAttributeFromArray('cheque_date')
+                ?? $this->resolved_cheque_date,
         );
     }
 

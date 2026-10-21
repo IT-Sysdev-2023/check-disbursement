@@ -29,7 +29,7 @@ class CrfResource extends JsonResource
         
         return [
             'id' => $this->id,
-            'cvNo' => $this->crf,
+            'cvNo' => $this->crf_no,
             'no' => $this->no,
             'company' => $this->getCompany,
             'status' => $status,

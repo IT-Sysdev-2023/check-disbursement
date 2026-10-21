@@ -35,6 +35,7 @@ class BorrowedChequeResource extends JsonResource
 
     protected function resolveCheckable()
     {
+        
         return match ($this->checkable_type) {
             'cv' => new CvResource($this->checkable),
             'crf' => new CrfResource($this->checkable),
