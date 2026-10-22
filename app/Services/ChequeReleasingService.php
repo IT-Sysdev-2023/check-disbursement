@@ -34,7 +34,6 @@ class ChequeReleasingService
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
-        // $chequeRecords = self::releasingCheques($filters);
 
         $chequeRecords = BorrowedCheque::
             select(
@@ -250,13 +249,17 @@ class ChequeReleasingService
 
                 $checkable = $chequeStatus->checkable;
 
-                $chequesDetails[] = $checkable->only([
-                    $checkable instanceof Cv ? 'cv_no' : 'crf_no',
-                    'cheque_number',
-                    'cheque_date',
-                    'payee',
-                    'cheque_amount',
-                ]);
+                $chequesDetails[] = [
+                    'cv_no' => $checkable instanceof Cv
+                        ? $checkable->cv_no
+                        : $checkable->crf_no,
+                    ...$checkable->only([
+                        'cheque_number',
+                        'cheque_date',
+                        'payee',
+                        'cheque_amount',
+                    ]),
+                ];
             }
             $locationTitle = Str::title($validated['location']);
             $data = [

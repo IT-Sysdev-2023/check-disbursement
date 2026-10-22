@@ -39,13 +39,17 @@ class ReleasingService
 
             $checkable = $chequeStatus->checkable;
 
-            $chequesDetails[] = $checkable->only([
-                $checkable instanceof Cv ? 'cv_no' : 'crf_no',
-                'cheque_number',
-                'cheque_date',
-                'payee',
-                'cheque_amount',
-            ]);
+            $chequesDetails[] = [
+                'cv_no' => $checkable instanceof Cv
+                    ? $checkable->cv_no
+                    : $checkable->crf_no,
+                ...$checkable->only([
+                    'cheque_number',
+                    'cheque_date',
+                    'payee',
+                    'cheque_amount',
+                ]),
+            ];
 
             $locations[] = $checkable?->getLocation;
         }
@@ -91,13 +95,17 @@ class ReleasingService
 
             $checkable = $chequeStatus->checkable;
 
-            $chequesDetails[] = $checkable->only([
-                $checkable instanceof Cv ? 'cv_no' : 'crf_no',
-                'cheque_number',
-                'cheque_date',
-                'payee',
-                'cheque_amount',
-            ]);
+            $chequesDetails[] = [
+                'cv_no' => $checkable instanceof Cv
+                    ? $checkable->cv_no
+                    : $checkable->crf_no,
+                ...$checkable->only([
+                    'cheque_number',
+                    'cheque_date',
+                    'payee',
+                    'cheque_amount',
+                ]),
+            ];
 
             $locations[] = $checkable?->getLocation;
         }
@@ -120,7 +128,7 @@ class ReleasingService
 
     private static function data(array $validated)
     {
-        $getCheques = self::query($validated['batchReference'], $validated['isForwarded']);
+        $getCheques = self::query($validated['batchReference']);
 
         return $getCheques->map(function ($cheque) {
             $location = $cheque->checkable?->getLocation;
@@ -137,7 +145,7 @@ class ReleasingService
             ->all();
     }
 
-    private static function query(string $batchReference, bool $isForwarded)
+    private static function query(string $batchReference)
     {
         return BorrowedCheque::whereRelation(
             'scannedRecord',
