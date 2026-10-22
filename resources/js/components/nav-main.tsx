@@ -31,6 +31,7 @@ import {
     forwardedReleasing,
     forwardedReleasingViewing,
     notifications,
+    releasePerBu,
     report,
     retrievedRecords,
     scannedDocuments,
@@ -81,6 +82,9 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     );
     const cdcForwarded = roles.includes(
         'corporate_disbursing_clerk(forwarded)',
+    );
+    const cdcReleasing = roles.includes(
+        'corporate_disbursing_clerk(releasing)',
     );
     const closingOfficer = roles.includes(
         'corporate_disbursing_clerk(closing)',
@@ -157,6 +161,15 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           title: 'Voucher Status Summary',
                           href: statusSummary(),
                           icon: Check,
+                      },
+                  ]
+                : []),
+            ...(isAdmin || cdcReleasing
+                ? [
+                      {
+                          title: 'Cheque Releasing',
+                          href: releasePerBu(),
+                          icon: FolderCheck,
                       },
                   ]
                 : []),
@@ -336,6 +349,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         sectionHead,
         viewing,
         isCmDc,
+        cdcForwarded,
+        cdcReleasing
     ]);
 
     // Automatically open submenu if current page belongs to it

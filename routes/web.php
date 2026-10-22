@@ -146,8 +146,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('release-forwarded-cheque/{reference}', [CheckReleasingController::class, 'releaseForwardedCheque'])->name('release-forwarded-cheque');
 
         Route::post('generate-location-pdf/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-location-pdf');
-
     });
+
+    Route::get('cheques-per-bu', [CheckReleasingController::class, 'releasePerBu'])->name('release-per-bu');
+    Route::post('store-release-bu', [CheckReleasingController::class, 'storeReleaseBu'])->name('store-release-bu');
+    Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
+
     //! SUPERVISOR
     Route::prefix('section-head')->middleware('role:corporate_accounting_supervisor|admin')->group(function () {
 
@@ -172,7 +176,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
             Route::post('store-release-check-all', [CheckReleasingController::class, 'storeAll'])->name('store-release-check-all');
             Route::post('store-release-check-location', [CheckReleasingController::class, 'storeForwarded'])->name('store-release-check-location');
-            Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
             Route::post('cancel', [CheckReleasingController::class, 'cancelCheck'])->name('cancel-releasing');
 
             Route::get('get-cheques-for-releasing', [CheckReleasingController::class, 'chequesToRelease'])->name('cheques-to-release');

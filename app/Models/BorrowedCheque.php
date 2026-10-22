@@ -37,6 +37,15 @@ class BorrowedCheque extends Model
         ;
     }
 
+    public function scopeExcludeForwarded(Builder $builder)
+    {
+        return $builder->whereHasMorph(
+            'checkable',
+            [Cv::class, Crf::class],
+            fn($q) => $q->whereNotIn('tag_location_id', [1, 2]) //Exclude Cebu and Manila
+        );
+    }
+
     protected function scopeRegionalPermission(Builder $query): void
     {
         $query->where(function ($query) {

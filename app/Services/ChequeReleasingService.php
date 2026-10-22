@@ -42,10 +42,10 @@ class ChequeReleasingService
                 DB::raw('MIN(scanned_records.supplier) as supplier'),
                 DB::raw('MIN(scanned_records.scan_method) as method')
             )
-
+            ->excludeForwarded() // exclude Manila and Cebu
             ->whereNot('approver_id', null)
             ->join('scanned_records', 'borrowed_cheques.id', 'scanned_records.borrowed_cheque_id')
-            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
+
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
@@ -204,6 +204,28 @@ class ChequeReleasingService
                 ->handlePdf($data, 'releasedPdf');
         });
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
+    }
+
+    public function storeReleaseBu(Request $request)
+    {
+        $validated = $request->validate([
+            'receiversName' => 'required|string|max:255',
+            'file' => 'nullable|string',
+            'signature' => 'required|string',
+            "selectedBu" => "required",
+            "selectedCompany" => "required"
+        ]);
+        $userId = $request->user()->id;
+        $stream = DB::transaction(function () use ($validated, $userId) {
+
+            $data = $this->releasingService->releaseBu($validated, $userId);
+
+            return $this->fileHandler
+                ->inFolder('pdfs/releasing/releasedPerBu/')
+                ->createFileName("released-{$validated['selectedCompany']}-{$validated['selectedBu']}", $userId, '.pdf')
+                ->handlePdf($data, 'releasedPdf');
+        });
+        return redirect()->route('release-per-bu')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
 

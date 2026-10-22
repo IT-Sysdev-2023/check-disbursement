@@ -79,6 +79,7 @@ class DatabaseSeeder extends Seeder
         Role::create(['name' => 'viewing']);
         Role::create(['name' => 'cm_dibursement_clerk']);
         Role::create(['name' => 'corporate_disbursing_clerk(forwarded)']);
+        Role::create(['name' => 'corporate_disbursing_clerk(releasing)']);
 
         Permission::create(['name' => 'access cebu']);
         Permission::create(['name' => 'access manila']);

@@ -69,6 +69,86 @@ class ReleasingService
 
         ];
     }
+    public function releaseBu(array $validated, int $userId)
+    {
+        $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
+        $locations = [];
+        $chequesDetails = [];
+
+        $handleFiles = $this->fileHandler->handleFiles($validated, $transactionNo);
+        $company = $validated['selectedCompany'];
+        $bu = $validated['selectedBu'];
+        $cheques = BorrowedCheque::whereHasMorph(
+            'checkable',
+            [Crf::class, Cv::class],
+            function ($q) use ($company, $bu) {
+                $q->when(
+                    $bu !== 'all',
+                    fn($query) => $query->where('busines_unit_id', $bu)
+                )->whereRelation('businessUnit.company', 'id', $company);
+            }
+        )
+            ->get()
+            ->map(function ($cheque) {
+                $location = $cheque->checkable?->getLocation;
+                return [
+                    'id' => $cheque->id,
+                    'status' => match ($location) {
+                        'Manila', 'Cebu' => 'Forward',
+                        'Deposit' => 'Deposit',
+                        default => 'Release',
+                    },
+                ];
+            })
+            ->values()
+            ->all();
+        foreach ($cheques as $cheque) {
+            $borrowedCheque = BorrowedCheque::findOrFail($cheque['id']);
+            $label = StringHelper::statusPastTense($cheque['status']);
+
+            $chequeStatus = $borrowedCheque->checkable
+                ->chequeStatus()
+                ->create([
+                    'transaction_no' => $transactionNo,
+                    'status' => Str::lower($label),
+                    'receiver_name' => $validated['receiversName'],
+                    'image' => $handleFiles->imagePath,
+                    'signature' => $handleFiles->signaturePath,
+                    'caused_by' => $userId,
+                ]);
+
+            $checkable = $chequeStatus->checkable;
+
+            $chequesDetails[] = [
+                'cv_no' => $checkable instanceof Cv
+                    ? $checkable->cv_no
+                    : $checkable->crf_no,
+                ...$checkable->only([
+                    'cheque_number',
+                    'cheque_date',
+                    'payee',
+                    'cheque_amount',
+                ]),
+            ];
+
+            $locations[] = $checkable?->getLocation;
+        }
+
+        return [
+            'transactionNo' => $transactionNo,
+
+            'dateLabel' => 'Date Released:',
+            'dateReleased' => now()->format('M d, Y H:i A'),
+
+            'causedBy' => auth()->user()->name,
+
+            'receivedBy' => $validated['receiversName'],
+            'signature' => $handleFiles->signatureUri,
+            'location' => implode(', ', array_unique($locations)),
+            'cheques' => $chequesDetails
+
+        ];
+    }
 
     public function releaseAll($validated)
     {
