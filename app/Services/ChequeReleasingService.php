@@ -315,6 +315,7 @@ class ChequeReleasingService
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
 
         $records = BorrowedCheque::with('checkable')
+            ->regionalPermission()
             ->whereNot('approver_id', null)
             ->has('scannedRecord')
             ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereIn('tag_location_id', [1, 2])) // exclude Manila and Cebu

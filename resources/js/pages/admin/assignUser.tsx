@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import PermissionSelection from './components/permissionSelection';
 
 const breadcrumbs: BreadcrumbItem[] = [
-     {
+    {
         title: 'Assign User',
         href: users().url,
     },
@@ -51,7 +51,7 @@ export default function AssignUser({ user }: { user: { data: User } }) {
 
         fetchPermissions();
     }, []);
-    
+
     //Set Defaul User Permission to the UI
     useEffect(() => {
         setSelectedPermission(
@@ -111,7 +111,7 @@ export default function AssignUser({ user }: { user: { data: User } }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Register" />
 
-            <Box sx={{ py: 6,px: 20}}>
+            <Box sx={{ py: 6, px: 20 }}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     Assign Role/ Permission
                 </Typography>
@@ -137,11 +137,15 @@ export default function AssignUser({ user }: { user: { data: User } }) {
                     handleChange={handleChangeRole}
                 />
 
-                {selectedRole?.includes('corporate_disbursing_clerk(forwarded_releasing)') && (
+                {[
+                    'corporate_disbursing_clerk(forwarded_releasing)',
+                    'corporate_disbursing_clerk(forwarded)',
+                ].some((role) => selectedRole?.includes(role)) && (
                     <>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             Assign Region
                         </Typography>
+
                         <PermissionSelection
                             permissions={permissionsList.accessPermission}
                             selectedPermission={selectedAccessPermission}

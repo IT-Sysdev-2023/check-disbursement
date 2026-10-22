@@ -75,7 +75,7 @@ class AdminService
         if (!empty($request->selectedAccessPermission)) {
             $user->syncPermissions($request->selectedAccessPermission);
         }
-        return redirect()->back()->with(['status' => true, 'message' => 'Bank Created Successfully']);
+        return redirect()->back()->with(['status' => true, 'message' => 'Role Updated Successfully']);
     }
 
     public function setupBank()

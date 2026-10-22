@@ -28,16 +28,46 @@ class BorrowedCheque extends Model
     public function scopeFilter(Builder $builder, array $filters): Builder
     {
         return $builder->whereHasMorph(
-                    'checkable',
-                    [Crf::class, Cv::class],
-                    function ($q, $type) use ($filters) {
-                        $q->filter($filters);
-                    }
-                );
-            ;
+            'checkable',
+            [Crf::class, Cv::class],
+            function ($q, $type) use ($filters) {
+                $q->filter($filters);
+            }
+        );
+        ;
     }
 
-    public function scannedRecord(){
+    protected function scopeRegionalPermission(Builder $query): void
+    {
+        $query->where(function ($query) {
+
+            $user = auth()->user();
+            $locations = [];
+
+            if ($user->hasPermissionTo('access cebu')) {
+                $locations[] = 'Cebu';
+            }
+
+            if ($user->hasPermissionTo('access manila')) {
+                $locations[] = 'Manila';
+            }
+
+
+            $query->whereHasMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                function ($morphQuery) use ($locations) {
+                    $morphQuery->whereHas('tagLocation', function ($locationQuery) use ($locations) {
+                        $locationQuery->whereIn('location', $locations);
+                    });
+                }
+            );
+
+        });
+    }
+
+    public function scannedRecord()
+    {
         return $this->hasOne(ScannedRecords::class);
     }
 

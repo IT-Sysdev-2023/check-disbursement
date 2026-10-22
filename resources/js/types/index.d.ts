@@ -35,7 +35,7 @@ interface Page<PageProps> {
 
 export interface SharedData {
     name: string;
-    flash: { status: boolean; message?: string };
+    flash: { status: boolean; message?: string, stream?: string };
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
