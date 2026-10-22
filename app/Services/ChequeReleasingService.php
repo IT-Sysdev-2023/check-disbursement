@@ -392,15 +392,7 @@ class ChequeReleasingService
             ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
             ->regionalPermission()
             ->where(['status' => 'forwarded'])
-            ->where(function ($query) {
-                $query->whereDoesntHave('chequeForwardedStatus')
-                    ->orWhereRelation(
-                        'chequeForwardedStatus',
-                        'status',
-                        '!=',
-                        'cancelled'
-                    );
-            })
+            ->whereDoesntHave('chequeForwardedStatus')
             ->whereNotNull('received_by')
             ->paginate()
             ->withQueryString()

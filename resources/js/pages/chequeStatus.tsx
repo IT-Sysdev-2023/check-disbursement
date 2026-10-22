@@ -85,7 +85,7 @@ export default function ChequeStatus({
     };
 
     const isRegional = auth.user.roles.some(
-        (role) => role.name === 'regional_officer',
+        (role) => role.name === 'corporate_disbursing_clerk(forwarded_releasing)',
     );
 
     const columns =

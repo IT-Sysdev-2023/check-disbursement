@@ -71,13 +71,14 @@ class DatabaseSeeder extends Seeder
 
         // Role::create(['name' => 'releasing']);
         // Role::create(['name' => 'scanning']);
-        Role::create(['name' => 'disbursement_officer']);
-        Role::create(['name' => 'closing_officer']);
-        Role::create(['name' => 'regional_officer']);
-        Role::create(['name' => 'section_head']); //section head
+        Role::create(['name' => 'corporate_disbursing_officer']);
+        Role::create(['name' => 'corporate_disbursing_clerk(closing)']);
+        Role::create(['name' => 'corporate_disbursing_clerk(forwarded_releasing)']);
+        Role::create(['name' => 'corporate_accounting_supervisor']); //section head
         Role::create(['name' => 'admin']);
         Role::create(['name' => 'viewing']);
         Role::create(['name' => 'cm_dibursement_clerk']);
+        Role::create(['name' => 'corporate_disbursing_clerk(forwarded)']);
 
         Permission::create(['name' => 'access cebu']);
         Permission::create(['name' => 'access manila']);

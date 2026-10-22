@@ -27,32 +27,24 @@ export default function UsersDataGrid({
     };
 
     const handleModal = (user: User) => {
-         router.get(assign(user.id))
+        router.get(assign(user.id));
     };
 
     const columns: GridColDef[] = [
         {
             field: 'id',
             headerName: 'Id',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 1,
             minWidth: 50,
         },
         {
             field: 'name',
             headerName: 'Full Name',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 2,
+            flex: 1,
             minWidth: 100,
         },
         {
             field: 'username',
             headerName: 'Username',
-            headerAlign: 'right',
-            align: 'right',
-            flex: 2,
             minWidth: 100,
         },
         {
@@ -61,7 +53,6 @@ export default function UsersDataGrid({
             headerAlign: 'right',
             align: 'right',
             flex: 1,
-            minWidth: 50,
             valueGetter: (params: Permission[]) => {
                 return params?.map((r) => r.name).join(', ') || '-';
             },

@@ -39,7 +39,7 @@ class NotificationJob implements ShouldQueue
                     ->on('cvs.cv_no', '=', 'latest.cv_no');
             })->get();
 
-        $users = User::role('disbursement_officer')->get();
+        $users = User::role('corporate_disbursing_officer')->get();
         $cvs->each(function ($item) use ($users) {
 
             $totalNewRecords = (new GenerateCvService())

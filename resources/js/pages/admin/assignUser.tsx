@@ -137,7 +137,7 @@ export default function AssignUser({ user }: { user: { data: User } }) {
                     handleChange={handleChangeRole}
                 />
 
-                {selectedRole?.includes('regional_officer') && (
+                {selectedRole?.includes('corporate_disbursing_clerk(forwarded_releasing)') && (
                     <>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             Assign Region

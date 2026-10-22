@@ -75,7 +75,7 @@ class StatusService
                                 [Cv::class, Crf::class],
                                 fn(Builder $q) =>
                                     $q->when(
-                                        auth()->user()->hasRole('regional_officer'),
+                                        auth()->user()->hasRole('corporate_disbursing_clerk(forwarded_releasing)'),
 
                                         function ($query) use ($tab) { // CEBU/ MANILA tabs
                                         $query->has('chequeStatus.chequeForwardedStatus')
