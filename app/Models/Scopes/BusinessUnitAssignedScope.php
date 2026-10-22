@@ -20,14 +20,14 @@ class BusinessUnitAssignedScope implements Scope
             return; // Prevent crashes in CLI, queues, etc.
         }
 
-        if ($user->hasRole('disbursement_officer')) {
+        if ($user->hasRole('corporate_disbursing_officer')) {
             $builder->whereHas('businessUnit.company.companyPermissions', function ($q) use ($user) {
                 $q->where('user_id', $user->id);
             });
         }
 
         // Regional Officer restriction
-        // if ($user->hasRole('regional_officer')) {
+        // if ($user->hasRole('corporate_disbursing_clerk(forwarded_releasing)')) {
 
 
         //     if ($user->hasPermissionTo('access manila')) {

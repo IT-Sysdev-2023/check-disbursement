@@ -1,18 +1,42 @@
-import { borrowedChecks, borrowedNumberCheques } from "@/routes";
-import { Borrower } from "@/types";
-import { router } from "@inertiajs/react";
-import { Box, Collapse, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { ArrowBigRightDash } from 'lucide-react';
+import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
+import {
+    borrowedChecks,
+    borrowedNumberCheques,
+    changeApprover,
+    getApprovers,
+} from '@/routes';
+import { Borrower } from '@/types';
+import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import {
+    Box,
+    Collapse,
+    IconButton,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Typography,
+} from '@mui/material';
+import axios from 'axios';
+import { ArrowBigRightDash, Pencil } from 'lucide-react';
+import { FormEvent, useEffect, useState } from 'react';
 
-export default function TableItems(props: { row: Borrower, isVisible: boolean}) {
+export default function TableItems(props: {
+    row: Borrower;
+    isVisible: boolean;
+}) {
     const { row, isVisible } = props;
-    
+
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
+    const [openEdit, setOpenEdit] = useState(false);
+    const [borrowerId, setBorrowerId] = useState();
+    const [approvers, setApprovers] = useState<
+        { label: string; value: string }[]
+    >([]);
 
     useEffect(() => {
         if (open) {
@@ -33,9 +57,39 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
         }
     }, [open, row.borrowerNoClean, row.check]);
 
+    const handleEdit = async (borrowerNo: string) => {
+        const { data } = await axios.get(getApprovers().url);
+        console.log(data);
+        setApprovers(data);
+        setBorrowerId(borrowerNo);
+        setOpenEdit(true);
+        // Open the edit modal or navigate to the edit page.
+    };
+
     const handleAction = async (borrowedNo: number) => {
         router.visit(borrowedNumberCheques(borrowedNo));
     };
+
+    const [selectedApprover, setSelectedApprover] = useState(row.approver.id);
+
+    const handleTagSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        router.put(
+            changeApprover(),
+            {
+                approver: selectedApprover,
+                borrowerNo: row.borrowerNoClean,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => {
+                    setOpenEdit(false);
+                },
+            },
+        );
+    };
+
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -57,16 +111,28 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
                 </TableCell>
                 <TableCell align="right">{row.lastBorrowedAt}</TableCell>
                 <TableCell align="right">{row.borrower}</TableCell>
+                <TableCell align="right">{row.approver.name}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
-                {isVisible && <TableCell align="center">
-                    <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={() => handleAction(row.borrowerNoClean)}
-                    >
-                        <ArrowBigRightDash />
-                    </IconButton>
-                </TableCell>}
+                {isVisible && (
+                    <TableCell align="center">
+                        <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={() => handleAction(row.borrowerNoClean)}
+                        >
+                            <ArrowBigRightDash />
+                        </IconButton>
+
+                        <IconButton
+                            size="small"
+                            color="secondary"
+                            onClick={() => handleEdit(row.borrowerNoClean)}
+                            title="Edit"
+                        >
+                            <Pencil size={18} />
+                        </IconButton>
+                    </TableCell>
+                )}
             </TableRow>
             <TableRow>
                 <TableCell
@@ -133,7 +199,10 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
                                                     {historyRow.checkable.payee}
                                                 </TableCell>
                                                 <TableCell>
-                                                    {historyRow.checkable.location}
+                                                    {
+                                                        historyRow.checkable
+                                                            .location
+                                                    }
                                                 </TableCell>
                                                 <TableCell>
                                                     {historyRow.check}
@@ -147,6 +216,22 @@ export default function TableItems(props: { row: Borrower, isVisible: boolean}) 
                     </Collapse>
                 </TableCell>
             </TableRow>
+
+            <OnlySelectionModal
+                title="Change Approver"
+                open={openEdit}
+                onClose={() => {
+                    setBorrowerId(null);
+                    setOpenEdit(false);
+                }}
+                handleSubmit={handleTagSubmit}
+                handleSelectedItem={(event) =>
+                    setSelectedApprover(event.target.value)
+                }
+                selectedItem={selectedApprover}
+                item={approvers}
+                // loading={tagLoading}
+            />
         </>
     );
 }

@@ -6,6 +6,7 @@ use App\Enums\ProgressStatus;
 use App\Events\CvProgress;
 use App\Helpers\Calendar;
 use App\Http\Resources\ChequeCollection;
+use App\Http\Resources\ChequeRecordCollection;
 use App\Jobs\CvDatabase;
 use App\Models\Approver;
 use App\Models\BorrowedCheque;
@@ -84,12 +85,11 @@ class ChequeService
             ->doesntHave('source.borrowedCheque')
             ->paginate()
             ->withQueryString();
-
         $records = match ($tab) {
             'calendar' => Calendar::calendar($filters),
             'cheques' => new ChequeCollection($cheques),
             'borrowed' => ChequeRequestService::borrowedRecords($filters),
-            'manageChecks' => new ChequeCollection(self::manageChecks($filters)),
+            'manageChecks' => self::manageChecks($filters),
             default => null
         };
 
@@ -164,74 +164,30 @@ class ChequeService
 
     public static function manageChecks(array $filters = [])
     {
-        // LAST OPTION : JOIN TYPE AND CHECKABLE
-        // I DID THIS CAUSE WE CANNOT GET THE SCANNED RECORDS DATA
-        // $cv = Cv::
-        //     baseColumns()
-        //     ->doesntHave('chequeStatus')
-        //     ->leftJoinScanRecords()
-
-        //     ->filter($filters)
-        //     ->addSelect(
-        //         'borrowed_cheques.id as borrowedCheckId',
-        //         'borrowed_cheques.approved_at',
-        //         'approvers.name as approver_name',
-        //         'scanned_records.id as scanned_id',
-        //         'scanned_records.payee as scanned_payee',
-        //         'scanned_records.amount as scanned_amount'
-        //     );
-
-        // $crf = Crf::
-        //     baseColumns()
-        //     ->doesntHave('chequeStatus')
-        //     ->leftJoinScanRecords()
-
-        //     ->filter($filters)
-        //     ->addSelect(
-        //         'borrowed_cheques.id as borrowedCheckId',
-        //         'borrowed_cheques.approved_at',
-        //         'approvers.name as approver_name',
-        //         'scanned_records.id as scanned_id',
-        //         'scanned_records.payee as scanned_payee',
-        //         'scanned_records.amount as scanned_amount'
-        //     );
-
-        // $unionQuery = $cv->unionAll($crf);
-
-        $cheques = ChequeRecord::leftJoin('borrowed_cheques', function ($join) {
-            $join->on('borrowed_cheques.checkable_id', '=', 'cheque_records.source_id')
-                ->whereRaw("
-                (
-                    cheque_records.type = 'cv'
-                    AND borrowed_cheques.checkable_type = ?
-                )
-                OR
-                (
-                    cheque_records.type = 'crf'
-                    AND borrowed_cheques.checkable_type = ?
-                )
-            ", [
-                    Cv::class,
-                    Crf::class,
-                ]);
-        })
-            ->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
+        return ChequeRecord::query()
+            ->filter($filters)
+            ->select('cheque_records.uid as id', 'cheque_records.source_id as cheque_id', 'cheque_records.cheque_number', 'cheque_records.bu_name as business_unit', 'cheque_records.cheque_date', 'cheque_records.payee', 'approvers.name as approver_name', 'scanned_records.id as scannedId', 'cheque_records.type', 'cheque_records.location')
+            ->join('borrowed_cheques', function ($join) {
+                $join->on(
+                    'borrowed_cheques.checkable_id',
+                    '=',
+                    'cheque_records.source_id'
+                )->where(function ($query) {
+                    $query->where(function ($query) {
+                        $query->where('cheque_records.type', 'cv')
+                            ->where('borrowed_cheques.checkable_type', 'cv');
+                    })->orWhere(function ($query) {
+                        $query->where('cheque_records.type', 'crf')
+                            ->where('borrowed_cheques.checkable_type', 'crf');
+                    });
+                });
+            })->leftJoin('approvers', 'approvers.id', '=', 'borrowed_cheques.approver_id')
             ->whereNotNull('borrowed_cheques.approved_at')
             ->leftJoin('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id')
             ->orderByDesc('scanned_records.id')
             ->paginate(10)
-            ->withQueryString();
-
-        return $cheques;
-        // dd($cheques);
-
-        // return DB::query()
-        //     ->fromSub($cheques, 'merged')
-        //     ->when($filters['sort'] ?? null, function (Builder $q, array $sort) {
-        //         $q->orderBy(Str::snake($sort['field']), $sort['sort']);
-        //     }, fn($q) => $q->orderByDesc('scanned_id'))
-        //     ->paginate(10)
-        //     ->withQueryString();
+            ->withQueryString()
+            ->toResourceCollection();
     }
 
     private static function pendingRecords(array $filters)

@@ -35,7 +35,7 @@ interface Page<PageProps> {
 
 export interface SharedData {
     name: string;
-    flash: { status: boolean; message?: string };
+    flash: { status: boolean; message?: string, stream?: string };
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
@@ -198,13 +198,13 @@ export interface BorrowerDetails {
 
 export interface ManageChecks {
     id: number;
-    check_number: string;
+    chequeNumber: string;
+    chequeDate: string;
+    approverName: string;
+    location: string;
     payee: string;
-    cv_header_id: number;
-    company_id: number;
-    assignedCheckNumber: AssignedCheckNumber;
-    company: Company;
-    cvHeader: CvHeader;
+    scannedId?: number;
+    type: string
 }
 
 export interface ChequeResourceType {

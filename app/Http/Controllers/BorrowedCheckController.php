@@ -22,6 +22,10 @@ class BorrowedCheckController extends Controller
     {
         return $this->service->borrower();
     }
+    public function approvers()
+    {
+        return $this->service->approvers();
+    }
 
     public function pendingDetails(BorrowedCheque $id)
     {

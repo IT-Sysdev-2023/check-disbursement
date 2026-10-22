@@ -215,7 +215,7 @@ export const createManageColumns = (
         flex: 1,
     },
     {
-        field: 'companyName',
+        field: 'businessUnit',
         headerName: 'Business Unit',
         headerAlign: 'center',
         align: 'center',
@@ -230,7 +230,7 @@ export const createManageColumns = (
     // },
 
     {
-        field: 'approversName',
+        field: 'approverName',
         headerName: 'Approved By',
         headerAlign: 'left',
         align: 'left',
@@ -260,8 +260,7 @@ export const createManageColumns = (
     {
         field: 'location',
         headerName: 'Location',
-        headerAlign: 'right',
-        align: 'right',
+        align: 'left',
         flex: 1,
     },
     {
@@ -272,15 +271,6 @@ export const createManageColumns = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
-            // const details = {
-            //     'id': row.borrowedCheckId,
-            //     'amount': row.amountUnformatted,
-            //     'isScanned': row.isScanned,
-            //     'payee': row.payee,
-            //     'chequeDate': row.chequeDateUnformatted,
-            //     'chequeNumber': row.chequeNumber,
-            // }
-            // const isSync = localStorage.getItem('syncScanned') === 'true';
             return (
                 <Stack direction="row" sx={{ gap: 1 }}>
                     <IconButton

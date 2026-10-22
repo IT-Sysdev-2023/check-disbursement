@@ -31,6 +31,7 @@ import {
     forwardedReleasing,
     forwardedReleasingViewing,
     notifications,
+    releasePerBu,
     report,
     retrievedRecords,
     scannedDocuments,
@@ -75,10 +76,20 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
     const isAdmin = roles.includes('admin');
     const isCmDc = roles.includes('cm_dibursement_clerk');
     // const releasing = roles.includes('releasing');
-    const disbursementOfficer = roles.includes('disbursement_officer');
-    const regionalOfficer = roles.includes('regional_officer');
-    const closingOfficer = roles.includes('closing_officer');
-    const sectionHead = roles.includes('section_head');
+    const disbursementOfficer = roles.includes('corporate_disbursing_officer');
+    const regionalOfficer = roles.includes(
+        'corporate_disbursing_clerk(forwarded_releasing)',
+    );
+    const cdcForwarded = roles.includes(
+        'corporate_disbursing_clerk(forwarded)',
+    );
+    const cdcReleasing = roles.includes(
+        'corporate_disbursing_clerk(releasing)',
+    );
+    const closingOfficer = roles.includes(
+        'corporate_disbursing_clerk(closing)',
+    );
+    const sectionHead = roles.includes('corporate_accounting_supervisor');
     const viewing = roles.includes('viewing');
 
     const [openItem, setOpenItem] = useState<string | null>(null);
@@ -147,6 +158,24 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           icon: Check,
                       },
                       {
+                          title: 'Voucher Status Summary',
+                          href: statusSummary(),
+                          icon: Check,
+                      },
+                  ]
+                : []),
+            ...(isAdmin || cdcReleasing
+                ? [
+                      {
+                          title: 'Cheque Releasing',
+                          href: releasePerBu(),
+                          icon: FolderCheck,
+                      },
+                  ]
+                : []),
+            ...(isAdmin || cdcForwarded
+                ? [
+                      {
                           title: 'Forwarded Cheques',
                           href: '#',
                           icon: Forward,
@@ -171,17 +200,12 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                                   href: forwardedReleased(),
                                   icon: PackageCheck,
                               },
-                            //   {
-                            //       title: 'Return',
-                            //       href: checkRequestForm(),
-                            //       icon: PackageX,
-                            //   },
+                              //   {
+                              //       title: 'Return',
+                              //       href: checkRequestForm(),
+                              //       icon: PackageX,
+                              //   },
                           ],
-                    },
-                      {
-                          title: 'Voucher Status Summary',
-                          href: statusSummary(),
-                          icon: Check,
                       },
                   ]
                 : []),
@@ -325,6 +349,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         sectionHead,
         viewing,
         isCmDc,
+        cdcForwarded,
+        cdcReleasing
     ]);
 
     // Automatically open submenu if current page belongs to it

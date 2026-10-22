@@ -34,7 +34,6 @@ class ChequeReleasingService
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
-        // $chequeRecords = self::releasingCheques($filters);
 
         $chequeRecords = BorrowedCheque::
             select(
@@ -43,10 +42,10 @@ class ChequeReleasingService
                 DB::raw('MIN(scanned_records.supplier) as supplier'),
                 DB::raw('MIN(scanned_records.scan_method) as method')
             )
-
+            ->excludeForwarded() // exclude Manila and Cebu
             ->whereNot('approver_id', null)
             ->join('scanned_records', 'borrowed_cheques.id', 'scanned_records.borrowed_cheque_id')
-            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
+
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
@@ -207,6 +206,28 @@ class ChequeReleasingService
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
+    public function storeReleaseBu(Request $request)
+    {
+        $validated = $request->validate([
+            'receiversName' => 'required|string|max:255',
+            'file' => 'nullable|string',
+            'signature' => 'required|string',
+            "selectedBu" => "required",
+            "selectedCompany" => "required"
+        ]);
+        $userId = $request->user()->id;
+        $stream = DB::transaction(function () use ($validated, $userId) {
+
+            $data = $this->releasingService->releaseBu($validated, $userId);
+
+            return $this->fileHandler
+                ->inFolder('pdfs/releasing/releasedPerBu/')
+                ->createFileName("released-{$validated['selectedCompany']}-{$validated['selectedBu']}", $userId, '.pdf')
+                ->handlePdf($data, 'releasedPdf');
+        });
+        return redirect()->route('release-per-bu')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
+    }
+
 
     public function storeForwarded(Request $request)
     {
@@ -250,13 +271,17 @@ class ChequeReleasingService
 
                 $checkable = $chequeStatus->checkable;
 
-                $chequesDetails[] = $checkable->only([
-                    $checkable instanceof Cv ? 'cv_no' : 'crf_no',
-                    'cheque_number',
-                    'cheque_date',
-                    'payee',
-                    'cheque_amount',
-                ]);
+                $chequesDetails[] = [
+                    'cv_no' => $checkable instanceof Cv
+                        ? $checkable->cv_no
+                        : $checkable->crf_no,
+                    ...$checkable->only([
+                        'cheque_number',
+                        'cheque_date',
+                        'payee',
+                        'cheque_amount',
+                    ]),
+                ];
             }
             $locationTitle = Str::title($validated['location']);
             $data = [
@@ -312,6 +337,7 @@ class ChequeReleasingService
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
 
         $records = BorrowedCheque::with('checkable')
+            ->regionalPermission()
             ->whereNot('approver_id', null)
             ->has('scannedRecord')
             ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
@@ -389,15 +415,7 @@ class ChequeReleasingService
             ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
             ->regionalPermission()
             ->where(['status' => 'forwarded'])
-            ->where(function ($query) {
-                $query->whereDoesntHave('chequeForwardedStatus')
-                    ->orWhereRelation(
-                        'chequeForwardedStatus',
-                        'status',
-                        '!=',
-                        'cancelled'
-                    );
-            })
+            ->whereDoesntHave('chequeForwardedStatus')
             ->whereNotNull('received_by')
             ->paginate()
             ->withQueryString()

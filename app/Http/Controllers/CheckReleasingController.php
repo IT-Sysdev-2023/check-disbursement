@@ -8,10 +8,12 @@ use App\Helpers\NumberHelper;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\BorrowedChequeResource;
 use App\Models\BorrowedCheque;
+use App\Models\BusinessUnit;
 use App\Models\Crf;
 use App\Models\Cv;
 use App\Models\ReceiverName;
 use App\Services\ChequeReleasingService;
+use App\Services\PermissionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -56,6 +58,10 @@ class CheckReleasingController extends Controller
     public function storeForwarded(Request $request)
     {
         return $this->service->storeForwarded($request);
+    }
+    public function storeReleaseBu(Request $request)
+    {
+        return $this->service->storeReleaseBu($request);
     }
 
     public function receiving(Request $request)
@@ -107,8 +113,8 @@ class CheckReleasingController extends Controller
     public function chequesToRelease(Request $request)
     {
         $records = BorrowedCheque::with('checkable')
+            ->excludeForwarded()
             ->whereRelation('scannedRecord', 'batch_reference', $request->batchReference)
-            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
@@ -122,8 +128,8 @@ class CheckReleasingController extends Controller
     {
 
         $records = BorrowedCheque::with('checkable')
+            ->excludeForwarded()
             ->whereRelation('scannedRecord', 'batch_reference', $reference)
-            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereNotIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
@@ -311,6 +317,53 @@ class CheckReleasingController extends Controller
             ->inFolder("exports/{$location}/")
             ->createFileName('report-', auth()->user()->id, '.pdf')
             ->handlePdf($data, 'forwardedReleasingPdf');
+    }
+
+
+    public function releasePerBu(Request $request)
+    {
+        $filters = $request->only(['bu', 'search', 'company']);
+
+        $baseQuery = BorrowedCheque::with('checkable')
+            ->filter($filters)
+            ->excludeForwarded()
+            ->whereNot('approver_id', null)
+            ->has('scannedRecord')
+            ->whereDoesntHaveMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                fn($query) => $query->has('chequeStatus')
+            );
+
+        $firstRecord = (clone $baseQuery)
+            ->first();
+
+        $company = $filters['company']
+            ?? $firstRecord?->checkable?->businessUnit?->company_id;
+
+        $bu = $filters['bu']
+            ?? $firstRecord?->checkable?->business_unit_id;
+
+        $records = (clone $baseQuery)
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
+
+        $receiverNames = ReceiverName::select('id', 'name as label')->get();
+
+        return Inertia::render('chequeReleasing/releasePerBu', [
+            'cheques' => $records,
+            'receiverNames' => $receiverNames,
+            'filter' => (object) [
+                'selectedBu' => $bu ?? 'all',
+                'selectedCompany' => $company ?? 'all',
+                'search' => $filters['search'] ?? '',
+            ],
+            'businessUnits' => $company
+                ? BusinessUnit::businessUnits($company)
+                : [],
+            'company' => PermissionService::userAssignedCompany($request->user())
+        ]);
     }
 
 }

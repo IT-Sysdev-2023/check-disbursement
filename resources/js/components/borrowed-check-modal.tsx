@@ -1,15 +1,15 @@
 import { modalStyle } from '@/lib/modalStyle';
 import SelectItem from '@/pages/dashboard/components/SelectItem';
-import { borrowCheck, borrowerNames } from '@/routes';
-import { FlashReponse, Option, SelectionType } from '@/types';
+import { borrowCheck, getApprovers } from '@/routes';
+import { FlashReponse, Option } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { Grid, SelectChangeEvent, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
-import axios from 'axios';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import AutocompleteUser from './autocomplete-user';
+import axios from 'axios';
 
 const reasons = [
     {
@@ -21,32 +21,27 @@ export default function BorrowedCheckModal({
     cheque,
     open,
     handleClose,
-    handleSuccess
+    handleSuccess,
 }: {
     cheque: { id: number; chequeId: number; type: string }[];
     open: boolean;
     handleClose: () => void;
     handleSuccess: () => void;
 }) {
-    const [borrowerSelection, setBorrowerSelection] = useState<SelectionType[]>(
-        [],
-    );
-
     const { data, setData, post, processing, transform, reset } = useForm({
-        // approver: '',
+        approver: '',
         borrower: '',
         reason: '',
     });
 
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
+    const [approvers, setApprovers] = useState([]);
 
     useEffect(() => {
         const fetchBorrower = async () => {
-            const { data } = await axios.get(borrowerNames().url);
-
-            setBorrowerSelection(data.borrower);
-            // setApproverSelection(data.approver);
+            const { data } = await axios.get(getApprovers().url);
+            setApprovers(data);
         };
 
         fetchBorrower();
@@ -80,17 +75,13 @@ export default function BorrowedCheckModal({
             },
         });
     };
-
-    const handleChange = (event: SelectChangeEvent) => {
-        setData('borrower', event.target.value);
-    };
     const handleTextChange = (_: SyntheticEvent, name: Option) => {
         setData('borrower', name.label);
     };
 
-    // const handleChangeApprover = (event: SelectChangeEvent) => {
-    //     setData('approver', event.target.value);
-    // };
+    const handleChangeApprover = (event: SelectChangeEvent) => {
+        setData('approver', event.target.value);
+    };
 
     const handleChangeReason = (event: SelectChangeEvent) => {
         setData('reason', event.target.value);
@@ -118,17 +109,10 @@ export default function BorrowedCheckModal({
                             spacing={2}
                             sx={{ mb: 2, width: '100%', mt: 3 }}
                         >
-                            {/* <Grid size={{ xs: 12, sm: 12 }}>
-                                <SelectItem
-                                    handleChange={handleChangeApprover}
-                                    value={data.approver}
-                                    title="Approver Name"
-                                    items={approverSelection}
-                                />
-                            </Grid> */}
                             <Grid size={{ xs: 12, sm: 12 }}>
                                 <AutocompleteUser
                                     label="Assign Laison"
+                                    sxWidth={'100%'}
                                     handleTextChange={handleTextChange}
                                 />
                                 {/* <SelectItem
@@ -138,7 +122,15 @@ export default function BorrowedCheckModal({
                                     items={borrowerSelection}
                                 /> */}
                             </Grid>
-                            <Grid size={{ xs: 12, sm: 12 }}>
+                            <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2 }}>
+                                <SelectItem
+                                    handleChange={handleChangeApprover}
+                                    value={data.approver}
+                                    title="Approver Name"
+                                    items={approvers}
+                                />
+                            </Grid>
+                            <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2 }}>
                                 <SelectItem
                                     handleChange={handleChangeReason}
                                     value={data.reason}

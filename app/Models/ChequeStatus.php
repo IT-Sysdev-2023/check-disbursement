@@ -58,17 +58,17 @@ class ChequeStatus extends Model
                 $locations[] = 'Manila';
             }
 
-            if (!empty($locations)) {
-                $query->whereHasMorph(
-                    'checkable',
-                    [Cv::class, Crf::class],
-                    function ($morphQuery) use ($locations) {
-                        $morphQuery->whereHas('tagLocation', function ($locationQuery) use ($locations) {
-                            $locationQuery->whereIn('location', $locations);
-                        });
-                    }
-                );
-            }
+
+            $query->whereHasMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                function ($morphQuery) use ($locations) {
+                    $morphQuery->whereHas('tagLocation', function ($locationQuery) use ($locations) {
+                        $locationQuery->whereIn('location', $locations);
+                    });
+                }
+            );
+
         });
     }
 }

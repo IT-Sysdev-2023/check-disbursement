@@ -57,7 +57,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
     });
 
-    Route::middleware('role:disbursement_officer|admin')->group(function () {
+    Route::get('get-approvers', [BorrowedCheckController::class, 'approvers'])->name('get-approvers');
+    Route::get('/pdf/view', [PdfController::class, 'show'])
+        ->middleware('auth')
+        ->name('pdf.view');
+
+    Route::middleware('role:corporate_disbursing_officer|admin')->group(function () {
         //! EXTRACT CHECKS
         Route::prefix('extract')->group(function () {
             Route::get('business-units', [CvController::class, 'businessUnits'])->name('get-business-units');
@@ -83,11 +88,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrower-names');
             Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
 
-            // routes/web.php
-            Route::get('/pdf/view', [FileHandler::class, 'show'])
-                ->middleware('auth')
-                ->name('pdf.view');
-                
             Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
             Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
 
@@ -134,10 +134,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('scanned-records/{id}', [StatusController::class, 'scannedRecords'])->name('scanned-records');
     });
 
-    Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->middleware('role:disbursement_officer|section_head|admin')->name('borrowed-checks');
+    Route::get('borrowed-checks', [CheckRequestController::class, 'borrowedChecks'])->middleware('role:corporate_disbursing_officer|corporate_accounting_supervisor|admin')->name('borrowed-checks');
 
-    //! SECTION HEAD
-    Route::prefix('section-head')->middleware('role:section_head|admin')->group(function () {
+    //! Forwarded
+    Route::prefix('forwarded-viewing')->middleware('role:corporate_disbursing_clerk(forwarded)|admin')->group(function () {
+        Route::get('releasing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
+        Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
+        Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
+        Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
+
+        Route::get('release-forwarded-cheque/{reference}', [CheckReleasingController::class, 'releaseForwardedCheque'])->name('release-forwarded-cheque');
+
+        Route::post('generate-location-pdf/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-location-pdf');
+    });
+
+    Route::get('cheques-per-bu', [CheckReleasingController::class, 'releasePerBu'])->name('release-per-bu');
+    Route::post('store-release-bu', [CheckReleasingController::class, 'storeReleaseBu'])->name('store-release-bu');
+    Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
+
+    //! SUPERVISOR
+    Route::prefix('section-head')->middleware('role:corporate_accounting_supervisor|admin')->group(function () {
 
         Route::prefix('check-receiving')->group(function () {
             Route::get('index', [CheckRequestController::class, 'index'])->name('cheque-requests');
@@ -151,19 +167,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('change-approver', [CheckRequestController::class, 'changeApprover'])->name('change-approver');
         });
 
-        //!Viewing Forwarded in Section Head
-        Route::prefix('forwarded-viewing')->group(function () {
-            Route::get('releasing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
-            Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
-            Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
-            Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
-
-            Route::get('release-forwarded-cheque/{reference}', [CheckReleasingController::class, 'releaseForwardedCheque'])->name('release-forwarded-cheque');
-
-            Route::post('generate-location-pdf/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-location-pdf');
-
-        });
-
         Route::prefix('check-releasing')->group(function () {
             Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
             Route::get('cheque-register', [CheckReleasingController::class, 'chequeRegister'])->name('cheque-register');
@@ -173,7 +176,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('store-release-check', [CheckReleasingController::class, 'store'])->name('store-release-check');
             Route::post('store-release-check-all', [CheckReleasingController::class, 'storeAll'])->name('store-release-check-all');
             Route::post('store-release-check-location', [CheckReleasingController::class, 'storeForwarded'])->name('store-release-check-location');
-            Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
             Route::post('cancel', [CheckReleasingController::class, 'cancelCheck'])->name('cancel-releasing');
 
             Route::get('get-cheques-for-releasing', [CheckReleasingController::class, 'chequesToRelease'])->name('cheques-to-release');
@@ -187,7 +189,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //! REGIONAL OFFICER
     //Cebu & Manila
-    Route::prefix('forwarded-cheque')->middleware('role:regional_officer|admin')->group(function () {
+    Route::prefix('forwarded-cheque')->middleware('role:corporate_disbursing_clerk(forwarded_releasing)|admin')->group(function () {
         Route::get('index', [ForwardedChequeController::class, 'index'])->name('forwarded-cheque-releasing');
         Route::get('release-check/{id}/{status}', [ForwardedChequeController::class, 'showForwarded'])->name('release-check-forwarded');
         Route::post('store-release-check', [ForwardedChequeController::class, 'storeReleaseCheck'])->name('store-release-check-forwarded');

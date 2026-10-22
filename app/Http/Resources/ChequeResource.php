@@ -29,6 +29,7 @@ class ChequeResource extends JsonResource
         //     }
         // }
 
+        // dd($this);
         return [
             'id' => $this->uid,
             'sourceId' => $this->source_id,
@@ -37,7 +38,7 @@ class ChequeResource extends JsonResource
             'cvDate' => optional($cvDate)->toFormattedDateString(),
             'chequeDate' => optional($chequeDate)->toFormattedDateString(),
             'chequeNumber' => optional($this)->cheque_number,
-            'amount' => NumberHelper::currency(optional($this)->amount),
+            'amount' => NumberHelper::currency(optional($this)->amount ?? 0),
             'payee' => $this->payee,
             'taggedAt' => optional($taggedAt)->toFormattedDateString(),
             'location' => optional($this)->location,

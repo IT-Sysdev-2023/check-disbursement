@@ -1,5 +1,9 @@
 import { router } from '@inertiajs/react';
-import { GridFilterModel, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
+import {
+    GridFilterModel,
+    GridPaginationModel,
+    GridSortModel,
+} from '@mui/x-data-grid';
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -18,7 +22,10 @@ export const handlePagination = (model: GridPaginationModel) => {
     });
 };
 
-export const handleSearch = (model: GridFilterModel) => {
+export const handleSearch = (
+    model: GridFilterModel,
+    onLoading?: (loading: boolean) => void,
+) => {
     const query = model.quickFilterValues?.length
         ? model.quickFilterValues?.[0]
         : '';
@@ -29,6 +36,8 @@ export const handleSearch = (model: GridFilterModel) => {
         },
         // only: [check === 'cv' ? 'cv' : 'crf'],
         replace: true,
+        onStart: () => onLoading?.(true),
+        onFinish: () => onLoading?.(false),
     });
 };
 

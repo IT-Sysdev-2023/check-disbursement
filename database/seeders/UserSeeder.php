@@ -16,23 +16,23 @@ class UserSeeder extends Seeder
     {
         User::create([
             'name' => 'Section Head',
-            'username' => 'section_head',
+            'username' => 'corporate_accounting_supervisor',
             'password' => Hash::make('12341234'), // hash the password
-        ])->assignRole('section_head');
+        ])->assignRole('corporate_accounting_supervisor');
         User::create([
             'name' => 'Disbursement Officer',
-            'username' => 'disbursement_officer',
+            'username' => 'corporate_disbursing_officer',
             'password' => Hash::make('12341234'), // hash the password
-        ])->assignRole('disbursement_officer');
+        ])->assignRole('corporate_disbursing_officer');
         User::create([
             'name' => 'Cebu/Manila',
-            'username' => 'regional_officer',
+            'username' => 'corporate_disbursing_clerk(forwarded_releasing)',
             'password' => Hash::make('12341234'), // hash the password
-        ])->assignRole('regional_officer');
+        ])->assignRole('corporate_disbursing_clerk(forwarded_releasing)');
         User::create([
             'name' => 'Closing Cheques',
-            'username' => 'closing_officer',
+            'username' => 'corporate_disbursing_clerk(closing)',
             'password' => Hash::make('12341234'), // hash the password
-        ])->assignRole('closing_officer');
+        ])->assignRole('corporate_disbursing_clerk(closing)');
     }
 }
