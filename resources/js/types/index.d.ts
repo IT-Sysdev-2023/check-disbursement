@@ -198,13 +198,13 @@ export interface BorrowerDetails {
 
 export interface ManageChecks {
     id: number;
-    check_number: string;
+    chequeNumber: string;
+    chequeDate: string;
+    approverName: string;
+    location: string;
     payee: string;
-    cv_header_id: number;
-    company_id: number;
-    assignedCheckNumber: AssignedCheckNumber;
-    company: Company;
-    cvHeader: CvHeader;
+    scannedId?: number;
+    type: string
 }
 
 export interface ChequeResourceType {

@@ -51,13 +51,13 @@ class ChequeRecord extends Model
 
         return $builder->when($filters['search'] ?? null, function ($query, $search) {
             $query->whereAny([
-                'document_no',
-                'cheque_number',
-                'payee',
-                'amount',
-                'location',
-                'company_name',
-                'bu_name',
+                'cheque_records.document_no',
+                'cheque_records.cheque_number',
+                'cheque_records.payee',
+                'cheque_records.amount',
+                'cheque_records.location',
+                'cheque_records.company_name',
+                'cheque_records.bu_name',
             ], 'LIKE', '%' . $search . '%');
         })
             ->when($type && ($type !== 'all'), function ($query) use ($type) {
@@ -86,4 +86,5 @@ class ChequeRecord extends Model
     {
         return $query->where('type', 'crf');
     }
+    
 }
