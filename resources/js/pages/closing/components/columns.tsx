@@ -33,14 +33,6 @@ export const createClosingCvColumns = (
         flex: 1,
         minWidth: 80,
     },
-    // {
-    //     field: 'bankName',
-    //     headerName: 'Account Name',
-    //     headerAlign: 'right',
-    //     align: 'right',
-    //     flex: 1,
-    //     minWidth: 100,
-    // },
     {
         field: 'location',
         headerName: 'Location',
@@ -89,6 +81,7 @@ export const createClosingCvColumns = (
                 payee: row.checkable?.payee,
                 amount: row.checkable?.amount,
                 receivedBy: row.receiversName,
+                hasDocument: row.hasDocument
             };
 
             return (

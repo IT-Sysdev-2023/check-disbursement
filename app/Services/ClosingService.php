@@ -19,15 +19,14 @@ class ClosingService
     }
     public function index(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
 
         $disk = Storage::disk('cheque_doc');
-
+        $tab = $filters['tab'] ?? 'doc_required';
         $files = $disk->files('new');
 
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
-            ->where(['is_closed' => false, 'has_document' => 0])
             ->whereNot('status', 'cancel')
             ->where(function ($query) {
                 $query->where(function ($q) {
@@ -36,18 +35,20 @@ class ClosingService
                 })
                     ->orWhere('status', '!=', 'forwarded');
             })
+            ->when(($tab == 'doc_required') ?? null, fn($q) => $q->where('has_document', false)->where('is_closed', false), fn($q) => $q->where('has_document', true))
             ->filter($filters)
             ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
-
+            
         return Inertia::render('cvCrfList', [
             'cheques' => $cheques,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
             'filter' => (object) [
                 'selectedBu' => $filters['bu'] ?? '0',
                 'search' => $filters['search'] ?? '',
+                'tab' => $tab,
                 'date' => $filters['date'] ?? (object) [
                     'start' => null,
                     'end' => null

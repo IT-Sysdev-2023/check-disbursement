@@ -3,17 +3,18 @@ import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { markAsClose, submitDocuments } from '@/routes';
+import { closingCheque, markAsClose, submitDocuments } from '@/routes';
 import {
     ChequeStatus,
     ClosingCheckDetailsType,
-    DateFilterType,
+    FilterType,
     FlashReponse,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { SwipeVertical, ViewCompact } from '@mui/icons-material';
 import {
     Box,
     Button,
@@ -21,12 +22,14 @@ import {
     IconButton,
     Modal,
     TextField,
+    ToggleButton,
+    ToggleButtonGroup,
     Tooltip,
     Typography,
 } from '@mui/material';
 import axios from 'axios';
 import { RefreshCwIcon } from 'lucide-react';
-import { useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import { createClosingCvColumns } from './closing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 
@@ -55,12 +58,7 @@ export default function CvCrfList({
 }: {
     cheques: InertiaPagination<ChequeStatus>;
     company: SelectionType[];
-    filter: {
-        selectedCompany: string;
-        selectedBu: string;
-        search: string;
-        date: DateFilterType;
-    };
+    filter: FilterType;
     totalDocuments: number;
 }) {
     const [openModal, setOpenModal] = useState(false);
@@ -72,39 +70,35 @@ export default function CvCrfList({
 
     const handleStatusChange = (data: ClosingCheckDetailsType) => {
         setRecordDetails(data);
-        setOpenModal(true);
-
-        // if (check === 'cv') router.visit(signatureDetails(id));
-        // else router.visit(detailsCrf(id));
-    };
-    const handleMarkClose = () => {
-        try {
-            if (recordDetails)
-                router.post(
-                    markAsClose(recordDetails.id),
-                    {},
-                    {
-                        onSuccess: ({ props }) => {
-                            const m = props.flash as FlashReponse;
-
-                            setOpenModal(false);
-                            if (m.status) {
-                                setStream(m.stream);
-                                setOpenModalPdf(true);
-                            }
-                        },
-                    },
-                );
-        } finally {
+        if (data.hasDocument) {
+            setOpenModal(true);
+        } else {
             setOpenScan(true);
         }
+    };
+
+    const handleMarkClose = () => {
+        if (recordDetails)
+            router.post(
+                markAsClose(recordDetails.id),
+                {},
+                {
+                    onSuccess: ({ props }) => {
+                        const m = props.flash as FlashReponse;
+
+                        setOpenModal(false);
+                        if (m.status) {
+                            setStream(m.stream!);
+                            setOpenModalPdf(true);
+                        }
+                    },
+                },
+            );
     };
 
     const columns = createClosingCvColumns(handleStatusChange);
 
     const [openScan, setOpenScan] = useState(false);
-
-    const handleCloseScan = () => setOpenScan(false);
 
     const handleRefreshTotalFiles = () => {
         router.reload({ only: ['totalDocuments'] });
@@ -113,7 +107,7 @@ export default function CvCrfList({
     const handleGetFiles = async () => {
         const { data } = await axios.post(submitDocuments().url, {
             chequeNumber: recordDetails?.checkNo,
-            id: recordDetails?.id
+            id: recordDetails?.id,
         });
 
         if (data.status === 'success') {
@@ -124,10 +118,40 @@ export default function CvCrfList({
             setOpenScan(false);
         }
     };
+
+    const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
+        if (newValue === null) return;
+        router.get(
+            closingCheque(),
+            {
+                tab: newValue,
+            },
+            { replace: true },
+        );
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
-            <PageContainer title="Cheque Status">
+            <PageContainer title="Closing Cheques">
+                <ToggleButtonGroup
+                    color="primary"
+                    value={filter.tab}
+                    exclusive
+                    onChange={handleChangeTab}
+                    aria-label="Platform"
+                >
+                    <ToggleButton value="doc_required">
+                        <ViewCompact sx={{ mr: 1, fontSize: 18 }} />
+                        Document Required
+                    </ToggleButton>
+                    <ToggleButton value="doc_uploaded">
+                        <SwipeVertical sx={{ mr: 1, fontSize: 18 }} />
+                        Document Uploaded
+                    </ToggleButton>
+                </ToggleButtonGroup>
+
+                {/* <Box sx={{ mt: 5 }}> */}
                 <TableFilter company={company} filters={filter} />
 
                 <TableDataGrid
@@ -138,6 +162,7 @@ export default function CvCrfList({
                     handleSortFilter={handleSort}
                     columns={columns}
                 />
+                {/* </Box> */}
             </PageContainer>
 
             <Modal
@@ -228,10 +253,10 @@ export default function CvCrfList({
             <Modal
                 open={openScan}
                 onClose={(event, reason) => {
-                    if (reason === 'backdropClick') {
-                        return;
-                    }
-                    handleCloseScan();
+                    // if (reason === 'backdropClick') {
+                    //     return;
+                    // }
+                    setOpenScan(false);
                 }}
                 aria-labelledby="scan-modal-title"
             >

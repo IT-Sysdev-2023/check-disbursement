@@ -83,6 +83,7 @@ export interface ClosingCheckDetailsType {
     payee: string;
     amount: string;
     receivedBy: string;
+    hasDocument: number;
 }
 
 export interface DateFilterType {

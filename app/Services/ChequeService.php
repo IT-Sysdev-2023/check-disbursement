@@ -32,10 +32,6 @@ class ChequeService
 
     public function records(Request $request)
     {
-
-        // $records = ChequeRecord::with('source')->limit(10)->get();
-        // dd($records);
-
         $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page', 'documentType']);
         $assignment = $filters['assignment'] ?? 'toAssign';
         $company = $filters['company'] ?? 'all';

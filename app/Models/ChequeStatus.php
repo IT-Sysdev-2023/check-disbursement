@@ -15,6 +15,7 @@ class ChequeStatus extends Model
         return [
             'created_at' => 'datetime',
             'received_at' => 'datetime',
+            'is_closed' => 'boolean'
         ];
 
     }

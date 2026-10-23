@@ -221,7 +221,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             ...(isAdmin || closingOfficer
                 ? [
                       {
-                          title: 'Scanned Documents',
+                          title: 'Closed Cheques',
                           href: scannedDocuments(),
                           icon: BookmarkX,
                       },
