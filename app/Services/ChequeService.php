@@ -226,7 +226,7 @@ class ChequeService
     private function countCompleted(array $filters)
     {
         return ChequeRecord::filter($filters)
-            ->where(fn($q) => $q->whereNotNull('cheque_number')->orWhereNotNull('cheque_date'))
+            ->where(fn($q) => $q->whereNotNull('cheque_number')->whereNotNull('cheque_date'))
             ->doesntHave('source.borrowedCheque')
             ->limit(100)
             ->count();

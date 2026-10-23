@@ -1,5 +1,3 @@
-
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -11,15 +9,11 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import {
-    dashboard,
-} from '@/routes';
+import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import {
-    BookOpen,
-    LayoutGrid,
-} from 'lucide-react';
+import { Chip } from '@mui/material';
+import { BookOpen, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -28,9 +22,8 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
-    
 ];
-
+const isProduction = import.meta.env.MODE === 'production';
 const footerNavItems: NavItem[] = [
     {
         title: 'Get Started',
@@ -40,7 +33,6 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -60,7 +52,12 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
+                <Chip
+                    label={isProduction ? 'Production' : 'Development'}
+                    color={isProduction ? 'error' : 'success'}
+                    size="small"
+                />
+                {/* <NavFooter items={footerNavItems} className="mt-auto" /> */}
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
