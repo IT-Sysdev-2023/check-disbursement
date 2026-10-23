@@ -58,7 +58,7 @@ export default function CustomizedDataGrid({
             flex: 1,
         },
         {
-            field: 'bankName',
+            field: 'bank',
             headerName: 'Bank Name',
             flex: 1,
             minWidth: 150,

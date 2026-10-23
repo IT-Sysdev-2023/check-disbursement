@@ -124,7 +124,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           icon: PackageOpen,
                       },
                       {
-                          title: 'Cheque Status Monitoring',
+                          title: 'Cheque Range Monitoring',
                           href: chequeStatusRange(),
                           icon: Sunset,
                       },

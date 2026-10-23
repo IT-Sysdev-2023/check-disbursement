@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\NumberHelper;
 use App\Http\Resources\ChequeCollection;
+use App\Http\Resources\ChequeRecordCollection;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
 use App\Models\ChequeRecord;
@@ -176,7 +177,8 @@ class DashboardController extends Controller
     private static function chequeRecords($filters)
     {
         return ChequeRecord::
-            orderByDesc('created_at')
+            filter($filters)
+            ->orderByDesc('created_at')
             ->paginate(10)
             ->withQueryString();
     }
@@ -237,19 +239,19 @@ class DashboardController extends Controller
                                 'checkable',
                                 [Cv::class, Crf::class],
                                 fn(Builder $q) =>
-                                $q->when($tab !== 'all', function ($q) use ($tab) {
+                                    $q->when($tab !== 'all', function ($q) use ($tab) {
 
-                                if ($tab === 'closed') {
-                                    $q->whereRelation('chequeStatus', 'is_closed', 1);
-                                    // }else if ($tab === 'cancelled') {
-                                } else {
-                                    $q->whereRelation('chequeStatus', function ($query) use ($tab) {
-                                        $query->where('status', $tab)
-                                            ->where('is_closed', 0);
-                                    });
-                                }
-                            })->filter($filters)
-                                    ->has('chequeStatus')
+                                    if ($tab === 'closed') {
+                                        $q->whereRelation('chequeStatus', 'is_closed', 1);
+                                        // }else if ($tab === 'cancelled') {
+                                    } else {
+                                        $q->whereRelation('chequeStatus', function ($query) use ($tab) {
+                                            $query->where('status', $tab)
+                                                ->where('is_closed', 0);
+                                        });
+                                    }
+                                })->filter($filters)
+                                        ->has('chequeStatus')
                             );
                         });
                     }
@@ -318,8 +320,8 @@ class DashboardController extends Controller
                             'checkable',
                             [Cv::class, Crf::class],
                             fn(Builder $q) =>
-                            $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', $tab)
-                                ->orWhereRelation('chequeStatus', 'status', $tab)
+                                $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', $tab)
+                                    ->orWhereRelation('chequeStatus', 'status', $tab)
                         );
                     });
                 }

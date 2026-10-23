@@ -199,6 +199,7 @@ export default function ExtractCv({
                             <SelectBu
                                 label=" Select Company"
                                 permissions={bu}
+                                isAllSelected={permissionList.includes('All')}
                                 selectedPermission={permissionList}
                                 handleChange={handleChange}
                             />

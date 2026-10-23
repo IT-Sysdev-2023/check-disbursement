@@ -36,7 +36,10 @@ class CvService
     }
     public function index(User $user)
     {
-        $bu = PermissionService::getCompanyPermissions($user);
+        $bu = PermissionService::getCompanyPermissions($user)->prepend([
+            'label' => 'All',
+            'value' => 'all',
+        ]);
         return Inertia::render('extract/extractCv', [
             'bu' => $bu
         ]);
@@ -44,25 +47,30 @@ class CvService
     public function retrieveData(Request $request)
     {
 
-        $request->validate([
+        $validated = $request->validate([
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
             'company' => ['required', 'array', 'min:1'],
             'bu' => ['required', 'array', 'min:1'],
         ]);
+
         $date = (object) [
-            'start' => $request->start_date,
-            'end' => $request->end_date
+            'start' => $validated['start_date'],
+            'end' => $validated['end_date']
         ];
 
         $user = $request->user();
+        $bu = $validated['bu'];
+        $company = $validated['company'];
 
         // Get all the Navition Servers
         $buId = BusinessUnit::
-            when(!in_array('All', $request->bu), function ($q) use ($request) {
-                $q->whereIn('name', $request->bu);
+            when(!in_array('All', $bu), function ($q) use ($bu) {
+                $q->whereIn('name', $bu);
             })
-            ->whereHas('company', fn($q) => $q->whereIn('name', $request->company))
+            ->when(!in_array('All', $company), function ($q) use ($company) {
+                $q->whereHas('company', fn($q) => $q->whereIn('name', $company));
+            })
             ->pluck('id', 'name')->values();
 
         $nav = NavServer::select('id', 'host', 'username', 'password', 'port')
@@ -115,14 +123,17 @@ class CvService
 
     public function businessUnits(Request $request)
     {
+        $companies = $request->companies;
         $bu = BusinessUnit::query()
-            ->whereHas(
-                'company',
-                fn($q) =>
-                    $q->whereIn('name', $request->companies)
-            )
-            ->pluck('name', 'id')
-            ->map(fn($label, $value) => compact('label', 'value'))
+            ->select('id as value', 'name as label')
+            ->when(!in_array('All', $companies), function ($q) use ($companies) {
+                $q->whereHas(
+                    'company',
+                    fn($q) =>
+                        $q->whereIn('name', $companies)
+                );
+            })
+            ->get()
             ->values()
             ->prepend([
                 'label' => 'All',

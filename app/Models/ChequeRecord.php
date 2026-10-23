@@ -75,6 +75,9 @@ class ChequeRecord extends Model
             })
             ->when($filters['date'] ?? null, function ($query, $date) {
                 $query->whereBetween('document_date', [$date['start'], $date['end']]);
+            })
+            ->when(($filters['bank'] ?? null) && $filters['bank'] != 'All', function ($query) use ($filters) {
+                $query->where('bank', $filters['bank']);
             });
     }
 
@@ -86,5 +89,5 @@ class ChequeRecord extends Model
     {
         return $query->where('type', 'crf');
     }
-    
+
 }

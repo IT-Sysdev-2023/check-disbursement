@@ -44,6 +44,7 @@ class ChequeResource extends JsonResource
             'location' => optional($this)->location,
             'companyName' => $this->company_name,
             'businessUnit' => $this->bu_name,
+            'bank' => $this->bank,
             'hasCrf' => (bool) $this->has_crf,
             'createdAt' => Date::parse($this->created_at)->toFormattedDateString()
             // 'cvNo' => $this->cv_no,
