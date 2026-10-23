@@ -109,12 +109,6 @@
                 <strong>{{ $data['dateLabel'] }}</strong> {{ $data['dateReleased'] ?? '-' }}
             </td>
         </tr>
-        {{-- <tr>
-            <td style="border: none; padding: 0;">
-                <strong>Location:</strong> {{ $data['location'] ?? '-' }}
-            </td>
-            <td style="border: none; padding: 0;"></td>
-        </tr> --}}
     </table>
 
     <table>
@@ -133,10 +127,10 @@
                 <tr>
                     <td class="center">{{ $cheque['cv_no'] }}</td>
                     <td class="center">{{ $cheque['cheque_number'] }}</td>
-                    <td class="center">{{ $cheque['cheque_date'] }}</td>
+                    <td class="center"> {{ \Carbon\Carbon::parse($cheque['cheque_date'])->format('Y-m-d') }}</td>
                     <td>{{ $cheque['payee'] }}</td>
                     <td class="center">
-                        {{ $cheque['cheque_amount'] }}
+                        ₱{{ number_format((float) ($cheque['cheque_amount'] ?? 0), 2) }}
                     </td>
                 </tr>
             @endforeach

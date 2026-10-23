@@ -254,7 +254,10 @@ class ReleasingService
     public static function forwardQuery(int $location)
     {
         return BorrowedCheque::
-            whereDoesntHaveMorph(
+            regionalPermission()
+            ->whereNot('approver_id', null)
+            ->has('scannedRecord')
+            ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
                 fn($query) => $query->has('chequeStatus')
