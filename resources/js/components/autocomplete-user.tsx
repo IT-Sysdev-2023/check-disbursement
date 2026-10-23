@@ -12,9 +12,11 @@ export default function AutocompleteUser({
     handleTextChange,
     label = 'Users',
     sxWidth = 300,
-    recentUsers = null
+    recentUsers = null,
+    defaultField = '',
 }: {
-        label?: string;
+    label?: string;
+    defaultField?: string;
     recentUsers?: Option[] | null;
     sxWidth?: string | number;
     handleTextChange: (_: SyntheticEvent, item: Option) => void;
@@ -62,7 +64,6 @@ export default function AutocompleteUser({
     }, [inputValue]);
 
     const handleFocus = () => {
-  
         if (!inputValue) {
             setOptions(recentUsers ?? []);
         }
@@ -72,6 +73,7 @@ export default function AutocompleteUser({
         <Autocomplete
             freeSolo
             disableClearable
+            defaultValue={defaultField}
             sx={{ width: sxWidth }}
             options={options}
             loading={loading}

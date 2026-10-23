@@ -1,3 +1,4 @@
+import AutocompleteUser from '@/components/autocomplete-user';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
 import {
     borrowedChecks,
@@ -5,7 +6,7 @@ import {
     changeApprover,
     getApprovers,
 } from '@/routes';
-import { Borrower } from '@/types';
+import { Borrower, Option } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -22,7 +23,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { ArrowBigRightDash, Pencil } from 'lucide-react';
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, SyntheticEvent, useEffect, useState } from 'react';
 
 export default function TableItems(props: {
     row: Borrower;
@@ -34,6 +35,7 @@ export default function TableItems(props: {
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
     const [openEdit, setOpenEdit] = useState(false);
     const [borrowerId, setBorrowerId] = useState();
+    const [borrower, setBorrower] = useState('');
     const [approvers, setApprovers] = useState<
         { label: string; value: string }[]
     >([]);
@@ -59,7 +61,6 @@ export default function TableItems(props: {
 
     const handleEdit = async (borrowerNo: string) => {
         const { data } = await axios.get(getApprovers().url);
-        console.log(data);
         setApprovers(data);
         setBorrowerId(borrowerNo);
         setOpenEdit(true);
@@ -77,6 +78,7 @@ export default function TableItems(props: {
         router.put(
             changeApprover(),
             {
+                borrower: borrower,
                 approver: selectedApprover,
                 borrowerNo: row.borrowerNoClean,
             },
@@ -90,6 +92,9 @@ export default function TableItems(props: {
         );
     };
 
+     const handleTextChange = (_: SyntheticEvent, name: Option) => {
+           setBorrower(name.label)
+        };
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -218,7 +223,7 @@ export default function TableItems(props: {
             </TableRow>
 
             <OnlySelectionModal
-                title="Change Approver"
+                title="Change Approver & Borrower"
                 open={openEdit}
                 onClose={() => {
                     setBorrowerId(null);
@@ -231,7 +236,14 @@ export default function TableItems(props: {
                 selectedItem={selectedApprover}
                 item={approvers}
                 // loading={tagLoading}
-            />
+            >
+                <AutocompleteUser
+                    label="Assign Laison"
+                    defaultField={row.borrower}
+                    sxWidth={'100%'}
+                    handleTextChange={handleTextChange}
+                />
+            </OnlySelectionModal>
         </>
     );
 }

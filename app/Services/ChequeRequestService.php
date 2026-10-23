@@ -239,11 +239,16 @@ class ChequeRequestService
     {
         $validated = $request->validate([
             // 'key' => 'required',
+            'borrower' => 'required',
             'approver' => 'required|exists:approvers,id',
             'borrowerNo' => 'required'
         ]);
 
-        $isSuccess = BorrowedCheque::where('borrower_no', $validated['borrowerNo'])->update(['approver_id' => $validated['approver']]);
+        $isSuccess = BorrowedCheque::where('borrower_no', $validated['borrowerNo'])
+            ->update([
+                'approver_id' => $validated['approver'],
+                'borrower_name' => $validated['borrower']
+            ]);
         if (!$isSuccess)
             return;
 
