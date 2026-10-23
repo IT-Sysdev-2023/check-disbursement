@@ -40,7 +40,7 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => 'E:\ChequeDocuments\File Documents',
+            'root' => PHP_OS_FAMILY === 'Windows' ? 'E:\ChequeDocuments\File Documents' : storage_path('app/public'),
             'url' => env('APP_URL') . '/storage',
             'visibility' => 'public',
             'throw' => false,
