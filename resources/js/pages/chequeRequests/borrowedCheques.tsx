@@ -6,6 +6,7 @@ import { approveCheck, chequeRequests } from '@/routes';
 import {
     Borrower,
     DateFilterType,
+    FormData,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
@@ -28,10 +29,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '#',
     },
 ];
-type FormData = {
-    borrowedNo: (string | number)[];
-    type: 'include' | 'exclude';
-};
 
 export default function BorrowedCheques({
     cheques,

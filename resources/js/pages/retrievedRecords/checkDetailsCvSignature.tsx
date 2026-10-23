@@ -16,13 +16,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function CheckDetailsCvSignature({ cv }: { cv: { data: Cv } }) {
-    
+export default function CheckDetailsCvSignature({ cheque }: { cheque: any }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Cheque Details" />
             <PageContainer title="Cheque Details">
-                <CvDetailsSignature details={cv.data} />
+                <CvDetailsSignature details={cheque.data.checkable} />
             </PageContainer>
         </AppLayout>
     );

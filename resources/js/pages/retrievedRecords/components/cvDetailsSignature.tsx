@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 
 export default function CvDetailsSignature({ details }: { details: Cv }) {
-    console.log(details);
     return (
         <Box sx={{ flexGrow: 1, width: '100%' }}>
             <Grid container spacing={2} sx={{ width: '100%' }}>

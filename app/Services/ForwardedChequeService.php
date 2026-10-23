@@ -69,9 +69,13 @@ class ForwardedChequeService
 
         return redirect()->back()->with(['status' => true, 'message' => 'Save Successfully!']);
     }
-    public function update(ChequeStatus $id, Request $request)
+    public function update(Request $request)
     {
-        $id->update(['received_by' => $request->user()->id, 'received_at' => now()]);
+        $validated = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['required', 'integer', 'distinct'],
+        ]);
+        ChequeStatus::whereIn('id', $validated['ids'])->update(['received_by' => $request->user()->id, 'received_at' => now()]);
         return redirect()->back()->with(['status' => true, 'message' => 'Save Successfully!']);
     }
 

@@ -340,6 +340,11 @@ export interface Option {
     label: string;
 }
 
+export type FormData = {
+    borrowedNo: (string | number)[];
+    type: 'include' | 'exclude';
+};
+
 export interface ProgressState {
     [message: string]: {
         progress: number;

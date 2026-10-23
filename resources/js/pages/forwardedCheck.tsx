@@ -11,15 +11,18 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { Box, Button } from '@mui/material';
+import { GridRowSelectionModel } from '@mui/x-data-grid';
+import { Handshake } from 'lucide-react';
 import { useState } from 'react';
 import TableFilter from '../components/tableFilter';
-import { createForwardedColumns, createForwardedCvColumns } from './chequeReleasing/components/columns';
+import { createForwardedColumns } from './chequeReleasing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import OnlySelectionModal from './dashboard/components/onlySelectionModal';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Check Releasing',
+        title: 'Forwarded Cheques',
         href: '#',
     },
 ];
@@ -44,41 +47,53 @@ export default function ForwardedCheck({
     const [selectedReceiver, setselectedReceiver] = useState('0');
     const [chequeStatusId, setChequeStatusId] = useState<number>();
 
-    const handleStatusChange = (
-        chequeStatusId: number,
-        value: string,
-        checkId: number,
-    ) => {
-        if (value === 'view') {
-            router.visit(signatureDetails(checkId));
-            return;
-        }
-        setChequeStatusId(chequeStatusId);
-        setOpenModal(true);
+    const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+    const handleStatusChange = (checkId: number) => {
+        router.visit(signatureDetails(checkId));
     };
 
     const handleReceiveSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (chequeStatusId)
-            router.put(
-                receiverForwarded(chequeStatusId),
-                {},
-                {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        setOpenModal(false);
-                        
-                    },
+
+        router.put(
+            receiverForwarded().url,
+            { ids: selectedRows },
+            {
+                onSuccess: () => {
+                    setOpenModal(false);
                 },
-            );
+            },
+        );
     };
-    
+
+    const handleSelectionChange = (model: GridRowSelectionModel) => {
+        const currentPageIds = new Set(cheques.data.map((row) => row.id));
+
+        const previousSelections = selectedRows.filter(
+            (id) => !currentPageIds.has(id),
+        );
+
+        const currentSelections = cheques.data
+            .filter((row) => {
+                if (model.type === 'include') {
+                    return model.ids.has(row.id);
+                }
+
+                // everything is selected except IDs in model.ids
+                return !model.ids.has(row.id);
+            })
+            .map((row) => row.id);
+
+        setSelectedRows([...previousSelections, ...currentSelections]);
+    };
+    const enableButtonTag = selectedRows.length > 0;
     const columns = createForwardedColumns(handleStatusChange);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Cheques" />
-            <PageContainer title="Receiving">
+            <PageContainer title="Forwarded Cheques">
                 <TableFilter company={company} filters={filter} />
 
                 <TableDataGrid
@@ -88,20 +103,35 @@ export default function ForwardedCheck({
                     handleSearchFilter={handleSearch}
                     handleSortFilter={handleSort}
                     columns={columns}
+                    hasSelection
+                    handleSelectionChange={handleSelectionChange}
                 />
-                {/* <Copyright sx={{ my: 4 }} /> */}
-                <OnlySelectionModal
-                    title="Received By :"
-                    open={openModal}
-                    onClose={() => setOpenModal(false)}
-                    handleSubmit={handleReceiveSubmit}
-                    handleSelectedItem={(e) =>
-                        setselectedReceiver(e.target.value)
-                    }
-                    selectedItem={selectedReceiver}
-                    item={receiver}
-                />
+
+                <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
+                    <Button
+                        // disabled={
+                        //     data.borrowedNo.length === 0 &&
+                        //     data.type === 'include'
+                        // }
+                        disabled={!enableButtonTag}
+                        variant="outlined"
+                        startIcon={<Handshake />}
+                        onClick={() => setOpenModal(true)}
+                    >
+                        Receive
+                    </Button>
+                </Box>
             </PageContainer>
+
+            <OnlySelectionModal
+                title="Received By :"
+                open={openModal}
+                onClose={() => setOpenModal(false)}
+                handleSubmit={handleReceiveSubmit}
+                handleSelectedItem={(e) => setselectedReceiver(e.target.value)}
+                selectedItem={selectedReceiver}
+                item={receiver}
+            />
         </AppLayout>
     );
 }

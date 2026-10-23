@@ -22,9 +22,9 @@ class ForwardedChequeController extends Controller
     {
         return $this->service->cancelForwarded($id, $request);
     }
-    public function update(ChequeStatus $id, Request $request)
+    public function update(Request $request)
     {
-        return $this->service->update($id, $request);
+        return $this->service->update($request);
     }
 
     public function showForwarded(string $id, string $status)

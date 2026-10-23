@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\BusinessUnit;
+use App\Models\ChequeStatus;
 use App\Models\Company;
 use App\Models\Cv;
 use App\Models\CvCheckPayment;
@@ -30,7 +31,7 @@ class CvController extends Controller
         return $this->service->details($id);
     }
 
-    public function signatureDetails(Cv $id)
+    public function signatureDetails(ChequeStatus $id)
     {
         return $this->service->signatureDetails($id);
     }
