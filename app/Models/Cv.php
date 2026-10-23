@@ -89,7 +89,7 @@ class Cv extends Model
                 $query->whereBetween('cvs.cv_date', [$date['start'], $date['end']]);
             })
             ->when(($filters['bank'] ?? null) && $filters['bank'] != 'All', function ($query) use ($filters) {
-                $query->where('bank_name', $filters['bank']);
+                $query->where('bank', $filters['bank']);
             })
             ->when(($filters['bankAccount'] ?? null) && $filters['bankAccount'] != 'All', function ($query) use ($filters) {
                 $query->where('bank_account_no', $filters['bankAccount']);
@@ -118,7 +118,7 @@ class Cv extends Model
             'cvs.tagged_at',
             'tag_locations.location',
             DB::raw("'cv' as type"),
-            'bank_name',
+            'bank',
             'cvs.created_at',
             'cvs.cv_date',
 

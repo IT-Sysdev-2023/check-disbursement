@@ -40,7 +40,7 @@ class CvResource extends JsonResource
             'status' => $status,
             'taggedAt' => $this->tagged_at,
             'payee' => $this->payee,
-            'bank' => $this->bank_name,
+            'bank' => $this->bank,
             'bankAccountNo' => $this->bank_account_no,
             'remarks' => $this->remarks,
 

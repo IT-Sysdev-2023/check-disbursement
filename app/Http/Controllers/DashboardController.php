@@ -146,10 +146,10 @@ class DashboardController extends Controller
 
     private static function banks()
     {
-        return Cv::select('bank_name')
+        return Cv::select('bank')
             ->distinct()
-            ->orderBy('bank_name')
-            ->pluck('bank_name')
+            ->orderBy('bank')
+            ->pluck('bank')
             ->filter()
             ->map(fn($bank, $index) => ['value' => $index, 'label' => $bank])
             ->values()->prepend([
@@ -161,7 +161,7 @@ class DashboardController extends Controller
     private static function bankAccounts($bank)
     {
         return Cv::select('bank_account_no')
-            ->where('bank_name', $bank)
+            ->where('bank', $bank)
             ->distinct()
             ->orderBy('bank_account_no')
             ->pluck('bank_account_no')

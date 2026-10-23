@@ -25,7 +25,7 @@ return new class extends Migration {
             $table->string('cv_no');
             $table->date('cv_date')->nullable();
             $table->string('bank_account_no');
-            $table->string('bank_name');
+            $table->string('bank');
             $table->string('remarks');
 
             $table->string('resolved_cheque_number')->nullable();

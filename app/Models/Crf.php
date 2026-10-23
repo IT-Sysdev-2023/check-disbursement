@@ -126,7 +126,7 @@ class Crf extends Model
             'tagged_at',
             'tag_locations.location',
             DB::raw("'crf' as type"),
-            'bank as bank_name',
+            'crfs.bank',
             'crfs.created_at',
             'crfs.crf_date as cv_date',
 

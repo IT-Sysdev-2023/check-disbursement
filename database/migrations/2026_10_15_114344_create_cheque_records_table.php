@@ -33,6 +33,7 @@ return new class extends Migration
                 COALESCE(crfs.cheque_amount, cvs.cheque_amount) AS amount,
                 COALESCE(crfs.cheque_date, cvs.cheque_date) AS cheque_date,
 
+                cvs.bank,
                 cvs.tagged_at,
                 tag_locations.location,
                 companies.name AS company_name,
@@ -78,6 +79,7 @@ return new class extends Migration
                     crfs.resolved_cheque_date
                 ) AS cheque_date,
 
+                crfs.bank,
                 crfs.tagged_at,
                 tag_locations.location,
                 companies.name AS company_name,
