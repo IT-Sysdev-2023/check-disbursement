@@ -2,7 +2,7 @@ import ForwardedReleasingModal from '@/components/forwarded-releasing-modal';
 import PageContainer from '@/components/pageContainer';
 import PdfReader from '@/components/pdf-reader';
 import AppLayout from '@/layouts/app-layout';
-import { modalStyle } from '@/lib/modalStyle';
+import { modalMediumStyle } from '@/lib/modalStyle';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { cancelForwarded } from '@/routes';
 import {
@@ -14,6 +14,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, useForm, usePage } from '@inertiajs/react';
+import AssignmentReturnOutlinedIcon from '@mui/icons-material/AssignmentReturnOutlined';
 import CallMissedOutgoingOutlinedIcon from '@mui/icons-material/CallMissedOutgoingOutlined';
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
 import { GridRowSelectionModel } from '@mui/x-data-grid';
@@ -49,9 +50,9 @@ export default function ForwardedChequeReleasing({
     const [selectedRows, setSelectedRows] = useState<
         { id: number; status: string }[]
     >([]);
-    const [selectedCheques, setSelectedCheques] = useState<
-        { id: number; status: string }[]
-    >([]);
+    // const [selectedCheques, setSelectedCheques] = useState<
+    //     { id: number; status: string }[]
+    // >([]);
 
     const [chequeStatusId, setChequeStatusId] = useState<number | undefined>(
         undefined,
@@ -59,7 +60,7 @@ export default function ForwardedChequeReleasing({
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
 
-    const { setData, post, processing, errors, reset } = useForm({
+    const { setData, post, processing, errors, reset, transform } = useForm({
         reason: '',
     });
 
@@ -74,51 +75,30 @@ export default function ForwardedChequeReleasing({
         }
     }, [flash]);
 
-    const handleStatusChange = (
-        items: { id: number; status: string },
-        value: string,
-    ) => {
-        if (value === 'cancel') {
-            setChequeStatusId(items.id);
-            setOpen(true);
-            return;
-        }
-        // console.log(items);
-
-        proceed([items]);
-        // router.push({
-        //     url: releaseCheckForwarded([chequeStatusId, value]).url,
-        //     component: 'chequeReleasing/releaseCheckForwarded',
-        //     props: (curr) => ({
-        //         ...curr,
-        //         id: chequeStatusId,
-        //         status: value,
-        //         label: value + ' Check',
-        //     }),
-        // });
-    };
-
     const handleSubmitCancellation = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (chequeStatusId)
-            post(cancelForwarded(chequeStatusId).url, {
-                preserveScroll: true,
-                preserveState: true,
-                onSuccess: () => {
-                    reset();
-                    setOpen(false);
-                },
-            });
+        transform((data) => ({
+            ...data,
+            cheques: selectedRows.map((row) => row.id),
+        }));
+
+        post(cancelForwarded().url, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                reset();
+                setOpen(false);
+            },
+        });
     };
 
     const multipleRelease = () => {
-        proceed(selectedRows);
+        setOpenReleasing(true);
     };
 
-    const proceed = (items: { id: number; status: string }[]) => {
-        setSelectedCheques(items);
-        setOpenReleasing(true);
+    const returnCheque = () => {
+        setOpen(true);
     };
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
@@ -136,7 +116,7 @@ export default function ForwardedChequeReleasing({
         setSelectedRows(selectedR);
     };
 
-    const columns = createForwardedReleasingColumns(handleStatusChange);
+    const columns = createForwardedReleasingColumns();
     const enableButton = selectedRows.length > 0;
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -163,6 +143,14 @@ export default function ForwardedChequeReleasing({
                     >
                         Release
                     </Button>
+                    <Button
+                        disabled={!enableButton}
+                        variant="outlined"
+                        startIcon={<AssignmentReturnOutlinedIcon />}
+                        onClick={returnCheque}
+                    >
+                        Return Cheques
+                    </Button>
                 </Box>
                 {/* <Copyright sx={{ my: 4 }} /> */}
 
@@ -172,7 +160,7 @@ export default function ForwardedChequeReleasing({
                     aria-labelledby="modal-modal-title"
                     aria-describedby="modal-modal-description"
                 >
-                    <Box sx={modalStyle}>
+                    <Box sx={modalMediumStyle}>
                         <Typography
                             id="modal-modal-title"
                             variant="h6"
@@ -189,7 +177,7 @@ export default function ForwardedChequeReleasing({
                             >
                                 <Grid size={{ xs: 12, sm: 12 }}>
                                     <TextField
-                                        id="outlined-multiline-static"
+                                        id="reason"
                                         label="Type your reason here..."
                                         onChange={(e) =>
                                             setData('reason', e.target.value)
@@ -197,7 +185,14 @@ export default function ForwardedChequeReleasing({
                                         error={!!errors.reason}
                                         helperText={errors.reason}
                                         multiline
+                                        rows={4}
                                         fullWidth
+                                        sx={{
+                                            '& .MuiInputBase-root': {
+                                                minHeight: 120,
+                                                alignItems: 'flex-start',
+                                            },
+                                        }}
                                     />
                                 </Grid>
                             </Grid>
@@ -216,7 +211,7 @@ export default function ForwardedChequeReleasing({
                 </Modal>
             </PageContainer>
             <ForwardedReleasingModal
-                cheques={selectedCheques}
+                cheques={selectedRows}
                 open={openReleasing}
                 handleClose={() => {
                     setOpenReleasing(false);

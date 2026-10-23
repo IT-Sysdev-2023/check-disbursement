@@ -18,9 +18,9 @@ class ForwardedChequeController extends Controller
         return $this->service->index($request);
     }
 
-    public function cancelForwarded(ChequeStatus $id, Request $request)
+    public function cancelForwarded(Request $request)
     {
-        return $this->service->cancelForwarded($id, $request);
+        return $this->service->cancelForwarded($request);
     }
     public function update(Request $request)
     {

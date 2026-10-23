@@ -8,6 +8,7 @@ use App\Helpers\StringHelper;
 use App\Http\Requests\ReleasingCheckRequest;
 use App\Models\ChequeForwardedStatus;
 use App\Models\ChequeStatus;
+use App\Models\Cv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -54,18 +55,21 @@ class ForwardedChequeService
         ]);
     }
 
-    public function cancelForwarded(ChequeStatus $id, Request $request)
+    public function cancelForwarded(Request $request)
     {
-        $request->validate([
-            'reason' => 'required | string'
+        $validated = $request->validate([
+            'reason' => 'required | string',
+            'cheques' => 'required | array | min:1'
         ]);
-
-        $id->chequeForwardedStatus()
-            ->create([
-                'status' => 'cancel',
-                'cancelled_reason' => $request->reason,
-                'caused_by' => $request->user()->id
-            ]);
+        ChequeStatus::whereIn('id', $validated['cheques'])
+            ->get()
+            ->each(function ($chequeStatus) use ($request, $validated) {
+                $chequeStatus->chequeForwardedStatus()->create([
+                    'status' => 'cancelled',
+                    'cancelled_reason' => $validated['reason'],
+                    'caused_by' => $request->user()->id,
+                ]);
+            });
 
         return redirect()->back()->with(['status' => true, 'message' => 'Save Successfully!']);
     }
@@ -108,9 +112,9 @@ class ForwardedChequeService
 
         $stream = DB::transaction(function () use ($cheques, $validated, $request) {
             $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
-            $companies = [];
-            $locations = [];
-
+            // $companies = [];
+            // $locations = [];
+            $chequesDetails = [];
 
             $handleFiles = $this->handleFiles($validated, $transactionNo);
             foreach ($cheques as $cheque) {
@@ -123,15 +127,30 @@ class ForwardedChequeService
                         'signature' => $handleFiles->signaturePath,
                         'caused_by' => $request->user()->id,
                     ]);
+
+                $checkable = $chequeStatus->checkable;
+
+                $chequesDetails[] = [
+                    'cv_no' => $checkable instanceof Cv
+                        ? $checkable->cv_no
+                        : $checkable->crf_no,
+                    ...$checkable->only([
+                        'cheque_number',
+                        'cheque_date',
+                        'payee',
+                        'cheque_amount',
+                    ]),
+                ];
             }
 
-            $companies[] = $chequeStatus->checkable->getCompany;
+            // $companies[] = $chequeStatus->checkable->getCompany;
 
-            $locations[] = $chequeStatus->checkable?->getLocation;
+            // $locations[] = $chequeStatus->checkable?->getLocation;
 
             $label = StringHelper::statusPastTense($validated['cheques'][0]['status']);
 
             $data = [
+                'cheques' => $chequesDetails,
                 'transactionNo' => $transactionNo,
 
                 'dateLabel' => 'Date ' . $label . ':',
@@ -143,15 +162,15 @@ class ForwardedChequeService
                 'releasedLabel' => 'Released By:',
                 'releasedBy' => auth()->user()->name,
 
-                'company' => implode(', ', array_unique($companies)),
-                'location' => implode(', ', array_unique($locations)),
+                // 'company' => implode(', ', array_unique($companies)),
+                // 'location' => implode(', ', array_unique($locations)),
 
             ];
 
             return $this->fileHandler
                 ->inFolder('pdfs/releasing/' . $label . '/')
                 ->createFileName($chequeStatus->id, $request->user()->id, '.pdf')
-                ->handlePdf($data, 'releasingPdf');
+                ->handlePdf($data, 'releasedForwardedPdf');
         });
 
 

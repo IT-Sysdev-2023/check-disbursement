@@ -63,7 +63,7 @@ export const forReceivingColumn = (): GridColDef[] => [
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.status || '—',
+        renderCell: ({ row }) => 'Receiving',
     },
     {
         field: 'createdAt',

@@ -197,7 +197,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::put('update-receiver', [ForwardedChequeController::class, 'update'])->name('receiver-forwarded');
 
         Route::get('releasing', [ForwardedChequeController::class, 'forwardedReleasing'])->name('forwarded-releasing');
-        Route::post('cancel/{id}', [ForwardedChequeController::class, 'cancelForwarded'])->name('cancel-forwarded');
+        Route::post('cancel', [ForwardedChequeController::class, 'cancelForwarded'])->name('cancel-forwarded');
     });
 
     Route::prefix('closing-cheque')->group(function () {

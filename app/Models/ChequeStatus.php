@@ -59,7 +59,6 @@ class ChequeStatus extends Model
                 $locations[] = 'Manila';
             }
 
-
             $query->whereHasMorph(
                 'checkable',
                 [Cv::class, Crf::class],

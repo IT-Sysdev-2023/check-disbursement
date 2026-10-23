@@ -234,7 +234,7 @@ export const createForwardedColumns = (
         align: 'right',
         flex: 1,
         minWidth: 80,
-        renderCell: ({ row }) => row.status || '—',
+        renderCell: ({ row }) => 'To Receive',
     },
 
     {
@@ -266,10 +266,6 @@ export const createForwardedColumns = (
 ];
 
 export const createForwardedReleasingColumns = (
-    handleStatusChange: (
-        checkId: { id: number; status: string },
-        value: string,
-    ) => void,
 ): GridColDef[] => [
     {
         field: 'chequeNumber',
@@ -336,40 +332,40 @@ export const createForwardedReleasingColumns = (
         renderCell: ({ row }) => row.status || '—',
     },
 
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 100,
-        align: 'center',
-        flex: 1,
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: ({ row }) => {
-            const { id } = row;
+    // {
+    //     field: 'actions',
+    //     headerName: 'Action',
+    //     width: 100,
+    //     align: 'center',
+    //     flex: 1,
+    //     headerAlign: 'center',
+    //     sortable: false,
+    //     renderCell: ({ row }) => {
+    //         const { id } = row;
 
-            return (
-                <Select
-                    size="small"
-                    value={null}
-                    onChange={(e) => {
-                        if (!e.target.value) return;
-                        const selectedItem = {
-                            id: id,
-                            status: e.target.value,
-                        };
-                        handleStatusChange(selectedItem, e.target.value);
-                    }}
-                >
-                    <MenuItem value="released">
-                        <Chip label="Release Check" color="primary" />
-                    </MenuItem>
-                    <MenuItem value="cancelled">
-                        <Chip label="Return Check" color="info" />
-                    </MenuItem>
-                </Select>
-            );
-        },
-    },
+    //         return (
+    //             <Select
+    //                 size="small"
+    //                 value={null}
+    //                 onChange={(e) => {
+    //                     if (!e.target.value) return;
+    //                     const selectedItem = {
+    //                         id: id,
+    //                         status: e.target.value,
+    //                     };
+    //                     handleStatusChange(selectedItem, e.target.value);
+    //                 }}
+    //             >
+    //                 <MenuItem value="released">
+    //                     <Chip label="Release Check" color="primary" />
+    //                 </MenuItem>
+    //                 <MenuItem value="cancelled">
+    //                     <Chip label="Return Check" color="info" />
+    //                 </MenuItem>
+    //             </Select>
+    //         );
+    //     },
+    // },
     ];
 
     export const perBuColumn = (
