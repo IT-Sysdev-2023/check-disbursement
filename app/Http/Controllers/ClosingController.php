@@ -32,9 +32,9 @@ class ClosingController extends Controller
         return $this->service->documents($request->chequeNumber, $request->id);
     }
 
-    public function scannedDocuments()
+    public function scannedDocuments(Request $request)
     {
-        return $this->service->scannedDocuments();
+        return $this->service->scannedDocuments($request);
     }
     public function documentImages(Request $request)
     {

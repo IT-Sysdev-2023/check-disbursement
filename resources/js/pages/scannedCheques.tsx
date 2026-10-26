@@ -1,11 +1,13 @@
 import PageContainer from '@/components/pageContainer';
+import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { documentImages } from '@/routes';
 import {
     ChequeStatus,
-    DateFilterType,
+    FilterType,
     InertiaPagination,
+    SelectionType,
     type BreadcrumbItem,
 } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -34,14 +36,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function ScannedCheques({
     cheques,
     filter,
+    company,
+    businessUnits,
 }: {
     cheques: InertiaPagination<ChequeStatus>;
-    filter: {
-        selectedCompany: string;
-        selectedBu: string;
-        search: string;
-        date: DateFilterType;
-    };
+    filter: FilterType;
+    company: SelectionType[];
+    businessUnits: SelectionType[];
 }) {
     const [open, setOpen] = useState(false); // Temporary images for testing
     const [images, setImages] = useState<string[]>([]);
@@ -65,6 +66,11 @@ export default function ScannedCheques({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
             <PageContainer title="Cheques w/ Documents">
+                <TableFilter
+                    company={company}
+                    businessUnits={businessUnits}
+                    filters={filter}
+                />
                 <TableDataGrid
                     data={cheques}
                     filter={filter.search}

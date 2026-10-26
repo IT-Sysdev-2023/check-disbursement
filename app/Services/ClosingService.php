@@ -72,7 +72,6 @@ class ClosingService
         ]);
     }
 
-
     public function close(ChequeStatus $id)
     {
 
@@ -130,12 +129,15 @@ class ClosingService
 
     }
 
-    public function scannedDocuments()
+    public function scannedDocuments(Request $request)
     {
-        //  $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck']);
+
+        $company = $filters['company'] ?? '';
 
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
+            ->filter($filters)
             ->where(['is_closed' => 1, 'has_document' => 1])
             ->whereNot('status', 'cancel')
             ->where(function ($query) {
@@ -153,13 +155,21 @@ class ClosingService
         return Inertia::render('scannedCheques', [
             'cheques' => $cheques,
             'filter' => (object) [
-                'selectedBu' => $filters['bu'] ?? '0',
+                'selectedCompany' => $company,
+                'selectedBu' => $filters['bu'] ?? '',
                 'search' => $filters['search'] ?? '',
                 'date' => $filters['date'] ?? (object) [
                     'start' => null,
                     'end' => null
                 ]
             ],
+            'businessUnits' => $company
+                ? BusinessUnit::businessUnits($company)
+                : [],
+            'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
+                'label' => 'All',
+                'value' => '0'
+            ]),
         ]);
     }
 
