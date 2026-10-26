@@ -50,13 +50,6 @@ export default function ForwardedChequeReleasing({
     const [selectedRows, setSelectedRows] = useState<
         { id: number; status: string }[]
     >([]);
-    // const [selectedCheques, setSelectedCheques] = useState<
-    //     { id: number; status: string }[]
-    // >([]);
-
-    const [chequeStatusId, setChequeStatusId] = useState<number | undefined>(
-        undefined,
-    );
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
 

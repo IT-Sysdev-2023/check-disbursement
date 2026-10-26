@@ -47,5 +47,9 @@ class CheckRequestController extends Controller
         return $this->service->changeApprover($request);
     }
 
+    public function setDs(Request $request){
+        return $this->service->setToDepositSlip($request);
+    }
+
    
 }

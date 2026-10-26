@@ -14,6 +14,7 @@ class BorrowedCheque extends Model
     {
         return [
             'created_at' => 'datetime',
+            'is_ds' => 'boolean'
         ];
 
     }
@@ -24,7 +25,10 @@ class BorrowedCheque extends Model
     //         get: fn() => $this->secondary_approver_id ? $this->secondaryApprover?->name : $this->primaryApprover?->name,
     //     );
     // }
-
+    public function scopeNotDs(Builder $query): void //Deposit Slip
+    {
+        $query->where('is_ds', false);
+    }
     public function scopeFilter(Builder $builder, array $filters): Builder
     {
         return $builder->whereHasMorph(

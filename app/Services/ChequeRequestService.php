@@ -57,33 +57,18 @@ class ChequeRequestService
 
     public function approveCheck(Request $request)
     {
-        $request->validate([
-            'type' => ['required', 'in:include,exclude'],
-            'borrowedNo' => [
+        $validated = $request->validate([
+            'borrowedIds' => [
                 'array',
-                Rule::requiredIf(fn() => $request->type === 'include'),
+                'min:1',
             ],
-            'borrowerId' => ['required', 'integer']
+            'borrowerNo' => ['required', 'integer']
         ]);
-        $ids = $request->borrowedNo ?? [];
+        $ids = $validated['borrowedIds'] ?? [];
 
-        $query = BorrowedCheque::where('borrower_no', $request->borrowerId);
-
-        $updateData = [
+        $query = BorrowedCheque::where('borrower_no', $validated['borrowerNo'])->whereIn('id', $ids)->update([
             'approved_at' => now(),
-        ];
-
-        if ($request->type === 'exclude') {
-            if (empty($ids)) {
-                // Everything is selected
-                $query->update($updateData);
-            } else {
-                $query->whereNotIn('id', $ids)->update($updateData);
-            }
-        } else {
-            $query->whereIn('id', $ids)->update($updateData);
-
-        }
+        ]);
 
         $message = $query
             ? 'Successfully Approved'
@@ -107,6 +92,7 @@ class ChequeRequestService
     public function borrowedNumberCheques(int $id)
     {
         $record = BorrowedCheque::with('checkable.tagLocation')
+            ->notDs()
             ->where([['borrower_no', $id], ['approved_at', null]])
             ->whereDoesntHaveMorph(
                 'checkable',
@@ -135,58 +121,29 @@ class ChequeRequestService
 
     public function cancelCheck(Request $request)
     {
-        $request->validate([
-            'reason' => 'required|string|max:255',
-            // 'type' => ['required', 'in:include,exclude'],
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'max:255'],
             'ids' => [
                 'array',
-                Rule::requiredIf(fn() => $request->type === 'include'),
+                'min:1',
             ],
+            'borrowerNo' => ['required', 'integer']
         ]);
-        $ids = $request->ids ?? [];
+        $ids = $validated['ids'] ?? [];
 
-        $query = BorrowedCheque::where(
+        BorrowedCheque::where(
             'borrower_no',
-            $request->borrowerId
-        );
-
-        if ($request->type === 'exclude') {
-            if (empty($ids)) { //everything is selected
-                $query->chunkById(100, function ($checks) use ($request) {
-                    foreach ($checks as $check) {
-                        $check->checkable?->chequeStatus()->create([
-                            'status' => 'cancelled',
-                            'cancelled_reason' => $request->reason,
-                            'caused_by' => $request->user()->id,
-                        ]);
-                    }
-                });
-            } else {
-                $query
-                    ->whereNotIn('id', $ids)
-                    ->chunkById(100, function ($checks) use ($request) {
-                        foreach ($checks as $check) {
-                            $check->checkable?->chequeStatus()->create([
-                                'status' => 'cancelled',
-                                'cancelled_reason' => $request->reason,
-                                'caused_by' => $request->user()->id,
-                            ]);
-                        }
-                    });
-            }
-        } else { //include type
-            $query
-                ->whereIn('id', $ids)
-                ->chunkById(100, function ($checks) use ($request) {
-                    foreach ($checks as $check) {
-                        $check->checkable?->chequeStatus()->create([
-                            'status' => 'cancelled',
-                            'cancelled_reason' => $request->reason,
-                            'caused_by' => $request->user()->id,
-                        ]);
-                    }
-                });
-        }
+            $validated['borrowerNo']
+        )->whereIn('id', $ids)
+            ->chunkById(100, function ($checks) use ($request) {
+                foreach ($checks as $check) {
+                    $check->checkable?->chequeStatus()->create([
+                        'status' => 'cancelled',
+                        'cancelled_reason' => $request->reason,
+                        'caused_by' => $request->user()->id,
+                    ]);
+                }
+            });
 
         return redirect()
             ->route('cheque-requests')
@@ -208,6 +165,7 @@ class ChequeRequestService
             DB::raw('MAX(created_at) as last_borrowed_at')
         )
             ->with('approver')
+            ->notDs()
             ->has('approver')
             ->when($filters['search'] ?? null, function (Builder $query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -249,10 +207,34 @@ class ChequeRequestService
                 'approver_id' => $validated['approver'],
                 'borrower_name' => $validated['borrower']
             ]);
+
         if (!$isSuccess)
             return;
 
         return redirect()->back()->with(['status' => true, 'message' => 'Approver Updated']);
+    }
+
+    public function setToDepositSlip(Request $request)
+    {
+        $validated = $request->validate([
+            'borrowedIds' => [
+                'array',
+                'min:1',
+            ],
+            'borrowerNo' => ['required', 'integer']
+        ]);
+
+        BorrowedCheque::where('borrower_no', $validated['borrowerNo'])
+            ->whereIn('id', $validated['borrowedIds'])->update([
+                    'is_ds' => true,
+                ]);
+
+        return redirect()
+            ->route('cheque-requests')
+            ->with([
+                'status' => true,
+                'message' => 'Successfully Updated',
+            ]);
     }
 
 

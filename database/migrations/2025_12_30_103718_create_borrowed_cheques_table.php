@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('borrower_no');
             $table->string('reason');
             $table->timestamp('approved_at')->nullable();
+            $table->boolean('is_ds')->default(0);
             $table->morphs('checkable');
             $table->unique(['checkable_id', 'checkable_type']);
             $table->timestamps();

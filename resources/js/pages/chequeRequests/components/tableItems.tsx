@@ -34,7 +34,6 @@ export default function TableItems(props: {
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
     const [openEdit, setOpenEdit] = useState(false);
-    const [borrowerId, setBorrowerId] = useState();
     const [borrower, setBorrower] = useState('');
     const [approvers, setApprovers] = useState<
         { label: string; value: string }[]
@@ -59,12 +58,10 @@ export default function TableItems(props: {
         }
     }, [open, row.borrowerNoClean, row.check]);
 
-    const handleEdit = async (borrowerNo: string) => {
+    const handleEdit = async () => {
         const { data } = await axios.get(getApprovers().url);
         setApprovers(data);
-        setBorrowerId(borrowerNo);
         setOpenEdit(true);
-        // Open the edit modal or navigate to the edit page.
     };
 
     const handleAction = async (borrowedNo: number) => {
@@ -131,7 +128,7 @@ export default function TableItems(props: {
                         <IconButton
                             size="small"
                             color="secondary"
-                            onClick={() => handleEdit(row.borrowerNoClean)}
+                            onClick={() => handleEdit()}
                             title="Edit"
                         >
                             <Pencil size={18} />
@@ -226,7 +223,6 @@ export default function TableItems(props: {
                 title="Change Approver & Borrower"
                 open={openEdit}
                 onClose={() => {
-                    setBorrowerId(null);
                     setOpenEdit(false);
                 }}
                 handleSubmit={handleTagSubmit}

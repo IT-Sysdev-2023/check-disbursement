@@ -10,15 +10,13 @@ import { GridRowId } from '@mui/x-data-grid';
 
 export default function CancellationBorrowedModal({
     id,
-    type,
     open,
     handleClose,
-    borrowerId,
+    borrowerNo,
 }: {
     id: GridRowId[] | number;
-    type: 'exclude' | 'include';
     open: boolean;
-    borrowerId: number;
+    borrowerNo: number;
     handleClose: () => void;
 }) {
     const { setData, post, processing, errors, reset, transform } = useForm({
@@ -29,9 +27,8 @@ export default function CancellationBorrowedModal({
 
         transform((data) => ({
             ...data,
-            borrowerId: borrowerId,
+            borrowerNo: borrowerNo,
             ids: id,
-            type: type,
         }));
 
         post(cancelCheck().url, {

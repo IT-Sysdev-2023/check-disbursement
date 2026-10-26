@@ -165,6 +165,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
             Route::get('approver', [CheckRequestController::class, 'approver'])->name('approver-names');
             Route::put('approve-check', [CheckRequestController::class, 'approveCheck'])->name('approve-check');
+            Route::put('set-to-ds', [CheckRequestController::class, 'setDs'])->name('set-ds');
 
             Route::put('change-approver', [CheckRequestController::class, 'changeApprover'])->name('change-approver');
         });
