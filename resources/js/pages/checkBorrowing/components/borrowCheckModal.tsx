@@ -133,9 +133,6 @@ export default function BorrowCheckModal({
                     </form>
                 </Box>
             </Modal>
-            {/* <a-modal v-model:open="openModalReprint" style="width: 70%;">
-        <iframe :src="stream" frameborder="0" style="width: 100%; height: 500px;"></iframe>
-    </a-modal> */}
         </>
     );
 }

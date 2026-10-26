@@ -84,7 +84,7 @@ class ReleasingService
             function ($q) use ($company, $bu) {
                 $q->when(
                     $bu !== 'all',
-                    fn($query) => $query->where('busines_unit_id', $bu)
+                    fn($query) => $query->where('business_unit_id', $bu)
                 )->whereRelation('businessUnit.company', 'id', $company);
             }
         )

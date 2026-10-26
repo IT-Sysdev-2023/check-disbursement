@@ -1,9 +1,15 @@
 import useNotifications from '@/components/notifications/useNotifications';
 import PageContainer from '@/components/pageContainer';
+import { usePdfPreview } from '@/components/PdfPreview';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { closingCheque, markAsClose, submitDocuments } from '@/routes';
+import {
+    closingCheque,
+    exportPdfBu,
+    markAsClose,
+    submitDocuments,
+} from '@/routes';
 import {
     ChequeStatus,
     ClosingCheckDetailsType,
@@ -28,7 +34,7 @@ import {
     Typography,
 } from '@mui/material';
 import axios from 'axios';
-import { RefreshCwIcon } from 'lucide-react';
+import { FileDown, RefreshCwIcon } from 'lucide-react';
 import { SyntheticEvent, useState } from 'react';
 import { createClosingCvColumns } from './closing/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
@@ -54,19 +60,18 @@ export default function CvCrfList({
     cheques,
     company,
     filter,
+    businessUnits,
     totalDocuments,
 }: {
     cheques: InertiaPagination<ChequeStatus>;
     company: SelectionType[];
+    businessUnits: SelectionType[];
     filter: FilterType;
     totalDocuments: number;
 }) {
     const [openModal, setOpenModal] = useState(false);
     const [recordDetails, setRecordDetails] =
         useState<ClosingCheckDetailsType | null>(null);
-
-    const [stream, setStream] = useState('');
-    const [openModalPdf, setOpenModalPdf] = useState(false);
 
     const handleStatusChange = (data: ClosingCheckDetailsType) => {
         setRecordDetails(data);
@@ -76,6 +81,8 @@ export default function CvCrfList({
             setOpenScan(true);
         }
     };
+
+    const { openPdf } = usePdfPreview();
 
     const handleMarkClose = () => {
         if (recordDetails)
@@ -88,8 +95,7 @@ export default function CvCrfList({
 
                         setOpenModal(false);
                         if (m.status) {
-                            setStream(m.stream!);
-                            setOpenModalPdf(true);
+                            openPdf(m.stream!);
                         }
                     },
                 },
@@ -103,7 +109,9 @@ export default function CvCrfList({
     const handleRefreshTotalFiles = () => {
         router.reload({ only: ['totalDocuments'] });
     };
+
     const notifications = useNotifications();
+
     const handleGetFiles = async () => {
         const { data } = await axios.post(submitDocuments().url, {
             chequeNumber: recordDetails?.checkNo,
@@ -129,7 +137,24 @@ export default function CvCrfList({
             { replace: true },
         );
     };
-
+    const generatePdf = () => {
+        router.post(
+            exportPdfBu(),
+            {
+                company: filter.selectedCompany,
+                bu: filter.selectedBu,
+            },
+            {
+                onSuccess: ({ props }) => {
+                    const m = props.flash as FlashReponse;
+                    if (m.status) {
+                        openPdf(m.stream!);
+                    }
+                },
+            },
+        );
+    };
+    const isDisabled = filter.selectedBu != '' && filter.selectedBu != '';
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -151,8 +176,22 @@ export default function CvCrfList({
                     </ToggleButton>
                 </ToggleButtonGroup>
 
-                {/* <Box sx={{ mt: 5 }}> */}
-                <TableFilter company={company} filters={filter} />
+                <TableFilter
+                    company={company}
+                    businessUnits={businessUnits}
+                    filters={filter}
+                >
+                    {filter.tab == 'doc_uploaded' && (
+                        <Button
+                            disabled={!isDisabled}
+                            variant="outlined"
+                            startIcon={<FileDown />}
+                            onClick={generatePdf}
+                        >
+                            Export To PDF
+                        </Button>
+                    )}
+                </TableFilter>
 
                 <TableDataGrid
                     data={cheques}
@@ -235,18 +274,6 @@ export default function CvCrfList({
                             Mark as Close
                         </Button>
                     </Box>
-                </Box>
-            </Modal>
-
-            <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
-                <Box sx={{ ...style, width: '70%' }}>
-                    {stream && (
-                        <iframe
-                            src={stream}
-                            style={{ width: '100%', height: '500px' }}
-                            frameBorder={0}
-                        />
-                    )}
                 </Box>
             </Modal>
 

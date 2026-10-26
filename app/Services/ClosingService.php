@@ -4,7 +4,11 @@ namespace App\Services;
 
 use App\Helpers\FileHandler;
 use App\Helpers\NumberHelper;
+use App\Models\BusinessUnit;
 use App\Models\ChequeStatus;
+use App\Models\Company;
+use App\Models\Crf;
+use App\Models\Cv;
 use App\Services\PermissionService;
 use Exception;
 use Illuminate\Http\Request;
@@ -19,10 +23,11 @@ class ClosingService
     }
     public function index(Request $request)
     {
-        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab']);
+        $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab', 'company']);
 
         $disk = Storage::disk('cheque_doc');
         $tab = $filters['tab'] ?? 'doc_required';
+        $company = $filters['company'] ?? '';
         $files = $disk->files('new');
 
         $cheques = ChequeStatus::
@@ -41,12 +46,14 @@ class ClosingService
             ->paginate(10)
             ->withQueryString()
             ->toResourceCollection();
-            
+
+
         return Inertia::render('cvCrfList', [
             'cheques' => $cheques,
             'defaultCheck' => $filters['selectedCheck'] ?? 'cv',
             'filter' => (object) [
-                'selectedBu' => $filters['bu'] ?? '0',
+                'selectedCompany' => $company,
+                'selectedBu' => $filters['bu'] ?? '',
                 'search' => $filters['search'] ?? '',
                 'tab' => $tab,
                 'date' => $filters['date'] ?? (object) [
@@ -55,6 +62,9 @@ class ClosingService
                 ]
             ],
             'totalDocuments' => count($files),
+            'businessUnits' => $company
+                ? BusinessUnit::businessUnits($company)
+                : [],
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
                 'value' => '0'
@@ -188,5 +198,76 @@ class ClosingService
         abort_unless($disk->exists($path), 404);
 
         return $disk->response($path);
+    }
+
+    public function exportPdfBu(Request $request)
+    {
+        $validated = $request->validate([
+            'bu' => 'required',
+            'company' => 'required'
+        ]);
+
+        $company = $validated['company'];
+        $bu = $validated['bu'];
+
+        $cheques = ChequeStatus::
+            with(['checkable' => ['borrowedCheque', 'tagLocation']])
+            ->whereNot('status', 'cancel')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('status', 'forwarded')
+                        ->has('chequeForwardedStatus');
+                })
+                    ->orWhere('status', '!=', 'forwarded');
+            })
+            ->whereHasMorph(
+                'checkable',
+                [Crf::class, Cv::class],
+                function ($q) use ($company, $bu) {
+                    $q->where('business_unit_id', $bu)
+                        ->whereRelation('businessUnit.company', 'id', $company);
+                }
+            )
+            ->where('has_document', true);
+
+
+        if ($cheques->doesntExist()) {
+            return redirect()->back()->with(['status' => false, 'message' => 'No Record Found']);
+        }
+
+        $userId = $request->user()->id;
+        $stream = DB::transaction(function () use ($userId, $bu, $company, $cheques) {
+
+            $bu = BusinessUnit::where('id', $bu)->value('name');
+            $company = Company::where('id', $company)->value('name');
+
+            $chequesDetails = [];
+            foreach ($cheques->get() as $cheque) {
+                $checkable = $cheque->checkable;
+
+                $chequesDetails[] = [
+                    'cv_no' => $checkable instanceof Cv
+                        ? $checkable->cv_no
+                        : $checkable->crf_no,
+                    ...$checkable->only([
+                        'cheque_number',
+                        'cheque_date',
+                        'payee',
+                        'cheque_amount',
+                    ]),
+                ];
+            }
+
+            $data = [
+                'date' => now()->format('M d, Y H:i A'),
+                'cheques' => $chequesDetails
+            ];
+
+            return $this->fileHandler
+                ->inFolder('pdfs/documentUploaded/')
+                ->createFileName("{$company}-{$bu}", $userId, '.pdf')
+                ->handlePdf($data, 'documentUploaded');
+        });
+        return redirect()->route('closing-cheque')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 }

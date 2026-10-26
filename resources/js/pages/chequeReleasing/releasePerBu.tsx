@@ -29,8 +29,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function ReleasePerBu({
     cheques,
-    company,
     filter,
+    company,
     businessUnits,
     receiverNames,
 }: {
@@ -154,7 +154,7 @@ export default function ReleasePerBu({
                 receiverNames={receiverNames}
                 open={openReleasing}
                 handleClose={() => {
-                    setOpenReleasing(false);
+                                    setOpenReleasing(false);
                 }}
             />
         </AppLayout>

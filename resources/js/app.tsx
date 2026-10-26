@@ -12,6 +12,7 @@ import { initializeTheme } from './hooks/use-appearance';
 import { dataGridCustomizations } from './themes/customizations/dataGridCustomizations';
 import { formInputCustomizations } from './themes/customizations/formInputCustomizations';
 import AppTheme from './themes/shared-theme/AppTheme';
+import { PdfPreviewProvider } from './components/PdfPreview';
 
 configureEcho({
     broadcaster: 'reverb',
@@ -45,11 +46,13 @@ createInertiaApp({
                     <CssBaseline />
                     <NotificationsProvider>
                         <DialogsProvider>
-                            <App {...props} />
+                            <PdfPreviewProvider>
+                                <App {...props} />
+                            </PdfPreviewProvider>
                         </DialogsProvider>
                     </NotificationsProvider>
                 </AppTheme>
-            </LocalizationProvider>
+            </LocalizationProvider>,
         );
     },
     progress: {

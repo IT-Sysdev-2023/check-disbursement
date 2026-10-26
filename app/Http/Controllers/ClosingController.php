@@ -44,4 +44,8 @@ class ClosingController extends Controller
     public function document($id, $chequeNumber, $filename){
         return $this->service->document($id, $chequeNumber, $filename);
     }
+
+    public function exportPdfBu(Request $request){
+        return $this->service->exportPdfBu($request);
+    }
 }
