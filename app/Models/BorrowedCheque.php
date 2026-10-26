@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class BorrowedCheque extends Model
 {
@@ -93,17 +94,16 @@ class BorrowedCheque extends Model
     {
         return $this->belongsTo(Approver::class);
     }
-    // public function primaryApprover()
-    // {
-    //     return $this->belongsTo(Approver::class, 'primary_approver_id');
-    // }
-    // public function secondaryApprover()
-    // {
-    //     return $this->belongsTo(Approver::class, 'secondary_approver_id');
-    // }
-
     public function checkable()
     {
         return $this->morphTo();
+    }
+
+    public function depositSlips(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            DepositSlip::class,
+            'borrowed_cheque_deposit_slips'
+        );
     }
 }

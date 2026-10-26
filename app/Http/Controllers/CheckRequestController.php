@@ -51,5 +51,11 @@ class CheckRequestController extends Controller
         return $this->service->setToDepositSlip($request);
     }
 
+    public function depositSlips(Request $request){
+        return $this->service->depositSlips($request);
+    }
+    public function uploadDepositSlips(Request $request){
+        return $this->service->uploadDepositSlips($request);
+    }
    
 }

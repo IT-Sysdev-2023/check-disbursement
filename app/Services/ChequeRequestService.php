@@ -10,12 +10,17 @@ use App\Models\BusinessUnit;
 use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
+use App\Models\DepositSlip;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class ChequeRequestService
 {
@@ -237,5 +242,97 @@ class ChequeRequestService
             ]);
     }
 
+    public function depositSlips(Request $request)
+    {
+        $filters = $request->only(['search']);
+        $cheques = BorrowedCheque::where('is_ds', true)
+            ->doesntHave('depositSlips')
+            ->filter($filters)
+            ->with('checkable')
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('chequeRequests/depositSlips', [
+            'cheques' => $cheques,
+            'filter' => (object) [
+                'search' => $filters['search'] ?? '',
+            ],
+        ]);
+    }
+
+    public function uploadDepositSlips(Request $request)
+    {
+
+        $validated = $request->validate([
+            'cheque_ids' => ['required', 'array', 'min:1'],
+            'cheque_ids.*' => ['integer', 'exists:borrowed_cheques,id'],
+            'deposit_slips' => ['required', 'array', 'min:1', 'max:10'],
+            // max is in kilobytes: 5120 KB = 5 MB (matches the modal)
+            'deposit_slips.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+        ]);
+
+        $storedPaths = [];
+        try {
+            DB::transaction(function () use ($request, $validated, &$storedPaths) {
+                foreach ($request->file('deposit_slips') as $file) {
+                    // Private disk: not publicly accessible via URL
+                    $path = $file->store('deposit-slips', 'local');
+                    $storedPaths[] = $path;
+
+                    $slip = DepositSlip::create([
+                        'path' => $path,
+                        'original_name' => $file->getClientOriginalName(),
+                        'mime_type' => $file->getMimeType(),
+                        'size' => $file->getSize(),
+                        'uploaded_by' => $request->user()->id,
+                    ]);
+
+                    // One slip can cover many cheques
+                    $slip->borrowedCheques()->syncWithoutDetaching($validated['cheque_ids']);
+                }
+
+                $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
+                $userId = $request->user()->id;
+
+                BorrowedCheque::whereIn(
+                    'id',
+                    $validated['cheque_ids']
+                )->chunk(100, function (Collection $borrowedCheque) use ($transactionNo, $userId) {
+                    foreach ($borrowedCheque as $cheque) {
+                        $cheque->checkable->chequeStatus()->create([
+                            'transaction_no' => $transactionNo,
+                            'status' => 'released',
+                            'receiver_name' => null,
+                            'image' => null,
+                            'signature' => null,
+                            'caused_by' => $userId,
+                        ]);
+                    }
+                });
+            });
+        } catch (Throwable $e) {
+            // Don't leave orphaned files if the DB write failed
+            Storage::disk('local')->delete($storedPaths);
+            report($e);
+
+            return back()->withErrors([
+                'deposit_slips' => 'Upload failed. Please try again.',
+            ]);
+        }
+
+        return back()->with(['status' => true, 'message' => 'Deposit slips uploaded successfully.']);
+    }
+
+    // public function show(DepositSlip $depositSlip): StreamedResponse
+    // {
+    //     // $this->authorize('view', $depositSlip);
+
+    //     return Storage::disk('local')->response(
+    //         $depositSlip->path,
+    //         $depositSlip->original_name,
+    //         ['Content-Type' => $depositSlip->mime_type],
+    //     );
+    // }
 
 }

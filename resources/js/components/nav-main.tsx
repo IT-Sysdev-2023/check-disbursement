@@ -21,6 +21,7 @@ import {
     chequeStatusRange,
     closingCheque,
     cmDisbursementClerkStatus,
+    depositSlips,
     eodRecords,
     forReceived,
     forReceiving,
@@ -160,6 +161,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Voucher Status Summary',
                           href: statusSummary(),
+                          icon: Check,
+                      },
+                      {
+                          title: 'Deposit Slips',
+                          href: depositSlips(),
                           icon: Check,
                       },
                   ]
@@ -350,7 +356,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         viewing,
         isCmDc,
         cdcForwarded,
-        cdcReleasing
+        cdcReleasing,
     ]);
 
     // Automatically open submenu if current page belongs to it

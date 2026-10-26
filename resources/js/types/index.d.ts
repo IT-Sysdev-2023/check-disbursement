@@ -35,7 +35,7 @@ interface Page<PageProps> {
 
 export interface SharedData {
     name: string;
-    flash: { status: boolean; message?: string, stream?: string };
+    flash: { status: boolean; message?: string; stream?: string };
     quote: { message: string; author: string };
     auth: Auth;
     sidebarOpen: boolean;
@@ -116,7 +116,7 @@ export interface FilterType {
     bank?: string;
     bankAccount?: string;
     documentType: string;
-    default?: string
+    default?: string;
 }
 
 export interface Role {
@@ -153,7 +153,7 @@ export interface Cv {
     payee: string;
     bankAccountNo: string;
     bankName: string;
-    borrowedCheque: BorrowedCheck;
+    borrowedCheque: BorrowedCheque;
     chequeStatus: ChequeStatus;
     tagLocation: TagLocation;
     amount: string;
@@ -205,7 +205,7 @@ export interface ManageChecks {
     location: string;
     payee: string;
     scannedId?: number;
-    type: string
+    type: string;
 }
 
 export interface ChequeResourceType {
@@ -242,12 +242,18 @@ export interface AssignedCheckNumber {
     created_at: string;
     updated_at: string;
 }
-export interface BorrowedCheck {
+export interface BorrowedCheque {
     id: number;
-    check_id: number;
-    name: string;
-    reasong: string;
-    check: 'crf' | 'cv';
+    approverId?: number;
+    borrower?: string;
+    borrowerNo: string;
+    borrowerNoClean: number;
+    check: 'cv' | 'crf';
+    checkable: ChequeType;
+    exists_on_remote_server: boolean;
+    lastBorrowedAt: string;
+    reason: string;
+    totalChecks?: number;
 }
 
 export interface ChequeStatus {

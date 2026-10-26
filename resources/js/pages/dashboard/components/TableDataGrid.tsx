@@ -1,4 +1,5 @@
 import {
+    BorrowedCheque,
     Borrower,
     ChequeResourceType,
     ChequeStatus,
@@ -46,6 +47,7 @@ export default function TableDataGrid({
         | ChequeStatus
         | User
         | ChequeResourceType
+        | BorrowedCheque
     >;
     rowSelectionModel?: GridRowSelectionModel;
     columns: GridColDef[];
