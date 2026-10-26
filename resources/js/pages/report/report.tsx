@@ -20,10 +20,10 @@ import { Head, useForm } from '@inertiajs/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { ChangeEvent, ReactNode } from 'react';
-import PermissionSelection from '../admin/components/permissionSelection';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
+import { ChangeEvent, ReactNode } from 'react';
+import PermissionSelection from '../admin/components/permissionSelection';
 
 const SectionCard = ({
     title,
@@ -67,10 +67,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const CHECK_OPTIONS = {
-    cv: 'Check Voucher (CV)',
-    crf: 'Check Request Form (CRF)',
-};
 const REPORT_OPTIONS = {
     pdc: 'PDC Cheques',
     vss: 'Voucher Status Summary',
@@ -90,32 +86,35 @@ export default function EmployeeReportFilters({
     location: SelectionType[];
     bu: SelectionType[];
 }) {
-    const { data, setData, post, errors, transform } =
-        useForm({
-            bu: [] as string[],
-            borrower: [] as string[],
-            settlementStatus: [] as string[],
-            chequeStatus: [] as string[],
-            location: [] as string[],
-            selectedChecks: [] as string[],
-            selectedReport: [] as string[],
-            columns: [] as string[],
-             date: '',
-        });
-   
+    const { data, setData, post, errors, transform } = useForm({
+        bu: [] as string[],
+        borrower: [] as string[],
+        settlementStatus: [] as string[],
+        chequeStatus: [] as string[],
+        location: [] as string[],
+        selectedChecks: [] as string[],
+        selectedReport: [] as string[],
+        columns: [] as string[],
+        date: '',
+    });
+
     const handleChange =
         (field: keyof typeof data) =>
         (key: string) =>
         (event: ChangeEvent<HTMLInputElement>) => {
+            const checked = event.target.checked;
             const current = data[field] as string[];
-            if (event.target.checked) {
-                setData(field, [...current, key]);
-            } else {
-                setData(
-                    field,
-                    current.filter((v) => v !== key),
-                );
+
+            if (key === 'All') {
+                setData(field, checked ? columns : []);
+                return;
             }
+
+            const updated = checked
+                ? [...current.filter((v) => v !== 'All'), key]
+                : current.filter((v) => v !== key);
+
+            setData(field, updated);
         };
 
     const onGenerate = () => {
@@ -132,7 +131,12 @@ export default function EmployeeReportFilters({
 
     const handleChangeSelection = (
         event: SelectChangeEvent<string[]>,
-        filter: 'borrower' | 'location' | 'settlementStatus' | 'chequeStatus' | 'bu',
+        filter:
+            | 'borrower'
+            | 'location'
+            | 'settlementStatus'
+            | 'chequeStatus'
+            | 'bu',
     ) => {
         const {
             target: { value },
@@ -233,6 +237,15 @@ export default function EmployeeReportFilters({
                                         control={
                                             <Checkbox
                                                 size="small"
+                                                checked={
+                                                    label === 'All'
+                                                        ? data.columns
+                                                              .length ===
+                                                          columns.length
+                                                        : data.columns.includes(
+                                                              label,
+                                                          )
+                                                }
                                                 onChange={handleChange(
                                                     'columns',
                                                 )(label)}
@@ -263,12 +276,18 @@ export default function EmployeeReportFilters({
                                 sx={{ mb: 2, mt: 3 }}
                             >
                                 <InputLabel>Filter Date</InputLabel>
-                                <DatePicker value={data.date ? dayjs(data.date) : null}
+                                <DatePicker
+                                    value={data.date ? dayjs(data.date) : null}
                                     onChange={(date) =>
-                                        setData('date', date?.isValid() ? date.format('YYYY-MM-DD') : '')
-                                    }/>
+                                        setData(
+                                            'date',
+                                            date?.isValid()
+                                                ? date.format('YYYY-MM-DD')
+                                                : '',
+                                        )
+                                    }
+                                />
                             </FormControl>
-                           
 
                             <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <InputLabel>Business Unit</InputLabel>
@@ -280,7 +299,7 @@ export default function EmployeeReportFilters({
                                     }
                                 />
                             </FormControl>
-                             <FormControl fullWidth size="small" sx={{ mb: 3 }}>
+                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <InputLabel>Tag Location</InputLabel>
                                 <PermissionSelection
                                     permissions={location}
@@ -291,25 +310,20 @@ export default function EmployeeReportFilters({
                                 />
                             </FormControl>
 
-                            <FormControl
-                                fullWidth
-                                size="small"
-                                sx={{ mb: 3 }}
-                            >
+                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <InputLabel>Settlement Method</InputLabel>
                                 <PermissionSelection
                                     permissions={settlementStatuses}
                                     selectedPermission={data.settlementStatus}
                                     handleChange={(e) =>
-                                        handleChangeSelection(e, 'settlementStatus')
+                                        handleChangeSelection(
+                                            e,
+                                            'settlementStatus',
+                                        )
                                     }
                                 />
                             </FormControl>
-                            <FormControl
-                                fullWidth
-                                size="small"
-                                sx={{ mb: 3}}
-                            >
+                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <InputLabel>Cheque Status</InputLabel>
                                 <PermissionSelection
                                     permissions={chequeStatuses}
@@ -330,7 +344,6 @@ export default function EmployeeReportFilters({
                                 />
                             </FormControl> */}
 
-                           
                             {/* <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <InputLabel>Is Closed</InputLabel>
                                 <PermissionSelection
@@ -341,22 +354,20 @@ export default function EmployeeReportFilters({
                                     }
                                 />
                             </FormControl> */}
-
-                          
                         </SectionCard>
                     </Grid>
 
-                      <Button
-                                variant="contained"
-                                fullWidth
-                                sx={{
-                                    bgcolor: '#009688',
-                                    '&:hover': { bgcolor: '#00796b' },
-                                }}
-                                onClick={onGenerate}
-                            >
-                                Generate Report
-                            </Button>
+                    <Button
+                        variant="contained"
+                        fullWidth
+                        sx={{
+                            bgcolor: '#009688',
+                            '&:hover': { bgcolor: '#00796b' },
+                        }}
+                        onClick={onGenerate}
+                    >
+                        Generate Report
+                    </Button>
                 </Grid>
             </Box>
         </AppLayout>

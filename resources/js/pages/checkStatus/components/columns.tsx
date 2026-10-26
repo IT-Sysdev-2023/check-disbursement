@@ -319,7 +319,7 @@ export const pdcColumn = (
         minWidth: 80,
         },
     {
-        field: 'bankName',
+        field: 'bank',
         headerName: 'Bank Name',
         headerAlign: 'right',
         align: 'right',
@@ -359,6 +359,7 @@ export const pdcColumn = (
         headerAlign: 'center',
         sortable: false,
         renderCell: ({ row }) => {
+            console.log(row);
             const record = {
                 id: row.chequeId,
                 type: row.type,

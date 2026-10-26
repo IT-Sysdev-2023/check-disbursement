@@ -6,6 +6,7 @@ use App\Http\Resources\ChequeCollection;
 use App\Http\Resources\ScannedRecordResource;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
+use App\Models\ChequeRecord;
 use App\Models\Crf;
 use App\Models\Cv;
 use App\Models\CvCheckPayment;
@@ -125,26 +126,14 @@ class StatusService
 
     private static function pdcStale($tab)
     {
-        $cvQuery = Cv::baseColumns()
-            ->when(
-                $tab == 'pdc',
-                fn($q) =>
-                    $q->whereColumn('cheque_date', '>', 'cv_date'),
-                fn($q) => $q->where('cheque_date', '<', now()->subMonths(6)) //STALED
-            );
 
-        $crfQuery = Crf::baseColumns()
-            ->when(
-                $tab == 'pdc',
-                fn($q) =>
-                    $q->whereColumn('cheque_date', '>', 'crf_date'),
-                fn($q) => $q->where('cheque_date', '<', now()->subMonths(6)) //STALED
-            );
-
-        $unionQuery = $cvQuery->unionAll($crfQuery);
-        return DB::query()
-            ->fromSub($unionQuery, 'merged')
-            ->paginate(10)
+        return ChequeRecord::when(
+            $tab == 'pdc',
+            fn($q) =>
+                $q->whereColumn('cheque_date', '>', 'document_date'),
+            fn($q) => $q->where('cheque_date', '<', now()->subMonths(6)) //STALED
+        )
+            ->paginate()
             ->withQueryString();
     }
 

@@ -27,8 +27,7 @@ class ReportController extends Controller
     }
     public function index(Request $request)
     {
-        $columns = ColumnResolver::resolve($request->check);
-
+        $columns = ColumnResolver::resolve();
 
         $bu = $request->user()
             ->companyPermissions()
@@ -46,7 +45,6 @@ class ReportController extends Controller
             return in_array($item['label'], $excluded, true);
         })->values();
 
-
         $chequeStatuses = ColumnResolver::statusColumnEnums()->reject(function ($item) use ($excludedCheque) {
             return in_array($item['label'], $excludedCheque, true);
         })->values();
@@ -55,8 +53,6 @@ class ReportController extends Controller
         $location = TagLocation::locationSelection();
         return Inertia::render('report/report', [
             'columns' => $columns,
-            // 'cvColumns' => ColumnResolver::TYPE_COLUMNS['cv'],
-            // 'crfColumns' => ColumnResolver::TYPE_COLUMNS['crf'],
             'settlementStatuses' => $settlementStatuses,
             'chequeStatuses' => $chequeStatuses,
             'borrower' => $borrower,
@@ -89,7 +85,7 @@ class ReportController extends Controller
         if (self::validateFilter($validated)) {
             return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
         }
-
+        
         $role = $this->userType;
         $date = now()->format('Ymd_His');
 

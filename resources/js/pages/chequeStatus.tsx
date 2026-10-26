@@ -26,7 +26,7 @@ import {
     SwipeRightOutlined,
 } from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { SyntheticEvent, useMemo, useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import { chequeStatusColumns, pdcColumn } from './checkStatus/components/columns';
 import ScannedDetails from './checkStatus/components/scannedDetails';

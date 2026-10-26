@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 class ColumnResolver
 {
     public const DEFAULT_COLUMNS = [
+        'All',
         'CV/CRF No',
         'Cheque Number',
         'Cheque Amount',
@@ -40,7 +41,7 @@ class ColumnResolver
     //     ],
     // ];
 
-    public static function resolve(?array $types)
+    public static function resolve()
     {
         return self::DEFAULT_COLUMNS;
         // return collect(self::DEFAULT_COLUMNS)
@@ -76,7 +77,7 @@ class ColumnResolver
     {
         return array_map(
             fn($value) => $value === 'CV/CRF No' ? 'no' : Str::snake($value),
-            $type
+            array_filter($type, fn($value) => $value !== 'All')
         );
     }
 }
