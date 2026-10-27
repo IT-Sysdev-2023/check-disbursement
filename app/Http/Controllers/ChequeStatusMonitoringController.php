@@ -2,95 +2,89 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\NumberHelper;
+use App\Helpers\PaginatorHelper;
+use App\Models\ChequeRecord;
 use App\Models\ChequeRegister;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
 class ChequeStatusMonitoringController extends Controller
 {
+
     public function index(Request $request)
     {
         $perPage = 15;
         $currentPage = request()->integer('page', 1);
-        $data = collect(DB::select("
-            WITH RECURSIVE cheque_numbers AS (
-                SELECT
-                    id AS register_id,
-                    cheque_from AS cheque_number,
-                    cheque_to
-                FROM cheque_registers
 
-                UNION ALL
+        $cheques = ChequeRegister::join('banks', 'cheque_registers.bank_id', 'banks.id')
+            ->select('cheque_registers.id', 'banks.acronym as name', 'cheque_from', 'cheque_to')
+            ->get();
 
-                SELECT
-                    register_id,
-                    cheque_number + 1,
-                    cheque_to
-                FROM cheque_numbers
-                WHERE cheque_number < cheque_to
-            ),
+        $acronyms = $cheques->pluck('name')->unique()->values();
 
-            cheque_documents AS (
-                SELECT
-                    id,
-                    cheque_number,
-                    payee,
-                    cheque_date,
-                    cheque_amount,
-                    'cv' AS source
-                FROM cvs
+        // Maps 'BPI - ICM Branch' => 'BPI' (null if no known acronym matches)
+        $resolveBank = function (?string $raw) use ($acronyms) {
+            $raw = strtoupper(trim((string) $raw));
+            $match = null;
 
-                UNION ALL
+            foreach ($acronyms as $acronym) {
+                $a = strtoupper($acronym);
 
-                SELECT
-                    id,
-                    cheque_number,
-                    payee,
-                    cheque_date,
-                    cheque_amount,
-                    'crf' AS source
-                FROM crfs
-            )
+                // starts with the acronym and is not followed by another letter/digit
+                if (preg_match('/^' . preg_quote($a, '/') . '(?![A-Z0-9])/', $raw)) {
+                    // prefer the longest acronym if several match
+                    if ($match === null || strlen($a) > strlen($match)) {
+                        $match = $a;
+                    }
+                }
+            }
 
-            SELECT
-                cn.cheque_number AS id,
-                cn.register_id,
-                cn.cheque_number,
+            return $match;
+        };
 
-                cd.id AS document_id,
-                cd.source AS document_type,
-                cd.payee,
-                cd.cheque_date,
-                cd.cheque_amount
+        // Only pull records whose bank name starts with one of our acronyms
+        $records = ChequeRecord::where(function ($q) use ($acronyms) {
+            foreach ($acronyms as $acronym) {
+                $q->orWhere('bank', 'like', $acronym . '%');
+            }
+        })
+            ->get()
+            ->keyBy(fn($r) => $resolveBank($r->bank) . '-' . trim((string) $r->cheque_number));
 
-            FROM cheque_numbers cn
+        $numbers = [];
 
-            LEFT JOIN cheque_documents cd
-                ON cd.cheque_number = cn.cheque_number
+        foreach ($cheques as $cheque) {
+            $from = trim((string) $cheque->cheque_from);
+            $to = trim((string) $cheque->cheque_to);
 
-            ORDER BY
-                cn.register_id,
-                cn.cheque_number
-        "));
+            // Preserve the number of digits in the range.
+            $width = max(strlen($from), strlen($to));
 
-        $items = $data->forPage($currentPage, $perPage)->values();
+            for ($i = (int) $from; $i <= (int) $to; $i++) {
+                $number = str_pad((string) $i, $width, '0', STR_PAD_LEFT);
 
-        $data = new LengthAwarePaginator(
-            $items,
-            $data->count(),
-            $perPage,
-            $currentPage,
-            [
-                'path' => request()->url(),
-                'query' => request()->query(),
-            ]
-        );
+                $key = strtoupper($cheque->name) . '-' . $number;
+                $record = $records->get($key);
 
-        return Inertia::render('chequeStatusRange', [
-            'data' => $data,
+                $numbers[$key] = [
+                    'id' => $key,
+                    'bank' => $cheque->name,
+                    'cheque_number' => $number,
+                    'is_used' => $record !== null,
+                    'record' => $record
+                        ? tap($record, function ($item) {
+                            $item->amount = NumberHelper::currency($item->amount);
+                        })
+                        : null,
+                ];
+            }
+        }
+        $data = collect($numbers)->values();
 
-        ]);
+        return Inertia::render('chequeStatusRange', ['data' => PaginatorHelper::paginateCollection($data)]);
     }
 }

@@ -1,5 +1,6 @@
 import { Chip } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
+import dayjs from 'dayjs';
 
 export const eodColumns = (): GridColDef[] => [
     {
@@ -76,10 +77,7 @@ export const eodColumns = (): GridColDef[] => [
                         label={statusMap[status]?.label || 'For Releasing'}
                         color={statusMap[status]?.color || 'default'}
                     />
-                    {row.isClosed == 1 && <Chip
-                        label='Closed'
-                        color='error'
-                    />}
+                    {row.isClosed == 1 && <Chip label="Closed" color="error" />}
                 </>
             );
         },
@@ -98,65 +96,64 @@ export const eodColumns = (): GridColDef[] => [
 ];
 export const chequeStatusRangeColumn = (): GridColDef[] => [
     {
-        field: 'chequeNumber',
+        field: 'bank',
+        headerName: 'Bank',
+        headerAlign: 'right',
+        align: 'right',
+    },
+    {
+        field: 'cheque_number',
         headerName: 'Cheque Number',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        renderCell: ({ row }) => row.cheque_number,
     },
     {
         field: 'cheque_amount',
         headerName: 'Cheque Amount',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
-        minWidth: 80,
+        renderCell: ({ row }) => row.record?.amount,
     },
     {
         field: 'cheque_date',
         headerName: 'Cheque Date',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
-        minWidth: 100,
+        renderCell: ({ row }) =>
+            row.record?.cheque_date
+                ? dayjs(row.record?.cheque_date).format('YYYY-MM-DD')
+                : null,
     },
-     {
+    {
         field: 'payee',
         headerName: 'Payee',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
+        renderCell: ({ row }) => row.record?.payee,
     },
     {
         field: 'document_type',
-        headerName: 'Cheque Type',
+        headerName: 'Type',
         headerAlign: 'right',
         align: 'right',
-        flex: 1,
-        minWidth: 100,
+        renderCell: ({ row }) => row.record?.type,
     },
-      {
+    {
         field: 'range',
         headerName: 'Usage',
         headerAlign: 'center',
         align: 'center',
         renderCell: ({ row }) => {
-            if (row.document_id) {
-                return (
-                    <Chip
-                        label='Used'
-                        color="success"
-                        size="small"
-                    />
-                );
+            console.log(row);
+            if (row.is_used) {
+                return <Chip label="Used" color="success" size="small" />;
             }
-            return  <Chip
-                        label='Unuse'
-                        color="default"
-                        size="small"
-                    />
+            return <Chip label="Unuse" color="default" size="small" />;
         },
     },
 ];
@@ -186,17 +183,15 @@ export const voucherSummaryColumn = (): GridColDef[] => [
         flex: 1,
         minWidth: 100,
         renderCell: ({ row }) => row.checkable.chequeDate,
-
     },
-     {
+    {
         field: 'payee',
         headerName: 'Payee',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-         minWidth: 100,
+        minWidth: 100,
         renderCell: ({ row }) => row.checkable.payee,
-        
     },
     {
         field: 'check',
@@ -206,71 +201,65 @@ export const voucherSummaryColumn = (): GridColDef[] => [
         minWidth: 100,
     },
     {
-            field: 'settlement_status',
-            headerName: 'Settlement Status',
-            minWidth: 120,
-            flex: 1,
-            renderCell: ({ row }) => {
-                const chequeStatus = row.checkable?.chequeStatus;
-                let status = null;
-    
-                if (chequeStatus?.status) {
-                    status = chequeStatus.status;
+        field: 'settlement_status',
+        headerName: 'Settlement Status',
+        minWidth: 120,
+        flex: 1,
+        renderCell: ({ row }) => {
+            const chequeStatus = row.checkable?.chequeStatus;
+            let status = null;
+
+            if (chequeStatus?.status) {
+                status = chequeStatus.status;
+            }
+
+            if (chequeStatus?.isClosed) {
+                status = 'closed';
+            }
+
+            const statusMap: Record<
+                string,
+                {
+                    label: string;
+                    color:
+                        'default' | 'primary' | 'success' | 'warning' | 'error';
                 }
-    
-                if (chequeStatus?.isClosed) {
-                    status = 'closed';
-                }
-    
-                const statusMap: Record<
-                    string,
-                    {
-                        label: string;
-                        color:
-                            'default' | 'primary' | 'success' | 'warning' | 'error';
-                    }
-                > = {
-                    closed: { label: 'Closed', color: 'primary' },
-                    forSignature: { label: 'For Signature', color: 'success' },
-                    released: { label: 'Released', color: 'success' },
-                    forwarded: { label: 'Forwarded', color: 'warning' },
-                    deposited: { label: 'Deposit', color: 'success' },
-                    received: { label: 'Received', color: 'default' },
-                    cancelled: { label: 'Cancelled', color: 'error' },
-                    returned: { label: 'Returned', color: 'error' },
-                    staled: { label: 'Staled', color: 'warning' },
-                };
-    
-                return (
-                    <Chip
-                        label={statusMap[status]?.label || 'For Releasing'}
-                        color={statusMap[status]?.color || 'default'}
-                    />
-                );
-            },
+            > = {
+                closed: { label: 'Closed', color: 'primary' },
+                forSignature: { label: 'For Signature', color: 'success' },
+                released: { label: 'Released', color: 'success' },
+                forwarded: { label: 'Forwarded', color: 'warning' },
+                deposited: { label: 'Deposit', color: 'success' },
+                received: { label: 'Received', color: 'default' },
+                cancelled: { label: 'Cancelled', color: 'error' },
+                returned: { label: 'Returned', color: 'error' },
+                staled: { label: 'Staled', color: 'warning' },
+            };
+
+            return (
+                <Chip
+                    label={statusMap[status]?.label || 'For Releasing'}
+                    color={statusMap[status]?.color || 'default'}
+                />
+            );
         },
-      {
+    },
+    {
         field: 'status',
         headerName: 'Status',
-          headerAlign: 'center',
+        headerAlign: 'center',
         flex: 1,
         align: 'center',
-          renderCell: ({ row }) => {
+        renderCell: ({ row }) => {
             console.log(row);
             if (row.exists_on_remote_server) {
                 return (
-                    <Chip
-                        label='Closed-Cleared'
-                        color="success"
-                        size="small"
-                    />
+                    <Chip label="Closed-Cleared" color="success" size="small" />
                 );
             }
-            return  <Chip
-                        label='Closed-Uncleared'
-                        color="default"
-                        size="small"
-                    />
+            return (
+                <Chip label="Closed-Uncleared" color="default" size="small" />
+            );
         },
     },
 ];

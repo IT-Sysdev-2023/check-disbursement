@@ -17,18 +17,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function ChequeRegister({
     banks,
-    bankAccounts,
     filters,
 }: {
     banks: SelectionType[];
-    bankAccounts: SelectionType[];
     filters: FilterType;
     }) {
     const { data, setData, post, processing, reset } = useForm({
         min: '',
         max: '',
         bank:  filters.bank,
-        bank_account: filters.bankAccount,
     });
 
     const minValue = data.min === '' ? null : Number(data.min);
@@ -59,24 +56,11 @@ export default function ChequeRegister({
     const handleChange = async (event: SelectChangeEvent) => {
         const val = event.target.value;
         setData('bank', val);
-        setData('bank_account', '');
 
         const selected = banks.find((bank) => bank.value === val);
         router.reload({
             data: {
                 bank: selected?.value,
-                bankAccount: null,
-            },
-        });
-    };
-    const handleChangeBa = async (event: SelectChangeEvent) => {
-        const val = event.target.value;
-        setData('bank_account', val);
-
-        const selected = bankAccounts.find((bank) => bank.value === val);
-        router.reload({
-            data: {
-                bankAccount: selected?.value,
             },
         });
     };
@@ -137,12 +121,6 @@ export default function ChequeRegister({
                             value={data.bank}
                             title="Bank"
                             items={banks}
-                        />
-                        <SelectItem
-                            handleChange={handleChangeBa}
-                            value={data.bank_account}
-                            title="Bank Accounts"
-                            items={bankAccounts}
                         />
                     {/* </Stack> */}
                     {/* <TextField
