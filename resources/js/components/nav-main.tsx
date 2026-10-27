@@ -33,6 +33,7 @@ import {
     releasePerBu,
     report,
     retrievedRecords,
+    returnedCheques,
     scannedDocuments,
     statusSummary,
     users,
@@ -47,10 +48,12 @@ import {
     Check,
     ChevronDown,
     ChevronRight,
+    ClipboardList,
     Database,
     FileSpreadsheet,
     FolderCheck,
     Forward,
+    HandCoins,
     Landmark,
     PackageCheck,
     PackageOpen,
@@ -59,6 +62,7 @@ import {
     Send,
     Sunset,
     Tickets,
+    Undo2,
     Users,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -162,17 +166,22 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Cheque Register',
                           href: chequeRegister(),
-                          icon: Check,
+                          icon: BookOpen,
                       },
                       {
                           title: 'Voucher Status Summary',
                           href: statusSummary(),
-                          icon: Check,
+                          icon: ClipboardList,
                       },
                       {
                           title: 'Deposit Slips',
                           href: depositSlips(),
-                          icon: Check,
+                          icon: HandCoins,
+                      },
+                      {
+                          title: 'Returned Cheques',
+                          href: returnedCheques(),
+                          icon: Undo2,
                       },
                   ]
                 : []),
@@ -361,6 +370,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         isCmDc,
         cdcForwarded,
         cdcReleasing,
+        accessCebu,
+        accessManila
     ]);
 
     // Automatically open submenu if current page belongs to it

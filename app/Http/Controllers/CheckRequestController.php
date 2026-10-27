@@ -54,6 +54,9 @@ class CheckRequestController extends Controller
     public function depositSlips(Request $request){
         return $this->service->depositSlips($request);
     }
+    public function returnedCheques(Request $request){
+        return $this->service->returnedCheques($request);
+    }
     
     public function uploadDepositSlips(Request $request){
         return $this->service->uploadDepositSlips($request);

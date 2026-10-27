@@ -23,7 +23,7 @@ class ChequeForwardedStatusResource extends JsonResource
             'image' => $this->image,
             'signature' => $this->signature,
             'status' => $this->status,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->toFormattedDateString(),
             'updated_at' => $this->updated_at
         ];
     }

@@ -261,6 +261,23 @@ class ChequeRequestService
         ]);
     }
 
+    public function returnedCheques(Request $request)
+    {
+        $filters = $request->only(['search']);
+        $cheques = ChequeStatus::whereRelation('chequeForwardedStatus', 'status', 'cancelled')
+            ->with('checkable')
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('supervisor/returnedCheques', [
+            'cheques' => $cheques,
+            'filter' => (object) [
+                'search' => $filters['search'] ?? '',
+            ],
+        ]);
+    }
+
     public function uploadDepositSlips(Request $request)
     {
 

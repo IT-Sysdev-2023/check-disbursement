@@ -173,6 +173,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         });
 
         Route::get('deposit-slips', [CheckRequestController::class, 'depositSlips'])->name('deposit-slips');
+        Route::get('returned-cheques', [CheckRequestController::class, 'returnedCheques'])->name('returned-cheques');
         Route::post('deposit-slips/upload', [CheckRequestController::class, 'uploadDepositSlips'])->name('deposit-slips-upload');
 
         Route::prefix('check-releasing')->group(function () {
