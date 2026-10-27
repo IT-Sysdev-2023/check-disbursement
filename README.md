@@ -10,3 +10,7 @@ post_max_size = 512M
 
 
 before deploying to production, clear all test files in storage
+
+
+to Fix, the wayfinder error in the server not detecting routes in index.tsx
+simply clear all config, route, cache using php artisan
