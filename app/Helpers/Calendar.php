@@ -20,60 +20,60 @@ class Calendar
         $page = $filters['page'] ?? 1;
         $perPage = $filters['perPage'] ?? 2; // BUs per page
 
-        // if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
-        //     //  Nav selected: use nav records only, don't merge with base
-        //     $data = self::distinctMonthsNav($filters['monthDetails']);
-        // } else {
-        //     //  Normal: use base data only
-        //     $data = self::distinctMonths($filters['company'] ?? null);
-        // }
+        if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
+            //  Nav selected: use nav records only, don't merge with base
+            $data = self::distinctMonthsNav($filters['monthDetails']);
+        } else {
+            //  Normal: use base data only
+            $data = self::distinctMonths($filters['company'] ?? null);
+        }
 
-        // $total = $data->count();
-        // $data = $data->slice(($page - 1) * $perPage, $perPage);
+        $total = $data->count();
+        $data = $data->slice(($page - 1) * $perPage, $perPage);
 
 
-        // $navDetails = self::getNavConnectionDetails($data);
-        // $records = collect();
+        $navDetails = self::getNavConnectionDetails($data);
+        $records = collect();
 
-        // foreach ($data as $bu => $cheques) {
+        foreach ($data as $bu => $cheques) {
 
-        //     $groupdByDate = $cheques->groupBy(
-        //         fn($q) => Date::parse($q->date)->format('Y-m')
-        //     );
+            $groupdByDate = $cheques->groupBy(
+                fn($q) => Date::parse($q->date)->format('Y-m')
+            );
 
-        //     $monthlyData = collect();
+            $monthlyData = collect();
 
-        //     foreach ($groupdByDate as $groupedMonthYear => $value) {
+            foreach ($groupdByDate as $groupedMonthYear => $value) {
 
-        //         $nav = $navDetails[$value->first()->buId] ?? null;
+                $nav = $navDetails[$value->first()->buId] ?? null;
 
-        //         if (!is_null($nav)) {
-        //             $totalNavRecords = (new GenerateCvService())
-        //                 ->setConnection($nav->navServer, $nav->name)
-        //                 ->countNavRecords($nav->navHeaderTable->name, $groupedMonthYear);
+                if (!is_null($nav)) {
+                    $totalNavRecords = (new GenerateCvService())
+                        ->setConnection($nav->navServer, $nav->name)
+                        ->countNavRecords($nav->navHeaderTable->name, $groupedMonthYear);
 
-        //             $date = Date::createFromFormat('!Y-m', $groupedMonthYear);
+                    $date = Date::createFromFormat('!Y-m', $groupedMonthYear);
 
-        //             $monthlyData->put(
-        //                 $groupedMonthYear,
-        //                 self::transformCalendarData($date, $value, $totalNavRecords)
-        //             );
-        //         }
+                    $monthlyData->put(
+                        $groupedMonthYear,
+                        self::transformCalendarData($date, $value, $totalNavRecords)
+                    );
+                }
 
-        //     }
+            }
 
-        //     $records->push([
-        //         'business_unit' => $bu,
-        //         'months' => $monthlyData->toArray(),
-        //     ]);
-        // }
+            $records->push([
+                'business_unit' => $bu,
+                'months' => $monthlyData->toArray(),
+            ]);
+        }
         return [
-            'data' => [],
+            'data' => $records->toArray(),
             'meta' => [
                 'current_page' => $page,
                 'per_page' => $perPage,
-                'total' => 1,
-                'last_page' => ceil(1 / $perPage),
+                'total' => $total,
+                'last_page' => ceil($total / $perPage),
             ]
         ];
     }
