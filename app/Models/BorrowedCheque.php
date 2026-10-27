@@ -53,31 +53,38 @@ class BorrowedCheque extends Model
 
     protected function scopeRegionalPermission(Builder $query): void
     {
-        $query->where(function ($query) {
+        $user = auth()->user();
+        
+        if (
+            !$user->hasRole([
+                'corporate_disbursing_clerk(forwarded_releasing)',
+                'corporate_disbursing_clerk(forwarded)',
+            ])
+        ) {
+            return;
+        }
 
-            $user = auth()->user();
-            $locations = [];
+        $locations = [];
 
-            if ($user->hasPermissionTo('access cebu')) {
-                $locations[] = 'Cebu';
+        if ($user->hasPermissionTo('access cebu')) {
+            $locations[] = 'Cebu';
+        }
+
+        if ($user->hasPermissionTo('access manila')) {
+            $locations[] = 'Manila';
+        }
+
+        $query->whereHasMorph(
+            'checkable',
+            [Cv::class, Crf::class],
+            function ($morphQuery) use ($locations) {
+                $morphQuery->whereHas('tagLocation', function ($locationQuery) use ($locations) {
+                    $locationQuery->whereIn('location', $locations);
+                });
             }
-
-            if ($user->hasPermissionTo('access manila')) {
-                $locations[] = 'Manila';
-            }
+        );
 
 
-            $query->whereHasMorph(
-                'checkable',
-                [Cv::class, Crf::class],
-                function ($morphQuery) use ($locations) {
-                    $morphQuery->whereHas('tagLocation', function ($locationQuery) use ($locations) {
-                        $locationQuery->whereIn('location', $locations);
-                    });
-                }
-            );
-
-        });
     }
 
     public function scannedRecord()

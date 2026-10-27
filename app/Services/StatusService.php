@@ -33,7 +33,7 @@ class StatusService
             $cheque = BorrowedCheque::query()
                 ->filter($filters)
                 ->with('checkable.chequeStatus.chequeForwardedStatus')
-
+                ->regionalPermission()
                 ->where(function (Builder $q) use ($tab) {
                     if ($tab === 'for_releasing') { // "For Releasing Tab"
                         $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)

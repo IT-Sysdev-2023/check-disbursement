@@ -122,13 +122,13 @@ export default function ChequeStatus({
                             <DownloadDoneOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
-                            Post Dated Cheques
+                            Post Dated
                         </ToggleButton>
                         <ToggleButton value="cancelled">
                             <CancelPresentationOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
-                            Cancelled
+                            Returned
                         </ToggleButton>
                         {!isRegional && (
                             <ToggleButton value="forwarded">
