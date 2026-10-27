@@ -333,7 +333,7 @@ class ChequeReleasingService
         return redirect()->route('check-releasing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
-    public function forwardedReleasing(Request $request)
+    public function forwardedReleasing(int $location, Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'company']);
 
@@ -341,7 +341,7 @@ class ChequeReleasingService
             ->regionalPermission()
             ->whereNot('approver_id', null)
             ->has('scannedRecord')
-            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->whereIn('tag_location_id', [1, 2])) // exclude Manila and Cebu
+            ->whereHasMorph('checkable', [Cv::class, Crf::class], fn($q) => $q->where('tag_location_id', $location))
             ->whereDoesntHaveMorph(
                 'checkable',
                 [Cv::class, Crf::class],
@@ -364,6 +364,7 @@ class ChequeReleasingService
                     'end' => null
                 ]
             ],
+            'forwardedLocation' => $location == 1 ? 'Cebu' : 'Manila',
             'businessUnits' => isset($filters['company']) ? BusinessUnit::businessUnits($filters['company']) : [],
             'company' => PermissionService::userAssignedCompany($request->user())
         ]);

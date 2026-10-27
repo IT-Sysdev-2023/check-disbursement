@@ -26,9 +26,7 @@ import {
     forReceived,
     forReceiving,
     forwardedChequeReleasing,
-    forwardedReceived,
-    forwardedReceiving,
-    forwardedReleased,
+    forwardedChequeStatus,
     forwardedReleasing,
     forwardedReleasingViewing,
     notifications,
@@ -74,6 +72,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         () => user?.roles?.map((r) => r.name) || [],
         [user?.roles],
     );
+    const permissions = useMemo(
+        () => user?.permissions?.map((r) => r.name) || [],
+        [user?.permissions],
+    );
+    const accessCebu = permissions.includes('access cebu');
+    
+    const accessManila = permissions.includes('access manila');
+
     const isAdmin = roles.includes('admin');
     const isCmDc = roles.includes('cm_dibursement_clerk');
     // const releasing = roles.includes('releasing');
@@ -182,36 +188,34 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             ...(isAdmin || cdcForwarded
                 ? [
                       {
-                          title: 'Forwarded Cheques',
+                          title: 'Cheques Forwarding',
                           href: '#',
                           icon: Forward,
                           submenu: [
-                              {
-                                  title: 'Releasing',
-                                  href: forwardedReleasingViewing(),
-                                  icon: Send,
-                              },
-                              {
-                                  title: 'Receiving',
-                                  href: forwardedReceiving(),
-                                  icon: PackageCheck,
-                              },
-                              {
-                                  title: 'Received',
-                                  href: forwardedReceived(),
-                                  icon: PackageOpen,
-                              },
-                              {
-                                  title: 'Released',
-                                  href: forwardedReleased(),
-                                  icon: PackageCheck,
-                              },
-                              //   {
-                              //       title: 'Return',
-                              //       href: checkRequestForm(),
-                              //       icon: PackageX,
-                              //   },
+                              ...(accessCebu
+                                  ? [
+                                        {
+                                            title: 'Cebu',
+                                            href: forwardedReleasingViewing(1),
+                                            icon: Send,
+                                        },
+                                    ]
+                                  : []),
+                              ...(accessManila
+                                  ? [
+                                        {
+                                            title: 'Manila',
+                                            href: forwardedReleasingViewing(2),
+                                            icon: PackageCheck,
+                                        },
+                                    ]
+                                  : []),
                           ],
+                      },
+                      {
+                          title: 'Cheque Status',
+                          href: forwardedChequeStatus(),
+                          icon: FolderCheck,
                       },
                   ]
                 : []),

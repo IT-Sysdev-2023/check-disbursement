@@ -53,7 +53,7 @@ class HandleInertiaRequests extends Middleware
             'notificationCount' => $request->user()?->unreadNotifications()->count(),
             'quote' => ['message' => trim($message), 'author' => trim($author)],
             'auth' => [
-                'user' => $request->user()?->load('roles'),
+                'user' => $request->user()?->load('roles', 'permissions'),
                 // ?->load('roles', 'permissions', 'companyPermissions.company'),
             ],
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

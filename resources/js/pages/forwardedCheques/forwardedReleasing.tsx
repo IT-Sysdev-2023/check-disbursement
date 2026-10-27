@@ -15,7 +15,7 @@ import {
 } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import { Box, Button } from '@mui/material';
-import { FileDown, FileOutput } from 'lucide-react';
+import { FileOutput } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import TableDataGrid from '../dashboard/components/TableDataGrid';
 import { forwardColumns } from './components/forwardColumn';
@@ -33,12 +33,14 @@ export default function ForwardedReleasing({
     filter,
     businessUnits,
     receiverNames,
+    forwardedLocation,
 }: {
     cheques: InertiaPagination<any>;
     filter: FilterType;
     company: SelectionType[];
     businessUnits: SelectionType[];
     receiverNames: Option[];
+    forwardedLocation: string;
 }) {
     const [stream, setStream] = useState('');
     const [openModalPdf, setOpenModalPdf] = useState(false);
@@ -48,7 +50,7 @@ export default function ForwardedReleasing({
 
     const uPage = usePage<SharedData>();
 
-    const permissions = uPage.props.auth.user.permissions.map((p) => p.name);
+    // const permissions = uPage.props.auth.user.permissions.map((p) => p.name);
     const flash = uPage.props.flash;
     useEffect(() => {
         if (flash?.status && flash?.stream) {
@@ -59,7 +61,7 @@ export default function ForwardedReleasing({
 
     const exportRecord = async (location: string) => {
         setOpenReleasing(true);
-        setLocation(location);
+        setLocation(location.toLowerCase());
     };
 
     const column = forwardColumns();
@@ -81,22 +83,25 @@ export default function ForwardedReleasing({
                     mb={3}
                     gap={2}
                 >
-                    {permissions.includes('access cebu') && <Button
-                        variant="outlined"
-                        startIcon={<FileDown />}
-                        onClick={() => exportRecord('cebu')}
-                        // disabled={generating}
-                    >
-                        Release to Cebu
-                    </Button>}
-                    {permissions.includes('access manila') && <Button
+                    {/* {(permissions.includes('access cebu') && forwardedLocation == 'Cebu') && (
+                        <Button
+                            variant="outlined"
+                            startIcon={<FileDown />}
+                            onClick={() => exportRecord('cebu')}
+                            // disabled={generating}
+                        >
+                            Release to Cebu
+                        </Button>
+                    )} */}
+
+                    <Button
                         variant="outlined"
                         startIcon={<FileOutput />}
-                        onClick={() => exportRecord('manila')}
+                        onClick={() => exportRecord(forwardedLocation)}
                         // disabled={generating}
                     >
-                        Release to Manila
-                    </Button>}
+                        Release to {forwardedLocation}
+                    </Button>
                 </Box>
 
                 <TableDataGrid

@@ -9,6 +9,7 @@ use App\Http\Requests\ReleasingCheckRequest;
 use App\Http\Resources\BorrowedChequeResource;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
+use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
 use App\Models\ReceiverName;
@@ -42,9 +43,9 @@ class CheckReleasingController extends Controller
         return $this->service->chequeRegistrationStore($request);
     }
 
-    public function forwardedReleasing(Request $request)
+    public function forwardedReleasing(int $location, Request $request)
     {
-        return $this->service->forwardedReleasing($request);
+        return $this->service->forwardedReleasing($location, $request);
     }
 
     public function store(ReleasingCheckRequest $request)
@@ -363,6 +364,54 @@ class CheckReleasingController extends Controller
                 ? BusinessUnit::businessUnits($company)
                 : [],
             'company' => PermissionService::userAssignedCompany($request->user())
+        ]);
+    }
+
+    public function chequeStatus(Request $request)
+    {
+        $filters = $request->only(['search', 'date', 'bu', 'company', 'tab']);
+        $tab = $filters['tab'] ?? 'receiving';
+        $company = $filters['company'] ?? 'all';
+
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at')
+            ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
+            ->regionalPermission()
+            ->where('status', 'forwarded')
+            ->where(function ($q) use ($tab) {
+                if ($tab == 'receiving') {
+                    $q->whereNull('received_by')->whereDoesntHave('chequeForwardedStatus');
+                    return;
+                } else if ($tab == 'received') {
+                    $q->whereNotNull('received_by')->whereDoesntHave('chequeForwardedStatus');
+                    return;
+                } else {
+                    $q->whereNotNull('received_by')->whereRelation(
+                        'chequeForwardedStatus',
+                        'status',
+                        '!=',
+                        'cancelled'
+                    );
+                }
+            })
+            ->paginate()
+            ->withQueryString()
+            ->toResourceCollection();
+
+        return Inertia::render('forwardedCheques/forwardedChequeStatus', [
+            'cheques' => $chequeRecords,
+            'filter' => (object) [
+                'search' => $filters['search'] ?? '',
+                'tab' => $tab,
+                'date' => $filters['date'] ?? (object) [
+                    'start' => null,
+                    'end' => null
+                ],
+                'selectedCompany' => $company,
+                'selectedBu' => $filters['bu'] ?? 'all',
+
+            ],
+            'company' => PermissionService::userAssignedCompany($request->user()),
+            'businessUnits' => BusinessUnit::businessUnits($company),
         ]);
     }
 

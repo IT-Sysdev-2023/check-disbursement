@@ -138,10 +138,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     //! Forwarded
     Route::prefix('forwarded-viewing')->middleware('role:corporate_disbursing_clerk(forwarded)|admin')->group(function () {
-        Route::get('releasing', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
-        Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
-        Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
-        Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
+        Route::get('releasing/{location}', [CheckReleasingController::class, 'forwardedReleasing'])->name('forwarded-releasing-viewing');
+        // Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
+        // Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
+        // Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
+        
+        Route::get('forwarded-cheque-status', [CheckReleasingController::class, 'chequeStatus'])->name('forwarded-cheque-status');
 
         Route::post('store-release-check-location', [CheckReleasingController::class, 'storeForwarded'])->name('store-release-check-location');
 
