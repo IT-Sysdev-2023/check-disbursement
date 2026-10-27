@@ -12,13 +12,13 @@ return new class extends Migration {
     {
         Schema::create('cheque_registers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('bank_id');
+            $table->unsignedBigInteger('bank_account_id');
             $table->string('cheque_from');
             $table->string('cheque_to');
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->foreign('bank_id')->references('id')->on('banks')->onDelete('restrict');
+            $table->foreign('bank_account_id')->references('id')->on('bank_accounts')->onDelete('restrict');
         });
     }
 

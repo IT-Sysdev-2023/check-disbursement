@@ -102,6 +102,13 @@ export const chequeStatusRangeColumn = (): GridColDef[] => [
         align: 'right',
     },
     {
+        field: 'account_no',
+        headerName: 'Account No.',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+    },
+    {
         field: 'cheque_number',
         headerName: 'Cheque Number',
         headerAlign: 'right',

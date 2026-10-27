@@ -26,7 +26,7 @@ class PaginatorHelper
     public static function paginateCollection(Collection $collection, $perPage = 15, $page = null, $options = [])
     {
         $page = $page ?: (LengthAwarePaginator::resolveCurrentPage() ?: 1);
-        $items = $collection->forPage($page, $perPage);
+        $items = $collection->forPage($page, $perPage)->values();
         return new LengthAwarePaginator($items, $collection->count(), $perPage, $page, $options);
     }
 

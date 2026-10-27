@@ -79,11 +79,13 @@ class ChequeReleasingService
     }
     public function chequeRegistration(Request $request)
     {
-        $filters = $request->only(['bank']);
+        $filters = $request->only(['bank', 'bankAccount']);
         return Inertia::render('chequeRegister', [
             'banks' => self::banks(),
+            'bankAccounts' => isset($filters['bank']) ? self::bankAccounts($filters['bank']) : [],
             'filters' => [
                 'bank' => $filters['bank'] ?? null,
+                'bankAccount' => $filters['bankAccount'] ?? null,
             ]
         ]);
     }
@@ -103,10 +105,12 @@ class ChequeReleasingService
 
     public function chequeRegistrationStore(Request $request)
     {
+
         $validated = $request->validate([
             'min' => ['required', 'numeric', 'min:0'],
             'max' => ['required', 'numeric', 'min:0', 'gte:min'],
             'bank' => ['required'],
+            'bank_account' => ['required'],
         ]);
 
         $userId = $request->user()->id;
@@ -114,8 +118,8 @@ class ChequeReleasingService
         return DB::transaction(function () use ($validated, $userId) {
 
             $overlaps = ChequeRegister::where(
-                'bank_id',
-                $validated['bank']
+                'bank_account_id',
+                $validated['bank_account']
             )
                 ->whereRaw('CAST(cheque_from AS UNSIGNED) <= ?', [$validated['max']])
                 ->whereRaw('CAST(cheque_to AS UNSIGNED) >= ?', [$validated['min']])
@@ -129,7 +133,7 @@ class ChequeReleasingService
             }
 
             ChequeRegister::create([
-                'bank_id' => $validated['bank'],
+                'bank_account_id' => $validated['bank_account'],
                 'cheque_from' => $validated['min'],
                 'cheque_to' => $validated['max'],
                 'caused_by' => $userId,

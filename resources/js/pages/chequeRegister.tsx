@@ -4,8 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { chequeRegisterStore } from '@/routes';
 import { FilterType, SelectionType, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
-import { Box, Button, SelectChangeEvent, Stack, TextField } from '@mui/material';
-import { useState } from 'react';
+import { Box, Button, SelectChangeEvent, TextField } from '@mui/material';
 import SelectItem from './dashboard/components/SelectItem';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -17,15 +16,18 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function ChequeRegister({
     banks,
+    bankAccounts,
     filters,
 }: {
     banks: SelectionType[];
+    bankAccounts: SelectionType[];
     filters: FilterType;
-    }) {
+}) {
     const { data, setData, post, processing, reset } = useForm({
         min: '',
         max: '',
-        bank:  filters.bank,
+        bank: filters.bank,
+        bank_account: filters.bankAccount,
     });
 
     const minValue = data.min === '' ? null : Number(data.min);
@@ -56,11 +58,24 @@ export default function ChequeRegister({
     const handleChange = async (event: SelectChangeEvent) => {
         const val = event.target.value;
         setData('bank', val);
+        setData('bank_account', '');
 
         const selected = banks.find((bank) => bank.value === val);
         router.reload({
             data: {
                 bank: selected?.value,
+                bankAccount: null,
+            },
+        });
+    };
+    const handleChangeBa = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setData('bank_account', val);
+
+        const selected = bankAccounts.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bankAccount: selected?.value,
             },
         });
     };
@@ -116,12 +131,18 @@ export default function ChequeRegister({
                             marginBottom: 2,
                         }}
                     > */}
-                        <SelectItem
-                            handleChange={handleChange}
-                            value={data.bank}
-                            title="Bank"
-                            items={banks}
-                        />
+                    <SelectItem
+                        handleChange={handleChange}
+                        value={data.bank}
+                        title="Bank"
+                        items={banks}
+                    />
+                    <SelectItem
+                        handleChange={handleChangeBa}
+                        value={data.bank_account}
+                        title="Bank Accounts"
+                        items={bankAccounts}
+                    />
                     {/* </Stack> */}
                     {/* <TextField
                         label="Bank"

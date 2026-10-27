@@ -5,9 +5,7 @@ import {
 } from '@/types';
 import { Box } from '@mui/material';
 import { chequeStatusRangeColumn } from './eod/columns';
-import { DataGrid, GridPaginationModel } from '@mui/x-data-grid';
-import { router } from '@inertiajs/react';
-import { chequeStatusRange } from '@/routes';
+import { DataGrid } from '@mui/x-data-grid';
 import { handlePagination } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
