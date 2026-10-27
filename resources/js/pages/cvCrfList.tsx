@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import {
     closingCheque,
+    exportPdfAll,
     exportPdfBu,
     markAsClose,
     submitDocuments,
@@ -73,14 +74,14 @@ export default function CvCrfList({
     const [recordDetails, setRecordDetails] =
         useState<ClosingCheckDetailsType | null>(null);
 
-    const handleStatusChange = (data: ClosingCheckDetailsType) => {
-        setRecordDetails(data);
-        if (data.hasDocument) {
-            setOpenModal(true);
-        } else {
-            setOpenScan(true);
-        }
-    };
+    // const handleStatusChange = (data: ClosingCheckDetailsType) => {
+    //     setRecordDetails(data);
+    //     if (data.hasDocument) {
+    //         setOpenModal(true);
+    //     } else {
+    //         setOpenScan(true);
+    //     }
+    // };
 
     const { openPdf } = usePdfPreview();
 
@@ -101,9 +102,6 @@ export default function CvCrfList({
                 },
             );
     };
-
-    const columns = createClosingCvColumns(handleStatusChange);
-
     const [openScan, setOpenScan] = useState(false);
 
     const handleRefreshTotalFiles = () => {
@@ -154,7 +152,24 @@ export default function CvCrfList({
             },
         );
     };
+    const generateAll = () => {
+        router.post(
+            exportPdfAll(),
+            {},
+            {
+                onSuccess: ({ props }) => {
+                    const m = props.flash as FlashReponse;
+                    if (m.status) {
+                        openPdf(m.stream!);
+                    }
+                },
+            },
+        );
+    };
     const isDisabled = filter.selectedBu != '' && filter.selectedBu != '';
+
+    const columns = createClosingCvColumns();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -182,14 +197,24 @@ export default function CvCrfList({
                     filters={filter}
                 >
                     {filter.tab == 'doc_uploaded' && (
-                        <Button
-                            disabled={!isDisabled}
-                            variant="outlined"
-                            startIcon={<FileDown />}
-                            onClick={generatePdf}
-                        >
-                            Export To PDF
-                        </Button>
+                        <>
+                            <Button
+                                disabled={!isDisabled}
+                                variant="outlined"
+                                startIcon={<FileDown />}
+                                onClick={generatePdf}
+                            >
+                                Export This Bu
+                            </Button>
+
+                            <Button
+                                variant="outlined"
+                                startIcon={<FileDown />}
+                                onClick={generateAll}
+                            >
+                                Export All
+                            </Button>
+                        </>
                     )}
                 </TableFilter>
 

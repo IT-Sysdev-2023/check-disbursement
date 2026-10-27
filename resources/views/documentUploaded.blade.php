@@ -80,10 +80,18 @@
     <div class="report-header">
         <h1>Cheques with Documents</h1>
 
-        <div class="report-date">
-            {{ $data['date'] }}
-        </div>
+       
     </div>
+    <table class="report-details">
+        <tr>
+            <td style="width: 50%; border: none; padding: 0 0 10px 0;">
+                <strong>Date Closed:</strong> {{ $data['date']}}
+            </td>
+            <td style="width: 50%; border: none; padding: 0 0 10px 0; text-align: right;">
+                <strong>Closed by:</strong> {{ $data['closedBy'] }}
+            </td>
+        </tr>
+    </table>
 
     <table>
         <thead>

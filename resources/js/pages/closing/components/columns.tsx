@@ -4,7 +4,6 @@ import { GridColDef } from '@mui/x-data-grid';
 import { ArrowBigRightDash } from 'lucide-react';
 
 export const createClosingCvColumns = (
-    handleStatusChange: (data: ClosingCheckDetailsType) => void,
 ): GridColDef[] => [
     {
         field: 'chequeNumber',
@@ -60,40 +59,8 @@ export const createClosingCvColumns = (
         headerName: 'Status',
         minWidth: 120,
         flex: 1,
-    },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 100,
-        align: 'center',
-        flex: 1,
         headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            const { row } = params;
-
-            const data = {
-                id: row.id,
-                cvNo: row.checkable?.cvNo,
-                releasedAt: row.createdAt,
-                bank: row.checkable?.bank,
-                checkNo: row.checkable?.chequeNumber,
-                payee: row.checkable?.payee,
-                amount: row.checkable?.amount,
-                receivedBy: row.receiversName,
-                hasDocument: row.hasDocument
-            };
-
-            return (
-                <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => handleStatusChange(data)}
-                >
-                    <ArrowBigRightDash />
-                </IconButton>
-            );
-        },
+        align: 'center',
     },
 ];
 export const scannedDocumentsColumn = (
@@ -152,32 +119,32 @@ export const scannedDocumentsColumn = (
         field: 'status',
         headerName: 'Status',
         minWidth: 120,
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-    },
-    {
-        field: 'actions',
-        headerName: 'View',
-        width: 100,
+        headerAlign: 'center',
         align: 'center',
         flex: 1,
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: (params) => {
-            const { row } = params;
-
-            return (
-                <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() =>
-                        handleAction(row.id, row.checkable?.chequeNumber)
-                    }
-                >
-                    <ArrowBigRightDash />
-                </IconButton>
-            );
-        },
     },
+    // {
+    //     field: 'actions',
+    //     headerName: 'View',
+    //     width: 100,
+    //     align: 'center',
+    //     flex: 1,
+    //     headerAlign: 'center',
+    //     sortable: false,
+    //     renderCell: (params) => {
+    //         const { row } = params;
+
+    //         return (
+    //             <IconButton
+    //                 size="small"
+    //                 color="primary"
+    //                 onClick={() =>
+    //                     handleAction(row.id, row.checkable?.chequeNumber)
+    //                 }
+    //             >
+    //                 <ArrowBigRightDash />
+    //             </IconButton>
+    //         );
+    //     },
+    // },
 ];

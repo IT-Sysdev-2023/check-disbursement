@@ -33,6 +33,7 @@ class ClosingService
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
             ->whereNot('status', 'cancel')
+            ->where('is_closed', false)
             ->where(function ($query) {
                 $query->where(function ($q) {
                     $q->where('status', 'forwarded')
@@ -40,7 +41,11 @@ class ClosingService
                 })
                     ->orWhere('status', '!=', 'forwarded');
             })
-            ->when(($tab == 'doc_required') ?? null, fn($q) => $q->where('has_document', false)->where('is_closed', false), fn($q) => $q->where('has_document', true))
+            ->when(
+                ($tab == 'doc_required') ?? null,
+                fn($q) => $q->where('has_document', false),
+                fn($q) => $q->where('has_document', true)
+            )
             ->filter($filters)
             ->orderByDesc('created_at')
             ->paginate(10)
@@ -238,7 +243,8 @@ class ClosingService
                         ->whereRelation('businessUnit.company', 'id', $company);
                 }
             )
-            ->where('has_document', true);
+            ->where('has_document', true)
+            ->where('is_closed', false);
 
 
         if ($cheques->doesntExist()) {
@@ -268,9 +274,15 @@ class ClosingService
                 ];
             }
 
+            $cheques->update([
+                'is_closed' => true,
+                'closed_at' => now()
+            ]);
+
             $data = [
                 'date' => now()->format('M d, Y H:i A'),
-                'cheques' => $chequesDetails
+                'cheques' => $chequesDetails,
+                'closedBy' => auth()->user()->name
             ];
 
             return $this->fileHandler
@@ -280,4 +292,89 @@ class ClosingService
         });
         return redirect()->route('closing-cheque')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
+    public function exportPdfAll(Request $request)
+    {
+
+        $cheques = ChequeStatus::
+            with(['checkable' => ['borrowedCheque', 'tagLocation']])
+            ->whereNot('status', 'cancel')
+            ->where(function ($query) {
+                $query->where(function ($q) {
+                    $q->where('status', 'forwarded')
+                        ->has('chequeForwardedStatus');
+                })
+                    ->orWhere('status', '!=', 'forwarded');
+            })
+            ->where('has_document', true)
+            ->where('is_closed', false);
+
+
+        if ($cheques->doesntExist()) {
+            return redirect()->back()->with(['status' => false, 'message' => 'No Record Found']);
+        }
+
+        $userId = $request->user()->id;
+        $stream = DB::transaction(function () use ($userId, $cheques) {
+
+            $chequesDetails = [];
+            foreach ($cheques->get() as $cheque) {
+                $checkable = $cheque->checkable;
+
+                $chequesDetails[] = [
+                    'cv_no' => $checkable instanceof Cv
+                        ? $checkable->cv_no
+                        : $checkable->crf_no,
+                    ...$checkable->only([
+                        'cheque_number',
+                        'cheque_date',
+                        'payee',
+                        'cheque_amount',
+                    ]),
+                ];
+            }
+
+            $cheques->update([
+                'is_closed' => true,
+                'closed_at' => now()
+            ]);
+
+            $data = [
+                'date' => now()->format('M d, Y H:i A'),
+                'cheques' => $chequesDetails,
+                'closedBy' => auth()->user()->name
+            ];
+
+            return $this->fileHandler
+                ->inFolder('pdfs/documentUploaded/')
+                ->createFileName("All-bu", $userId, '.pdf')
+                ->handlePdf($data, 'documentUploaded');
+        });
+        return redirect()->route('closing-cheque')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
+    }
+
+    // $stream = DB::transaction(function () use ($id) {
+    // $isSuccess = $id->update([
+    //     'is_closed' => true,
+    //     'closed_at' => now()
+    // ]);
+
+    //         if ($isSuccess) {
+    //             $data = [
+    //                 'transactionNo' => NumberHelper::padLeft($id->id),
+    //                 'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
+
+    //                 'closedBy' => auth()->user()->name,
+
+    //                 'dateReceived' => $id->created_at->format('M d, Y H:i A'),
+
+    //                 // 'receivedBy' => $id->receivers_name,
+    //             ];
+
+    //             return $this->fileHandler
+    //                 ->inFolder('pdfs/releasing/closing/')
+    //                 ->createFileName($id->id, auth()->user()->id, '.pdf')
+    //                 ->handlePdf($data, 'closingPdf');
+
+    //         }
+    //     });
 }

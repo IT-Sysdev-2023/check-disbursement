@@ -48,4 +48,7 @@ class ClosingController extends Controller
     public function exportPdfBu(Request $request){
         return $this->service->exportPdfBu($request);
     }
+    public function exportPdfAll(Request $request){
+        return $this->service->exportPdfAll($request);
+    }
 }

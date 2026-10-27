@@ -217,6 +217,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         )->name('cheques.document'); //DONT REMOVE THIS ITS THE SOURCE OF SUPPORTING DOCUMENTS
 
         Route::post('export-pdf-bu', [ClosingController::class, 'exportPdfBu'])->name('export-pdf-bu');
+        Route::post('export-pdf-all', [ClosingController::class, 'exportPdfAll'])->name('export-pdf-all');
 
     });
 
