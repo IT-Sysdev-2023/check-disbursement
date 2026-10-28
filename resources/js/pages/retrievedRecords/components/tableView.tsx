@@ -264,7 +264,7 @@ export default function TableView({
                 >
                     <ToggleButton value="toAssign" aria-label="left aligned">
                         <Badge badgeContent={counts.toAssign} color="error">
-                            Assignment
+                            Incomplete
                         </Badge>
                     </ToggleButton>
                     <ToggleButton value="completed" aria-label="centered">

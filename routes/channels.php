@@ -27,3 +27,10 @@ Broadcast::channel('scanned-records.{id}', function (User $user, int $id) {
 Broadcast::channel('already-scanned-records.{id}', function (User $user, int $id) {
     return (int) $user->id === (int) $id;
 });
+
+Broadcast::channel('active-users', function ($user) {
+    return [
+        'id' => $user->id,
+        'name' => $user->name,
+    ];
+});

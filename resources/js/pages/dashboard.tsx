@@ -1,3 +1,4 @@
+import ActiveUsers from '@/components/active-users';
 import { requestNotificationPermission } from '@/components/notification';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
@@ -56,7 +57,7 @@ export default function Dashboard({
     company: SelectionType[];
     banks: SelectionType[];
     bankAccounts: SelectionType[];
-    }) {
+}) {
     useEffect(() => {
         requestNotificationPermission();
     }, []);
@@ -96,9 +97,15 @@ export default function Dashboard({
         },
     ];
     const defaultBank = banks.find((bank) => bank.label === filters.bank);
-    const defaultBankAccount = bankAccounts.find((bankAccount) => bankAccount.label === filters.bankAccount);
-    const [selectedBank, setSelectedBank] = useState(defaultBank ? defaultBank.value : 'all');
-    const [selectedBankAccount, setSelectedBankAccount] = useState(defaultBankAccount ? defaultBankAccount.value : 'all');
+    const defaultBankAccount = bankAccounts.find(
+        (bankAccount) => bankAccount.label === filters.bankAccount,
+    );
+    const [selectedBank, setSelectedBank] = useState(
+        defaultBank ? defaultBank.value : 'all',
+    );
+    const [selectedBankAccount, setSelectedBankAccount] = useState(
+        defaultBankAccount ? defaultBankAccount.value : 'all',
+    );
     const handleChange = async (event: SelectChangeEvent) => {
         const val = event.target.value;
         setSelectedBank(val);
@@ -107,7 +114,7 @@ export default function Dashboard({
         router.reload({
             data: {
                 bank: selected?.label,
-                bankAccount: null
+                bankAccount: null,
             },
         });
     };
@@ -136,6 +143,9 @@ export default function Dashboard({
                     <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
                         Overview
                     </Typography>
+                    <div className="p-6">
+                        <ActiveUsers />
+                    </div>
                     <Grid
                         container
                         spacing={2}
@@ -198,7 +208,10 @@ export default function Dashboard({
                     {/* </TableFilter> */}
                     <Grid container spacing={2}>
                         <Grid size={{ xs: 12 }}>
-                            <CustomizedDataGrid cheques={cheques} filters={filters} />
+                            <CustomizedDataGrid
+                                cheques={cheques}
+                                filters={filters}
+                            />
                         </Grid>
                     </Grid>
                 </Box>
