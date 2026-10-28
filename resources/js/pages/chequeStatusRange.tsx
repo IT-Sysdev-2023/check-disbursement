@@ -54,30 +54,32 @@ export default function ChequeStatusRange({
                         title="Bank/ Bank Account"
                         items={items}
                     />
-                    <DataGrid
-                        sx={{ mt:3}}
-                        rows={data.data}
-                        rowCount={data.total}
-                        columns={chequeColumn}
-                        paginationMode="server"
-                        disableRowSelectionOnClick={false}
-                        paginationModel={{
-                            page: data.current_page - 1,
-                            pageSize: data.per_page,
-                        }}
-                        onPaginationModelChange={handlePagination}
-                        showToolbar
-                        pageSizeOptions={[5, 10, 15, 25]}
-                        slotProps={{
-                            loadingOverlay: {
-                                variant: 'circular-progress',
-                                noRowsVariant: 'circular-progress',
-                            },
-                            baseIconButton: {
-                                size: 'small',
-                            },
-                        }}
-                    />
+                    <Box sx={{ width: '100%' }}>
+                        <DataGrid
+                            sx={{ mt: 3 }}
+                            rows={data.data}
+                            rowCount={data.total}
+                            columns={chequeColumn}
+                            paginationMode="server"
+                            disableRowSelectionOnClick={false}
+                            paginationModel={{
+                                page: data.current_page - 1,
+                                pageSize: data.per_page,
+                            }}
+                            onPaginationModelChange={handlePagination}
+                            showToolbar
+                            pageSizeOptions={[5, 10, 15, 25]}
+                            slotProps={{
+                                loadingOverlay: {
+                                    variant: 'circular-progress',
+                                    noRowsVariant: 'circular-progress',
+                                },
+                                baseIconButton: {
+                                    size: 'small',
+                                },
+                            }}
+                        />
+                    </Box>
                 </Box>
             </PageContainer>
         </AppLayout>

@@ -135,7 +135,7 @@ class ChequeStatusMonitoringController extends Controller
             ->values();
 
         return Inertia::render('chequeStatusRange', [
-            'data' => PaginatorHelper::paginateCollection($data),
+            'data' => PaginatorHelper::paginateCollection($data,10),
             'items' => $items,
             'bank' => $selectedFilter
         ]);
