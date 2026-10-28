@@ -43,7 +43,9 @@ class AdminService
 
         $request->validate([
             'selectedPermission' => 'required|array|min:1',
-            'id' => 'required|int'
+            'id' => 'required|int',
+            'name' => 'required|string',
+            'username' => 'required|string',
         ]);
 
         $user = User::findOrFail($request->id);
@@ -65,6 +67,8 @@ class AdminService
 
             CompanyPermission::insert($records);
         }
+
+        $user->update(['name' => $request->name, 'username' => $request->username]);
 
         // Sync Roles
         if (!empty($request->selectedRole)) {
