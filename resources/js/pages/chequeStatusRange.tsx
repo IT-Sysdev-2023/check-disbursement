@@ -51,7 +51,7 @@ export default function ChequeStatusRange({
                     <SelectItem
                         handleChange={handleChange}
                         value={selectedBank}
-                        title="Bank"
+                        title="Bank/ Bank Account"
                         items={items}
                     />
                     <DataGrid

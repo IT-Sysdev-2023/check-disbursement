@@ -72,7 +72,7 @@ class ClosingService
                 : [],
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
-                'value' => '0'
+                'value' => 'all'
             ]),
         ]);
     }
@@ -173,7 +173,7 @@ class ClosingService
                 : [],
             'company' => PermissionService::getCompanyPermissions($request->user())->prepend([
                 'label' => 'All',
-                'value' => '0'
+                'value' => 'all'
             ]),
         ]);
     }
@@ -239,8 +239,16 @@ class ClosingService
                 'checkable',
                 [Crf::class, Cv::class],
                 function ($q) use ($company, $bu) {
-                    $q->where('business_unit_id', $bu)
-                        ->whereRelation('businessUnit.company', 'id', $company);
+                    if ($bu !== 'all') {
+                        $q->where('business_unit_id', $bu);
+                    }
+                    if ($company !== 'all') {
+                        $q->whereRelation(
+                            'businessUnit.company',
+                            'id',
+                            $company
+                        );
+                    }
                 }
             )
             ->where('has_document', true)

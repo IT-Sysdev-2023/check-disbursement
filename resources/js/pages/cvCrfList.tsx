@@ -204,16 +204,16 @@ export default function CvCrfList({
                                 startIcon={<FileDown />}
                                 onClick={generatePdf}
                             >
-                                Export This Bu
+                                Export
                             </Button>
 
-                            <Button
+                            {/* <Button
                                 variant="outlined"
                                 startIcon={<FileDown />}
                                 onClick={generateAll}
                             >
                                 Export All
-                            </Button>
+                            </Button> */}
                         </>
                     )}
                 </TableFilter>
