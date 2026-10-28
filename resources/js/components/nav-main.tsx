@@ -55,6 +55,7 @@ import {
     Forward,
     HandCoins,
     Landmark,
+    ListOrdered,
     PackageCheck,
     PackageOpen,
     Pen,
@@ -137,7 +138,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                       {
                           title: 'Cheque Range Monitoring',
                           href: chequeStatusRange(),
-                          icon: Sunset,
+                          icon: ListOrdered,
                       },
                       {
                           title: 'End of Day',

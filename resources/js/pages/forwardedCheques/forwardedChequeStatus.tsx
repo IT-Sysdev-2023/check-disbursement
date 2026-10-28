@@ -14,7 +14,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { AssignmentReturnedOutlined, CreditScoreOutlined, DownloadDoneOutlined } from '@mui/icons-material';
+import { AssignmentReturnedOutlined, AssignmentReturnOutlined, CreditScoreOutlined, DownloadDoneOutlined, MarkEmailReadOutlined, MoveToInboxOutlined, OutboundOutlined } from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import TableDataGrid from '../dashboard/components/TableDataGrid';
@@ -67,21 +67,21 @@ export default function ForwardedChequeStatus({
                         aria-label="Platform"
                     >
                         <ToggleButton value="receiving">
-                            <CreditScoreOutlined sx={{ mr: 1, fontSize: 18 }} />
+                            <MoveToInboxOutlined sx={{ mr: 1, fontSize: 18 }} />
                             Receiving
                         </ToggleButton>
                         <ToggleButton value="received">
-                            <CreditScoreOutlined sx={{ mr: 1, fontSize: 18 }} />
+                            <MarkEmailReadOutlined sx={{ mr: 1, fontSize: 18 }} />
                             Received
                         </ToggleButton>
                         <ToggleButton value="released">
-                            <DownloadDoneOutlined
+                            <OutboundOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Released
                         </ToggleButton>
                         <ToggleButton value="returned">
-                            <AssignmentReturnedOutlined
+                            <AssignmentReturnOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Returned

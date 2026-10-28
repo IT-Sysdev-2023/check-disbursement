@@ -20,16 +20,20 @@ import {
 import { Head, router } from '@inertiajs/react';
 import {
     AccessAlarmsOutlined,
+    AccountBalanceOutlined,
+    AssignmentReturnedOutlined,
     CancelPresentationOutlined,
-    CreditScoreOutlined,
     DownloadDoneOutlined,
+    EventOutlined,
     SwipeRightOutlined,
 } from '@mui/icons-material';
-import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Alert, AlertTitle, Box, Card, CardContent, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import { chequeStatusColumns, pdcColumn } from './checkStatus/components/columns';
 import ScannedDetails from './checkStatus/components/scannedDetails';
+import HighlightedCard from './dashboard/components/HighlightedCard';
+import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -89,7 +93,7 @@ export default function ChequeStatus({
     );
 
     const columns =
-    tab === 'pdc'
+    tab === 'pdc' || tab == 'staled'
         ? pdcColumn(handleStatusChange)
         : chequeStatusColumns(handleStatusChange);
     return (
@@ -105,11 +109,11 @@ export default function ChequeStatus({
                         aria-label="Platform"
                     >
                         <ToggleButton value="for_releasing">
-                            <CreditScoreOutlined sx={{ mr: 1, fontSize: 18 }} />
+                            <AssignmentReturnedOutlined sx={{ mr: 1, fontSize: 18 }} />
                             For Releasing
                         </ToggleButton>
                         <ToggleButton value="deposited">
-                            <CreditScoreOutlined sx={{ mr: 1, fontSize: 18 }} />
+                            <AccountBalanceOutlined sx={{ mr: 1, fontSize: 18 }} />
                             Deposited
                         </ToggleButton>
                         <ToggleButton value="released">
@@ -119,7 +123,7 @@ export default function ChequeStatus({
                             Released
                         </ToggleButton>
                         <ToggleButton value="pdc">
-                            <DownloadDoneOutlined
+                            <EventOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Post Dated
@@ -145,6 +149,25 @@ export default function ChequeStatus({
                             Staled
                         </ToggleButton>
                     </ToggleButtonGroup>
+
+                     {(tab === 'staled' || tab === 'pdc') && (<Card sx={{ mt: '20px' }}>
+                        <CardContent>
+                            <InsightsRoundedIcon />
+                            <Typography
+                            component="h2"
+                            variant="subtitle2"
+                            gutterBottom
+                            sx={{ fontWeight: '600' }}
+                            >
+                                { tab =='pdc' ? 'Post-Dated Cheque Notice' : 'Stale Cheque Notice'}
+                            </Typography>
+                            <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
+                            {tab== 'pdc' ? 'A cheque is considered post-dated when its Cheque date is later than the Cv/Crf date.': 'This cheque is considered stale based on its cheque date, which exceeds six months from today.'}
+                            </Typography>
+                            
+                        </CardContent>
+                     </Card>)}
+                    
                     <TableFilter
                         company={company}
                         filters={filter}

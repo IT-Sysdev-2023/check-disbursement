@@ -13,7 +13,7 @@ export default function HighlightedCard() {
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   return (
-    <Card sx={{ height: '100%' }}>
+    <Card sx={{ mt: '20px' }}>
       <CardContent>
         <InsightsRoundedIcon />
         <Typography
