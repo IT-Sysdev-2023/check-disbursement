@@ -373,7 +373,7 @@ class CheckReleasingController extends Controller
         $tab = $filters['tab'] ?? 'receiving';
         $company = $filters['company'] ?? 'all';
 
-        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at')
+        $chequeRecords = ChequeStatus::select('id', 'checkable_id', 'checkable_type', 'status', 'created_at', 'received_by')
             ->with(['checkable' => ['borrowedCheque', 'businessUnit', 'tagLocation']])
             ->regionalPermission()
             ->where('status', 'forwarded')
@@ -384,6 +384,13 @@ class CheckReleasingController extends Controller
                 } else if ($tab == 'received') {
                     $q->whereNotNull('received_by')->whereDoesntHave('chequeForwardedStatus');
                     return;
+                } else if ($tab == 'returned') {
+                    $q->whereNotNull('received_by')->whereRelation(
+                        'chequeForwardedStatus',
+                        'status',
+                        '=',
+                        'cancelled'
+                    );
                 } else {
                     $q->whereNotNull('received_by')->whereRelation(
                         'chequeForwardedStatus',

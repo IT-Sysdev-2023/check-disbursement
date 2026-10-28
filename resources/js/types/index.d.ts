@@ -329,6 +329,37 @@ export interface InertiaPagination<T> {
     data: T[];
 }
 
+export interface PaginatorType<T> extends Meta {
+    data: T[];
+}
+
+export interface ChequeStatusRangeType {
+    account_no: string;
+    bank: string;
+    cheque_number: string;
+    id: string;
+    is_used: boolean;
+    record?: {
+        amount: string;
+        bank: string;
+        bu_name: string;
+        cheque_date: string;
+        cheque_number: string;
+        company_name: string;
+        created_at: string;
+        crf_id?: number;
+        document_date: string;
+        document_no: string;
+        has_crf: number;
+        location?: string;
+        payee: string;
+        source_id: number;
+        tagged_at?: string;
+        type: string;
+        uid: string;
+    };
+}
+
 export type SelectionModelType = {
     type: 'include';
     ids: Set<GridRowId>;

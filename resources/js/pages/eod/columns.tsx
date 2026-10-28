@@ -156,7 +156,6 @@ export const chequeStatusRangeColumn = (): GridColDef[] => [
         headerAlign: 'center',
         align: 'center',
         renderCell: ({ row }) => {
-            console.log(row);
             if (row.is_used) {
                 return <Chip label="Used" color="success" size="small" />;
             }

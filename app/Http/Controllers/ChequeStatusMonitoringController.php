@@ -17,9 +17,15 @@ class ChequeStatusMonitoringController extends Controller
 
     public function index(Request $request) // BAHALA NA SI CLAUDE
     {
+        $filter = $request->only(['bank']);
+
+        $selectedFilter = $filter['bank'] ?? null;
         $cheques = ChequeRegister::join('bank_accounts', 'bank_accounts.id', 'cheque_registers.bank_account_id')
             ->join('banks', 'bank_accounts.bank_id', 'banks.id')
             ->select('cheque_registers.id', 'banks.acronym as name', 'bank_accounts.account_no', 'cheque_from', 'cheque_to')
+            ->when($selectedFilter, function ($q) use ($selectedFilter) {
+                $q->where('cheque_registers.bank_account_id', $selectedFilter);
+            })
             ->get();
 
         $acronyms = $cheques->pluck('name')->unique()->values();
@@ -107,6 +113,31 @@ class ChequeStatusMonitoringController extends Controller
 
         $data = collect($numbers)->values();
 
-        return Inertia::render('chequeStatusRange', ['data' => PaginatorHelper::paginateCollection($data)]);
+
+        $items = ChequeRegister::join(
+            'bank_accounts',
+            'bank_accounts.id',
+            '=',
+            'cheque_registers.bank_account_id'
+        )
+            ->join('banks', 'bank_accounts.bank_id', '=', 'banks.id')
+            ->select([
+                'bank_accounts.id',
+                'bank_accounts.account_no',
+                'banks.acronym as bank_name',
+            ])
+            ->distinct()
+            ->get()
+            ->map(fn($item) => [
+                'label' => "{$item->bank_name} - {$item->account_no}",
+                'value' => $item->id,
+            ])
+            ->values();
+
+        return Inertia::render('chequeStatusRange', [
+            'data' => PaginatorHelper::paginateCollection($data),
+            'items' => $items,
+            'bank' => $selectedFilter
+        ]);
     }
 }

@@ -14,7 +14,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { CreditScoreOutlined, DownloadDoneOutlined } from '@mui/icons-material';
+import { AssignmentReturnedOutlined, CreditScoreOutlined, DownloadDoneOutlined } from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import TableDataGrid from '../dashboard/components/TableDataGrid';
@@ -32,13 +32,11 @@ export default function ForwardedChequeStatus({
     company,
     businessUnits,
     filter,
-    auth,
 }: {
     cheques: InertiaPagination<ChequeType>;
     businessUnits: SelectionType[];
     company: SelectionType[];
     filter: FilterType;
-    auth: Auth;
 }) {
     const [loading, setLoading] = useState(false);
     const [tab, setTab] = useState(filter.tab);
@@ -81,6 +79,12 @@ export default function ForwardedChequeStatus({
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
                             Released
+                        </ToggleButton>
+                        <ToggleButton value="returned">
+                            <AssignmentReturnedOutlined
+                                sx={{ mr: 1, fontSize: 18 }}
+                            />
+                            Returned
                         </ToggleButton>
                     </ToggleButtonGroup>
                     <TableFilter
