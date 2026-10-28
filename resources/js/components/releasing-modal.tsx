@@ -1,7 +1,7 @@
 import { storeReceiverName } from '@/actions/App/Http/Controllers/CheckReleasingController';
 import { modalMediumStyle } from '@/lib/modalStyle';
 import { storeReleaseCheck } from '@/routes';
-import { Option } from '@/types';
+import { FlashReponse, Option, SelectedChequeType } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import { FormControl, FormHelperText, Grid, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -12,6 +12,7 @@ import { Camera, Plus, Trash2 } from 'lucide-react';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import AutocompleteUser from './autocomplete-user';
+import { usePdfPreview } from './PdfPreview';
 import SignatureModal from './signature-modal';
 // import ScanChequeModal from './scan-cheque-modal';
 
@@ -28,22 +29,25 @@ export default function ReleasingModal({
     receiverNames,
     handleSuccess,
 }: {
-    cheques: { id: number; status: string }[];
+    cheques: SelectedChequeType[];
     open: boolean;
     handleClose: () => void;
     handleSuccess: () => void;
     receiverNames: Option[];
 }) {
     const [signatureModalOpen, setSignatureModalOpen] = useState(false);
-    // const [scanChequeModalOpen, setScanChequeModalOpen] = useState(false);
     const { data, setData, post, errors, reset, processing, transform } =
         useForm<MyFormData>({
             receiversName: '',
             file: null,
             signature: null,
         });
-    const handleSubmit = (e: React.FormEvent) => {
+
+    const { openPdf } = usePdfPreview();
+
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
+
         if (sigPadRef.current && !sigPadRef.current.isEmpty()) {
             const canvas = sigPadRef.current.getCanvas();
             setData('signature', canvas.toDataURL('image/png'));
@@ -57,14 +61,15 @@ export default function ReleasingModal({
             post(storeReleaseCheck().url, {
                 preserveScroll: true,
                 preserveState: true,
-                onError: (e) => {
-                    console.log(e);
-                },
-                onSuccess: () => {
+                onSuccess: ({props}) => {
                     handleClose();
                     reset();
                     handleSuccess();
-                    // setScanChequeModalOpen(true);
+
+                    const m = props.flash as FlashReponse;
+                    if (m.status) {
+                        openPdf(m.stream!);
+                    }
                 },
             });
         } else {
@@ -216,7 +221,6 @@ export default function ReleasingModal({
                                         </Box>
                                     )}
 
-                                    {/* Error message like TextField helperText */}
                                     <FormHelperText>
                                         {errors.file ?? ' '}
                                     </FormHelperText>
@@ -229,7 +233,6 @@ export default function ReleasingModal({
                                         sx={{
                                             border: '1px solid #ccc',
                                             borderRadius: 1,
-                                            // height: 300,
                                             width: '100%',
                                         }}
                                     >
@@ -269,7 +272,6 @@ export default function ReleasingModal({
                 open={signatureModalOpen}
                 handleClose={() => setSignatureModalOpen(false)}
             />
-            {/* <ScanChequeModal onClose={() => setScanChequeModalOpen(false)} onSave={() => {}} open={scanChequeModalOpen} /> */}
         </>
     );
 }

@@ -1,15 +1,15 @@
 import PageContainer from '@/components/pageContainer';
-import PdfReader from '@/components/pdf-reader';
 import AppLayout from '@/layouts/app-layout';
 import { checkReleasing } from '@/routes';
 import {
+    BatchReleasingType,
     FilterType,
     InertiaPagination,
     Option,
     SelectionType,
     type BreadcrumbItem,
 } from '@/types';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
     Paper,
     Table,
@@ -19,7 +19,6 @@ import {
     TableHead,
     TableRow,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import TableFilter from '../components/tableFilter';
 import ChequeReleasingBatch from './chequeReleasing/chequeReleasingBatch';
 
@@ -37,26 +36,12 @@ export default function CheckReleasing({
     businessUnits,
     receiverNames,
 }: {
-    cheques: InertiaPagination<any>;
+    cheques: InertiaPagination<BatchReleasingType>;
     filter: FilterType;
     company: SelectionType[];
     businessUnits: SelectionType[];
     receiverNames: Option[];
 }) {
-    
-    const [stream, setStream] = useState('');
-    const [openModalPdf, setOpenModalPdf] = useState(false);
-
-    const { flash } = usePage().props as {
-        flash?: { status?: boolean; message?: string; stream?: string };
-    };
-
-    useEffect(() => {
-        if (flash?.status && flash?.stream) {
-            setStream(flash.stream);
-            setOpenModalPdf(true);
-        }
-    }, [flash]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -79,15 +64,15 @@ export default function CheckReleasing({
                                 <TableCell>Supplier</TableCell>
                                 <TableCell>Scan Method</TableCell>
                                 <TableCell>Total Cheques</TableCell>
-                                <TableCell align='center'>Action</TableCell>
+                                <TableCell align="center">Action</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {cheques?.data?.length ? (
                                 cheques.data.map((row) => (
                                     <ChequeReleasingBatch
-                                        receiverNames= {receiverNames}
-                                        key={row.borrowerNo}
+                                        receiverNames={receiverNames}
+                                        key={row.id}
                                         row={row}
                                         isVisible
                                     />
@@ -104,11 +89,6 @@ export default function CheckReleasing({
                 </TableContainer>
             </PageContainer>
 
-            <PdfReader
-                open={openModalPdf}
-                handleClose={() => setOpenModalPdf(false)}
-                stream={stream}
-            />
         </AppLayout>
     );
 }

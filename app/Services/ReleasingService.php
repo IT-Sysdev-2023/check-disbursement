@@ -18,13 +18,17 @@ class ReleasingService
 
     public function release(array $validated, int $userId)
     {
-        $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
+        $transactionNo = now()->format('YmdHis') . '-' . $userId;
         $locations = [];
         $chequesDetails = [];
         $handleFiles = $this->fileHandler->handleFiles($validated, $transactionNo);
+
         foreach ($validated['cheques'] as $cheque) {
+
+            $status = StringHelper::statusLocation($cheque['status']);
+
             $borrowedCheque = BorrowedCheque::findOrFail($cheque['id']);
-            $label = StringHelper::statusPastTense($cheque['status']);
+            $label = StringHelper::statusPastTense($status);
 
             $chequeStatus = $borrowedCheque->checkable
                 ->chequeStatus()
@@ -56,12 +60,9 @@ class ReleasingService
 
         return [
             'transactionNo' => $transactionNo,
-
             'dateLabel' => 'Date Released:',
             'dateReleased' => now()->format('M d, Y H:i A'),
-
             'causedBy' => auth()->user()->name,
-
             'receivedBy' => $validated['receiversName'],
             'signature' => $handleFiles->signatureUri,
             'location' => implode(', ', array_unique($locations)),
@@ -209,16 +210,12 @@ class ReleasingService
     private static function data(array $validated)
     {
         $getCheques = self::query($validated['batchReference']);
-
+        
         return $getCheques->map(function ($cheque) {
             $location = $cheque->checkable?->getLocation;
             return [
                 'id' => $cheque->id,
-                'status' => match ($location) {
-                    'Manila', 'Cebu' => 'Forward',
-                    'Deposit' => 'Deposit',
-                    default => 'Release',
-                },
+                'status' => StringHelper::statusLocation($location)
             ];
         })
             ->values()

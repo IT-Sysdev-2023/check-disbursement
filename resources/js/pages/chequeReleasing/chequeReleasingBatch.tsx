@@ -1,6 +1,6 @@
 import ReleasingModalAll from '@/components/releasing-modal_all';
 import { chequesToRelease, releaseCheque } from '@/routes';
-import { Option } from '@/types';
+import { BatchReleasingType, BorrowedCheque, Option } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -13,23 +13,22 @@ import {
     TableCell,
     TableHead,
     TableRow,
-    Typography,
 } from '@mui/material';
 import axios from 'axios';
 import { ListChecks, Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export default function ChequeReleasingBatch(props: {
-    row: any;
+    row: BatchReleasingType;
     isVisible: boolean;
     receiverNames: Option[];
 }) {
     const { row, isVisible, receiverNames } = props;
     const [selectedBatch, setSelectedBatch] = useState('');
     const [open, setOpen] = useState(false);
-    const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
+    const [borrowerData, setBorrowerData] = useState<Record<string, BorrowedCheque[]>>({});
     const [openReleasing, setOpenReleasing] = useState(false);
-
+    
     useEffect(() => {
         if (open) {
             const fetchBorrower = async () => {
@@ -54,7 +53,7 @@ export default function ChequeReleasingBatch(props: {
     };
 
     const selectToRelease = async (batchReference: string) => {
-        router.visit(releaseCheque(batchReference));
+        router.get(releaseCheque(batchReference));
     };
     return (
         <>
@@ -115,13 +114,6 @@ export default function ChequeReleasingBatch(props: {
                 >
                     <Collapse in={open} timeout="auto" unmountOnExit>
                         <Box sx={{ margin: 1 }}>
-                            <Typography
-                                variant="h6"
-                                gutterBottom
-                                component="div"
-                            >
-                                Cheques
-                            </Typography>
 
                             <Table size="small" aria-label="cv">
                                 <TableHead>

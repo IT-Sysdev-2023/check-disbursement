@@ -190,25 +190,25 @@ class CheckReleasingController extends Controller
 
     public function cancelCheck(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'reason' => 'required|string|max:255',
-            // 'type' => ['required', 'in:include,exclude'],
-            'ids' => [
-                'array',
-                Rule::requiredIf(fn() => $request->type === 'include'),
-            ],
+            'ids' => 'array',
+            'ids.*' => 'integer'
         ]);
-        $ids = $request->ids ?? [];
+
+        $ids = $validated['ids'] ?? [];
+        $userId = $request->user()->id;
+        $reason = $validated['reason'];
 
         BorrowedCheque::whereIn(
             'id',
             $ids
-        )->chunkById(100, function ($checks) use ($request) {
+        )->chunkById(100, function ($checks) use ($userId, $reason) {
             foreach ($checks as $check) {
                 $check->checkable?->chequeStatus()->create([
                     'status' => 'cancelled',
-                    'cancelled_reason' => $request->reason,
-                    'caused_by' => $request->user()->id,
+                    'cancelled_reason' => $reason,
+                    'caused_by' => $userId,
                 ]);
             }
         });

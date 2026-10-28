@@ -1,7 +1,7 @@
 import { storeReceiverName } from '@/actions/App/Http/Controllers/CheckReleasingController';
 import { modalMediumStyle } from '@/lib/modalStyle';
 import { storeReleaseCheckAll } from '@/routes';
-import { Option } from '@/types';
+import { FlashReponse, Option } from '@/types';
 import { router, useForm } from '@inertiajs/react';
 import { FormControl, FormHelperText, Grid, IconButton } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -12,6 +12,7 @@ import { Camera, Plus, Trash2 } from 'lucide-react';
 import { SyntheticEvent, useEffect, useRef, useState } from 'react';
 import SignatureCanvas from 'react-signature-canvas';
 import AutocompleteUser from './autocomplete-user';
+import { usePdfPreview } from './PdfPreview';
 import SignatureModal from './signature-modal';
 
 interface MyFormData {
@@ -38,6 +39,9 @@ export default function ReleasingModalAll({
             file: null,
             signature: null,
         });
+
+    const { openPdf } = usePdfPreview();
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (sigPadRef.current && !sigPadRef.current.isEmpty()) {
@@ -53,12 +57,14 @@ export default function ReleasingModalAll({
             post(storeReleaseCheckAll().url, {
                 preserveScroll: true,
                 preserveState: true,
-                onError: (e) => {
-                    console.log(e);
-                },
-                onSuccess: () => {
+                onSuccess: ({ props }) => {
                     handleClose();
                     reset();
+
+                    const m = props.flash as FlashReponse;
+                    if (m.status) {
+                        openPdf(m.stream!);
+                    }
                 },
             });
         } else {

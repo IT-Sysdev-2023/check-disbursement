@@ -5,9 +5,9 @@ import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
 import { checkReleasing } from '@/routes';
 import {
-    DateFilterType,
+    BorrowedCheque,
+    FilterType,
     InertiaPagination,
-    ListSelectedChequeType,
     Option,
     SelectedChequeType,
     type BreadcrumbItem,
@@ -36,63 +36,41 @@ export default function IndividualCheques({
     receiversName,
     filter,
 }: {
-    cheques: InertiaPagination<any>;
+    cheques: InertiaPagination<BorrowedCheque>;
     receiversName: Option[];
-    filter: {
-        selectedBu: string;
-        search: string;
-        date: DateFilterType;
-    };
-    }) {
-    
-    const [ids, setIds] = useState<number[]>([]);
+    filter: FilterType;
+}) {
     const [openCancel, setOpenCancel] = useState(false);
-    const [selectedCheques, setSelectedCheques] = useState<
-        SelectedChequeType[]
-    >([]);
     const [openReleasing, setOpenReleasing] = useState(false);
-    const [selectedRows, setSelectedRows] = useState<ListSelectedChequeType[]>(
-        [],
-    );
+    const [selectedRows, setSelectedRows] = useState<SelectedChequeType[]>([]);
 
     const handleSelectionChange = (model: GridRowSelectionModel) => {
         const currentPageIds = new Set(cheques.data.map((row) => row.id));
-        // Keep selections that aren't on the current page/filter
+
         const previousSelections = selectedRows.filter(
             (row) => !currentPageIds.has(row.id),
         );
-        // Current selections from the visible rows
+
         const currentSelections = cheques.data
-            .filter((row) => model.ids.has(row.id))
+            .filter((row) => {
+                if (model.type === 'include') {
+                    return model.ids.has(row.id);
+                }
+                return !model.ids.has(row.id);
+            })
             .map((row) => ({
                 id: row.id,
-                borrowedChequeId: row.id,
-                chequeNo: row.checkable.chequeNumber,
-                amount: row.checkable.amount,
-                chequeDate: row.checkable.chequeDate,
                 status: row.checkable.location,
             }));
+
         setSelectedRows([...previousSelections, ...currentSelections]);
     };
 
-    const multipleRelease = () => {
-        const selectedItems = selectedRows.map((item) => ({
-            id: item.id,
-            status:
-                item.status == 'Manila' || item.status == 'Cebu'
-                    ? 'Forward'
-                    : item.status == 'Deposit'
-                      ? 'Deposit'
-                      : 'Release',
-        }));
-
-        setSelectedCheques(selectedItems);
+    const releaseSubmit = () => {
         setOpenReleasing(true);
     };
 
     const cancelCheque = () => {
-        const selectedItems = selectedRows.map((item) => item.borrowedChequeId);
-        setIds(selectedItems);
         setOpenCancel(true);
     };
 
@@ -118,7 +96,7 @@ export default function IndividualCheques({
                         disabled={!enableButton}
                         variant="outlined"
                         startIcon={<Handshake />}
-                        onClick={multipleRelease}
+                        onClick={releaseSubmit}
                     >
                         Release
                     </Button>
@@ -134,7 +112,7 @@ export default function IndividualCheques({
                 </Box>
             </PageContainer>
             <ReleasingModal
-                cheques={selectedCheques}
+                cheques={selectedRows}
                 receiverNames={receiversName}
                 open={openReleasing}
                 handleClose={() => setOpenReleasing(false)}
@@ -143,16 +121,14 @@ export default function IndividualCheques({
                 }}
             />
 
-            {ids && (
-                <ReasonCancellationModal
-                    id={ids}
-                    open={openCancel}
-                    handleClose={() => {
-                        setSelectedRows([]);
-                        setOpenCancel(false);
-                    }}
-                />
-            )}
+            <ReasonCancellationModal
+                cheques={selectedRows}
+                open={openCancel}
+                handleClose={() => {
+                    setSelectedRows([]);
+                    setOpenCancel(false);
+                }}
+            />
         </AppLayout>
     );
 }

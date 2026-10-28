@@ -37,6 +37,7 @@ class ChequeReleasingService
 
         $chequeRecords = BorrowedCheque::
             select(
+                DB::raw('MIN(borrowed_cheques.id) as id'),
                 'scanned_records.batch_reference',
                 DB::raw('COUNT(scanned_records.id) as cheque_count'),
                 DB::raw('MIN(scanned_records.supplier) as supplier'),
@@ -57,11 +58,6 @@ class ChequeReleasingService
 
         $receiverNames = ReceiverName::select('id', 'name as label')->get();
 
-        // dd(
-        //     (new ChequeCollection($chequeRecords))
-        //         ->response()
-        //         ->getData(true)
-        // );
         return Inertia::render('checkReleasing', [
             'cheques' => $chequeRecords,
             'receiverNames' => $receiverNames,

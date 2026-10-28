@@ -75,6 +75,14 @@ export interface SelectionType {
     }[];
 }
 
+export interface BatchReleasingType {
+    id: number;
+    batch_reference: string;
+    cheque_count: number;
+    method: string;
+    supplier: string;
+}
+
 export interface ClosingCheckDetailsType {
     id: number;
     cvNo: string;
@@ -174,7 +182,8 @@ export interface ChequeType {
     statusOrder: string;
     payee: string;
     amount: string;
-    companyName?: string;
+    company?: string;
+    location: string;
     taggedAt: string | null;
     createdAt: string;
 }
@@ -413,6 +422,7 @@ export interface ListSelectedChequeType {
     status: string;
     releasable?: boolean;
 }
+
 export interface ListSelectedChequeTaggingType {
     id: number;
     chequeId: number;
