@@ -1,4 +1,4 @@
-import { CheckScannedDetails } from '@/types';
+import { CheckScannedDetails, IdType } from '@/types';
 import { Box, Chip, MenuItem, Select } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 
@@ -157,7 +157,7 @@ export const createStatusChequeColumns = (
     },
 ];
 export const chequeStatusColumns = (
-    handleStatusChange: (value: string, record: CheckScannedDetails) => void,
+    handleStatusChange: (value: string, record: IdType) => void,
 ): GridColDef[] => [
     {
         field: 'chequeNumber',
@@ -268,11 +268,8 @@ export const chequeStatusColumns = (
         sortable: false,
         renderCell: ({ row }) => {
             const record = {
-                borrowedId: row.id,
                 id: row.checkable?.id,
                 type: row.check,
-                amount: row.checkable?.unformattedAmount,
-                checkNumber: row.checkable?.chequeNumber,
             };
             return (
                 <Box sx={{ width: '100%' }}>
@@ -286,23 +283,13 @@ export const chequeStatusColumns = (
                         <MenuItem value="details">
                             Check Request Form Details
                         </MenuItem>
-                        {row.checkable?.chequeStatus?.status !== 'cancel' && (
-                            <MenuItem value="scannedDetails">
-                                Scanned Check Details
-                            </MenuItem>
-                        )}
-                        {row.checkable?.status && (
-                            <MenuItem value="cancel">Cancelled Check</MenuItem>
-                        )}
                     </Select>
                 </Box>
             );
         },
     },
 ];
-export const pdcColumn = (
-    handleStatusChange: (value: string, record: CheckScannedDetails) => void,
-): GridColDef[] => [
+export const pdcColumn = (): GridColDef[] => [
     {
         field: 'chequeNumber',
         headerName: 'Cheque Number',
@@ -313,26 +300,23 @@ export const pdcColumn = (
     {
         field: 'amount',
         headerName: 'Cheque Amount',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
-        minWidth: 80,
-        },
+    },
     {
         field: 'bank',
         headerName: 'Bank Name',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        minWidth: 100,
     },
     {
         field: 'cvDate',
         headerName: 'CV Date',
-        headerAlign: 'right',
-        align: 'right',
+        headerAlign: 'center',
+        align: 'center',
         flex: 1,
-        minWidth: 100,
     },
     {
         field: 'chequeDate',
@@ -340,46 +324,13 @@ export const pdcColumn = (
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        minWidth: 100,
     },
     {
         field: 'type',
         headerName: 'Cheque Type',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-    },
-    {
-        field: 'actions',
-        headerName: 'Action',
-        width: 100,
+        headerAlign: 'center',
         align: 'center',
         flex: 1,
-        headerAlign: 'center',
-        sortable: false,
-        renderCell: ({ row }) => {
-            console.log(row);
-            const record = {
-                id: row.chequeId,
-                type: row.type,
-            };
-            return (
-                <Box sx={{ width: '100%' }}>
-                    <Select
-                        size="small"
-                        value={status ?? ''}
-                        onChange={(e) =>
-                            handleStatusChange(e.target.value, record)
-                        }
-                    >
-                        <MenuItem value="details">
-                            Check Request Form Details
-                        </MenuItem>
-                    </Select>
-                </Box>
-            );
-        },
     },
 ];
 export const createCancelledChequeColumns = (

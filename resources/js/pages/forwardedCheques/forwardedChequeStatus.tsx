@@ -6,7 +6,6 @@ import {
     chequeStatus,
 } from '@/routes';
 import {
-    Auth,
     ChequeType,
     FilterType,
     InertiaPagination,
@@ -14,7 +13,7 @@ import {
     type BreadcrumbItem,
 } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { AssignmentReturnedOutlined, AssignmentReturnOutlined, CreditScoreOutlined, DownloadDoneOutlined, MarkEmailReadOutlined, MoveToInboxOutlined, OutboundOutlined } from '@mui/icons-material';
+import { AssignmentReturnOutlined, MarkEmailReadOutlined, MoveToInboxOutlined, OutboundOutlined } from '@mui/icons-material';
 import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { SyntheticEvent, useState } from 'react';
 import TableDataGrid from '../dashboard/components/TableDataGrid';

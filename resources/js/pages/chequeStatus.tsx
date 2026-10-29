@@ -2,17 +2,12 @@ import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import {
-    cancelStaleCheck,
-    chequeStatus,
-    detailsCrf,
-    signatureDetails,
-} from '@/routes';
+import { chequeStatus, detailsCrf, signatureDetails } from '@/routes';
 import {
     Auth,
-    CheckScannedDetails,
     ChequeType,
     FilterType,
+    IdType,
     InertiaPagination,
     SelectionType,
     type BreadcrumbItem,
@@ -27,13 +22,21 @@ import {
     EventOutlined,
     SwipeRightOutlined,
 } from '@mui/icons-material';
-import { Alert, AlertTitle, Box, Card, CardContent, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
-import { SyntheticEvent, useState } from 'react';
-import TableDataGrid from './dashboard/components/TableDataGrid';
-import { chequeStatusColumns, pdcColumn } from './checkStatus/components/columns';
-import ScannedDetails from './checkStatus/components/scannedDetails';
-import HighlightedCard from './dashboard/components/HighlightedCard';
 import InsightsRoundedIcon from '@mui/icons-material/InsightsRounded';
+import {
+    Box,
+    Card,
+    CardContent,
+    ToggleButton,
+    ToggleButtonGroup,
+    Typography,
+} from '@mui/material';
+import { SyntheticEvent, useState } from 'react';
+import {
+    chequeStatusColumns,
+    pdcColumn,
+} from './checkStatus/components/columns';
+import TableDataGrid from './dashboard/components/TableDataGrid';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -55,27 +58,24 @@ export default function ChequeStatus({
     filter: FilterType;
     auth: Auth;
 }) {
-    const [openModal, setOpenModal] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [scannedRecord, setScannedRecord] = useState<CheckScannedDetails>();
 
-    const handleStatusChange = (value: string, record: CheckScannedDetails) => {
-        if (value === 'cancel') {
-            //borrowedId
-            router.post(cancelStaleCheck(record.borrowedId));
-        } else if (value === 'details') {
-            if (record.type === 'cv') router.visit(signatureDetails(record.id));
-            else router.visit(detailsCrf(record.id));
-        } else {
-            setOpenModal(true);
-            setScannedRecord(record);
-        }
+    const handleStatusChange = (value: string, record: IdType) => {
+        console.log(record);
+        if (record.type === 'cv')
+            router.get(
+                signatureDetails(),
+                {
+                    id: record.id,
+                    type: record.type
+                },
+            );
+        else router.visit(detailsCrf(record.id));
     };
 
     const [tab, setTab] = useState(filter.tab);
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
-        
         router.reload({
             only: ['cheques'],
             data: {
@@ -85,17 +85,17 @@ export default function ChequeStatus({
             onFinish: () => setLoading(false),
             onSuccess: () => setTab(newValue),
         });
-        
     };
 
     const isRegional = auth.user.roles.some(
-        (role) => role.name === 'corporate_disbursing_clerk(forwarded_releasing)',
+        (role) =>
+            role.name === 'corporate_disbursing_clerk(forwarded_releasing)',
     );
 
     const columns =
-    tab === 'pdc' || tab == 'staled'
-        ? pdcColumn(handleStatusChange)
-        : chequeStatusColumns(handleStatusChange);
+        tab === 'pdc' || tab == 'staled'
+            ? pdcColumn()
+            : chequeStatusColumns(handleStatusChange);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="CV" />
@@ -109,11 +109,15 @@ export default function ChequeStatus({
                         aria-label="Platform"
                     >
                         <ToggleButton value="for_releasing">
-                            <AssignmentReturnedOutlined sx={{ mr: 1, fontSize: 18 }} />
+                            <AssignmentReturnedOutlined
+                                sx={{ mr: 1, fontSize: 18 }}
+                            />
                             For Releasing
                         </ToggleButton>
                         <ToggleButton value="deposited">
-                            <AccountBalanceOutlined sx={{ mr: 1, fontSize: 18 }} />
+                            <AccountBalanceOutlined
+                                sx={{ mr: 1, fontSize: 18 }}
+                            />
                             Deposited
                         </ToggleButton>
                         <ToggleButton value="released">
@@ -123,9 +127,7 @@ export default function ChequeStatus({
                             Released
                         </ToggleButton>
                         <ToggleButton value="pdc">
-                            <EventOutlined
-                                sx={{ mr: 1, fontSize: 18 }}
-                            />
+                            <EventOutlined sx={{ mr: 1, fontSize: 18 }} />
                             Post Dated
                         </ToggleButton>
                         <ToggleButton value="cancelled">
@@ -150,24 +152,31 @@ export default function ChequeStatus({
                         </ToggleButton>
                     </ToggleButtonGroup>
 
-                     {(tab === 'staled' || tab === 'pdc') && (<Card sx={{ mt: '20px' }}>
-                        <CardContent>
-                            <InsightsRoundedIcon />
-                            <Typography
-                            component="h2"
-                            variant="subtitle2"
-                            gutterBottom
-                            sx={{ fontWeight: '600' }}
-                            >
-                                { tab =='pdc' ? 'Post-Dated Cheque Notice' : 'Stale Cheque Notice'}
-                            </Typography>
-                            <Typography sx={{ color: 'text.secondary', mb: '8px' }}>
-                            {tab== 'pdc' ? 'A cheque is considered post-dated when its Cheque date is later than the Cv/Crf date.': 'This cheque is considered stale based on its cheque date, which exceeds six months from today.'}
-                            </Typography>
-                            
-                        </CardContent>
-                     </Card>)}
-                    
+                    {(tab === 'staled' || tab === 'pdc') && (
+                        <Card sx={{ mt: '20px' }}>
+                            <CardContent>
+                                <InsightsRoundedIcon />
+                                <Typography
+                                    component="h2"
+                                    variant="subtitle2"
+                                    gutterBottom
+                                    sx={{ fontWeight: '600' }}
+                                >
+                                    {tab == 'pdc'
+                                        ? 'Post-Dated Cheque Notice'
+                                        : 'Stale Cheque Notice'}
+                                </Typography>
+                                <Typography
+                                    sx={{ color: 'text.secondary', mb: '8px' }}
+                                >
+                                    {tab == 'pdc'
+                                        ? 'A cheque is considered post-dated when its Cheque date is later than the Cv/Crf date.'
+                                        : 'This cheque is considered stale based on its cheque date, which exceeds six months from today.'}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    )}
+
                     <TableFilter
                         company={company}
                         filters={filter}
@@ -184,14 +193,14 @@ export default function ChequeStatus({
                         columns={columns}
                     />
 
-                    {scannedRecord && (
+                    {/* {scannedRecord && (
                         <ScannedDetails
                             record={scannedRecord}
                             title="Cheque Details"
                             open={openModal}
                             onClose={() => setOpenModal(false)}
                         />
-                    )}
+                    )} */}
                 </Box>
             </PageContainer>
         </AppLayout>

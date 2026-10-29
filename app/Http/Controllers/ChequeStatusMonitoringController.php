@@ -111,7 +111,13 @@ class ChequeStatusMonitoringController extends Controller
             }
         }
 
-        $data = collect($numbers)->values();
+        $data = collect($numbers)->values()
+            ->sortBy([
+                ['bank', 'asc'],
+                ['account_no', 'asc'],
+                ['cheque_number', 'asc'],
+            ], SORT_REGULAR)
+            ->values();
 
 
         $items = ChequeRegister::join(
@@ -135,7 +141,7 @@ class ChequeStatusMonitoringController extends Controller
             ->values();
 
         return Inertia::render('chequeStatusRange', [
-            'data' => PaginatorHelper::paginateCollection($data,10),
+            'data' => PaginatorHelper::paginateCollection($data, 10),
             'items' => $items,
             'bank' => $selectedFilter
         ]);

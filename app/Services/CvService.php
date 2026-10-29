@@ -8,6 +8,7 @@ use App\Http\Resources\CvResource;
 use App\Jobs\CvDatabase;
 use App\Jobs\CvServer;
 use App\Models\BusinessUnit;
+use App\Models\ChequeRecord;
 use App\Models\ChequeStatus;
 use App\Models\Company;
 use App\Models\Cv;
@@ -115,10 +116,17 @@ class CvService
         ]);
     }
 
-    public function signatureDetails(ChequeStatus $id)
+    public function signatureDetails(Request $request)
     {
+        $cheque = ChequeRecord::where([
+            'source_id' => $request->id,
+            'type' => $request->type,
+        ])->firstOrFail();
+
+        $cheque->load('source');
+
         return Inertia::render('retrievedRecords/checkDetailsCvSignature', [
-            'cheque' => $id->load('checkable')->toResource()
+            'cheque' => $cheque->toResource()
         ]);
     }
 

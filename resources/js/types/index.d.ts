@@ -467,6 +467,11 @@ export interface CheckScannedDetails {
     checkNumber: string;
 }
 
+export interface IdType {
+    id: number | string;
+    type: number | string;
+}
+
 export interface EventType {
     percentage: number;
     total: number;

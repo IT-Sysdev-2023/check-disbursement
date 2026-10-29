@@ -21,7 +21,7 @@ export default function CheckDetailsCvSignature({ cheque }: { cheque: any }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Cheque Details" />
             <PageContainer title="Cheque Details">
-                <CvDetailsSignature details={cheque.data.checkable} />
+                <CvDetailsSignature details={cheque.data.source} />
             </PageContainer>
         </AppLayout>
     );
