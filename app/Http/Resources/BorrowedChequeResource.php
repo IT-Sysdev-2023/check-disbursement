@@ -26,6 +26,7 @@ class BorrowedChequeResource extends JsonResource
             'reason' => $this->reason,
             'check' => $this->checkable_type,
             'totalChecks' => $this->total_checks,
+            'isDepositSlip' => $this->is_ds,
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
             'approver' => $this->whenLoaded('approver'),
             'exists_on_remote_server' => (bool) $this->exists_on_remote_server,

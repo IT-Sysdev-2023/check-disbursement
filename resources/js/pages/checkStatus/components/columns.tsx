@@ -206,9 +206,10 @@ export const chequeStatusColumns = (
     {
         field: 'status',
         headerName: 'Status',
-        minWidth: 120,
+        minWidth: 120, //isDepositSlip
         flex: 1,
         renderCell: ({ row }) => {
+            console.log(row);
             const chequeStatus = row.checkable?.chequeStatus;
             let status = null;
 
@@ -240,10 +241,22 @@ export const chequeStatusColumns = (
             };
 
             return (
-                <Chip
-                    label={statusMap[status]?.label || 'For Releasing'}
-                    color={statusMap[status]?.color || 'default'}
-                />
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        height: '100%',
+                        width: '100%',
+                        gap: 1,
+                    }}
+                >
+                    <Chip
+                        label={statusMap[status]?.label ?? 'For Releasing'}
+                        color={statusMap[status]?.color ?? 'default'}
+                    />
+
+                    {row.isDepositSlip && <Chip label="DS" color="warning" />}
+                </Box>
             );
         },
     },
