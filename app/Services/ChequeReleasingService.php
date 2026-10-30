@@ -305,7 +305,9 @@ class ChequeReleasingService
                 ->handlePdf($data, 'forwardedReleasingPdf');
         });
 
-        return redirect()->route('forwarded-releasing-viewing')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
+        return redirect()->route('forwarded-releasing-viewing', [
+            'location' => $location
+        ])->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
 
     public function batchRelease(Request $request)
