@@ -131,12 +131,12 @@ export default function ScanCheques({ files }: int) {
        
     };
 
-    const clearCache = async () => {
-        const { data } = await axios.get('/retrieved-checks/clear-cache/');
-        if (data.status == 'success') {
-            router.reload();
-        }
-    };
+    // const clearCache = async () => {
+    //     const { data } = await axios.get('/retrieved-checks/clear-cache/');
+    //     if (data.status == 'success') {
+    //         router.reload();
+    //     }
+    // };
 
     const [inputValue, setInputValue] = useState('');
 

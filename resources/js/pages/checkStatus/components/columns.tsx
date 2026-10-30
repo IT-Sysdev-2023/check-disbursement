@@ -176,16 +176,6 @@ export const chequeStatusColumns = (
         minWidth: 80,
         renderCell: ({ row }) => row.checkable?.amount,
     },
-
-    {
-        field: 'bankName',
-        headerName: 'Bank Name',
-        headerAlign: 'right',
-        align: 'right',
-        flex: 1,
-        minWidth: 100,
-        renderCell: ({ row }) => row.checkable?.bank,
-    },
     {
         field: 'chequeDate',
         headerName: 'Cheque Date',
@@ -196,17 +186,27 @@ export const chequeStatusColumns = (
         renderCell: ({ row }) => row.checkable?.chequeDate,
     },
     {
-        field: 'check',
-        headerName: 'Cheque Type',
+        field: 'bankName',
+        headerName: 'Bank Name',
         headerAlign: 'right',
         align: 'right',
         flex: 1,
         minWidth: 100,
+        renderCell: ({ row }) => row.checkable?.bank,
+    },
+    {
+        field: 'dateAction',
+        headerName: 'Action Date',
+        headerAlign: 'right',
+        align: 'right',
+        flex: 1,
+        renderCell: ({ row }) => {
+            return row.checkable?.chequeStatus?.createdAt;
+        },
     },
     {
         field: 'status',
         headerName: 'Status',
-        minWidth: 120, //isDepositSlip
         flex: 1,
         renderCell: ({ row }) => {
             console.log(row);
@@ -266,10 +266,15 @@ export const chequeStatusColumns = (
         headerAlign: 'right',
         align: 'right',
         flex: 1,
-        minWidth: 80,
         renderCell: ({ row }) => {
             return row.checkable?.location;
         },
+    },
+    {
+        field: 'check',
+        headerName: 'Type',
+        headerAlign: 'right',
+        align: 'right',
     },
     {
         field: 'actions',

@@ -201,7 +201,6 @@ class ChequeRequestService
     public function changeApprover(Request $request)
     {
         $validated = $request->validate([
-            // 'key' => 'required',
             'borrower' => 'required',
             'approver' => 'required|exists:approvers,id',
             'borrowerNo' => 'required'

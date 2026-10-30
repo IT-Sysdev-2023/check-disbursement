@@ -34,7 +34,7 @@ export default function TableItems(props: {
     const [open, setOpen] = useState(false);
     const [borrowerData, setBorrowerData] = useState<Record<string, any[]>>({});
     const [openEdit, setOpenEdit] = useState(false);
-    const [borrower, setBorrower] = useState('');
+    const [borrower, setBorrower] = useState(row.borrower);
     const [approvers, setApprovers] = useState<
         { label: string; value: string }[]
     >([]);
@@ -89,9 +89,9 @@ export default function TableItems(props: {
         );
     };
 
-     const handleTextChange = (_: SyntheticEvent, name: Option) => {
-           setBorrower(name.label)
-        };
+    const handleTextChange = (_: SyntheticEvent, name: Option) => {
+        setBorrower(name.label);
+    };
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -235,7 +235,7 @@ export default function TableItems(props: {
             >
                 <AutocompleteUser
                     label="Assign Laison"
-                    defaultField={row.borrower}
+                    defaultField={borrower}
                     sxWidth={'100%'}
                     handleTextChange={handleTextChange}
                 />
