@@ -25,8 +25,8 @@ class ProcessChequeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected string $diskName = 'cheque_share';
     public function __construct(
-        public FileSystem $disk,
         public string $scanMethod,
         public string $imagePath,
         public int $id,
@@ -35,6 +35,8 @@ class ProcessChequeJob implements ShouldQueue
         public int $totalcount,
         public ?string $supplierName = null,
     ) {
+
+
     }
     public $tries = 5;
 
@@ -45,9 +47,11 @@ class ProcessChequeJob implements ShouldQueue
     public function handle(): void
     {
         $alreadyScanned = [];
+        $disk = Storage::disk($this->diskName);
+
         try {
 
-            $bytes = $this->disk->get($this->imagePath);
+            $bytes = $disk->get($this->imagePath);
 
             $payload = self::payLayoadFunction($bytes);
 
@@ -127,7 +131,7 @@ class ProcessChequeJob implements ShouldQueue
 
                 $filename = basename($this->imagePath);
 
-                $this->disk->move($this->imagePath, "scanned/{$filename}");
+                $disk->move($this->imagePath, "scanned/{$filename}");
             }
         } catch (QueryException $e) {
             if ($e->errorInfo[1] === 1062) {
