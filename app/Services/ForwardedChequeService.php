@@ -116,7 +116,7 @@ class ForwardedChequeService
             // $locations = [];
             $chequesDetails = [];
 
-            $handleFiles = $this->handleFiles($validated, $transactionNo);
+            $handleFiles = $this->fileHandler->handleFiles($validated, $transactionNo);
             foreach ($cheques as $cheque) {
                 $chequeStatus = ChequeStatus::where('id', $cheque['id'])->firstOrFail();
                 $chequeStatus->chequeForwardedStatus()
@@ -161,6 +161,7 @@ class ForwardedChequeService
 
                 'releasedLabel' => 'Released By:',
                 'releasedBy' => auth()->user()->name,
+                'signature' => $handleFiles->signatureUri,
 
                 // 'company' => implode(', ', array_unique($companies)),
                 // 'location' => implode(', ', array_unique($locations)),
@@ -207,24 +208,5 @@ class ForwardedChequeService
         ]);
     }
 
-    private function handleFiles(array $validated, string $transactionNo)
-    {
-        $userId = auth()->user()->id;
-        $uuid = Str::uuid();
-
-        // $signaturePath = $this->fileHandler
-        //     ->inFolder($transactionNo . "/forwardedSignatures")
-        //     ->createFileName($uuid, $userId, '.png')
-        //     ->saveSignature($validated['signature']);
-
-        // $imagePath = $this->fileHandler
-        //     ->inFolder($transactionNo . "/forwardedImages")
-        //     ->createFileName($uuid, $userId, '.png')
-        //     ->saveFile($validated['file']);
-
-        return (object) [
-            'signaturePath' => '$signaturePath',
-            'imagePath' => '$imagePath'
-        ];
-    }
+   
 }

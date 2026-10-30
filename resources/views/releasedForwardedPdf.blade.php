@@ -149,6 +149,8 @@
         <tr>
             <td style="border: none; padding: 10px 0 0 40px;">
                 <div style="text-align: center; border-bottom: 1px solid #000; padding-bottom: 3px;">
+                    <div style="height: 50px;"></div>
+
                     <div style="text-align: center;">
                         {{ Str::upper($data['causedBy'] ?? '-') }}
                     </div>
@@ -157,6 +159,13 @@
 
             <td style="border: none; padding: 10px 0 0 40px;">
                 <div style="text-align: center; border-bottom: 1px solid #000; padding-bottom: 3px;">
+                    <div style="height: 50px; text-align: center;">
+                        @if (!empty($data['signature']))
+                            <img src="{{ $data['signature'] }}" alt="Signature"
+                                style="max-height: 50px; max-width: 180px;">
+                        @endif
+                    </div>
+
                     <div style="text-align: center;">
                         {{ Str::upper($data['releasedBy'] ?? '-') }}
                     </div>
@@ -164,12 +173,6 @@
             </td>
         </tr>
     </table>
-    {{-- Start the included content on a new page --}}
-    {{-- <div class="page-break"></div>
-
-    @include('releasingPdf', [
-        'data' => $data,
-    ]) --}}
 
 </body>
 
