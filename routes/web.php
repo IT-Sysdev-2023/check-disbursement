@@ -211,7 +211,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('index', [ClosingController::class, 'index'])->name('closing-cheque');
         Route::post('mark-close/{id}', [ClosingController::class, 'close'])->name('mark-as-close');
 
-        Route::post('submit-documents/', [ClosingController::class, 'submitDocuments'])->name('submit-documents');
+        // Route::post('submit-documents/', [ClosingController::class, 'submitDocuments'])->name('submit-documents');
         Route::get('scanned-documents', [ClosingController::class, 'scannedDocuments'])->name('scanned-documents');
         Route::get('document-images', [ClosingController::class, 'documentImages'])->name('document-images');
         Route::get(
@@ -220,7 +220,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         )->name('cheques.document'); //DONT REMOVE THIS ITS THE SOURCE OF SUPPORTING DOCUMENTS
 
         Route::post('export-pdf-bu', [ClosingController::class, 'exportPdfBu'])->name('export-pdf-bu');
-        Route::post('export-pdf-all', [ClosingController::class, 'exportPdfAll'])->name('export-pdf-all');
+        // Route::post('export-pdf-all', [ClosingController::class, 'exportPdfAll'])->name('export-pdf-all');
 
     });
 

@@ -13,22 +13,40 @@ use App\Services\PermissionService;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class ClosingService
 {
+
     public function __construct(protected FileHandler $fileHandler)
     {
+    }
+
+    protected function getDocFiles(): array
+    {
+
+        $disk = Storage::disk('cheque_doc');
+
+        $folders = PHP_OS_FAMILY === 'Linux' ? $disk->directories('Documents/new') : $disk->directories('new');
+
+        return collect($folders)
+            ->filter(fn($folder) => !empty($disk->allFiles($folder)))
+            ->map(fn($folder) => basename($folder))
+            ->unique()
+            ->values()
+            ->all();
     }
     public function index(Request $request)
     {
         $filters = $request->only(['bu', 'search', 'sort', 'date', 'selectedCheck', 'tab', 'company']);
 
-        $disk = Storage::disk('cheque_doc');
         $tab = $filters['tab'] ?? 'doc_required';
         $company = $filters['company'] ?? '';
-        $files = $disk->files('new');
+
+
+        $docFiles = $this->getDocFiles();
 
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
@@ -44,7 +62,15 @@ class ClosingService
             ->when(
                 ($tab == 'doc_required') ?? null,
                 fn($q) => $q->where('has_document', false),
-                fn($q) => $q->where('has_document', true)
+                fn($q) => $q->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    function ($query, $type) use ($docFiles) {
+                        $column = $type === Crf::class ? 'crf_no' : 'cv_no';
+
+                        $query->whereIn($column, $docFiles);
+                    }
+                )
             )
             ->filter($filters)
             ->orderByDesc('created_at')
@@ -66,7 +92,6 @@ class ClosingService
                     'end' => null
                 ]
             ],
-            'totalDocuments' => count($files),
             'businessUnits' => $company
                 ? BusinessUnit::businessUnits($company)
                 : [],
@@ -225,6 +250,8 @@ class ClosingService
         $company = $validated['company'];
         $bu = $validated['bu'];
 
+        $docFiles = $this->getDocFiles();
+
         $cheques = ChequeStatus::
             with(['checkable' => ['borrowedCheque', 'tagLocation']])
             ->whereNot('status', 'cancel')
@@ -251,9 +278,17 @@ class ClosingService
                     }
                 }
             )
-            ->where('has_document', true)
-            ->where('is_closed', false);
+            // ->where('has_document', true)
+            ->whereHasMorph(
+                'checkable',
+                [Cv::class, Crf::class],
+                function ($query, $type) use ($docFiles) {
+                    $column = $type === Crf::class ? 'crf_no' : 'cv_no';
 
+                    $query->whereIn($column, $docFiles);
+                }
+            )
+            ->where('is_closed', false);
 
         if ($cheques->doesntExist()) {
             return redirect()->back()->with(['status' => false, 'message' => 'No Record Found']);
@@ -265,14 +300,20 @@ class ClosingService
             $bu = BusinessUnit::where('id', $bu)->value('name');
             $company = Company::where('id', $company)->value('name');
 
+
+            $disk = Storage::disk('cheque_doc');
+            $disk->makeDirectory('scanned');
+
             $chequesDetails = [];
             foreach ($cheques->get() as $cheque) {
                 $checkable = $cheque->checkable;
 
+                $uniqueNo = $checkable instanceof Cv
+                    ? $checkable->cv_no
+                    : $checkable->crf_no;
+
                 $chequesDetails[] = [
-                    'cv_no' => $checkable instanceof Cv
-                        ? $checkable->cv_no
-                        : $checkable->crf_no,
+                    'cv_no' => $uniqueNo,
                     ...$checkable->only([
                         'cheque_number',
                         'cheque_date',
@@ -280,9 +321,18 @@ class ClosingService
                         'cheque_amount',
                     ]),
                 ];
+
+                $source = "new/{$uniqueNo}";
+                $destination = "scanned/{$uniqueNo}";
+
+                if ($disk->exists($source)) {
+                    $disk->move($source, $destination);
+                }
+
             }
 
             $cheques->update([
+                'has_document' => true,
                 'is_closed' => true,
                 'closed_at' => now()
             ]);
@@ -300,89 +350,4 @@ class ClosingService
         });
         return redirect()->route('closing-cheque')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }
-    public function exportPdfAll(Request $request)
-    {
-
-        $cheques = ChequeStatus::
-            with(['checkable' => ['borrowedCheque', 'tagLocation']])
-            ->whereNot('status', 'cancel')
-            ->where(function ($query) {
-                $query->where(function ($q) {
-                    $q->where('status', 'forwarded')
-                        ->has('chequeForwardedStatus');
-                })
-                    ->orWhere('status', '!=', 'forwarded');
-            })
-            ->where('has_document', true)
-            ->where('is_closed', false);
-
-
-        if ($cheques->doesntExist()) {
-            return redirect()->back()->with(['status' => false, 'message' => 'No Record Found']);
-        }
-
-        $userId = $request->user()->id;
-        $stream = DB::transaction(function () use ($userId, $cheques) {
-
-            $chequesDetails = [];
-            foreach ($cheques->get() as $cheque) {
-                $checkable = $cheque->checkable;
-
-                $chequesDetails[] = [
-                    'cv_no' => $checkable instanceof Cv
-                        ? $checkable->cv_no
-                        : $checkable->crf_no,
-                    ...$checkable->only([
-                        'cheque_number',
-                        'cheque_date',
-                        'payee',
-                        'cheque_amount',
-                    ]),
-                ];
-            }
-
-            $cheques->update([
-                'is_closed' => true,
-                'closed_at' => now()
-            ]);
-
-            $data = [
-                'date' => now()->format('M d, Y H:i A'),
-                'cheques' => $chequesDetails,
-                'closedBy' => auth()->user()->name
-            ];
-
-            return $this->fileHandler
-                ->inFolder('pdfs/documentUploaded/')
-                ->createFileName("All-bu", $userId, '.pdf')
-                ->handlePdf($data, 'documentUploaded');
-        });
-        return redirect()->route('closing-cheque')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
-    }
-
-    // $stream = DB::transaction(function () use ($id) {
-    // $isSuccess = $id->update([
-    //     'is_closed' => true,
-    //     'closed_at' => now()
-    // ]);
-
-    //         if ($isSuccess) {
-    //             $data = [
-    //                 'transactionNo' => NumberHelper::padLeft($id->id),
-    //                 'dateForwarded' => $id->created_at->format('M d, Y H:i A'),
-
-    //                 'closedBy' => auth()->user()->name,
-
-    //                 'dateReceived' => $id->created_at->format('M d, Y H:i A'),
-
-    //                 // 'receivedBy' => $id->receivers_name,
-    //             ];
-
-    //             return $this->fileHandler
-    //                 ->inFolder('pdfs/releasing/closing/')
-    //                 ->createFileName($id->id, auth()->user()->id, '.pdf')
-    //                 ->handlePdf($data, 'closingPdf');
-
-    //         }
-    //     });
 }

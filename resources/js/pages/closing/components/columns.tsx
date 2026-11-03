@@ -1,4 +1,3 @@
-import { ClosingCheckDetailsType } from '@/types';
 import { IconButton } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import { ArrowBigRightDash } from 'lucide-react';
@@ -62,9 +61,31 @@ export const createClosingCvColumns = (
         headerAlign: 'center',
         align: 'center',
     },
+    // {
+    //     field: 'actions',
+    //     headerName: 'View',
+    //     width: 100,
+    //     align: 'center',
+    //     flex: 1,
+    //     headerAlign: 'center',
+    //     sortable: false,
+    //     renderCell: (params) => {
+    //         const { row } = params;
+    //         return (
+    //             <IconButton
+    //                 size="small"
+    //                 color="primary"
+    //                 onClick={() =>
+    //                     handleAction(row.id, row.checkable?.chequeNumber)
+    //                 }
+    //             >
+    //                 <ArrowBigRightDash />
+    //             </IconButton>
+    //         );
+    //     },
+    // },
 ];
 export const scannedDocumentsColumn = (
-    handleAction: (id: number, chequeNumber: string) => void,
 ): GridColDef[] => [
     {
         field: 'chequeNumber',

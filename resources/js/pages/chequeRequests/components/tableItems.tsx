@@ -234,7 +234,7 @@ export default function TableItems(props: {
                 // loading={tagLoading}
             >
                 <AutocompleteUser
-                    label="Assign Laison"
+                    label="Assign Liaison"
                     defaultField={borrower}
                     sxWidth={'100%'}
                     handleTextChange={handleTextChange}

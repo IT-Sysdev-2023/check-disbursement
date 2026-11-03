@@ -111,7 +111,7 @@ export default function BorrowedCheckModal({
                         >
                             <Grid size={{ xs: 12, sm: 12 }}>
                                 <AutocompleteUser
-                                    label="Assign Laison"
+                                    label="Assign Liaison"
                                     sxWidth={'100%'}
                                     handleTextChange={handleTextChange}
                                 />

@@ -2,7 +2,6 @@ import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { documentImages } from '@/routes';
 import {
     ChequeStatus,
     FilterType,
@@ -21,7 +20,6 @@ import {
     ImageListItem,
     Typography,
 } from '@mui/material';
-import axios from 'axios';
 import { ShieldCloseIcon } from 'lucide-react';
 import { useState } from 'react';
 import { scannedDocumentsColumn } from './closing/components/columns';
@@ -47,17 +45,17 @@ export default function ScannedCheques({
     const [open, setOpen] = useState(false); // Temporary images for testing
     const [images, setImages] = useState<string[]>([]);
 
-    const handleAction = async (id: number, chequeNumber: string) => {
-        const { data } = await axios.get(documentImages().url, {
-            params: {
-                id: id,
-                chequeNumber: chequeNumber,
-            },
-        });
-        setImages(data.images.map((file: { url: string }) => file.url));
-        setOpen(true);
-    };
-    const columns = scannedDocumentsColumn(handleAction);
+    // const handleAction = async (id: number, chequeNumber: string) => {
+    //     const { data } = await axios.get(documentImages().url, {
+    //         params: {
+    //             id: id,
+    //             chequeNumber: chequeNumber,
+    //         },
+    //     });
+    //     setImages(data.images.map((file: { url: string }) => file.url));
+    //     setOpen(true);
+    // };
+    const columns = scannedDocumentsColumn();
     const handleClose = () => {
         setOpen(false);
         setImages([]);
