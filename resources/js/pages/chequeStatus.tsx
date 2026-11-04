@@ -134,7 +134,7 @@ export default function ChequeStatus({
                             <CancelPresentationOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
-                            Cancelled
+                           {isRegional ? 'Returned' : 'Cancelled'}
                         </ToggleButton>
                         {!isRegional && (
                             <ToggleButton value="forwarded">

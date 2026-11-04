@@ -270,7 +270,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             disbursementOfficer ||
             regionalOfficer ||
             sectionHead ||
-            closingOfficer
+            closingOfficer ||
+            cdcReleasing
                 ? [
                       {
                           title: 'Cheque Status',
