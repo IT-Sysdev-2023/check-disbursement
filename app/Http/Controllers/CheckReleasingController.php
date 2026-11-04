@@ -389,14 +389,14 @@ class CheckReleasingController extends Controller
                         'chequeForwardedStatus',
                         'status',
                         '=',
-                        'cancelled'
+                        'returned'
                     );
                 } else {
                     $q->whereNotNull('received_by')->whereRelation(
                         'chequeForwardedStatus',
                         'status',
                         '!=',
-                        'cancelled'
+                        'returned'
                     );
                 }
             })
