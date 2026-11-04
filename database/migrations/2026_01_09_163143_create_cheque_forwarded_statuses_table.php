@@ -13,11 +13,11 @@ return new class extends Migration {
         Schema::create('cheque_forwarded_statuses', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('cheque_status_id')->cascadeOnUpdate()->cascadeOnDelete();
-            $table->enum('status', ['released', 'cancelled'])->nullable();
+            $table->enum('status', ['released', 'returned'])->nullable();
             $table->string('forwarded_receivers_name')->nullable();
             $table->string('image')->nullable();
             $table->string('signature')->nullable();
-            $table->string('cancelled_reason')->nullable();
+            $table->string('return_reason')->nullable();
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 

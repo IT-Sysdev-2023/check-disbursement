@@ -263,7 +263,7 @@ class ChequeRequestService
     public function returnedCheques(Request $request)
     {
         $filters = $request->only(['search']);
-        $cheques = ChequeStatus::whereRelation('chequeForwardedStatus', 'status', 'cancelled')
+        $cheques = ChequeStatus::whereRelation('chequeForwardedStatus', 'status', 'returned')
             ->with('checkable')
             ->paginate()
             ->withQueryString()

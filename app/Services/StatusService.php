@@ -53,7 +53,7 @@ class StatusService
                         $q->whereHasMorph(
                             'checkable',
                             [Cv::class, Crf::class],
-                            fn(Builder $q) => $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'cancelled')
+                            fn(Builder $q) => $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'returned')
                         );
                     } else {
                         $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status

@@ -16,7 +16,7 @@ class ChequeForwardedStatusResource extends JsonResource
     {
         return [
             'id'=> $this->id,
-            'cancelled_reason' => $this->cancelled_reason,
+            'return_reason' => $this->return_reason,
             'caused_by' => $this->caused_by,
             'cheque_status_id' => $this->cheque_status_id,
             'forwarded_receivers_name' => $this->forwarded_receivers_name,

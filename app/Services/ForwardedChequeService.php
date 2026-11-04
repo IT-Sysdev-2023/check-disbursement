@@ -65,8 +65,8 @@ class ForwardedChequeService
             ->get()
             ->each(function ($chequeStatus) use ($request, $validated) {
                 $chequeStatus->chequeForwardedStatus()->create([
-                    'status' => 'cancelled',
-                    'cancelled_reason' => $validated['reason'],
+                    'status' => 'returned',
+                    'return_reason' => $validated['reason'],
                     'caused_by' => $request->user()->id,
                 ]);
             });
