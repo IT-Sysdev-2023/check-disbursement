@@ -23,7 +23,7 @@ export default function ChequeRegister({
     bankAccounts: SelectionType[];
     filters: FilterType;
 }) {
-    const { data, setData, post, processing, reset } = useForm({
+    const { data, setData, post, processing, reset,transform } = useForm({
         min: '',
         max: '',
         bank: filters.bank,
@@ -45,6 +45,16 @@ export default function ChequeRegister({
             return;
         }
 
+        const selectedBank = banks.find((bank) => bank.value === data.bank);
+        const selectedBa = bankAccounts.find((bank) => bank.value === data.bank_account);
+
+
+         transform((data) => ({
+            ...data,
+            bank: selectedBank?.label,
+            bank_account: selectedBa?.label,
+        }));
+
         post(chequeRegisterStore().url, {
             onSuccess: () => {
                 reset();
@@ -63,7 +73,7 @@ export default function ChequeRegister({
         const selected = banks.find((bank) => bank.value === val);
         router.reload({
             data: {
-                bank: selected?.value,
+                bank: selected?.label,
                 bankAccount: null,
             },
         });
@@ -75,7 +85,7 @@ export default function ChequeRegister({
         const selected = bankAccounts.find((bank) => bank.value === val);
         router.reload({
             data: {
-                bankAccount: selected?.value,
+                bankAccount: selected?.label,
             },
         });
     };

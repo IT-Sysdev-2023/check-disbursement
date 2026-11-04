@@ -330,6 +330,11 @@ export const pdcColumn = (): GridColDef[] => [
         flex: 1,
     },
     {
+        field: 'payee',
+        headerName: 'Payee',
+        flex: 1,
+    },
+    {
         field: 'cvDate',
         headerName: 'CV Date',
         headerAlign: 'center',

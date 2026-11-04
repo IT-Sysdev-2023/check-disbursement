@@ -88,16 +88,40 @@ class ChequeReleasingService
 
     private static function banks()
     {
-        return Bank::select('id as value', 'name as label')
-            ->orderBy('name')->get();
+        return Cv::select('bank')
+            ->distinct()
+            ->orderBy('bank')
+            ->pluck('bank')
+            ->filter()
+            ->map(fn($bank, $index) => ['value' => $index, 'label' => $bank])
+            ->values()
+        ;
     }
 
     private static function bankAccounts($bank)
     {
-        return BankAccount::select('account_no as label', 'id as value')
-            ->where('bank_id', $bank)
-            ->orderBy('account_no')->get();
+        return Cv::select('bank_account_no')
+            ->where('bank', $bank)
+            ->distinct()
+            ->orderBy('bank_account_no')
+            ->pluck('bank_account_no')
+            ->filter()
+            ->map(fn($bankAccount, $index) => ['value' => $index, 'label' => $bankAccount])
+            ->values();
     }
+
+    // private static function banks()
+    // {
+    //     return Bank::select('id as value', 'name as label')
+    //         ->orderBy('name')->get();
+    // }
+
+    // private static function bankAccounts($bank)
+    // {
+    //     return BankAccount::select('account_no as label', 'id as value')
+    //         ->where('bank_id', $bank)
+    //         ->orderBy('account_no')->get();
+    // }
 
     public function chequeRegistrationStore(Request $request)
     {
@@ -108,15 +132,16 @@ class ChequeReleasingService
             'bank' => ['required'],
             'bank_account' => ['required'],
         ]);
-
+        
         $userId = $request->user()->id;
 
         return DB::transaction(function () use ($validated, $userId) {
 
             $overlaps = ChequeRegister::where(
-                'bank_account_id',
+                'bank_account',
                 $validated['bank_account']
             )
+                ->where('bank', $validated['bank'])
                 ->whereRaw('CAST(cheque_from AS UNSIGNED) <= ?', [$validated['max']])
                 ->whereRaw('CAST(cheque_to AS UNSIGNED) >= ?', [$validated['min']])
                 ->exists();
@@ -129,7 +154,8 @@ class ChequeReleasingService
             }
 
             ChequeRegister::create([
-                'bank_account_id' => $validated['bank_account'],
+                'bank' => $validated['bank'],
+                'bank_account' => $validated['bank_account'],
                 'cheque_from' => $validated['min'],
                 'cheque_to' => $validated['max'],
                 'caused_by' => $userId,

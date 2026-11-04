@@ -121,9 +121,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::post('generate-eod', [EodController::class, 'generateEod'])->name('generate-eod');
         });
 
-        Route::get('cheque-status-range', [ChequeStatusMonitoringController::class, 'index'])->name('cheque-status-range');
     });
 
+    Route::get('cheque-status-range', [ChequeStatusMonitoringController::class, 'index'])->name('cheque-status-range');
 
     Route::prefix('details')->group(function () {
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');
@@ -142,7 +142,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Route::get('forwarded-receiving', [CheckReleasingController::class, 'receiving'])->name('forwarded-receiving');
         // Route::get('forwarded-received', [CheckReleasingController::class, 'received'])->name('forwarded-received');
         // Route::get('forwarded-released', [CheckReleasingController::class, 'released'])->name('forwarded-released');
-        
+
         Route::get('forwarded-cheque-status', [CheckReleasingController::class, 'chequeStatus'])->name('forwarded-cheque-status');
 
         Route::post('store-release-check-location', [CheckReleasingController::class, 'storeForwarded'])->name('store-release-check-location');
@@ -257,12 +257,12 @@ Route::get('/test', function () {
     // });
     // dd($tables);
 
-    $start = "2025-11-03";
-    $end = "2025-11-04";
-    $tables = DB::connection('sqlsrvCaf')
-        ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
+    // $start = "2025-11-03";
+    // $end = "2025-11-04";
+    // $tables = DB::connection('sqlsrvCaf')
+    //     ->select("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'");
 
-    dd($tables);
+    // dd($tables);
 
 
     // $bu = Cv::select('business_unit_id')
@@ -277,11 +277,13 @@ Route::get('/test', function () {
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
         // ->table('SON-OK AGRI FARM$CV Check Payment')
-        ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
+        ->table('MFI REPACKING ACCOUNTING$CV Check Payment')
 
 
 
-        // ->where('CV No_', '2512000001')
+        // ->where('Check Voucher No_', 'CRF2610039')
+        // ->where('CV No_', 'CRF0000008')
+        // ->where('Cancelled Date', '0')
         // ->where('Check Number', "")
 
         // ->whereRaw("CONVERT(VARCHAR(10), [Check Date], 120) BETWEEN ? AND ?", [$start, $end])

@@ -82,7 +82,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         [user?.permissions],
     );
     const accessCebu = permissions.includes('access cebu');
-    
+
     const accessManila = permissions.includes('access manila');
 
     const isAdmin = roles.includes('admin');
@@ -183,6 +183,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           title: 'Returned Cheques',
                           href: returnedCheques(),
                           icon: Undo2,
+                      },
+                      {
+                          title: 'Cheque Range Monitoring',
+                          href: chequeStatusRange(),
+                          icon: ListOrdered,
                       },
                   ]
                 : []),
@@ -372,7 +377,7 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
         cdcForwarded,
         cdcReleasing,
         accessCebu,
-        accessManila
+        accessManila,
     ]);
 
     // Automatically open submenu if current page belongs to it
