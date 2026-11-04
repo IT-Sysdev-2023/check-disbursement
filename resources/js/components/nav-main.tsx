@@ -30,7 +30,6 @@ import {
     forwardedReleasing,
     forwardedReleasingViewing,
     notifications,
-    releasePerBu,
     report,
     retrievedRecords,
     returnedCheques,
@@ -195,8 +194,8 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 ? [
                       {
                           title: 'Cheque Releasing',
-                          href: releasePerBu(),
-                          icon: FolderCheck,
+                          href: checkReleasing(),
+                          icon: Check,
                       },
                   ]
                 : []),

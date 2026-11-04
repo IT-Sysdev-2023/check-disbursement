@@ -54,7 +54,7 @@ export const eodColumns = (): GridColDef[] => [
         flex: 1,
         renderCell: ({ row }) => {
             const { status } = row;
-
+            
             const statusMap: Record<
                 string,
                 {
@@ -67,6 +67,7 @@ export const eodColumns = (): GridColDef[] => [
                 released: { label: 'Released', color: 'default' },
                 forwarded: { label: 'Forwarded', color: 'warning' },
                 deposited: { label: 'Deposit', color: 'success' },
+                received: { label: 'Received', color: 'success' },
                 cancelled: { label: 'Cancelled', color: 'error' },
                 staled: { label: 'Staled', color: 'warning' },
             };

@@ -36,6 +36,9 @@ export default function ChequeStatusRange({
         const val = event.target.value;
         setSelectedBank(val);
 
+        console.log(items);
+        // const selectedBank = banks.find((bank) => bank.value === data.bank);
+
         router.reload({
             data: {
                 bank: event.target.value,

@@ -152,7 +152,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('generate-location-pdf/{location}', [CheckReleasingController::class, 'generateCebu'])->name('generate-location-pdf');
     });
 
-    Route::get('cheques-per-bu', [CheckReleasingController::class, 'releasePerBu'])->name('release-per-bu');
+    // Route::get('cheques-per-bu', [CheckReleasingController::class, 'releasePerBu'])->name('release-per-bu');
     Route::post('store-release-bu', [CheckReleasingController::class, 'storeReleaseBu'])->name('store-release-bu');
     Route::post('store-receiver-name', [CheckReleasingController::class, 'storeReceiverName'])->name('store-reciever-name');
 
@@ -179,6 +179,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         Route::post('deposit-slips/upload', [CheckRequestController::class, 'uploadDepositSlips'])->name('deposit-slips-upload');
 
+
+
+        Route::get('voucher-status-summary', [VoucherSummaryController::class, 'index'])->name('status-summary');
+
+    });
+
+    //! SECTION HEAD & corporate_disbursing_clerk(releasing)
+    Route::prefix('section-head')->middleware('role:corporate_accounting_supervisor|admin|corporate_disbursing_clerk(releasing)')->group(function () {
         Route::prefix('check-releasing')->group(function () {
             Route::get('index', [CheckReleasingController::class, 'index'])->name('check-releasing');
             Route::get('cheque-register', [CheckReleasingController::class, 'chequeRegister'])->name('cheque-register');
@@ -192,11 +200,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('get-cheques-for-releasing', [CheckReleasingController::class, 'chequesToRelease'])->name('cheques-to-release');
             Route::get('release-cheque/{reference}', [CheckReleasingController::class, 'releaseCheque'])->name('release-cheque');
         });
-
-        Route::get('voucher-status-summary', [VoucherSummaryController::class, 'index'])->name('status-summary');
-
     });
-
 
     //! REGIONAL OFFICER
     //Cebu & Manila

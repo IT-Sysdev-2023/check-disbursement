@@ -38,12 +38,17 @@ class EodController extends Controller
                 'value' => 'all',
                 'label' => 'All Status',
             ]);
+
         $filters = $request->only('default');
+
         $data = ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit'], 'chequeForwardedStatus'])
             ->whereDate('created_at', now())
             ->when(($filters['default'] ?? null) && $filters['default'] != 'all', function ($query) use ($filters) {
                 if ($filters['default'] == 'closed') {
                     $query->where('is_closed', 1);
+                    return;
+                }else if($filters['default'] == 'cancelled'){
+                    // $query->orWhereRelation('chequeForwardedStatus', 'status');
                     return;
                 }
                 $query->where('status', $filters['default']);

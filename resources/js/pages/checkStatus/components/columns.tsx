@@ -208,6 +208,7 @@ export const chequeStatusColumns = (
         field: 'status',
         headerName: 'Status',
         flex: 1,
+        minWidth:200,
         renderCell: ({ row }) => {
             console.log(row);
             const chequeStatus = row.checkable?.chequeStatus;
@@ -240,6 +241,10 @@ export const chequeStatusColumns = (
                 staled: { label: 'Staled', color: 'warning' },
             };
 
+            const isReturned =
+                row.checkable?.chequeStatus?.forwardedStatus?.status ===
+                'returned';
+
             return (
                 <Box
                     sx={{
@@ -250,6 +255,7 @@ export const chequeStatusColumns = (
                         gap: 1,
                     }}
                 >
+                    {isReturned && <Chip label="Returned" color="warning" />}
                     <Chip
                         label={statusMap[status]?.label ?? 'For Releasing'}
                         color={statusMap[status]?.color ?? 'default'}

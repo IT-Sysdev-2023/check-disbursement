@@ -21,6 +21,9 @@ class ChequeStatusMonitoringController extends Controller
         $selectedFilter = $request->input('bank');
 
         $cheques = ChequeRegister::select('id', 'bank as name', 'bank_account as account_no', 'cheque_from', 'cheque_to')
+            ->when($selectedFilter, function ($q) use ($selectedFilter) {
+                $q->where('cheque_registers.id', $selectedFilter);
+            })
             ->get();
 
         // Uppercase, trim and collapse repeated whitespace
