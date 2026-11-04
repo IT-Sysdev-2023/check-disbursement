@@ -24,9 +24,8 @@ class StatusService
         $filters = $request->only(['company', 'search', 'sort', 'date', 'tab']);
         $tab = $filters['tab'] ?? 'for_releasing';
         $staleThreshold = Date::today()->subMonths(6);
-        // dd(auth()->user()->getRoleNames());
-        //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
 
+        //THIS IS WHERE IT GETS CONFUSING SO PAY ATTENTION MAYTE!
         if ($tab === 'pdc' || $tab == 'staled') {
             $cheque = new ChequeCollection(self::pdcStale($tab));
         } else {
@@ -36,56 +35,56 @@ class StatusService
                 ->regionalPermission()
                 ->where(function (Builder $q) use ($tab) {
                     if ($tab === 'for_releasing') { // "For Releasing Tab"
-                        $q->where(function (Builder $q) { // GET THE CHEQUES FROM (FOR RELEASING)
+                        $q->where(function (Builder $q) {
                             $q->whereNotNull('approver_id')
                                 ->has('scannedRecord')
                                 ->whereDoesntHaveMorph(
                                     'checkable',
                                     [Cv::class, Crf::class],
                                     fn($query) => $query->has('chequeStatus')
-                                )
-
-                            ;
-
+                                );
                         });
-
-                    } else if ($tab === 'cancelled' && auth()->user()->hasRole('corporate_disbursing_clerk(forwarded_releasing)')) {
+                    } else {
                         $q->whereHasMorph(
                             'checkable',
                             [Cv::class, Crf::class],
-                            fn(Builder $q) => $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'returned')
-                        );
-                    } else {
-                        $q->orWhere(function (Builder $q) use ($tab) { // GET ALL THE CHEQUES STORED IN check_status table and in forwarded check status
-                            $q->whereHasMorph(
-                                'checkable',
-                                [Cv::class, Crf::class],
-                                fn(Builder $q) =>
-                                    $q->when(
-                                        auth()->user()->hasRole('corporate_disbursing_clerk(forwarded_releasing)'),
-
-                                        function ($query) use ($tab) { // CEBU/ MANILA tabs
+                            fn(Builder $q) =>
+                                $q->when(
+                                    auth()->user()->hasRole('corporate_disbursing_clerk(forwarded_releasing)'),
+                                    function ($query) use ($tab) { // CEBU/ MANILA tabs
                                         $query->has('chequeStatus.chequeForwardedStatus')
+                                            ->when($tab === 'cancelled', fn($q) => $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'returned'))
                                             ->when(
                                                 $tab === 'released',
                                                 fn($q) =>
                                                     $q->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'released'),
-                                                fn($query) =>
-                                                    $query->whereRelation('chequeStatus', 'status', $tab)
                                             );
                                     },
-                                        function ($query) use ($tab) {
-                                        $query->whereRelation('chequeStatus', 'status', $tab)
-                                            ->where(function ($q) use ($tab) {
-                                                $q->whereRelation('chequeStatus', 'status', $tab)
-                                                    ->when($tab === 'forwarded', fn($q) =>
-                                                        $q->whereHas('chequeStatus', fn($q) => $q->whereNotNull('received_by')));
-                                            });
+                                    function ($query) use ($tab) {
+                                        $query->where(function ($q) use ($tab) {
+                                            $q->whereRelation('chequeStatus', 'status', $tab)
+                                                ->when(
+                                                    $tab === 'cancelled',
+                                                    fn($q) =>
+                                                        $q->orWhere(fn($lq) =>
+                                                            $lq->whereRelation('chequeStatus.chequeForwardedStatus', 'status', 'returned'))
+                                                            ->whereRelation('chequeStatus.chequeForwardedStatus', 'is_cancelled', 1)
+                                                )
+                                                ->when(
+                                                    $tab === 'forwarded',
+                                                    fn($q) =>
+                                                        $q->whereHas(
+                                                            'chequeStatus',
+                                                            fn($q) =>
+                                                                $q->whereNotNull('received_by')
+                                                        )
+                                                            ->whereDoesntHaveRelation('chequeStatus.chequeForwardedStatus', 'status', 'returned')
+                                                );
+                                        });
                                     }
-                                    )
-                                        ->has('chequeStatus')
-                            );
-                        });
+                                )
+                                    ->has('chequeStatus')
+                        );
                     }
 
                 })

@@ -264,6 +264,7 @@ class ChequeRequestService
     {
         $filters = $request->only(['search']);
         $cheques = ChequeStatus::whereRelation('chequeForwardedStatus', 'status', 'returned')
+        ->where('is_cancelled', false)
             ->with('checkable')
             ->paginate()
             ->withQueryString()
@@ -338,6 +339,18 @@ class ChequeRequestService
         }
 
         return back()->with(['status' => true, 'message' => 'Deposit slips uploaded successfully.']);
+    }
+
+    public function cancelReturnCheques(Request $request)
+    {
+        $validated = $request->validate([
+            'cheques' => 'required|array',
+        ]);
+
+        $isSuccess = ChequeStatus::whereIn('id', $validated['cheques'])->update([
+            'is_cancelled' => 1
+        ]);
+        return redirect()->back()->with(['status' => $isSuccess, 'message' => 'Cheques Cancelled successfully']);
     }
 
     // public function show(DepositSlip $depositSlip): StreamedResponse

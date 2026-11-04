@@ -20,7 +20,7 @@ class ChequeStatusResource extends JsonResource
         $status = $this->when(
             $this->chequeForwardedStatus,
             fn() => match (true) {
-                $this->chequeForwardedStatus->status === 'cancelled' => 'returned',
+                $this->chequeForwardedStatus->status === 'returned' => 'cancelled',
                 default => $this->chequeForwardedStatus->status,
             },
             fn() => $this->status === 'forwarded' && is_null($this->chequeForwardedStatus) ? 'received' : $this->status

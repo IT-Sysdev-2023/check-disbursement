@@ -61,5 +61,9 @@ class CheckRequestController extends Controller
     public function uploadDepositSlips(Request $request){
         return $this->service->uploadDepositSlips($request);
     }
+
+    public function cancelReturnedCheques(Request $request){
+        return $this->service->cancelReturnCheques($request);
+    }
    
 }
