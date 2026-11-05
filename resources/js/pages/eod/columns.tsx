@@ -54,7 +54,6 @@ export const eodColumns = (): GridColDef[] => [
         flex: 1,
         renderCell: ({ row }) => {
             const { status } = row;
-            
             const statusMap: Record<
                 string,
                 {
@@ -72,8 +71,13 @@ export const eodColumns = (): GridColDef[] => [
                 staled: { label: 'Staled', color: 'warning' },
             };
 
+            const isReturned =
+                row.forwardedStatus?.status ===
+                'returned';
+            
             return (
                 <>
+                    {isReturned && <Chip label="Returned" color="warning" />}
                     <Chip
                         label={statusMap[status]?.label || 'For Releasing'}
                         color={statusMap[status]?.color || 'default'}

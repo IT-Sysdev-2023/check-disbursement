@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('image')->nullable();
             $table->string('signature')->nullable();
             $table->string('return_reason')->nullable();
+             $table->boolean('is_cancelled')->default(false);
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 

@@ -7,6 +7,7 @@ use App\Http\Resources\BorrowedChequeResource;
 use App\Models\Approver;
 use App\Models\BorrowedCheque;
 use App\Models\BusinessUnit;
+use App\Models\ChequeForwardedStatus;
 use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
@@ -264,7 +265,7 @@ class ChequeRequestService
     {
         $filters = $request->only(['search']);
         $cheques = ChequeStatus::whereRelation('chequeForwardedStatus', 'status', 'returned')
-        ->where('is_cancelled', false)
+            ->whereRelation('chequeForwardedStatus', 'is_cancelled', false)
             ->with('checkable')
             ->paginate()
             ->withQueryString()
@@ -347,9 +348,13 @@ class ChequeRequestService
             'cheques' => 'required|array',
         ]);
 
-        $isSuccess = ChequeStatus::whereIn('id', $validated['cheques'])->update([
-            'is_cancelled' => 1
-        ]);
+        $isSuccess = ChequeForwardedStatus::whereIn(
+            'cheque_status_id',
+            $validated['cheques']
+        )->update([
+                    'is_cancelled' => 1,
+                ]);
+
         return redirect()->back()->with(['status' => $isSuccess, 'message' => 'Cheques Cancelled successfully']);
     }
 

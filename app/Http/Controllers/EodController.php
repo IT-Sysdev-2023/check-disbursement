@@ -42,13 +42,18 @@ class EodController extends Controller
         $filters = $request->only('default');
 
         $data = ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit'], 'chequeForwardedStatus'])
-            ->whereDate('created_at', now())
+            ->whereDate('created_at', today())
             ->when(($filters['default'] ?? null) && $filters['default'] != 'all', function ($query) use ($filters) {
                 if ($filters['default'] == 'closed') {
                     $query->where('is_closed', 1);
                     return;
-                }else if($filters['default'] == 'cancelled'){
-                    // $query->orWhereRelation('chequeForwardedStatus', 'status');
+                } else if ($filters['default'] == 'cancelled') {
+                    $query->where('status', 'cancelled')
+                        ->orWhereRelation('chequeForwardedStatus', function ($q) {
+                            $q->where('status', 'returned')
+                                ->where('is_cancelled', 1);
+                        });
+
                     return;
                 }
                 $query->where('status', $filters['default']);
@@ -69,7 +74,6 @@ class EodController extends Controller
 
     public function generateEod(Request $request)
     {
-        // dd($request->all());
         $data['filter'] = $request->filterStatus;
 
         $data['columns'] = [
@@ -83,7 +87,10 @@ class EodController extends Controller
             'location',
             'business_unit'
         ];
-        $data['date'] = now()->format('Y-m-d');
+
+        $data['date'] = today()->format('Y-m-d');
+
+        $data['selectedReport'] = ['vss'];
 
         if (self::validateFilter($data['date'])) {
             return response()->json(['message' => 'No records found for today'], 404);
@@ -91,15 +98,12 @@ class EodController extends Controller
 
         $role = $this->userType;
         $date = now()->format('Ymd_His');
-
         $filename = "eod-{$request->user()->id}-{$date}.xlsx";
-        Excel::store(new ReportExport($data), $filename, 'public');
 
-        return Excel::download(
-            new ReportExport($data),
-            $filename
-        );
-        //  return redirect()->back()->with(['status' => true, 'message' => 'EOD generated successfully',   'url' => Storage::disk('public')->get($filename)]);
+        $export = new ReportExport($data);
+        Excel::store($export, $filename, 'public');
+
+        return Excel::download($export, $filename);
     }
 
     private static function validateFilter($date)

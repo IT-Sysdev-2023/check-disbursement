@@ -44,12 +44,13 @@ class VoucherStatusSummaryExport implements FromCollection, WithHeadings, WithTi
 
     public function collection()
     {
+        
         $res = $this->getRecords()->map(function ($item) {
             $checkable = $item->checkable;
-
+            $status = $item->chequeForwardedStatus?->status ?? $item->status;
             return [
                 'receiver_name' => $item->receiver_name,
-                'status' => $item->status,
+                'status' => $status,
                 'checkable_type' => $item->checkable_type,
 
                 'no' => $item->checkable_type === 'cv' ? $checkable?->cv_no : $checkable?->crf_no,
@@ -74,8 +75,8 @@ class VoucherStatusSummaryExport implements FromCollection, WithHeadings, WithTi
 
     private function getRecords()
     {
-        return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit']])
-            ->select('receiver_name', 'status', 'checkable_id', 'checkable_type')
+        return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit'], 'chequeForwardedStatus'])
+            ->select('receiver_name', 'status', 'checkable_id', 'checkable_type', 'id')
             ->when(
                 !empty($this->data['date']),
                 fn($query) =>

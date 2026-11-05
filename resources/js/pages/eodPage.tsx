@@ -37,9 +37,11 @@ export default function EodPage({
     statuses: any;
 }) {
     const notifications = useNotifications();
+    const [loading, setLoading] = useState(false);
     const [defaultFilter, setDefaultFilter] = useState(filter.default);
 
     const extractEod = async () => {
+        setLoading(true);
         try {
             const response = await axios.post(
                 generateEod().url,
@@ -86,6 +88,8 @@ export default function EodPage({
                     autoHideDuration: 3000,
                 });
             }
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -129,6 +133,7 @@ export default function EodPage({
                     />
                     <Box display="flex" justifyContent="flex-end" mt={3}>
                         <Button
+                            loading={loading}
                             variant="outlined"
                             startIcon={<Sunset />}
                             onClick={extractEod}

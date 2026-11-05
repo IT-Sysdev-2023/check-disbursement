@@ -22,9 +22,7 @@ return new class extends Migration {
             $table->timestamp('received_at')->nullable();
             $table->unsignedBigInteger('caused_by')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->boolean('is_closed')->default(false);
-            $table->boolean('is_cancelled')->default(false);
             $table->boolean('has_document')->default(false);
-
             $table->morphs('checkable');
             $table->unique(['checkable_id', 'checkable_type']);
 

@@ -176,11 +176,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('returned-cheques', [CheckRequestController::class, 'returnedCheques'])->name('returned-cheques');
         Route::post('cancel-returned-cheques', [CheckRequestController::class, 'cancelReturnedCheques'])->name('cancel-returned-cheques');
 
-
         Route::post('deposit-slips/upload', [CheckRequestController::class, 'uploadDepositSlips'])->name('deposit-slips-upload');
-
-
-
         Route::get('voucher-status-summary', [VoucherSummaryController::class, 'index'])->name('status-summary');
 
     });
