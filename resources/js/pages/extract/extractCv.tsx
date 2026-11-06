@@ -252,6 +252,8 @@ export default function ExtractCv({
                             </>
                         )}
                     </Stack>
+
+                    {/* <AntStyleSteps/> */}
                     <Box sx={{ width: '100%', p: 2 }}>
                         {loading && Object.keys(progress).length === 0 && (
                             <Typography variant="body2" color="text.secondary">

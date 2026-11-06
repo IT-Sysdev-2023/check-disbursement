@@ -118,7 +118,7 @@ export interface Company {
 export interface FilterType {
     selectedCompany: string;
     selectedBu: string;
-    assignments: 'completed' | 'toAssign';
+    assignments: 'completed' | 'toAssign' | 'tagged';
     search: string;
     date: DateFilterType;
     tab: string;

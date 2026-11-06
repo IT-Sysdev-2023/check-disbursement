@@ -50,6 +50,7 @@ export default function TableView({
     counts: {
         toAssign: string;
         completed: string;
+        forSignature: string;
     };
     filter: FilterType;
 }) {
@@ -272,13 +273,23 @@ export default function TableView({
                             Completed
                         </Badge>
                     </ToggleButton>
+                    {counts.forSignature && (
+                        <ToggleButton value="tagged" aria-label="centered">
+                            <Badge
+                                badgeContent={counts.forSignature}
+                                color="error"
+                            >
+                                For Signature
+                            </Badge>
+                        </ToggleButton>
+                    )}
                 </ToggleButtonGroup>
             </TableFilter>
             <TableDataGrid
                 data={cheques}
                 filter={filter.search}
                 isLoading={isLoading}
-                hasSelection={alignment === 'completed'}
+                hasSelection={alignment === 'completed' || alignment == 'tagged'}
                 rowSelectionModel={rowSelectionModel}
                 handleSelectionChange={handleSelectionChange}
                 pagination={handlePagination}
@@ -288,38 +299,37 @@ export default function TableView({
                 handleSortFilter={handleSort}
                 columns={chequeColumns}
             />
-            {alignment == 'completed' && (
-                <>
-                    <SelectedChequeList
-                        records={selectedRows}
-                        handleDelete={handleDelete}
-                    />
 
-                    <Box
-                        display="flex"
-                        justifyContent="flex-end"
-                        mt={3}
-                        gap={2}
-                    >
-                        <Button
-                            disabled={!enableButtonTag}
-                            variant="outlined"
-                            startIcon={<LocationOnOutlined />}
-                            onClick={listTagLocation}
-                        >
-                            Tag Location
-                        </Button>
-                        <Button
-                            disabled={!enableButton}
-                            variant="outlined"
-                            startIcon={<CallMissedOutgoingOutlinedIcon />}
-                            onClick={() => setOpen(true)}
-                        >
-                            Borrow
-                        </Button>
-                    </Box>
-                </>
+            {(alignment == 'completed' || alignment == 'tagged') && (
+                <SelectedChequeList
+                    records={selectedRows}
+                    handleDelete={handleDelete}
+                />
             )}
+
+            <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
+                {alignment == 'completed' && (
+                    <Button
+                        disabled={!enableButtonTag}
+                        variant="outlined"
+                        startIcon={<LocationOnOutlined />}
+                        onClick={listTagLocation}
+                    >
+                        Tag Location
+                    </Button>
+                )}
+
+                {alignment == 'tagged' && (
+                    <Button
+                        disabled={!enableButton}
+                        variant="outlined"
+                        startIcon={<CallMissedOutgoingOutlinedIcon />}
+                        onClick={() => setOpen(true)}
+                    >
+                        Borrow
+                    </Button>
+                )}
+            </Box>
 
             <BorrowedCheckModal
                 cheque={selectedRows}
@@ -327,7 +337,6 @@ export default function TableView({
                 handleClose={() => setOpen(false)}
                 handleSuccess={() => setSelectedRows([])}
             />
-
             <OnlySelectionModal
                 title="Tag Location"
                 open={openTagModal}

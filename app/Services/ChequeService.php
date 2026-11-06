@@ -59,7 +59,8 @@ class ChequeService
             'businessUnits' => BusinessUnit::businessUnits($company),
             'counts' => (object) [
                 'toAssign' => self::countToAssign($filters),
-                'completed' => self::countCompleted($filters)
+                'completed' => self::countCompleted($filters),
+                'forSignature' => self::countForSignature($filters)
             ],
         ]);
     }
@@ -73,9 +74,15 @@ class ChequeService
                 fn($q) => $q->where(fn($query) =>
                     $query->whereNull('cheque_number')
                         ->orWhereNull('cheque_date')),
-
+            )
+            ->when(
+                $assignment == 'completed',
                 fn($q) => $q->whereNotNull('cheque_number')
                     ->whereNotNull('cheque_date')
+            )
+            ->when(
+                $assignment == 'tagged',
+                fn($q) => $q->whereNotNull('location')
             )
             ->orderByDesc('created_at')
             ->doesntHave('source.borrowedCheque')
@@ -227,6 +234,14 @@ class ChequeService
     {
         return ChequeRecord::filter($filters)
             ->where(fn($q) => $q->whereNotNull('cheque_number')->whereNotNull('cheque_date'))
+            ->doesntHave('source.borrowedCheque')
+            ->limit(100)
+            ->count();
+    }
+    private function countForSignature(array $filters)
+    {
+        return ChequeRecord::filter($filters)
+            ->where(fn($q) => $q->whereNotNull('location'))
             ->doesntHave('source.borrowedCheque')
             ->limit(100)
             ->count();

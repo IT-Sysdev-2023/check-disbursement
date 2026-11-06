@@ -168,7 +168,7 @@ export default function ({
                         minDate={startDate || undefined}
                     />
 
-                    <Tooltip
+                    {/* <Tooltip
                         title="Reset Filters"
                         placement="right"
                         enterDelay={1000}
@@ -183,7 +183,7 @@ export default function ({
                                 <RefreshIcon />
                             </IconButton>
                         </div>
-                    </Tooltip>
+                    </Tooltip> */}
                 </Stack>
             </LocalizationProvider>
         </Stack>
