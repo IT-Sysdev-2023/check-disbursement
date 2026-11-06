@@ -29,6 +29,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Dayjs } from 'dayjs';
 import SelectBu from './components/selectBu';
+import HorizontalLinearAlternativeLabelStepper from './components/stepProgress';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -51,6 +52,7 @@ export default function ExtractCv({
     const [businessUnits, setBusinessUnits] = useState<SelectionType[]>([]);
     const [permissionList, setPermissionList] = useState<string[]>([]);
     const [selectedBu, setSelectedBu] = useState<string[]>([]);
+    const [progressStep, setProgressStep] = useState(0);
 
     useEcho(`cv-progress.${auth.user.id}`, 'CvProgress', (e: EventType) => {
         const { percentage, message, status, key, duplicates } = e;
@@ -68,6 +70,15 @@ export default function ExtractCv({
             },
         }));
     });
+
+    useEcho(
+        `cv-progress-stepper.${auth.user.id}`,
+        'CvProgressStepper',
+        (e: { step: number }) => {
+            const { step } = e;
+            setProgressStep(step);
+        },
+    );
 
     const simulateDataRetrieval = async () => {
         if (!startDate || !endDate) {
@@ -253,12 +264,14 @@ export default function ExtractCv({
                         )}
                     </Stack>
 
-                    {/* <AntStyleSteps/> */}
                     <Box sx={{ width: '100%', p: 2 }}>
                         {loading && Object.keys(progress).length === 0 && (
-                            <Typography variant="body2" color="text.secondary">
-                                Waiting for progress updates...
-                            </Typography>
+                            <HorizontalLinearAlternativeLabelStepper
+                                step={progressStep}
+                            />
+                            // <Typography variant="body2" color="text.secondary">
+                            //     Waiting for progress updates...
+                            // </Typography>
                         )}
 
                         {Object.entries(progress).map(([key, item]) => (
