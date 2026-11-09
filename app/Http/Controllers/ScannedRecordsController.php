@@ -66,8 +66,8 @@ class ScannedRecordsController extends Controller
                 $imagePath = $disk->path($file);
 
                 $text = (new TesseractOCR($imagePath))
-                    ->executable(config('app.executable'))
-                    ->tessdataDir(config('app.tessdata'))
+                    ->executable(config('ocr.executable'))
+                    ->tessdataDir(config('ocr.tessdata'))
                     ->lang('eng')
                     ->run();
 
@@ -98,8 +98,8 @@ class ScannedRecordsController extends Controller
                 $imagePath = $disk->path($file);
 
                 $text = (new TesseractOCR($imagePath))
-                    ->executable(config('app.executable'))
-                    ->tessdataDir(config('app.tessdata'))
+                    ->executable(config('ocr.executable'))
+                    ->tessdataDir(config('ocr.tessdata'))
                     ->lang('eng')
                     ->run();
 
