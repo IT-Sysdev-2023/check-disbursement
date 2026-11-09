@@ -7,6 +7,7 @@ use App\Http\Resources\ScannedRecordResource;
 use App\Jobs\ProcessChequeJob;
 use App\Models\BorrowedCheque;
 use App\Models\ScannedRecords;
+use App\Services\ChequeNoChecker;
 use App\Services\ScannedRecordsService;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -14,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
+use thiagoalessio\TesseractOCR\TesseractOCR;
 
 class ScannedRecordsController extends Controller
 {
@@ -43,8 +45,9 @@ class ScannedRecordsController extends Controller
     public function scan(Request $request)
     {
         $disk = Storage::disk('cheque_share');
-        $count = collect($disk->files('new'))
-            ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+        $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
+        $count = collect($files)
+            // ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
             ->count();
 
         return inertia('scanCheque/scanCheques', [
@@ -55,11 +58,20 @@ class ScannedRecordsController extends Controller
     public function viewScannedCheques()
     {
         $disk = Storage::disk('cheque_share');
-
-        $files = $disk->files('new');
+        $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
+        // $files = $disk->files('new');
 
         $fileData = collect($files)
-            ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+            ->filter(function ($file) use ($disk) {
+                $imagePath = $disk->path($file);
+
+                $text = (new TesseractOCR($imagePath))
+                    ->lang('eng')
+                    ->run();
+
+                return ChequeNoChecker::classifyChequeSide($text) === 'front';
+            })
+            // ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
             ->map(function ($file) use ($disk) {
                 return [
                     'name' => basename($file),
@@ -76,9 +88,19 @@ class ScannedRecordsController extends Controller
     {
         $disk = Storage::disk('cheque_share');
 
+        $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
+
         //Get Cheque front scanned only
-        $filteredFiles = collect($disk->files('new'))
-            ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+        $filteredFiles = collect($files)
+            ->filter(function ($file) use ($disk) {
+                $imagePath = $disk->path($file);
+
+                $text = (new TesseractOCR($imagePath))
+                    ->lang('eng')
+                    ->run();
+
+                return ChequeNoChecker::classifyChequeSide($text) === 'front';
+            })
             ->values();
 
         $count = 0;

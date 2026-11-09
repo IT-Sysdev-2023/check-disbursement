@@ -73,8 +73,8 @@ return [
             :
             [
                 'driver' => 'smb',
-                'host' => '172.16.42.91',
-                'path' => 'scanned',
+                'host' => '172.16.161.154',
+                'path' => 'ChequeDocuments',
                 'username' => env('SMB_USERNAME'),
                 'password' => env('SMB_PASSWORD'),
                 'workgroup' => env('SMB_WORKGROUP', 'WORKGROUP'),
