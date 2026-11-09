@@ -9,6 +9,7 @@ use App\Models\BorrowedCheque;
 use App\Models\ScannedRecords;
 use App\Services\ChequeNoChecker;
 use App\Services\ScannedRecordsService;
+use File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -46,10 +47,7 @@ class ScannedRecordsController extends Controller
 
     public function scan(Request $request)
     {
-        $disk = Storage::disk('cheque_share');
-        $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
-        $count = collect($files)
-            // ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+        $count = self::filterCheques()
             ->count();
 
         return inertia('scanCheque/scanCheques', [
@@ -60,33 +58,8 @@ class ScannedRecordsController extends Controller
     public function viewScannedCheques()
     {
         $disk = Storage::disk('cheque_share');
-        $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
-        // $files = $disk->files('new');
 
-        $fileData = collect($files)
-            ->filter(function ($file) use ($disk) {
-                try {
-                    $imagePath = $disk->path($file);
-
-                    $text = (new TesseractOCR($imagePath))
-                        ->executable(config('ocr.executable'))
-                        ->tessdataDir(config('ocr.tessdata'))
-                        ->lang('eng')
-                        ->psm(6)
-                        ->run();
-
-                    return ChequeNoChecker::classifyChequeSide($text) === 'front';
-
-                } catch (UnsuccessfulCommandException $e) {
-                    Log::warning('Cheque OCR could not recognize text.', [
-                        'file' => $file,
-                        'error' => $e->getMessage(),
-                    ]);
-
-                    return false;
-                }
-            })
-            // ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
+        $fileData = self::filterCheques()
             ->map(function ($file) use ($disk) {
                 return [
                     'name' => basename($file),
@@ -99,15 +72,13 @@ class ScannedRecordsController extends Controller
         return response()->json(['files' => $fileData]);
     }
 
-    public function scanAnalyze(Request $request)
+    private static function filterCheques()
     {
         $disk = Storage::disk('cheque_share');
 
         $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
 
-        //Get Cheque front scanned only
-
-        $filteredFiles = collect($files)
+        return collect($files)
             ->filter(function ($file) use ($disk) {
                 try {
                     $imagePath = $disk->path($file);
@@ -116,10 +87,9 @@ class ScannedRecordsController extends Controller
                         ->executable(config('ocr.executable'))
                         ->tessdataDir(config('ocr.tessdata'))
                         ->lang('eng')
-                        ->psm(6)
                         ->run();
 
-                    return ChequeNoChecker::classifyChequeSide($text) === 'front';
+                    return (bool) ChequeNoChecker::classifyChequeSide($text);
 
                 } catch (UnsuccessfulCommandException $e) {
                     Log::warning('Cheque OCR could not recognize text.', [
@@ -129,8 +99,14 @@ class ScannedRecordsController extends Controller
 
                     return false;
                 }
-            })
-            ->values();
+            });
+
+    }
+
+    public function scanAnalyze(Request $request)
+    {
+
+        $filteredFiles = self::filterCheques()->values();
 
         $count = 0;
         $totalBatches = $filteredFiles->count();
