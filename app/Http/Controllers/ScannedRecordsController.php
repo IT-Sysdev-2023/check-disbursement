@@ -9,6 +9,7 @@ use App\Models\BorrowedCheque;
 use App\Models\ScannedRecords;
 use App\Services\ChequeNoChecker;
 use App\Services\ScannedRecordsService;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Storage;
 use thiagoalessio\TesseractOCR\TesseractOCR;
+use thiagoalessio\TesseractOCR\UnsuccessfulCommandException;
 
 class ScannedRecordsController extends Controller
 {
@@ -63,15 +65,26 @@ class ScannedRecordsController extends Controller
 
         $fileData = collect($files)
             ->filter(function ($file) use ($disk) {
-                $imagePath = $disk->path($file);
+                try {
+                    $imagePath = $disk->path($file);
 
-                $text = (new TesseractOCR($imagePath))
-                    ->executable(config('ocr.executable'))
-                    ->tessdataDir(config('ocr.tessdata'))
-                    ->lang('eng')
-                    ->run();
+                    $text = (new TesseractOCR($imagePath))
+                        ->executable(config('ocr.executable'))
+                        ->tessdataDir(config('ocr.tessdata'))
+                        ->lang('eng')
+                        ->psm(6)
+                        ->run();
 
-                return ChequeNoChecker::classifyChequeSide($text) === 'front';
+                    return ChequeNoChecker::classifyChequeSide($text) === 'front';
+
+                } catch (UnsuccessfulCommandException $e) {
+                    Log::warning('Cheque OCR could not recognize text.', [
+                        'file' => $file,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    return false;
+                }
             })
             // ->filter(fn($file) => str_ends_with(strtoupper(pathinfo($file, PATHINFO_FILENAME)), 'F'))
             ->map(function ($file) use ($disk) {
@@ -93,17 +106,29 @@ class ScannedRecordsController extends Controller
         $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
 
         //Get Cheque front scanned only
+
         $filteredFiles = collect($files)
             ->filter(function ($file) use ($disk) {
-                $imagePath = $disk->path($file);
+                try {
+                    $imagePath = $disk->path($file);
 
-                $text = (new TesseractOCR($imagePath))
-                    ->executable(config('ocr.executable'))
-                    ->tessdataDir(config('ocr.tessdata'))
-                    ->lang('eng')
-                    ->run();
+                    $text = (new TesseractOCR($imagePath))
+                        ->executable(config('ocr.executable'))
+                        ->tessdataDir(config('ocr.tessdata'))
+                        ->lang('eng')
+                        ->psm(6)
+                        ->run();
 
-                return ChequeNoChecker::classifyChequeSide($text) === 'front';
+                    return ChequeNoChecker::classifyChequeSide($text) === 'front';
+
+                } catch (UnsuccessfulCommandException $e) {
+                    Log::warning('Cheque OCR could not recognize text.', [
+                        'file' => $file,
+                        'error' => $e->getMessage(),
+                    ]);
+
+                    return false;
+                }
             })
             ->values();
 
