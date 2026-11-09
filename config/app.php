@@ -56,6 +56,8 @@ return [
 
     'GEMINI_API_KEY' => env('GEMINI_API_KEY'),
 
+    'executable' => env('TESSERACT_PATH', 'tesseract'),
+    'tessdata' => env('TESSDATA_PATH'),
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
@@ -96,6 +98,7 @@ return [
     | are secure. You should do this prior to deploying the application.
     |
     */
+
 
     'cipher' => 'AES-256-CBC',
 
