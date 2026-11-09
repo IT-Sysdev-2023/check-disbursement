@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->decimal('cheque_amount', 20);
             $table->date('cheque_date')->nullable();
             $table->string('company_office');
-            $table->unsignedBigInteger('no');
+            $table->string('no');
             $table->string('crf_location');
             $table->string('payee');
             $table->string('particulars');

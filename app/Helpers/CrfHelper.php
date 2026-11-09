@@ -55,7 +55,7 @@ class CrfHelper
         // Extract number (e.g., "No. : 11000212")
         preg_match('/No\.\s*:\s*(\d+)/', $this->fileContents, $numMatches);
 
-        $this->no = Number::parseInt($numMatches[1]);
+        $this->no = $numMatches[1];
 
         return $this;
     }
