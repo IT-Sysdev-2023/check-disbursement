@@ -79,7 +79,6 @@ export default function TableView({
         const previousSelections = selectedRows.filter(
             (row) => !currentPageIds.has(row.id),
         );
-
         const currentSelections = cheques.data
             .filter((row) => {
                 if (model.type === 'include') {
@@ -98,7 +97,8 @@ export default function TableView({
                 chequeDate: row.chequeDate,
                 chequeNo: row.chequeNumber,
                 status: row.statusOrder,
-                releasable: true,
+                location: row.location,
+                releasable: !(alignment == 'completed' && row.location != null),
             }));
 
         setSelectedRows([...previousSelections, ...currentSelections]);

@@ -132,6 +132,7 @@
                 <th>Cheque Date</th>
                 <th>Payee</th>
                 <th>Amount</th>
+                <th>Location</th>
             </tr>
         </thead>
 
@@ -147,6 +148,7 @@
                     <td class="amount">
                         ₱{{ number_format((float) ($cheque['cheque_amount'] ?? 0), 2) }}
                     </td>
+                    <td class="center">{{ $cheque['tag_location']['location'] ?? '-' }}</td>
                 </tr>
             @endforeach
         </tbody>

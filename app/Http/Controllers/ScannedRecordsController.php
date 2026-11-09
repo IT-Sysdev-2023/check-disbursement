@@ -33,18 +33,6 @@ class ScannedRecordsController extends Controller
     {
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    // public function scan(Request $request)
-    // {
-    //     $path = '\\\\172.16.42.91\\';
-    //     // dd($path);
-    //     $files = File::files($path);
-    //     dd($files);
-    //     return inertia('scanCheque/scanCheques');
-    // }
-
     public function scan(Request $request)
     {
         $count = self::filterCheques()

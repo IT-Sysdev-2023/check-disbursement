@@ -17,7 +17,7 @@ export default function SelectedChequeList({
 }: {
     records: ListSelectedChequeType[] | ListSelectedChequeTaggingType[];
     handleDelete: (id: number) => void;
-}) {
+    }) {
     return (
         <Paper elevation={2} sx={{ mt: 4 }}>
             <Typography variant="h6" sx={{ px: 2, pt: 1 }}>
@@ -76,7 +76,7 @@ export default function SelectedChequeList({
                                             )}
                                         </Box>
                                     }
-                                    secondary={`${cheque.amount} • ${cheque.status}`}
+                                    secondary={`${cheque.amount} • ${cheque.location}`}
                                 />
                             </ListItem>
                             {index < records.length - 1 && (

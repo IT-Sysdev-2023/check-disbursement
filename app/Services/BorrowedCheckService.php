@@ -57,6 +57,7 @@ class BorrowedCheckService
                     'reason' => $validated['reason'],
                     'checkable_id' => $c['chequeId'],
                     'checkable_type' => $c['type'],
+                    'is_ds' => $c['location'] === 'Deposit',
                     'user_id' => auth()->user()->id,
                     'created_at' => now(),
                     'updated_at' => now(),
@@ -85,7 +86,7 @@ class BorrowedCheckService
     private function download(int $borrowerNo, string $reason)
     {
         $borrower = BorrowedCheque::with('borrower:id,name')
-            ->with('checkable')
+            ->with('checkable.tagLocation')
             ->where('borrower_no', $borrowerNo)
             ->get();
         $companyNames = $borrower->pluck('checkable.getCompany')
@@ -93,7 +94,7 @@ class BorrowedCheckService
             ->unique()
             ->implode(', ');
 
-        $chequeNumbers = $borrower
+        $cheques = $borrower
             ->map(fn($b) => $b->checkable)
             ->filter()
             ->unique();
@@ -106,7 +107,7 @@ class BorrowedCheckService
             'purpose' => $reason,
             'borrowedBy' => Str::upper($borrower->first()->borrower_name),
             'releasedBy' => Str::upper(auth()->user()->name),
-            'cheques' => $chequeNumbers->toArray()
+            'cheques' => $cheques->toArray()
         ];
 
         return $this->fileHandler
