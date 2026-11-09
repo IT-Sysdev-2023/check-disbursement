@@ -98,7 +98,8 @@ class CrfUploadingJob implements ShouldQueue
             "Files successfully uploaded. Inserted: {$inserted['inserted_count']}",
             $total,
             $total,
-            $this->userId
+            $this->userId,
+            true
         );
 
 

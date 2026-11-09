@@ -18,7 +18,7 @@ class CrfProgress implements ShouldBroadcast
     /**
      * Create a new event instance.
      */
-    public function __construct(protected string $message, protected int $currentRow, protected int $totalRows, protected int $userId)
+    public function __construct(protected string $message, protected int $currentRow, protected int $totalRows, protected int $userId, protected bool $isFinished = false)
     {
         $this->percentage = NumberHelper::percentage($currentRow, $totalRows);
     }
@@ -42,6 +42,7 @@ class CrfProgress implements ShouldBroadcast
             'percentage' => $this->percentage,
             'currentRow' => $this->currentRow,
             'totalRows' => $this->totalRows,
+            'isFinished' => $this->isFinished
         ];
     }
 }

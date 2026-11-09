@@ -3,7 +3,6 @@ import { checkRequestForm, extractCrf } from '@/routes';
 import {
     Auth,
     EventType,
-    FlashReponse,
     SingleProgressState,
     type BreadcrumbItem,
 } from '@/types';
@@ -11,7 +10,6 @@ import { Head } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
     Alert,
     Box,
@@ -19,11 +17,6 @@ import {
     Container,
     IconButton,
     LinearProgress,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
-    ListSubheader,
     Paper,
     Stack,
     Typography,
@@ -32,7 +25,6 @@ import { styled } from '@mui/material/styles';
 import axios from 'axios';
 // import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Dayjs } from 'dayjs';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
 
@@ -57,21 +49,19 @@ const VisuallyHiddenInput = styled('input')({
 
 export default function ExtractCrf({
     auth,
-    bu,
 }: {
     auth: Auth;
-    bu: { label: string; value: number }[];
 }) {
     const [progress, setProgress] = useState<SingleProgressState>();
-    const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
-        status: false,
-        message: '',
-        duplicates: [],
-    });
+    // const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
+    //     status: false,
+    //     message: '',
+    //     duplicates: [],
+    // });
     const [files, setFiles] = useState<File[]>([]);
     const [loading, setLoading] = useState(false);
     // const [startDate, setStartDate] = useState<Dayjs | null>(null);
-    const [endDate, setEndDate] = useState<Dayjs | null>(null);
+    // const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!event.target.files) return;
@@ -79,13 +69,14 @@ export default function ExtractCrf({
     };
 
     useEcho(`crf-progress.${auth.user.id}`, 'CrfProgress', (e: EventType) => {
-        const { percentage, message, status } = e;
+        const { percentage, message, status, isFinished } = e;
         const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
         setProgress({
             progress: percentage,
             buffer,
             message,
             status,
+            isFinished,
         });
     });
     const [totalInserted, setTotalInserted] = useState(0);
@@ -362,10 +353,27 @@ export default function ExtractCrf({
                                 >
                                     {progress.progress}%
                                 </Typography>
+
+                                {progress.isFinished && (
+                                    <Alert
+                                        variant="filled"
+                                        severity="success"
+                                        sx={{
+                                            mb: 2,
+                                            bgcolor: 'success.light',
+                                            '& .MuiAlert-icon': {
+                                                color: 'success.dark', // or any color you want
+                                            },
+                                            borderColor: 'success.main',
+                                        }}
+                                    >
+                                        {progress.message}
+                                    </Alert>
+                                )}
                             </Box>
                         )}
 
-                        {uploadResponse.message && (
+                        {/* {uploadResponse.message && (
                             <>
                                 <Alert
                                     variant="outlined"
@@ -377,8 +385,6 @@ export default function ExtractCrf({
                                 >
                                     {uploadResponse.message}
                                 </Alert>
-
-                                {/* Show duplicates if they exist */}
                                 {uploadResponse.duplicates?.length > 0 && (
                                     <List
                                         dense
@@ -410,7 +416,7 @@ export default function ExtractCrf({
                                     </List>
                                 )}
                             </>
-                        )}
+                        )} */}
                     </Stack>
                 </Container>
             </Box>

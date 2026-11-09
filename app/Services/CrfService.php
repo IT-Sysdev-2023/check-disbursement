@@ -1,15 +1,9 @@
 <?php
-
 namespace App\Services;
-use App\Events\CrfProgress;
-use App\Helpers\CrfHelper;
 use App\Jobs\CrfUploadingJob;
 use App\Models\Crf;
 use App\Models\Cv;
-use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -29,7 +23,8 @@ class CrfService
             'files.*' => 'file|max:5120|unique:crfs,filename',
         ]);
 
-        $paths = collect($request->file('files'))->map(fn($file) => [
+        $files = collect($request->file('files'));
+        $paths = $files->map(fn($file) => [
             'path' => $file->store('crf-uploads', 'local'),          // storage/app/crf-uploads/...
             'name' => $file->getClientOriginalName(),
         ])->all();
@@ -39,6 +34,7 @@ class CrfService
         return response()->json([
             'status' => true,
             'message' => 'Files received. Processing in the background.',
+            'inserted' => $files->count(),
         ], 202);
     }
 

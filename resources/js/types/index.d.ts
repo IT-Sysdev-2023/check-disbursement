@@ -407,6 +407,7 @@ export interface SingleProgressState {
     message: string;
     status: string;
     duplicates?: number;
+    isFinished: boolean;
 }
 export interface SelectedChequeType {
     id: number;
@@ -481,6 +482,7 @@ export interface EventType {
     status: string;
     key: string;
     duplicates: number;
+    isFinished: boolean;
 }
 
 export interface FlashReponse {
