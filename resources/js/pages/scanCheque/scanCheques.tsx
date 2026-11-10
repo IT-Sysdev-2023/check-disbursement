@@ -211,7 +211,7 @@ export default function ScanCheques({ files }: int) {
 
         setLoading(true);
 
-        try {
+        // try {
             const { data } = await axios.post(scanAnalyze().url, {
                 scanMethod: selectedChoice,
                 supplierName: inputValue,
@@ -220,10 +220,9 @@ export default function ScanCheques({ files }: int) {
             if (data.status == 'success') {
                 router.reload();
             }
-        } finally {
+        // } finally {
             setOpenTagModal(false);
-            // setLoading(false);
-        }
+        // }
     };
 
     const items = [
