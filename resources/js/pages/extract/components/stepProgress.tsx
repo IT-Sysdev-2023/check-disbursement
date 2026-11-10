@@ -6,11 +6,7 @@ import { StepIconProps } from '@mui/material/StepIcon';
 import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 
-const steps = [
-    'Validating Requests...',
-    'Connecting to Servers...',
-    'Retreiving...',
-];
+
 const ICON_SIZE = 40;
 
 function CustomStepIcon({ active, completed, icon }: StepIconProps) {
@@ -53,8 +49,10 @@ function CustomStepIcon({ active, completed, icon }: StepIconProps) {
 
 export default function HorizontalLinearAlternativeLabelStepper({
     step,
+    steps
 }: {
-    step: number;
+        step: number;
+    steps: string[]
 }) {
     return (
         <Box sx={{ width: '100%' }}>

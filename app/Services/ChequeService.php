@@ -38,11 +38,10 @@ class ChequeService
         $tab = $filters['tab'] ?? 'calendar';
 
         $records = self::chequeRecords($tab, $filters, $assignment);
-        $notScannedCheque = self::notScannedCheques();
 
         return Inertia::render('retrievedRecords', [
             'records' => $records,
-            'notScannedCheques' => $notScannedCheque,
+            'notScannedCheques' => self::notScannedCheques(),
             'filter' => (object) [
                 'selectedCompany' => $company,
                 'assignments' => $assignment,
@@ -67,7 +66,22 @@ class ChequeService
 
     private static function chequeRecords(string $tab, array $filters, string $assignment)
     {
-        $cheques = ChequeRecord::
+        $tableView = self::tableView($filters, $assignment);
+
+        $records = match ($tab) {
+            'calendar' => Calendar::calendar($filters),
+            'cheques' => new ChequeCollection($tableView),
+            'borrowed' => ChequeRequestService::borrowedRecords($filters),
+            'manageChecks' => self::manageChecks($filters),
+            default => null
+        };
+
+        return $records;
+    }
+
+    private static function tableView(array $filters, string $assignment)
+    {
+        return ChequeRecord::
             filter($filters)
             ->when(
                 $assignment == 'toAssign',
@@ -88,15 +102,6 @@ class ChequeService
             ->doesntHave('source.borrowedCheque')
             ->paginate()
             ->withQueryString();
-        $records = match ($tab) {
-            'calendar' => Calendar::calendar($filters),
-            'cheques' => new ChequeCollection($cheques),
-            'borrowed' => ChequeRequestService::borrowedRecords($filters),
-            'manageChecks' => self::manageChecks($filters),
-            default => null
-        };
-
-        return $records;
     }
 
     private static function notScannedCheques()

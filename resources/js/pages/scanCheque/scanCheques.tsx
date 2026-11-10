@@ -28,6 +28,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import axios from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
 import React, { FormEvent, useEffect, useState } from 'react';
+import HorizontalLinearAlternativeLabelStepper from '../extract/components/stepProgress';
 import ScanMethod from './scanMethod';
 
 interface FileItem {
@@ -37,6 +38,12 @@ interface FileItem {
     size: number;
     mime: string;
 }
+
+const steps = [
+    'Checking For Files...',
+    'Filtering Cheques...',
+    'Connecting to AI server...',
+];
 
 interface Props {
     files: FileItem[];
@@ -125,10 +132,9 @@ export default function ScanCheques({ files }: int) {
 
     const [scannedFiles, setScannedFiles] = useState([]);
     const filtered = files;
-
+    const [progressStep, setProgressStep] = useState(0);
     const analyzeScanned = async () => {
         setOpenTagModal(true);
-       
     };
 
     // const clearCache = async () => {
@@ -191,26 +197,31 @@ export default function ScanCheques({ files }: int) {
         },
     );
 
-    const handleChoiceSubmit = async(e: FormEvent) => {
+    useEcho(
+        `progress-stepper.${page.user.id}`,
+        'ProgressStepper',
+        (e: { step: number }) => {
+            const { step } = e;
+            setProgressStep(step);
+        },
+    );
+
+    const handleChoiceSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-
-         setLoading(true);
+        setLoading(true);
 
         try {
-            const { data } = await axios.post(
-                scanAnalyze().url,
-                {
-                    scanMethod: selectedChoice,
-                    supplierName: inputValue
-                }
-            );
+            const { data } = await axios.post(scanAnalyze().url, {
+                scanMethod: selectedChoice,
+                supplierName: inputValue,
+            });
 
             if (data.status == 'success') {
                 router.reload();
             }
         } finally {
-             setOpenTagModal(false);
+            setOpenTagModal(false);
             // setLoading(false);
         }
     };
@@ -323,8 +334,8 @@ export default function ScanCheques({ files }: int) {
                                             </p>
                                         </div>
                                     ) : (
-                                            <div className="divide-y">
-                                                {scannedFiles.map((file) => (
+                                        <div className="divide-y">
+                                            {scannedFiles.map((file) => (
                                                 <div
                                                     key={file.path}
                                                     className="group flex items-center gap-4 px-6 py-4 transition-all duration-150"
@@ -397,7 +408,12 @@ export default function ScanCheques({ files }: int) {
                                     : 'Sync Cheques & Analyze'}
                             </Button>
                         </div>
-
+                        {loading && (
+                            <HorizontalLinearAlternativeLabelStepper
+                                step={progressStep}
+                                steps={steps}
+                            />
+                        )}
                         {/* Right Column - 70% Processing Area */}
                         <div className="flex flex-col">
                             <div className="space-y-6">
@@ -445,9 +461,11 @@ export default function ScanCheques({ files }: int) {
                                         />
                                     </div>
                                 </div>
+
                                 {progress && (
                                     <div className="flex items-center gap-4">
                                         {/* {JSON.stringify(progress)} */}
+
                                         <div className="w-full rounded-2xl border p-6 shadow-lg">
                                             <div className="flex items-center justify-between">
                                                 {progress?.totalRows ===
@@ -897,7 +915,7 @@ export default function ScanCheques({ files }: int) {
                     item={items}
                     inputValue={inputValue}
                     onChangeInput={(e) => setInputValue(e.target.value)}
-                    disabled= {selectedChoice == ''}
+                    disabled={selectedChoice == ''}
                     // loading={tagLoading}
                 />
             </PageContainer>

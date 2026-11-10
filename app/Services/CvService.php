@@ -4,23 +4,15 @@ namespace App\Services;
 
 use App\Enums\ProgressStatus;
 use App\Events\CvProgress;
-use App\Events\CvProgressStepper;
+use App\Events\ProgressStepper;
 use App\Http\Resources\CvResource;
 use App\Jobs\CvDatabase;
-use App\Jobs\CvServer;
 use App\Models\BusinessUnit;
 use App\Models\ChequeRecord;
-use App\Models\ChequeStatus;
-use App\Models\Company;
 use App\Models\Cv;
-use App\Models\CvCheckPayment;
-use App\Models\NavHeaderTable;
 use App\Models\NavServer;
 use App\Models\User;
 use Illuminate\Contracts\Database\Query\Builder;
-use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Bus\Batch;
@@ -50,7 +42,7 @@ class CvService
     public function retrieveData(Request $request)
     {
 
-        CvProgressStepper::dispatch($request->user()->id, 1);
+        ProgressStepper::dispatch($request->user()->id, 1);
         $validated = $request->validate([
             'start_date' => ['required', 'date'],
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
@@ -102,10 +94,10 @@ class CvService
             ->name("CV Import All Servers")
             ->allowFailures()
             ->before(function (Batch $batch) use ($id) {
-                CvProgressStepper::dispatch($id, 2);
+                ProgressStepper::dispatch($id, 2);
             })
             ->progress(function (Batch $batch) use ($id) {
-                CvProgressStepper::dispatch($id, 3);
+                ProgressStepper::dispatch($id, 3);
             })
             ->then(function (Batch $batch) use ($id) {
                 CvProgress::dispatch($id, "Data Retrieval Completed", ProgressStatus::Finished);

@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class CvProgressStepper implements ShouldBroadcast
+class ProgressStepper implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -30,7 +30,7 @@ class CvProgressStepper implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('cv-progress-stepper.' . $this->userId),
+            new PrivateChannel('progress-stepper.' . $this->userId),
         ];
     }
     public function broadcastWith()

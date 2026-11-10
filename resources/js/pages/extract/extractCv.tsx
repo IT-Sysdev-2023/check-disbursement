@@ -38,6 +38,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
+const steps = [
+    'Validating Requests...',
+    'Connecting to Servers...',
+    'Retreiving...',
+];
+
 export default function ExtractCv({
     auth,
     bu,
@@ -72,8 +78,8 @@ export default function ExtractCv({
     });
 
     useEcho(
-        `cv-progress-stepper.${auth.user.id}`,
-        'CvProgressStepper',
+        `progress-stepper.${auth.user.id}`,
+        'ProgressStepper',
         (e: { step: number }) => {
             const { step } = e;
             setProgressStep(step);
@@ -268,6 +274,7 @@ export default function ExtractCv({
                         {loading && Object.keys(progress).length === 0 && (
                             <HorizontalLinearAlternativeLabelStepper
                                 step={progressStep}
+                                steps= {steps}
                             />
                             // <Typography variant="body2" color="text.secondary">
                             //     Waiting for progress updates...

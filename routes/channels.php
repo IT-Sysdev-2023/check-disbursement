@@ -10,7 +10,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('cv-progress.{id}', function (User $user, int $id) {
     return (int) $user->id === (int) $id;
 });
-Broadcast::channel('cv-progress-stepper.{id}', function (User $user, int $id) {
+Broadcast::channel('progress-stepper.{id}', function (User $user, int $id) {
     return (int) $user->id === (int) $id;
 });
 

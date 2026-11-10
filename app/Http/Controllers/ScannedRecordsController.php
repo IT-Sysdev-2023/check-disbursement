@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProgressStepper;
 use App\Events\ScanningChequesEvent;
 use App\Http\Resources\ScannedRecordResource;
 use App\Jobs\ProcessChequeJob;
@@ -64,12 +65,16 @@ class ScannedRecordsController extends Controller
     {
         $disk = Storage::disk('cheque_share');
 
-        $files = PHP_OS_FAMILY === 'Linux' ? $disk->files('ChequeScanner/new') : $disk->files('new');
+        $files = PHP_OS_FAMILY === 'Linux'
+            ? $disk->files('ChequeScanner/new')
+            : $disk->files('new');
 
         return collect($files)
             ->filter(function ($file) use ($disk) {
+                $tempPath = null;
+
                 try {
-                    $imagePath = $disk->path($file);
+                    $imagePath = self::localPath($disk, $file, $tempPath);
 
                     $text = (new TesseractOCR($imagePath))
                         ->executable(config('ocr.executable'))
@@ -86,21 +91,46 @@ class ScannedRecordsController extends Controller
                     ]);
 
                     return false;
+                } finally {
+                    if ($tempPath && is_file($tempPath)) {
+                        @unlink($tempPath);
+                    }
                 }
             });
+    }
 
+    private static function localPath($disk, string $file, ?string &$tempPath): string
+    {
+        if (config('filesystems.disks.cheque_share.driver') === 'local') {
+            return $disk->path($file);
+        }
+
+        $stream = $disk->readStream($file);
+
+        if ($stream === null || $stream === false) {
+            throw new \RuntimeException("Unable to read {$file} from cheque_share.");
+        }
+
+        $ext = pathinfo($file, PATHINFO_EXTENSION) ?: 'jpg';
+        $tempPath = sys_get_temp_dir() . '/' . uniqid('cheque_', true) . '.' . $ext;
+
+        $out = fopen($tempPath, 'wb');
+        stream_copy_to_stream($stream, $out);
+        fclose($out);
+        fclose($stream);
+
+        return $tempPath;
     }
 
     public function scanAnalyze(Request $request)
     {
-
+        ProgressStepper::dispatch($request->user()->id, 1);
         $filteredFiles = self::filterCheques()->values();
-
         $count = 0;
         $totalBatches = $filteredFiles->count();
         $referenceBatch = self::generateBatchReference();
         $filteredFiles->each(function ($item) use (&$count, $totalBatches, $referenceBatch, $request) {
-
+            ProgressStepper::dispatch($request->user()->id, 3);
             $count++;
             ProcessChequeJob::dispatch(
                 $request->scanMethod,
