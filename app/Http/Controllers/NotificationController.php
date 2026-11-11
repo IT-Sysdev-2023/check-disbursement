@@ -22,8 +22,8 @@ class NotificationController extends Controller
             ->notifications()
             ->latest()
             ->select('id', 'data', 'read_at', 'created_at')
-            ->get()
-            ->map(function ($notification) {
+            ->paginate(10)
+            ->through(function ($notification) {
                 return [
                     'id' => $notification->id,
                     'data' => $notification->data,
@@ -31,7 +31,7 @@ class NotificationController extends Controller
                     'created_at' => $notification->created_at->diffForHumans(),
                 ];
             });
-        return Inertia::render('notificationPage', ['records' => $notifications]);
+        return Inertia::render('notificationPage', ['records' => $notifications, 'unreadCount' => auth()->user()->unreadNotifications()->count(),]);
     }
     public function read(Request $request)
     {

@@ -9,5 +9,11 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::job(new NotificationJob())
-    ->everyFiveSeconds()
+    ->everyFifteenMinutes()
     ->withoutOverlapping();
+
+Schedule::call(function () {
+    DB::table('notifications')
+        ->where('created_at', '<', now()->subDays(30))
+        ->delete();
+})->daily();
