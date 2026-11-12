@@ -20,6 +20,7 @@ import PageViewsBarChart from './dashboard/components/PageViewsBarChart';
 import SelectItem from './dashboard/components/SelectItem';
 import SessionsChart from './dashboard/components/SessionsChart';
 import StatCard, { StatCardProps } from './dashboard/components/StatCard';
+import EnableNotifications from '@/components/enable-notification';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -146,6 +147,7 @@ export default function Dashboard({
                     <div className="p-6">
                         <ActiveUsers />
                     </div>
+                     <EnableNotifications />
                     <Grid
                         container
                         spacing={2}
