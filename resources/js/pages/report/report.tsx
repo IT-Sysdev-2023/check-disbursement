@@ -74,8 +74,10 @@ export default function EmployeeReportFilters({
     columns,
     reportSelection,
     bu,
+    locations
 }: {
     columns: string[];
+    locations: string[];
     reportSelection: string[];
     bu: SelectionType[];
 }) {
@@ -182,7 +184,7 @@ export default function EmployeeReportFilters({
                                                     'forwarded',
                                                 ) && (
                                                     <Box sx={{ pl: 4 }}>
-                                                        {['Cebu', 'Manila'].map(
+                                                        {locations.map(
                                                             (location) => (
                                                                 <FormControlLabel
                                                                     key={

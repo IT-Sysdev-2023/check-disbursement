@@ -56,11 +56,33 @@ class ReportController extends Controller
             'pickup' => 'Pickup',
         ];
 
+        $user = $request->user();
+
+        $restrictedRoles = [
+            'corporate_disbursing_clerk(forwarded_releasing)',
+            'corporate_disbursing_clerk(forwarded)',
+        ];
+        
+        $locations = ['Cebu', 'Manila'];
+
+        if ($user->hasAnyRole($restrictedRoles)) {
+            $locations = [];
+
+            if ($user->can('access cebu')) {
+                $locations[] = 'Cebu';
+            }
+
+            if ($user->can('access manila')) {
+                $locations[] = 'Manila';
+            }
+        }
+
         $borrower = Borrower::borrowerSelection();
         return Inertia::render('report/report', [
             'columns' => $columns,
             'chequeStatuses' => $chequeStatuses,
             'borrower' => $borrower,
+            'locations' => $locations,
             'reportSelection' => $reportSelection,
             'bu' => $bu
         ]);
