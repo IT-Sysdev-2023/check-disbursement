@@ -107,7 +107,6 @@ class DepositedChequesExport implements FromCollection, WithHeadings, WithTitle,
                         }
                     )
             )
-
             ->whereHasMorph(
                 'checkable',
                 [Cv::class, Crf::class],

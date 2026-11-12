@@ -311,33 +311,49 @@ export default function EmployeeReportFilters({
                     <Grid size={{ xs: 12 }} sx={{ mt: 3 }}>
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <Stack
-                                direction="row"
+                                direction="column"
                                 alignItems="center"
-                                justifyContent="center"
-                                spacing={1}
+                                spacing={1.5}
                             >
-                                <DatePicker
-                                    label="Start Date"
-                                    value={startDate}
-                                    onChange={handleStartDateChange}
-                                    maxDate={endDate || undefined}
-                                />
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        fontSize: '1.2rem',
-                                        color: 'text.secondary',
-                                    }}
+                                <Typography
+                                    variant="subtitle1"
+                                    fontWeight={600}
+                                    color="text.primary"
                                 >
-                                    ➔
-                                </Box>
-                                <DatePicker
-                                    label="End Date"
-                                    value={endDate}
-                                    onChange={handleEndDateChange}
-                                    minDate={startDate || undefined}
-                                />
+                                    Select Date
+                                </Typography>
+
+                                <Stack
+                                    direction="row"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    spacing={1}
+                                >
+                                    <DatePicker
+                                        label="Start Date"
+                                        value={startDate}
+                                        onChange={handleStartDateChange}
+                                        maxDate={endDate || undefined}
+                                    />
+
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            fontSize: '1.2rem',
+                                            color: 'text.secondary',
+                                        }}
+                                    >
+                                        ➔
+                                    </Box>
+
+                                    <DatePicker
+                                        label="End Date"
+                                        value={endDate}
+                                        onChange={handleEndDateChange}
+                                        minDate={startDate || undefined}
+                                    />
+                                </Stack>
                             </Stack>
                         </LocalizationProvider>
                     </Grid>
