@@ -44,7 +44,7 @@ class VoucherStatusSummaryExport implements FromCollection, WithHeadings, WithTi
 
     public function collection()
     {
-        
+
         $res = $this->getRecords()->map(function ($item) {
             $checkable = $item->checkable;
             $status = $item->chequeForwardedStatus?->status ?? $item->status;
@@ -78,33 +78,44 @@ class VoucherStatusSummaryExport implements FromCollection, WithHeadings, WithTi
         return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit'], 'chequeForwardedStatus'])
             ->select('receiver_name', 'status', 'checkable_id', 'checkable_type', 'id')
             ->when(
-                !empty($this->data['date']),
-                fn($query) =>
-                    $query->whereDate('created_at', $this->data['date'])
+                !empty($this->data['startDate']),
+                fn($query) => $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $this->data['startDate']
+                )
             )
             ->when(
-                (!empty($this->data['filter'])) && ($this->data['filter'] != 'all'),
-                function ($query) {
-                    if ($this->data['filter']) {
-                        $query->where('is_closed', 1);
-                        return;
-                    }
-                    $query->where('status', $this->data['filter']);
-                }
+                !empty($this->data['endDate']),
+                fn($query) => $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $this->data['endDate']
+                )
             )
-            ->when(
-                !empty($this->data['status']),
-                fn($query) =>
-                    $query->where(function ($q) {
-                        $q->whereHas('chequeForwardedStatus', function ($q) {
-                            $q->whereIn('status', $this->data['status']);
-                        })
-                            ->orWhere(function ($q) {
-                                $q->whereDoesntHave('chequeForwardedStatus')
-                                    ->whereIn('status', $this->data['status']);
-                            });
-                    })
-            )
+            // ->when(
+            //     (!empty($this->data['filter'])) && ($this->data['filter'] != 'all'),
+            //     function ($query) {
+            //         if ($this->data['filter']) {
+            //             $query->where('is_closed', 1);
+            //             return;
+            //         }
+            //         $query->where('status', $this->data['filter']);
+            //     }
+            // )
+            // ->when(
+            //     !empty($this->data['status']),
+            //     fn($query) =>
+            //         $query->where(function ($q) {
+            //             $q->whereHas('chequeForwardedStatus', function ($q) {
+            //                 $q->whereIn('status', $this->data['status']);
+            //             })
+            //                 ->orWhere(function ($q) {
+            //                     $q->whereDoesntHave('chequeForwardedStatus')
+            //                         ->whereIn('status', $this->data['status']);
+            //                 });
+            //         })
+            // )
             ->when(
                 !empty($this->data['bu']),
                 fn($outerQuery) =>
@@ -118,19 +129,19 @@ class VoucherStatusSummaryExport implements FromCollection, WithHeadings, WithTi
                         }
                     )
             )
-            ->when(
-                !empty($this->data['location']),
-                fn($outerQuery) =>
-                    $outerQuery->whereHasMorph(
-                        'checkable',
-                        [Cv::class, Crf::class],
-                        function (Builder $query) {
-                            $query->whereHas('tagLocation', function (Builder $query) {
-                                $query->whereIn('location', $this->data['location']);
-                            });
-                        }
-                    )
-            )
+            // ->when(
+            //     !empty($this->data['location']),
+            //     fn($outerQuery) =>
+            //         $outerQuery->whereHasMorph(
+            //             'checkable',
+            //             [Cv::class, Crf::class],
+            //             function (Builder $query) {
+            //                 $query->whereHas('tagLocation', function (Builder $query) {
+            //                     $query->whereIn('location', $this->data['location']);
+            //                 });
+            //             }
+            //         )
+            // )
             ->get();
     }
 }

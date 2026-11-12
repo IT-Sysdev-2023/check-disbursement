@@ -38,25 +38,30 @@ class ReportController extends Controller
                 'value' => $permission->company->id,
             ]);
 
-        $excluded = ['staled', 'cancelled'];
         $excludedCheque = ['forwarded', 'released', 'deposited'];
-
-        $settlementStatuses = ColumnResolver::statusColumnEnums()->reject(function ($item) use ($excluded) {
-            return in_array($item['label'], $excluded, true);
-        })->values();
 
         $chequeStatuses = ColumnResolver::statusColumnEnums()->reject(function ($item) use ($excludedCheque) {
             return in_array($item['label'], $excludedCheque, true);
         })->values();
 
+        $reportSelection = [
+            'pdc' => 'PDC Cheques',
+            'vss' => 'Voucher Status Summary',
+            'rc' => 'Released Cheques',
+            'dc' => 'Deposited Cheques',
+            'cc' => 'Cancelled Cheques',
+            'forwarded' => 'Forwarded Cheques',
+            'sc' => 'Stale Cheques',
+            'internal' => 'Internal',
+            'pickup' => 'Pickup',
+        ];
+
         $borrower = Borrower::borrowerSelection();
-        $location = TagLocation::locationSelection();
         return Inertia::render('report/report', [
             'columns' => $columns,
-            'settlementStatuses' => $settlementStatuses,
             'chequeStatuses' => $chequeStatuses,
             'borrower' => $borrower,
-            'location' => $location,
+            'reportSelection' => $reportSelection,
             'bu' => $bu
         ]);
 
@@ -64,19 +69,15 @@ class ReportController extends Controller
 
     public function generate(Request $request)
     {
-        // return Excel::download(new ReportExport, 'report.xlsx');
         $validated = $request->validate([
-            // 'selectedChecks' => 'required | array | min:1',
-            // 'selectedChecks.*' => 'string',
-            'date' => ['nullable', 'date_format:Y-m-d'],
+            'startDate' => ['nullable', 'date_format:Y-m-d'],
+            'endDate' => ['nullable', 'date_format:Y-m-d'],
             'selectedReport' => 'required | array | min:1',
             'selectedReport.*' => 'string',
+            'forwardedLocations' => 'required | array | min:1',
+            'forwardedLocations.*' => 'string',
             'columns' => 'required | array | min:1',
             'columns.*' => 'string',
-
-            'borrower' => 'array',
-            'location' => 'array',
-            'status' => 'array',
             'bu' => 'array',
         ]);
 
@@ -85,7 +86,7 @@ class ReportController extends Controller
         if (self::validateFilter($validated)) {
             return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
         }
-        
+
         $role = $this->userType;
         $date = now()->format('Ymd_His');
 

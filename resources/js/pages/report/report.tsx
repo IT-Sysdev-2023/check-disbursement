@@ -10,6 +10,7 @@ import {
     Grid,
     InputLabel,
     SelectChangeEvent,
+    Stack,
     Typography,
 } from '@mui/material';
 
@@ -20,9 +21,11 @@ import { Head, useForm } from '@inertiajs/react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
-import { DatePicker } from '@mui/x-date-pickers';
-import dayjs from 'dayjs';
-import { ChangeEvent, ReactNode } from 'react';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { PickerValue } from '@mui/x-date-pickers/internals';
+import { Dayjs } from 'dayjs';
+import { ChangeEvent, ReactNode, useState } from 'react';
 import PermissionSelection from '../admin/components/permissionSelection';
 
 const SectionCard = ({
@@ -67,36 +70,23 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const REPORT_OPTIONS = {
-    pdc: 'PDC Cheques',
-    vss: 'Voucher Status Summary',
-};
 export default function EmployeeReportFilters({
     columns,
-    chequeStatuses,
-    settlementStatuses,
-    // borrower,
-    location,
+    reportSelection,
     bu,
 }: {
     columns: string[];
-    chequeStatuses: SelectionType[];
-    settlementStatuses: SelectionType[];
-    // borrower: SelectionType[];
-    location: SelectionType[];
+    reportSelection: string[];
     bu: SelectionType[];
 }) {
     const { data, setData, post, errors, transform } = useForm({
         bu: [] as string[],
-        borrower: [] as string[],
-        settlementStatus: [] as string[],
-        chequeStatus: [] as string[],
-        location: [] as string[],
-        selectedChecks: [] as string[],
         selectedReport: [] as string[],
+        forwardedLocations: [] as string[],
         columns: [] as string[],
-        date: '',
     });
+    const [startDate, setStartDate] = useState<Dayjs | null>(null);
+    const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
     const handleChange =
         (field: keyof typeof data) =>
@@ -120,9 +110,10 @@ export default function EmployeeReportFilters({
     const onGenerate = () => {
         transform((data) => ({
             ...data,
-            status: [...data.settlementStatus, ...data.chequeStatus],
+            startDate: startDate?.format('YYYY-MM-DD') ?? null,
+            endDate: endDate?.format('YYYY-MM-DD') ?? null,
         }));
-        // console.log(data);
+
         post(generateReport().url, {
             preserveScroll: true,
             preserveState: true,
@@ -144,47 +135,21 @@ export default function EmployeeReportFilters({
         setData(filter, typeof value === 'string' ? value.split(',') : value);
     };
 
+    const handleStartDateChange = (value: PickerValue) => {
+        setStartDate(value);
+    };
+
+    const handleEndDateChange = (value: PickerValue) => {
+        setEndDate(value);
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Report" />
 
             <Box sx={{ p: 2 }}>
                 <Grid container spacing={2}>
-                    {/* DISPLAY FIELDS */}
                     <Grid size={{ xs: 12, md: 3 }}>
-                        {/* <SectionCard
-                            title="SELECT CHECK"
-                            color="#1e88e5"
-                            icon={<ViewListIcon fontSize="small" />}
-                        >
-                            <FormControl
-                                error={Boolean(errors.selectedChecks)}
-                                component="fieldset"
-                            >
-                                {Object.entries(CHECK_OPTIONS).map(
-                                    ([key, label]) => (
-                                        <FormControlLabel
-                                            key={key}
-                                            control={
-                                                <Checkbox
-                                                    size="small"
-                                                    onChange={handleChange(
-                                                        'selectedChecks',
-                                                    )(key)}
-                                                />
-                                            }
-                                            label={label}
-                                        />
-                                    ),
-                                )}
-
-                                {errors.selectedChecks && (
-                                    <FormHelperText>
-                                        {errors.selectedChecks}
-                                    </FormHelperText>
-                                )}
-                            </FormControl>
-                        </SectionCard> */}
                         <SectionCard
                             title="Select Report"
                             color="#1e88e5"
@@ -194,20 +159,76 @@ export default function EmployeeReportFilters({
                                 error={Boolean(errors.selectedReport)}
                                 component="fieldset"
                             >
-                                {Object.entries(REPORT_OPTIONS).map(
+                                {Object.entries(reportSelection).map(
                                     ([key, label]) => (
-                                        <FormControlLabel
-                                            key={key}
-                                            control={
-                                                <Checkbox
-                                                    size="small"
-                                                    onChange={handleChange(
-                                                        'selectedReport',
-                                                    )(key)}
-                                                />
-                                            }
-                                            label={label}
-                                        />
+                                        <Box key={key}>
+                                            <FormControlLabel
+                                                control={
+                                                    <Checkbox
+                                                        size="small"
+                                                        checked={data.selectedReport.includes(
+                                                            key,
+                                                        )}
+                                                        onChange={handleChange(
+                                                            'selectedReport',
+                                                        )(key)}
+                                                    />
+                                                }
+                                                label={label}
+                                            />
+
+                                            {key === 'forwarded' &&
+                                                data.selectedReport.includes(
+                                                    'forwarded',
+                                                ) && (
+                                                    <Box sx={{ pl: 4 }}>
+                                                        {['Cebu', 'Manila'].map(
+                                                            (location) => (
+                                                                <FormControlLabel
+                                                                    key={
+                                                                        location
+                                                                    }
+                                                                    control={
+                                                                        <Checkbox
+                                                                            size="small"
+                                                                            checked={data.forwardedLocations.includes(
+                                                                                location,
+                                                                            )}
+                                                                            onChange={(
+                                                                                e,
+                                                                            ) => {
+                                                                                const checked =
+                                                                                    e
+                                                                                        .target
+                                                                                        .checked;
+
+                                                                                setData(
+                                                                                    'forwardedLocations',
+                                                                                    checked
+                                                                                        ? [
+                                                                                              ...data.forwardedLocations,
+                                                                                              location,
+                                                                                          ]
+                                                                                        : data.forwardedLocations.filter(
+                                                                                              (
+                                                                                                  item,
+                                                                                              ) =>
+                                                                                                  item !==
+                                                                                                  location,
+                                                                                          ),
+                                                                                );
+                                                                            }}
+                                                                        />
+                                                                    }
+                                                                    label={
+                                                                        location
+                                                                    }
+                                                                />
+                                                            ),
+                                                        )}
+                                                    </Box>
+                                                )}
+                                        </Box>
                                     ),
                                 )}
 
@@ -273,23 +294,8 @@ export default function EmployeeReportFilters({
                             <FormControl
                                 fullWidth
                                 size="small"
-                                sx={{ mb: 2, mt: 3 }}
+                                sx={{ mt: 3, mb: 3 }}
                             >
-                                <InputLabel>Filter Date</InputLabel>
-                                <DatePicker
-                                    value={data.date ? dayjs(data.date) : null}
-                                    onChange={(date) =>
-                                        setData(
-                                            'date',
-                                            date?.isValid()
-                                                ? date.format('YYYY-MM-DD')
-                                                : '',
-                                        )
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
                                 <InputLabel>Business Unit</InputLabel>
                                 <PermissionSelection
                                     permissions={bu}
@@ -299,62 +305,41 @@ export default function EmployeeReportFilters({
                                     }
                                 />
                             </FormControl>
-                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
-                                <InputLabel>Tag Location</InputLabel>
-                                <PermissionSelection
-                                    permissions={location}
-                                    selectedPermission={data.location}
-                                    handleChange={(e) =>
-                                        handleChangeSelection(e, 'location')
-                                    }
-                                />
-                            </FormControl>
-
-                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
-                                <InputLabel>Settlement Method</InputLabel>
-                                <PermissionSelection
-                                    permissions={settlementStatuses}
-                                    selectedPermission={data.settlementStatus}
-                                    handleChange={(e) =>
-                                        handleChangeSelection(
-                                            e,
-                                            'settlementStatus',
-                                        )
-                                    }
-                                />
-                            </FormControl>
-                            <FormControl fullWidth size="small" sx={{ mb: 3 }}>
-                                <InputLabel>Cheque Status</InputLabel>
-                                <PermissionSelection
-                                    permissions={chequeStatuses}
-                                    selectedPermission={data.chequeStatus}
-                                    handleChange={(e) =>
-                                        handleChangeSelection(e, 'chequeStatus')
-                                    }
-                                />
-                            </FormControl>
-                            {/* <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-                                <InputLabel>Borrower Name</InputLabel>
-                                <PermissionSelection
-                                    permissions={borrower}
-                                    selectedPermission={data.borrower}
-                                    handleChange={(e) =>
-                                        handleChangeSelection(e, 'borrower')
-                                    }
-                                />
-                            </FormControl> */}
-
-                            {/* <FormControl fullWidth size="small" sx={{ mb: 3 }}>
-                                <InputLabel>Is Closed</InputLabel>
-                                <PermissionSelection
-                                    permissions={location}
-                                    selectedPermission={data.location}
-                                    handleChange={(e) =>
-                                        handleChangeSelection(e, 'location')
-                                    }
-                                />
-                            </FormControl> */}
                         </SectionCard>
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }} sx={{ mt: 3 }}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <Stack
+                                direction="row"
+                                alignItems="center"
+                                justifyContent="center"
+                                spacing={1}
+                            >
+                                <DatePicker
+                                    label="Start Date"
+                                    value={startDate}
+                                    onChange={handleStartDateChange}
+                                    maxDate={endDate || undefined}
+                                />
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        fontSize: '1.2rem',
+                                        color: 'text.secondary',
+                                    }}
+                                >
+                                    ➔
+                                </Box>
+                                <DatePicker
+                                    label="End Date"
+                                    value={endDate}
+                                    onChange={handleEndDateChange}
+                                    minDate={startDate || undefined}
+                                />
+                            </Stack>
+                        </LocalizationProvider>
                     </Grid>
 
                     <Button
