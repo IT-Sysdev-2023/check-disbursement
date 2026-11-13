@@ -1,0 +1,7 @@
+[90m= [39m[34;4mIlluminate\Support\Collection[39;24m {#7820
+    [34mall[39m: [
+      [32m"[39m[32mPost[39m[32m"[39m,
+      [32m"[39m[32mDated[39m[32m"[39m,
+      [32m"[39m[32mCheques[39m[32m"[39m,
+    ],
+  }

@@ -55,10 +55,10 @@ class ReportController extends Controller
             'rc' => 'Released Cheques',
             'dc' => 'Deposited Cheques',
             'cc' => 'Cancelled Cheques',
-            'forwarded' => 'Forwarded Cheques',
+            'fc' => 'Forwarded Cheques',
             'sc' => 'Stale Cheques',
-            'internal' => 'Internal',
-            'pickup' => 'Pickup',
+            'ic' => 'Internal',
+            'tpc' => 'Pickup',
         ];
 
         $user = $request->user();
@@ -107,12 +107,12 @@ class ReportController extends Controller
             'columns.*' => 'string',
             'bu' => ['nullable', 'array'],
         ]);
-
+     
         $validated['columns'] = ColumnResolver::transformColumn($validated['columns']);
 
-        if (self::validateFilter($validated)) {
-            return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
-        }
+        // if (self::validateFilter($validated)) {
+        //     return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
+        // }
 
         $role = $this->userType;
         $date = now()->format('Ymd_His');
@@ -127,23 +127,39 @@ class ReportController extends Controller
     {
         return ChequeStatus::
             when(
-                !empty($columns['date']),
-                fn($query) =>
-                    $query->whereDate('created_at', $columns['date'])
+                !empty($columns['startDate']),
+                fn($query) => $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $columns['startDate']
+                )
             )
             ->when(
-                !empty($columns['status']),
-                fn($query) =>
-                    $query->where(function ($q) use ($columns) {
-                        $q->whereHas('chequeForwardedStatus', function ($q) use ($columns) {
-                            $q->whereIn('status', $columns['status']);
-                        })
-                            ->orWhere(function ($q) use ($columns) {
-                                $q->whereDoesntHave('chequeForwardedStatus')
-                                    ->whereIn('status', $columns['status']);
-                            });
-                    })
+                !empty($columns['endDate']),
+                fn($query) => $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $columns['endDate']
+                )
             )
+            ->when(in_array('pdc', $columns['selectedReport']), fn($q) =>
+                $q->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
+                    if ($type === Cv::class) {
+                        $q->whereColumn('cheque_date', '>', 'cv_date');
+                    } elseif ($type === Crf::class) {
+                        $q->whereColumn('cheque_date', '>', 'crf_date');
+                    }
+                }))
+
+            ->when(in_array('vss', $columns['selectedReport']), fn($q) =>
+                $q->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
+                    if ($type === Cv::class) {
+                        $q->whereColumn('cheque_date', '>', 'cv_date');
+                    } elseif ($type === Crf::class) {
+                        $q->whereColumn('cheque_date', '>', 'crf_date');
+                    }
+                }))
+
             ->when(
                 !empty($columns['bu']),
                 fn($outerQuery) =>
@@ -156,21 +172,6 @@ class ReportController extends Controller
                                 fn(Builder $query) =>
                                     $query->whereIn('name', $columns['bu'])
                             )
-                    )
-            )
-            ->when(
-                !empty($columns['location']),
-                fn($outerQuery) =>
-                    $outerQuery->whereHasMorph(
-                        'checkable',
-                        [Cv::class, Crf::class],
-                        fn(Builder $query) =>
-                            $query->whereHas(
-                                'tagLocation',
-                                fn(Builder $query) =>
-                                    $query->whereIn('location', $columns['location'])
-                            )
-
                     )
             )->doesntExist();
     }

@@ -179,9 +179,9 @@ export default function EmployeeReportFilters({
                                                 label={label}
                                             />
 
-                                            {key === 'forwarded' &&
+                                            {key === 'fc' &&
                                                 data.selectedReport.includes(
-                                                    'forwarded',
+                                                    'fc',
                                                 ) && (
                                                     <Box sx={{ pl: 4 }}>
                                                         {locations.map(

@@ -21,49 +21,49 @@ class ReportExport implements WithMultipleSheets
     }
     public function sheets(): array
     {
-        $data = collect($this->data['selectedReport']);
+
+        $data = collect($this->data);
+        $data->put('columns', collect($data->get('columns'))->prepend('date_of_action')->prepend('status')->all())
+            ->put('selectedReport', collect($data->get('selectedReport')));
+
+        $sheetReport = $data->get('selectedReport');
+
         $sheets = [];
 
-        $hasPdc = self::doesReportExist($data, 'pdc');
-        $hasVss = self::doesReportExist($data, 'vss');
-        $releasedCheques = self::doesReportExist($data, 'rc');
-        $cancelledCheques = self::doesReportExist($data, 'cc');
-        $forwarded = self::doesReportExist($data, 'forwarded');
-        $staleCheques = self::doesReportExist($data, 'sc');
-        $internal = self::doesReportExist($data, 'internal');
-        $depositedCheques = self::doesReportExist($data, 'dc');
-        $pickup = self::doesReportExist($data, 'pickup');
-
-        if ($hasPdc) {
-            $sheets[] = new PdcReportExport($this->data);
+        if ($sheetReport->contains('pdc')) {
+            $sheets[] = new SheetReportExport($data, 'Post Dated Cheques');
         }
 
-        if ($hasVss) {
-            $sheets[] = new VoucherStatusSummaryExport($this->data);
-        }
-        if ($releasedCheques) {
-            $sheets[] = new ReleasedChequesExport($this->data);
+        if ($sheetReport->contains('vss')) {
+            $sheets[] = new SheetReportExport($data, 'Voucher Status Summary');
         }
 
-        if ($cancelledCheques) {
-            $sheets[] = new CancelledChequesExport($this->data);
+        if ($sheetReport->contains('rc')) {
+            $sheets[] = new SheetReportExport($data, 'Released Cheques');
         }
 
-        if ($forwarded) {
-            $sheets[] = new ForwardedChequesExport($this->data);
-        }
-        if ($staleCheques) {
-            $sheets[] = new StaleChequesExport($this->data);
-        }
-        if ($internal) {
-            $sheets[] = new InternalChequesExport($this->data);
+        if ($sheetReport->contains('cc')) {
+            $sheets[] = new SheetReportExport($data, 'Cancelled Cheques');
         }
 
-        if ($depositedCheques) {
-            $sheets[] = new DepositedChequesExport($this->data);
+        if ($sheetReport->contains('fc')) {
+            $sheets[] = new SheetReportExport($data, 'Forwarded Cheques');
         }
-        if ($pickup) {
-            $sheets[] = new PickupChequesExport($this->data);
+
+        if ($sheetReport->contains('sc')) {
+            $sheets[] = new SheetReportExport($data, 'Staled Cheques');
+        }
+
+        if ($sheetReport->contains('ic')) {
+            $sheets[] = new SheetReportExport($data, 'Internal Cheques');
+        }
+
+        if ($sheetReport->contains('dc')) {
+            $sheets[] = new SheetReportExport($data, 'Deposited Cheques');
+        }
+
+        if ($sheetReport->contains('tpc')) {
+            $sheets[] = new SheetReportExport($data, 'Tagbilaran Pick-up Cheques');
         }
 
         if (empty($sheets)) {
@@ -73,14 +73,6 @@ class ReportExport implements WithMultipleSheets
         }
         return $sheets;
     }
-    //     4 => "internal"
-//     5 => "dc"
-//     8 => "pickup"
-    private static function doesReportExist($data, $report)
-    {
-        return $data->contains(
-            fn($item) => ($item ?? null) === $report
-        );
-    }
+   
 
 }

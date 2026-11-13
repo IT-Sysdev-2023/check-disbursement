@@ -216,13 +216,11 @@ export default function ExtractCv({
                             <SelectBu
                                 label=" Select Company"
                                 permissions={bu}
-                                isAllSelected={permissionList.includes('All')}
                                 selectedPermission={permissionList}
                                 handleChange={handleChange}
                             />
                             <SelectBu
                                 isDisabled={permissionList.length < 1}
-                                isAllSelected={selectedBu.includes('All')}
                                 label=" Select Business Unit"
                                 permissions={businessUnits}
                                 selectedPermission={selectedBu}

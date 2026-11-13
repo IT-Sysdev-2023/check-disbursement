@@ -72,6 +72,7 @@ export default function PermissionSelection({
                         <MenuItem
                             key={permission.value}
                             value={permission.label}
+                            disabled={selectedPermission.includes('All') && permission.label !== 'All'}
                             style={getStyles(
                                 permission.label,
                                 selectedPermission,

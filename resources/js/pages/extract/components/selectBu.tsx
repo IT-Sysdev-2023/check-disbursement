@@ -41,11 +41,9 @@ export default function SelectBu({
     permissions,
     label,
     placeholder,
-    isAllSelected = false,
     isDisabled = false,
 }: {
     isDisabled?: boolean;
-    isAllSelected?: boolean;
     placeholder?: string;
     label: string;
     permissions: SelectionType[];
@@ -127,7 +125,7 @@ export default function SelectBu({
                             <MenuItem
                                 key={item.value}
                                 value={item.label}
-                                disabled={isAllSelected && item.label !== 'All'}
+                                disabled={selectedPermission.includes('All') && item.label !== 'All'}
                                 style={getStyles(
                                     item.label,
                                     selectedPermission,
