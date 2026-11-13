@@ -77,28 +77,32 @@ class SheetReportExport implements FromCollection, WithHeadings, WithTitle, Shou
     {
         return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit']])
             ->select('receiver_name', 'status', 'checkable_id', 'checkable_type', 'created_at')
-            ->when($this->acronym() === 'pdc', fn($q) =>
-                $q->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
-                    if ($type === Cv::class) {
-                        $q->whereColumn('cheque_date', '>', 'cv_date');
-                    } elseif ($type === Crf::class) {
-                        $q->whereColumn('cheque_date', '>', 'crf_date');
-                    }
-                }))
+
+            ->when(
+                $this->acronym() === 'pdc', //Post Dated
+                fn($q) =>
+                    $q->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
+                        if ($type === Cv::class) {
+                            $q->whereColumn('cheque_date', '>', 'cv_date');
+                        } elseif ($type === Crf::class) {
+                            $q->whereColumn('cheque_date', '>', 'crf_date');
+                        }
+                    })
+            )
 
             //! NO FILTERING FOR VSS
             ->when(
-                $this->acronym() === 'rc',
+                $this->acronym() === 'rc', //Released
                 fn($q) =>
                     $q->where('status', 'released')
             )
             ->when(
-                $this->acronym() === 'cc',
+                $this->acronym() === 'cc', //Cancelled
                 fn($q) =>
                     $q->where('status', 'cancelled')
             )
             ->when(
-                $this->acronym() === 'fc',
+                $this->acronym() === 'fc', //Forwarded
                 fn($q) =>
                     $q->whereHas('chequeForwardedStatus', function ($q) {
                         $q->where('status', 'released');
@@ -118,14 +122,14 @@ class SheetReportExport implements FromCollection, WithHeadings, WithTitle, Shou
             )
 
             ->when(
-                $this->acronym() === 'sc',
+                $this->acronym() === 'sc', // Staled 
                 fn($q) =>
                     $q->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
                         $q->where('cheque_date', '<', now()->subMonths(6));
                     })
             )
             ->when(
-                $this->acronym() === 'ic',
+                $this->acronym() === 'ic', //Internal
                 fn($q) =>
                     $q->where('status', 'released')
                         ->whereHasMorph(
@@ -140,9 +144,9 @@ class SheetReportExport implements FromCollection, WithHeadings, WithTitle, Shou
 
             )
             ->when(
-                $this->acronym() === 'dc',
+                $this->acronym() === 'dc', //Deposited
                 fn($q) =>
-                    $q->where('status', 'released')
+                    $q->where('status', 'deposited')
                         ->whereHasMorph(
                             'checkable',
                             [Cv::class, Crf::class],
@@ -154,7 +158,7 @@ class SheetReportExport implements FromCollection, WithHeadings, WithTitle, Shou
                         )
             )
             ->when(
-                $this->acronym() === 'tpc',
+                $this->acronym() === 'tpc', //Tagbilaran Pick-up
                 fn($q) =>
                     $q->where('status', 'released')
                         ->whereHasMorph(
