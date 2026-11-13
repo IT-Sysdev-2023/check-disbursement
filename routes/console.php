@@ -14,6 +14,6 @@ Schedule::job(new NotificationJob())
 
 Schedule::call(function () {
     DB::table('notifications')
-        ->where('created_at', '<', now()->subDays(30))
+        ->where('created_at', '<', now()->subDays(10))
         ->delete();
 })->daily();

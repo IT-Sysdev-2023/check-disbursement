@@ -107,12 +107,12 @@ class ReportController extends Controller
             'columns.*' => 'string',
             'bu' => ['nullable', 'array'],
         ]);
-     
+
         $validated['columns'] = ColumnResolver::transformColumn($validated['columns']);
 
-        // if (self::validateFilter($validated)) {
-        //     return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
-        // }
+        if (!self::validateFilter($validated)) {
+            return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
+        }
 
         $role = $this->userType;
         $date = now()->format('Ymd_His');
@@ -125,8 +125,10 @@ class ReportController extends Controller
 
     private static function validateFilter(array $columns)
     {
-        return ChequeStatus::
-            when(
+        $acronyms = $columns['selectedReport'];
+
+        return collect($acronyms)->contains(function ($acronym) use ($columns) {
+            $query = ChequeStatus::query()->when(
                 !empty($columns['startDate']),
                 fn($query) => $query->whereDate(
                     'created_at',
@@ -134,46 +136,90 @@ class ReportController extends Controller
                     $columns['startDate']
                 )
             )
-            ->when(
-                !empty($columns['endDate']),
-                fn($query) => $query->whereDate(
-                    'created_at',
-                    '<=',
-                    $columns['endDate']
+                ->when(
+                    !empty($columns['endDate']),
+                    fn($query) => $query->whereDate(
+                        'created_at',
+                        '<=',
+                        $columns['endDate']
+                    )
                 )
-            )
-            ->when(in_array('pdc', $columns['selectedReport']), fn($q) =>
-                $q->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
-                    if ($type === Cv::class) {
-                        $q->whereColumn('cheque_date', '>', 'cv_date');
-                    } elseif ($type === Crf::class) {
-                        $q->whereColumn('cheque_date', '>', 'crf_date');
-                    }
-                }))
+                ->when(
+                    !empty($columns['bu']),
+                    fn($outerQuery) =>
+                        $outerQuery->whereHasMorph(
+                            'checkable',
+                            [Cv::class, Crf::class],
+                            fn(Builder $query) =>
+                                $query->whereHas(
+                                    'businessUnit.company',
+                                    fn(Builder $query) =>
+                                        $query->whereIn('name', $columns['bu'])
+                                )
+                        )
+                );
 
-            ->when(in_array('vss', $columns['selectedReport']), fn($q) =>
-                $q->whereHasMorph('checkable', [Cv::class, Crf::class], function ($q, $type) {
-                    if ($type === Cv::class) {
-                        $q->whereColumn('cheque_date', '>', 'cv_date');
-                    } elseif ($type === Crf::class) {
-                        $q->whereColumn('cheque_date', '>', 'crf_date');
-                    }
-                }))
+            match ($acronym) {
+                'pdc' => $query->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    function ($q, $type) {
+                            $column = $type === Cv::class ? 'cv_date' : 'crf_date';
+                            $q->whereColumn('cheque_date', '>', $column);
+                        }
+                ),
 
-            ->when(
-                !empty($columns['bu']),
-                fn($outerQuery) =>
-                    $outerQuery->whereHasMorph(
+                'rc' => $query->where('status', 'released'),
+
+                'cc' => $query->where('status', 'cancelled'),
+
+                'fc' => $query->whereHas(
+                    'chequeForwardedStatus',
+                    fn($q) =>
+                        $q->where('status', 'released')
+                ),
+
+                'sc' => $query->whereHasMorph(
+                    'checkable',
+                    [Cv::class, Crf::class],
+                    fn($q) => $q->where('cheque_date', '<', now()->subMonths(6))
+                ),
+
+                'ic' => $query->where('status', 'released')
+                    ->whereHasMorph(
                         'checkable',
                         [Cv::class, Crf::class],
-                        fn(Builder $query) =>
-                            $query->whereHas(
-                                'businessUnit.company',
-                                fn(Builder $query) =>
-                                    $query->whereIn('name', $columns['bu'])
-                            )
-                    )
-            )->doesntExist();
+                        fn($q) => $q->whereHas(
+                            'tagLocation',
+                            fn($q) => $q->where('location', 'Internal')
+                        )
+                    ),
+
+                'dc' => $query->where('status', 'deposited')
+                    ->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        fn($q) => $q->whereHas(
+                            'tagLocation',
+                            fn($q) => $q->where('location', 'Deposit')
+                        )
+                    ),
+
+                'tpc' => $query->where('status', 'released')
+                    ->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        fn($q) => $q->whereHas(
+                            'tagLocation',
+                            fn($q) => $q->where('location', 'Tagbilaran Pick-up')
+                        )
+                    ),
+
+                default => $query->whereRaw('1 = 0'),
+            };
+
+            return $query->exists();
+        });
     }
 
     public function generatedReports(Request $request)
