@@ -74,7 +74,7 @@ export default function EmployeeReportFilters({
     columns,
     reportSelection,
     bu,
-    locations
+    locations,
 }: {
     columns: string[];
     locations: string[];
@@ -150,7 +150,7 @@ export default function EmployeeReportFilters({
             <Head title="Report" />
 
             <Box sx={{ p: 2 }}>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} justifyContent="center">
                     <Grid size={{ xs: 12, md: 3 }}>
                         <SectionCard
                             title="Select Report"
@@ -286,13 +286,53 @@ export default function EmployeeReportFilters({
                         </SectionCard>
                     </Grid>
 
-                    {/* OTHER FILTER */}
                     <Grid size={{ xs: 12, md: 3 }}>
                         <SectionCard
                             title="OTHER FILTER"
                             color="#4fc3f7"
                             icon={<TuneIcon fontSize="small" />}
                         >
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <Stack
+                                    direction="column"
+                                    alignItems="center"
+                                    spacing={1.5}
+                                    mt={3}
+                                >
+                                    <Stack
+                                        direction="column"
+                                        alignItems="stretch"
+                                        spacing={2}
+                                        sx={{ width: '100%' }}
+                                    >
+                                        <DatePicker
+                                            label="Start Date"
+                                            value={startDate}
+                                            onChange={handleStartDateChange}
+                                            maxDate={endDate || undefined}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    size: 'small',
+                                                },
+                                            }}
+                                        />
+
+                                        <DatePicker
+                                            label="End Date"
+                                            value={endDate}
+                                            onChange={handleEndDateChange}
+                                            minDate={startDate || undefined}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    size: 'small',
+                                                },
+                                            }}
+                                        />
+                                    </Stack>
+                                </Stack>
+                            </LocalizationProvider>
                             <FormControl
                                 fullWidth
                                 size="small"
@@ -308,56 +348,6 @@ export default function EmployeeReportFilters({
                                 />
                             </FormControl>
                         </SectionCard>
-                    </Grid>
-
-                    <Grid size={{ xs: 12 }} sx={{ mt: 3 }}>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <Stack
-                                direction="column"
-                                alignItems="center"
-                                spacing={1.5}
-                            >
-                                <Typography
-                                    variant="subtitle1"
-                                    fontWeight={600}
-                                    color="text.primary"
-                                >
-                                    Select Date
-                                </Typography>
-
-                                <Stack
-                                    direction="row"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    spacing={1}
-                                >
-                                    <DatePicker
-                                        label="Start Date"
-                                        value={startDate}
-                                        onChange={handleStartDateChange}
-                                        maxDate={endDate || undefined}
-                                    />
-
-                                    <Box
-                                        sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            fontSize: '1.2rem',
-                                            color: 'text.secondary',
-                                        }}
-                                    >
-                                        ➔
-                                    </Box>
-
-                                    <DatePicker
-                                        label="End Date"
-                                        value={endDate}
-                                        onChange={handleEndDateChange}
-                                        minDate={startDate || undefined}
-                                    />
-                                </Stack>
-                            </Stack>
-                        </LocalizationProvider>
                     </Grid>
 
                     <Button
