@@ -234,7 +234,7 @@ export const chequeStatusColumns = (
                 forSignature: { label: 'For Signature', color: 'success' },
                 released: { label: 'Released', color: 'success' },
                 forwarded: { label: 'Forwarded', color: 'warning' },
-                deposited: { label: 'Deposit', color: 'success' },
+                deposited: { label: 'Deposited', color: 'success' },
                 received: { label: 'Received', color: 'default' },
                 cancelled: { label: 'Cancelled', color: 'error' },
                 returned: { label: 'Returned', color: 'error' },

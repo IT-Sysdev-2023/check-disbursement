@@ -320,7 +320,7 @@ class ChequeRequestService
                     foreach ($borrowedCheque as $cheque) {
                         $cheque->checkable->chequeStatus()->create([
                             'transaction_no' => $transactionNo,
-                            'status' => 'released',
+                            'status' => 'deposited',
                             'receiver_name' => null,
                             'image' => null,
                             'signature' => null,
