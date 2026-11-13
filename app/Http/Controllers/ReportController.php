@@ -36,7 +36,12 @@ class ReportController extends Controller
             ->map(fn($permission) => [
                 'label' => $permission->company->name,
                 'value' => $permission->company->id,
-            ]);
+            ])
+            ->prepend([
+                'label' => 'All',
+                'value' => 'all',
+            ])
+            ->values();
 
         $excludedCheque = ['forwarded', 'released', 'deposited'];
 
@@ -62,7 +67,7 @@ class ReportController extends Controller
             'corporate_disbursing_clerk(forwarded_releasing)',
             'corporate_disbursing_clerk(forwarded)',
         ];
-        
+
         $locations = ['Cebu', 'Manila'];
 
         if ($user->hasAnyRole($restrictedRoles)) {
@@ -94,13 +99,13 @@ class ReportController extends Controller
         $validated = $request->validate([
             'startDate' => ['nullable', 'date_format:Y-m-d'],
             'endDate' => ['nullable', 'date_format:Y-m-d'],
-            'selectedReport' => 'required | array | min:1',
+            'selectedReport' => ['required', 'array', 'min:1'],
             'selectedReport.*' => 'string',
-            'forwardedLocations' => 'required | array | min:1',
+            'forwardedLocations' => ['nullable', 'array'],
             'forwardedLocations.*' => 'string',
             'columns' => 'required | array | min:1',
             'columns.*' => 'string',
-            'bu' => 'array',
+            'bu' => ['nullable', 'array'],
         ]);
 
         $validated['columns'] = ColumnResolver::transformColumn($validated['columns']);

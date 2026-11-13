@@ -57,8 +57,12 @@ export default function PermissionSelection({
                     input={
                         <OutlinedInput
                             sx={{
-                                height: 60, // 👈 set your height here
-                                alignItems: 'flex-start', // align chips top
+                                height: 'auto',
+                                alignItems: 'flex-start', // keep chips aligned to the top
+                                '& .MuiSelect-select': {
+                                    whiteSpace: 'normal', // allow the chips to wrap
+                                    height: 'auto',
+                                },
                             }}
                         />
                     }
