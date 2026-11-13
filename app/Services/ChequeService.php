@@ -93,6 +93,7 @@ class ChequeService
                 $assignment == 'completed',
                 fn($q) => $q->whereNotNull('cheque_number')
                     ->whereNotNull('cheque_date')
+                    ->whereNull('location')
             )
             ->when(
                 $assignment == 'tagged',
