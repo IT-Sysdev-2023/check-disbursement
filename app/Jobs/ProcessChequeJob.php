@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Events\AlreadyScannedEvent;
 use App\Events\ScannedRecordEvent;
-use App\Events\ScanningChequesEvent;
 use App\Models\BorrowedCheque;
 use App\Models\Crf;
 use App\Models\Cv;
@@ -19,7 +18,6 @@ use Illuminate\Support\Facades\Log;
 use App\Models\ScannedRecords;
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
-use Illuminate\Contracts\Filesystem\Filesystem;
 
 class ProcessChequeJob implements ShouldQueue
 {

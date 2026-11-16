@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProgressStatus;
 use App\Events\ProgressStepper;
+use App\Events\ReportProgress;
 use App\Exports\ReportExport;
 use App\Helpers\ColumnResolver;
 use App\Helpers\FileHandler;
+use App\Jobs\ReportCompletedJob;
 use App\Models\Borrower;
 use App\Models\ChequeStatus;
 use App\Models\Crf;
@@ -122,7 +125,9 @@ class ReportController extends Controller
         $date = now()->format('Ymd_His');
 
         $filename = "reports/{$role}/report-{$userId}-{$date}.xlsx";
-        Excel::queue(new ReportExport($validated, $userId), $filename, 'public');
+        Excel::queue(new ReportExport($validated, $userId), $filename, 'public')->chain([
+            new ReportCompletedJob($userId),
+        ]);
     }
 
     private static function validateFilter(array $columns)

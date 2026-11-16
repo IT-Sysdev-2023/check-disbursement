@@ -463,6 +463,11 @@ export default function EmployeeReportFilters({
                                     </Alert>
                                 ) : (
                                     <>
+                                        <Box>
+                                            <Typography variant="body2">
+                                                {item.message}
+                                            </Typography>
+                                        </Box>
                                         <LinearProgress
                                             variant="buffer"
                                             value={item.progress}

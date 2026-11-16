@@ -21,12 +21,12 @@ class ReportProgress implements ShouldBroadcast
      * Create a new event instance.
      */
     public function __construct(
-        protected string $key,
         protected int $userId,
         protected string $message,
+        protected ProgressStatus $status,
         protected int $currentRow = 0,
         protected int $totalRows = 0,
-           protected ProgressStatus $status,
+        protected string $key = '',
     ) {
         //
         $this->percentage = NumberHelper::percentage($currentRow, $totalRows);

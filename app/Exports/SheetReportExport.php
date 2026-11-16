@@ -84,7 +84,7 @@ class SheetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
             'business_unit' => $checkable?->businessUnit->name,
         ];
 
-        ReportProgress::dispatch($this->acronym(), $this->userId, "Generating {$this->title}", $this->currentIndex++, $this->totalItems, ProgressStatus::Processing);
+        ReportProgress::dispatch($this->userId, "Generating {$this->title}", ProgressStatus::Processing, $this->currentIndex++, $this->totalItems, $this->acronym());
 
         return collect($this->data->get('columns'))
             ->map(fn($column) => $record[$column] ?? null)
