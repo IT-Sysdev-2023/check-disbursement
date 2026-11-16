@@ -128,6 +128,8 @@ class ReportController extends Controller
         Excel::queue(new ReportExport($validated, $userId), $filename, 'public')->chain([
             new ReportCompletedJob($userId),
         ]);
+
+        return response()->json(['downloadLink' => "report-{$userId}-{$date}.xlsx"]);
     }
 
     private static function validateFilter(array $columns)

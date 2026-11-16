@@ -9,14 +9,18 @@ import {
     FormControlLabel,
     FormHelperText,
     Grid,
+    IconButton,
     InputLabel,
+    Paper,
     SelectChangeEvent,
+    Snackbar,
+    SnackbarCloseReason,
     Stack,
     Typography,
 } from '@mui/material';
 
 import AppLayout from '@/layouts/app-layout';
-import { generateReport } from '@/routes';
+import { downloadReport, generateReport } from '@/routes';
 import {
     Auth,
     BreadcrumbItem,
@@ -34,9 +38,11 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PickerValue } from '@mui/x-date-pickers/internals';
 import axios from 'axios';
 import { Dayjs } from 'dayjs';
+import { DownloadIcon, X } from 'lucide-react';
 import { ChangeEvent, ReactNode, useState } from 'react';
 import PermissionSelection from '../admin/components/permissionSelection';
 import HorizontalLinearAlternativeLabelStepper from '../extract/components/stepProgress';
+import SectionCard from './components/sectionCard';
 
 const steps = [
     'Validating Requests...',
@@ -44,41 +50,6 @@ const steps = [
     'Retreiving...',
 ];
 
-const SectionCard = ({
-    title,
-    color,
-    icon,
-    children,
-    height = 520,
-}: {
-    title: string;
-    color: string;
-    icon?: ReactNode;
-    children: ReactNode;
-    height?: number;
-}) => (
-    <Card sx={{ borderRadius: 2, height }}>
-        <Box
-            sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                px: 2,
-                py: 1,
-                bgcolor: color,
-                color: '#fff',
-                fontWeight: 600,
-            }}
-        >
-            {icon}
-            <Typography variant="subtitle2">{title}</Typography>
-        </Box>
-
-        <CardContent sx={{ overflowY: 'auto', height: height - 52 }}>
-            {children}
-        </CardContent>
-    </Card>
-);
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Report',
@@ -111,6 +82,8 @@ export default function EmployeeReportFilters({
     const [progress, setProgress] = useState<ProgressState>({});
     const [loading, setLoading] = useState(false);
 
+    const [openDownload, setOpenDownload] = useState(false);
+    const [downloadLink, setDownloadLink] = useState('');
     useEcho(
         `report-progress.${auth.user.id}`,
         'ReportProgress',
@@ -119,6 +92,7 @@ export default function EmployeeReportFilters({
 
             if (status === 'finished') {
                 setLoading(false);
+                setOpenDownload(true);
             }
             const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
@@ -165,14 +139,23 @@ export default function EmployeeReportFilters({
     const onGenerate = async () => {
         setLoading(true);
 
-        await axios.post(generateReport().url, {
+        const res = await axios.post(generateReport().url, {
+            ...data,
             startDate: startDate?.format('YYYY-MM-DD') ?? null,
             endDate: endDate?.format('YYYY-MM-DD') ?? null,
-            bu: data.bu,
-            selectedReport: data.selectedReport,
-            forwardedLocations: data.forwardedLocations,
-            columns: data.columns,
         });
+
+        setDownloadLink(res.data.downloadLink);
+    };
+    const handleClose = (
+        event: React.SyntheticEvent | Event,
+        reason?: SnackbarCloseReason,
+    ) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+
+        setOpenDownload(false);
     };
 
     const handleChangeSelection = (
@@ -196,6 +179,10 @@ export default function EmployeeReportFilters({
 
     const handleEndDateChange = (value: PickerValue) => {
         setEndDate(value);
+    };
+
+    const downloadFile = () => {
+        window.location.href = downloadReport().url + `?file=${downloadLink}`;
     };
 
     return (
@@ -487,6 +474,45 @@ export default function EmployeeReportFilters({
                     </Box>
                 </Grid>
             </Box>
+            <Snackbar
+                open={openDownload}
+                autoHideDuration={5000}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+            >
+                <Paper elevation={6} sx={{ p: 2, width: 320 }}>
+                    <Stack spacing={1}>
+                        <Stack direction="row" justifyContent="space-between">
+                            <Typography fontWeight={600}>
+                                Report ready
+                            </Typography>
+
+                            <IconButton
+                                size="small"
+                                onClick={() => setOpenDownload(false)}
+                            >
+                                <X />
+                            </IconButton>
+                        </Stack>
+
+                        <Typography variant="body2" color="text.secondary">
+                            Your Excel report is ready to download.
+                        </Typography>
+
+                        <Button
+                            variant="contained"
+                            startIcon={<DownloadIcon />}
+                            onClick={downloadFile}
+                            fullWidth
+                        >
+                            Download Excel
+                        </Button>
+                    </Stack>
+                </Paper>
+            </Snackbar>
         </AppLayout>
     );
 }
