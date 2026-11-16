@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ProgressStepper;
 use App\Exports\ReportExport;
 use App\Helpers\ColumnResolver;
 use App\Helpers\FileHandler;
@@ -108,19 +109,20 @@ class ReportController extends Controller
             'bu' => ['nullable', 'array'],
         ]);
 
-        $validated['columns'] = ColumnResolver::transformColumn($validated['columns']);
+        $userId = $request->user()->id;
+        ProgressStepper::dispatch($userId, 1);
 
+        $validated['columns'] = ColumnResolver::transformColumn($validated['columns']);
         if (!self::validateFilter($validated)) {
             return redirect()->back()->with(['status' => false, 'message' => 'No records found for the selected filters']);
         }
+        ProgressStepper::dispatch($userId, 2);
 
         $role = $this->userType;
         $date = now()->format('Ymd_His');
 
-        $filename = "reports/{$role}/report-{$request->user()->id}-{$date}.xlsx";
-        Excel::store(new ReportExport($validated), $filename, 'public');
-
-        return redirect()->back()->with(['status' => true, 'message' => 'Report generated Generated']);
+        $filename = "reports/{$role}/report-{$userId}-{$date}.xlsx";
+        Excel::queue(new ReportExport($validated, $userId), $filename, 'public');
     }
 
     private static function validateFilter(array $columns)

@@ -1,4 +1,5 @@
 import {
+    Alert,
     Box,
     Button,
     Card,
@@ -9,6 +10,7 @@ import {
     FormHelperText,
     Grid,
     InputLabel,
+    LinearProgress,
     SelectChangeEvent,
     Stack,
     Typography,
@@ -16,17 +18,32 @@ import {
 
 import AppLayout from '@/layouts/app-layout';
 import { generateReport } from '@/routes';
-import { BreadcrumbItem, SelectionType } from '@/types';
+import {
+    Auth,
+    BreadcrumbItem,
+    EventType,
+    ProgressState,
+    SelectionType,
+} from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import { useEcho } from '@laravel/echo-react';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import TuneIcon from '@mui/icons-material/Tune';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { PickerValue } from '@mui/x-date-pickers/internals';
+import axios from 'axios';
 import { Dayjs } from 'dayjs';
 import { ChangeEvent, ReactNode, useState } from 'react';
 import PermissionSelection from '../admin/components/permissionSelection';
+import HorizontalLinearAlternativeLabelStepper from '../extract/components/stepProgress';
+
+const steps = [
+    'Validating Requests...',
+    'Connecting to Servers...',
+    'Retreiving...',
+];
 
 const SectionCard = ({
     title,
@@ -75,13 +92,15 @@ export default function EmployeeReportFilters({
     reportSelection,
     bu,
     locations,
+    auth,
 }: {
     columns: string[];
     locations: string[];
     reportSelection: string[];
     bu: SelectionType[];
+    auth: Auth;
 }) {
-    const { data, setData, post, errors, transform } = useForm({
+    const { data, setData, errors } = useForm({
         bu: [] as string[],
         selectedReport: [] as string[],
         forwardedLocations: [] as string[],
@@ -89,6 +108,39 @@ export default function EmployeeReportFilters({
     });
     const [startDate, setStartDate] = useState<Dayjs | null>(null);
     const [endDate, setEndDate] = useState<Dayjs | null>(null);
+    const [progressStep, setProgressStep] = useState(0);
+    const [progress, setProgress] = useState<ProgressState>({});
+    const [loading, setLoading] = useState(false);
+
+    useEcho(
+        `report-progress.${auth.user.id}`,
+        'ReportProgress',
+        (e: EventType) => {
+            const { percentage, message, status, key } = e;
+
+            setLoading(false);
+            const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
+
+            setProgress((prev) => ({
+                ...prev,
+                [key]: {
+                    progress: percentage,
+                    buffer,
+                    message,
+                    status,
+                },
+            }));
+        },
+    );
+
+    useEcho(
+        `progress-stepper.${auth.user.id}`,
+        'ProgressStepper',
+        (e: { step: number }) => {
+            const { step } = e;
+            setProgressStep(step);
+        },
+    );
 
     const handleChange =
         (field: keyof typeof data) =>
@@ -109,16 +161,16 @@ export default function EmployeeReportFilters({
             setData(field, updated);
         };
 
-    const onGenerate = () => {
-        transform((data) => ({
-            ...data,
+    const onGenerate = async () => {
+        setLoading(true);
+
+        await axios.post(generateReport().url, {
             startDate: startDate?.format('YYYY-MM-DD') ?? null,
             endDate: endDate?.format('YYYY-MM-DD') ?? null,
-        }));
-
-        post(generateReport().url, {
-            preserveScroll: true,
-            preserveState: true,
+            bu: data.bu,
+            selectedReport: data.selectedReport,
+            forwardedLocations: data.forwardedLocations,
+            columns: data.columns,
         });
     };
 
@@ -350,17 +402,83 @@ export default function EmployeeReportFilters({
                         </SectionCard>
                     </Grid>
 
-                    <Button
-                        variant="contained"
-                        fullWidth
-                        sx={{
-                            bgcolor: '#009688',
-                            '&:hover': { bgcolor: '#00796b' },
-                        }}
-                        onClick={onGenerate}
-                    >
-                        Generate Report
-                    </Button>
+                    {!loading && (
+                        <Button
+                            variant="contained"
+                            fullWidth
+                            sx={{
+                                bgcolor: '#009688',
+                                '&:hover': { bgcolor: '#00796b' },
+                            }}
+                            onClick={onGenerate}
+                        >
+                            Generate Report
+                        </Button>
+                    )}
+                    <Box sx={{ width: '100%', p: 2 }}>
+                        {loading && Object.keys(progress).length === 0 && (
+                            <HorizontalLinearAlternativeLabelStepper
+                                step={progressStep}
+                                steps={steps}
+                            />
+                        )}
+                        {Object.entries(progress).map(([key, item]) => (
+                            <Box key={key} sx={{ mb: 3 }}>
+                                {item.status == 'no_record' ? (
+                                    <Alert
+                                        variant="filled"
+                                        severity="warning"
+                                        sx={{ mb: 2 }}
+                                    >
+                                        {item.message}
+                                    </Alert>
+                                ) : item.status == 'connection_error' ? (
+                                    <Alert
+                                        variant="filled"
+                                        severity="error"
+                                        sx={{
+                                            mb: 2,
+                                            '&.MuiAlert-filledError': {
+                                                backgroundColor: '#D32F2F',
+                                                color: '#FFFFFF',
+                                            },
+                                        }}
+                                    >
+                                        {item.message}
+                                    </Alert>
+                                ) : item.status == 'finished' ? (
+                                    <Alert
+                                        variant="filled"
+                                        severity="success"
+                                        sx={{
+                                            mb: 2,
+                                            bgcolor: 'success.light',
+                                            '& .MuiAlert-icon': {
+                                                color: 'success.dark', // or any color you want
+                                            },
+                                            borderColor: 'success.main',
+                                        }}
+                                    >
+                                        {item.message}
+                                    </Alert>
+                                ) : (
+                                    <>
+                                        <LinearProgress
+                                            variant="buffer"
+                                            value={item.progress}
+                                            valueBuffer={item.buffer}
+                                        />
+                                        <Typography
+                                            variant="caption"
+                                            color="text.secondary"
+                                        >
+                                            {item.progress}%
+                                        </Typography>
+                                    </>
+                                )}
+                            </Box>
+                        ))}
+                    </Box>
                 </Grid>
             </Box>
         </AppLayout>

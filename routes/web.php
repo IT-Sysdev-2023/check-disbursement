@@ -238,7 +238,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('reports')->group(function () {
         Route::get('index', [ReportController::class, 'index'])->name('report');
-        Route::post('generate-report', [ReportController::class, 'generate'])->name('generateReport');
+        Route::post('generate-report', [ReportController::class, 'generate'])->name('generate-report');
         Route::get('generated-reports', [ReportController::class, 'generatedReports'])->name('generatedReport');
 
         Route::get('download-report', [ReportController::class, 'download'])->name('download-report');

@@ -3,9 +3,15 @@
 namespace App\Exports;
 
 
+use App\Enums\ProgressStatus;
+use App\Events\ReportProgress;
 use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Concerns\FromQuery;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Concerns\WithMapping;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -16,18 +22,25 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithEvents;
+use Maatwebsite\Excel\Events\AfterChunk;
+use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 
-class SheetReportExport implements FromCollection, WithHeadings, WithTitle, ShouldAutoSize, WithStyles
+class SheetReportExport implements FromQuery, WithHeadings, WithMapping, WithTitle, ShouldAutoSize, WithStyles
 {
     /**
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
     protected Collection $data;
+    protected int $totalItems = 0;
+    protected int $currentIndex = 0;
+    protected int $userId;
     protected string $title;
-    public function __construct(Collection $data, string $title)
+    public function __construct(Collection $data, string $title, int $userId)
     {
         $this->data = $data;
         $this->title = $title;
+        $this->userId = $userId;
     }
 
     public function title(): string
@@ -43,40 +56,45 @@ class SheetReportExport implements FromCollection, WithHeadings, WithTitle, Shou
         );
     }
 
-    public function collection()
+    public function query(): Builder
     {
-        $res = $this->getRecords()->map(function ($item) {
-            $checkable = $item->checkable;
-            return [
-                'receiver_name' => $item->receiver_name,
-                'status' => $item->status,
-                "date_of_action" => $item->created_at ? Date::parse($item->created_at)->format('Y-m-d') : 'N/A',
-                'checkable_type' => $item->checkable_type,
+        $query = $this->getRecords();
+        $this->totalItems = (clone $query)->count();
+        return $query;
+    }
 
-                'no' => $item->checkable_type === 'cv' ? $checkable?->cv_no : $checkable?->crf_no,
-                'cheque_number' => $checkable?->cheque_number,
-                'cheque_amount' => $checkable?->cheque_amount,
-                'cheque_date' => $checkable?->cheque_date ? Date::parse($checkable->cheque_date)->format('Y-m-d') : null,
-                'payee' => $checkable?->payee,
-                'approver_name' => $checkable?->borrowedCheque?->approver->name,
-                'borrower_name' => $checkable?->borrowedCheque?->borrower_name,
-                'borrower_no' => $checkable?->borrowedCheque?->borrower_no,
-                'location' => $checkable?->tagLocation->location,
-                'business_unit' => $checkable?->businessUnit->name,
-            ];
-        });
+    public function map($item): array
+    {
+        $checkable = $item->checkable;
+        $record = [
+            'receiver_name' => $item->receiver_name,
+            'status' => $item->status,
+            "date_of_action" => $item->created_at ? Date::parse($item->created_at)->format('Y-m-d') : 'N/A',
+            'checkable_type' => $item->checkable_type,
 
-        return $res->map(
-            fn($item) => collect($this->data->get('columns'))
-                ->map(fn($column) => $item[$column] ?? null)
-                ->all()
-        );
+            'no' => $item->checkable_type === 'cv' ? $checkable?->cv_no : $checkable?->crf_no,
+            'cheque_number' => $checkable?->cheque_number,
+            'cheque_amount' => $checkable?->cheque_amount,
+            'cheque_date' => $checkable?->cheque_date ? Date::parse($checkable->cheque_date)->format('Y-m-d') : null,
+            'payee' => $checkable?->payee,
+            'approver_name' => $checkable?->borrowedCheque?->approver->name,
+            'borrower_name' => $checkable?->borrowedCheque?->borrower_name,
+            'borrower_no' => $checkable?->borrowedCheque?->borrower_no,
+            'location' => $checkable?->tagLocation->location,
+            'business_unit' => $checkable?->businessUnit->name,
+        ];
+
+        ReportProgress::dispatch($this->acronym(), $this->userId, "Generating {$this->title}", $this->currentIndex++, $this->totalItems, ProgressStatus::Processing);
+
+        return collect($this->data->get('columns'))
+            ->map(fn($column) => $record[$column] ?? null)
+            ->all();
     }
 
     private function getRecords()
     {
         return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit']])
-            ->select('receiver_name', 'status', 'checkable_id', 'checkable_type', 'created_at')
+            ->select('id', 'receiver_name', 'status', 'checkable_id', 'checkable_type', 'created_at')
 
             ->when(
                 $this->acronym() === 'pdc', //Post Dated
@@ -200,8 +218,7 @@ class SheetReportExport implements FromCollection, WithHeadings, WithTitle, Shou
                             });
                         }
                     )
-            )
-            ->get();
+            );
     }
 
     function acronym(): string
