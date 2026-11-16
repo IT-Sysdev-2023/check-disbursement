@@ -10,7 +10,6 @@ import {
     FormHelperText,
     Grid,
     InputLabel,
-    LinearProgress,
     SelectChangeEvent,
     Stack,
     Typography,
@@ -118,7 +117,9 @@ export default function EmployeeReportFilters({
         (e: EventType) => {
             const { percentage, message, status, key } = e;
 
-            setLoading(false);
+            if (status === 'finished') {
+                setLoading(false);
+            }
             const buffer = percentage + 10 > 100 ? 100 : percentage + 10;
 
             setProgress((prev) => ({
@@ -463,12 +464,12 @@ export default function EmployeeReportFilters({
                                     </Alert>
                                 ) : (
                                     <>
-                                        <Box>
+                                        <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2">
                                                 {item.message}
                                             </Typography>
                                         </Box>
-                                        <LinearProgress
+                                        {/* <LinearProgress
                                             variant="buffer"
                                             value={item.progress}
                                             valueBuffer={item.buffer}
@@ -478,7 +479,7 @@ export default function EmployeeReportFilters({
                                             color="text.secondary"
                                         >
                                             {item.progress}%
-                                        </Typography>
+                                        </Typography> */}
                                     </>
                                 )}
                             </Box>
