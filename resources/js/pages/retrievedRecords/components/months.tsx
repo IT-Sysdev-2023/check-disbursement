@@ -140,7 +140,8 @@ export default function Months({
                         >
                             {month.totalNavRecords !== month.totalMonthly ? (
                                 <>
-                                    {month.totalNavRecords} in Navision
+                                    {!checked[key(month)] &&
+                                        `${month.totalNavRecords} in Navision`}
                                     <Switch
                                         disabled={
                                             loading || loadingMap[key(month)]

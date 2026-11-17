@@ -19,7 +19,7 @@ class Calendar
     {
         $page = $filters['page'] ?? 1;
         $perPage = $filters['perPage'] ?? 2; // BUs per page
-
+        // dd($filters);
         if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
             //  Nav selected: use nav records only, don't merge with base
             $data = self::distinctMonthsNav($filters['monthDetails']);
@@ -135,47 +135,30 @@ class Calendar
     }
     private static function distinctMonths($company)
     {
-        $crf = Crf::select('cheque_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CRF' as type"),  DB::raw('MAX(crfs.created_at) as created_at'))
-            ->join('business_units', 'business_units.id', '=', 'crfs.business_unit_id')
-            ->whereNot('business_units.company_id', 13)
-            ->when($company && $company != 'all', function ($q) use ($company) {
-                $q->whereHas('businessUnit', function ($q) use ($company) {
-                    $q->where('company_id', $company);
-                });
-            })
-            // ->doesntHave('checkStatus')
-            ->groupBy('date', 'business_units.name', 'business_units.id');
-
-        $cv = Cv::select('cv_date as date', 'business_units.name as business_unit', 'business_units.id as buId', DB::raw('count(*) as total'), DB::raw("'CV' as type"),  DB::raw('MAX(cvs.created_at) as created_at'))
+        $result = Cv::query()
             ->join('business_units', 'business_units.id', '=', 'cvs.business_unit_id')
-             ->whereNot('business_units.company_id', 13)
-            ->when($company && $company != 'all', function ($q) use ($company) {
-                $q->whereHas('businessUnit', function ($q) use ($company) {
-                    $q->where('company_id', $company);
-                });
+            ->where('business_units.company_id', '<>', 13)
+            ->when($company && $company !== 'all', function ($q) use ($company) {
+                $q->where('business_units.company_id', $company);
             })
-            // ->doesntHave('checkStatus')
-            ->groupBy('cv_date', 'business_units.name', 'business_units.id');
-
-
-        $result = DB::query()
-            ->fromSub(
-                $crf->unionAll($cv),
-                'combined'
-            )
             ->selectRaw("
-            date,
-            business_unit,
-            buId,
-            SUM(CASE WHEN type = 'crf' THEN total ELSE 0 END) as crf_total,
-            SUM(CASE WHEN type = 'cv' THEN total ELSE 0 END) as cv_total,
-            SUM(total) as total,
-            MAX(created_at) as latest_created_at
-        ")
-            ->groupBy('date', 'business_unit', 'buId')
+        cvs.cv_date as date,
+        business_units.name as business_unit,
+        business_units.id as buId,
+        0 as crf_total,
+        COUNT(*) as cv_total,
+        COUNT(*) as total,
+        MAX(cvs.created_at) as latest_created_at
+    ")
+            ->groupBy(
+                'cvs.cv_date',
+                'business_units.name',
+                'business_units.id'
+            )
             ->orderByDesc('latest_created_at')
             ->get()
             ->groupBy('business_unit');
+
         return $result;
     }
 
@@ -210,7 +193,7 @@ class Calendar
                 'crf' => $findRecord ? $findRecord->crf_total : 0,
                 'cv' => $findRecord ? $findRecord->cv_total : 0,
                 'isCurrent' => false
-            ]; //$val->day === today()->day
+            ];
 
         });
 
@@ -221,14 +204,15 @@ class Calendar
             array_unshift($totalDay, ['day' => "", 'holiday' => null, 'isCurrent' => false]);
         }
 
+        $totalMontly = $records->sum('total');
         return [
             'month' => (clone $date)->format('M Y'),
             'y' => (clone $date)->year,
             'm' => (clone $date)->month,
             'days' => array_chunk($totalDay, 7),
-            'totalMonthly' => $records->sum('total'),
+            'totalMonthly' => $totalMontly,
             'businessUnit' => $records->first()->business_unit ?? null,
-            'totalNavRecords' => $navRecords
+            'totalNavRecords' => $navRecords - $totalMontly
 
         ];
 

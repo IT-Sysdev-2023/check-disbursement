@@ -57,7 +57,6 @@ class ChequeRequestService
                 fn($query) => $query->has('chequeStatus')
             )
             ->get();
-
         return response()->json(BorrowedChequeResource::collection($records));
     }
 

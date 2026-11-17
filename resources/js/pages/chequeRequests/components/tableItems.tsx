@@ -48,6 +48,7 @@ export default function TableItems(props: {
                         check: row.check,
                     },
                 });
+                
                 setBorrowerData((prev) => ({
                     ...prev,
                     [row.borrowerNoClean]: data,

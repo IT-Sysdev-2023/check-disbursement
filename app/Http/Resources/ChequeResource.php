@@ -17,7 +17,8 @@ class ChequeResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $chequeDate = $this->cheque_date ? $this->cheque_date : null;
+        $date = $this->fillChequeDate();
+        $chequeDate = $date ? $date : null;
         $taggedAt = $this->tagged_at ? $this->tagged_at : null;
         $cvDate = optional($this)->document_date ? $this->document_date : null;
         // $staleThreshold = Date::today()->subMonths(6);
@@ -75,5 +76,16 @@ class ChequeResource extends JsonResource
             // 'scannedPayee' => optional($this)->scanned_payee,
             // 'scannedAmount' => optional($this)->scanned_amount,
         ];
+    }
+
+    private function fillChequeDate()
+    {
+        if (
+            ($this->bank ?? null) === 'Revolving Fund' &&
+            $this->cheque_date?->isSameDay('1753-01-01')
+        ) {
+            return $this->document_date ?? null;
+        }
+        return $this->cheque_date;
     }
 }

@@ -68,6 +68,7 @@ class ChequeService
     {
         $tableView = self::tableView($filters, $assignment);
 
+        // dd($tableView);
         $records = match ($tab) {
             'calendar' => Calendar::calendar($filters),
             'cheques' => new ChequeCollection($tableView),
