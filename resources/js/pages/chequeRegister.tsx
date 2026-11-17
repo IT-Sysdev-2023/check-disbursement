@@ -23,7 +23,7 @@ export default function ChequeRegister({
     bankAccounts: SelectionType[];
     filters: FilterType;
 }) {
-    const { data, setData, post, processing, reset,transform } = useForm({
+    const { data, setData, post, processing, reset, transform } = useForm({
         min: '',
         max: '',
         bank: filters.bank,
@@ -46,10 +46,11 @@ export default function ChequeRegister({
         }
 
         const selectedBank = banks.find((bank) => bank.value === data.bank);
-        const selectedBa = bankAccounts.find((bank) => bank.value === data.bank_account);
+        const selectedBa = bankAccounts.find(
+            (bank) => bank.value === data.bank_account,
+        );
 
-
-         transform((data) => ({
+        transform((data) => ({
             ...data,
             bank: selectedBank?.label,
             bank_account: selectedBa?.label,
@@ -58,9 +59,13 @@ export default function ChequeRegister({
         post(chequeRegisterStore().url, {
             onSuccess: () => {
                 reset();
-                notifications.show('Range Added', {
-                    severity: 'success',
-                    autoHideDuration: 3000,
+            },
+            onError: (errors) => {
+                Object.values(errors).forEach((error) => {
+                    notifications.show(error, {
+                        severity: 'error',
+                        autoHideDuration: 3000,
+                    });
                 });
             },
         });

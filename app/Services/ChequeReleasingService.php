@@ -128,11 +128,18 @@ class ChequeReleasingService
 
         $validated = $request->validate([
             'min' => ['required', 'numeric', 'min:0'],
-            'max' => ['required', 'numeric', 'min:0', 'gte:min'],
+            'max' => [
+                'required',
+                'numeric',
+                'gte:min',
+                'max:999999999',
+                'lte:' . ($request->input('min') + 99),
+            ],
+            // 'max' => ['required', 'numeric', 'min:0', 'gte:min'],
             'bank' => ['required'],
             'bank_account' => ['required'],
         ]);
-        
+
         $userId = $request->user()->id;
 
         return DB::transaction(function () use ($validated, $userId) {
