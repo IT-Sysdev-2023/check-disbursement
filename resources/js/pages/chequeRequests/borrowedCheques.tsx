@@ -111,10 +111,9 @@ export default function BorrowedCheques({
                         disabled={data.borrowedIds.length === 0}
                         variant="outlined"
                         startIcon={<Handshake />}
-                        // onClick={handleSubmit}
                         onClick={() => setOpenApproval(true)}
                     >
-                        Receive
+                        Return
                     </Button>
                     <Button
                         disabled={data.borrowedIds.length === 0}
@@ -123,7 +122,7 @@ export default function BorrowedCheques({
                         startIcon={<X />}
                         onClick={() => setOpenCancel(true)}
                     >
-                        Return
+                        Cancel
                     </Button>
                     <Button
                         disabled={data.borrowedIds.length === 0}

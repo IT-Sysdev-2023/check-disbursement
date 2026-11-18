@@ -104,7 +104,7 @@ class ChequeRequestService
                 [Cv::class, Crf::class],
                 fn(Builder $query) => $query->has('chequeStatus')
             )
-            ->paginate(15)
+            ->paginate(request()->per_page ?? 15)
             ->withQueryString()
             ->toResourceCollection();
 
@@ -193,7 +193,7 @@ class ChequeRequestService
             ->whereNull('approved_at')
             ->groupBy('borrower_no', 'borrower_name', 'reason', 'approver_id')
             ->orderByDesc('borrower_no')
-            ->paginate(5)
+            ->paginate(request()->per_page ?? 15)
             ->withQueryString()
             ->toResourceCollection();
     }

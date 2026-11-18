@@ -111,7 +111,7 @@ export default function BorrowedTableGrid({
                 onPageChange={handleChangePage}
                 rowsPerPage={data?.meta.per_page || 10}
                 onRowsPerPageChange={handleChangeRowsPerPage}
-                rowsPerPageOptions={[5, 10, 25, 50]}
+                rowsPerPageOptions={[15, 25, 50, 100]}
             />
         </>
     );

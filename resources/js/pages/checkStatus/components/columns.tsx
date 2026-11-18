@@ -140,7 +140,7 @@ export const createStatusChequeColumns = (
                         }
                     >
                         <MenuItem value="details">
-                            Check Request Form Details
+                            Details
                         </MenuItem>
                         {row.checkable?.chequeStatus?.status !== 'cancel' && (
                             <MenuItem value="scannedDetails">
@@ -305,7 +305,7 @@ export const chequeStatusColumns = (
                         }
                     >
                         <MenuItem value="details">
-                            Check Request Form Details
+                            Details
                         </MenuItem>
                     </Select>
                 </Box>
@@ -456,7 +456,7 @@ export const createCancelledChequeColumns = (
                         }
                     >
                         <MenuItem value="details">
-                            Check Request Form Details
+                            Details
                         </MenuItem>
 
                         <MenuItem value="scannedDetails">

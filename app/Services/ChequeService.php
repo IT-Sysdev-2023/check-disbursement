@@ -32,7 +32,7 @@ class ChequeService
 
     public function records(Request $request)
     {
-        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page', 'documentType']);
+        $filters = $request->only(['company', 'bu', 'search', 'sort', 'date', 'tab', 'assignment', 'isNavSelected', 'monthDetails', 'page', 'per_page', 'documentType']);
         $assignment = $filters['assignment'] ?? 'toAssign';
         $company = $filters['company'] ?? 'all';
         $tab = $filters['tab'] ?? 'calendar';
@@ -102,7 +102,7 @@ class ChequeService
             )
             ->orderByDesc('created_at')
             ->doesntHave('source.borrowedCheque')
-            ->paginate()
+            ->paginate($filters['per_page'] ?? 15)
             ->withQueryString();
     }
 
@@ -195,7 +195,7 @@ class ChequeService
             ->whereNotNull('borrowed_cheques.approved_at')
             ->leftJoin('scanned_records', 'scanned_records.borrowed_cheque_id', '=', 'borrowed_cheques.id')
             ->orderByDesc('scanned_records.id')
-            ->paginate(10)
+            ->paginate($filters['per_page'] ?? 15)
             ->withQueryString()
             ->toResourceCollection();
     }

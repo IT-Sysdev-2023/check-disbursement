@@ -122,7 +122,7 @@ export default function TableDataGrid({
                 onFilterModelChange={handleFilterModelChange}
                 loading={isLoading}
                 showToolbar
-                pageSizeOptions={[5, 10, 15, 25]}
+                pageSizeOptions={[15, 25, 50, 100]}
                 sx={{
                     [`& .${gridClasses.columnHeader}, & .${gridClasses.cell}`]:
                         {
