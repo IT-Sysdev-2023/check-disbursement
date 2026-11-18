@@ -87,6 +87,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('filter-business-units', [RetrievedChecksController::class, 'businessUnits'])->name('filter-business-units');
             Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrower-names');
             Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
+            Route::post('view-borrowed-pdf', [BorrowedCheckController::class, 'viewPdf'])->name('view-borrowed-pdf');
 
             Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
             Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');

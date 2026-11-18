@@ -198,6 +198,7 @@ export interface Borrower {
     check: string;
     primaryApproverName?: string;
     borrowerNoClean: number;
+    doc?:string,
     checkable: Crf | Cv;
 }
 

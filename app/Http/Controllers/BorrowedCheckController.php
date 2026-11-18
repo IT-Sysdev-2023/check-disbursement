@@ -18,6 +18,10 @@ class BorrowedCheckController extends Controller
         return $this->service->store($request);
     }
 
+    public function viewPdf(Request $request){
+        return $this->service->viewPdf($request);
+    }
+
     public function borrower()
     {
         return $this->service->borrower();

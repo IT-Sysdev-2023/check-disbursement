@@ -54,7 +54,7 @@ class BorrowedCheque extends Model
     protected function scopeRegionalPermission(Builder $query): void
     {
         $user = auth()->user();
-        
+
         if (
             !$user->hasRole([
                 'corporate_disbursing_clerk(forwarded_releasing)',
@@ -96,6 +96,11 @@ class BorrowedCheque extends Model
     // {
     //     return $this->belongsTo(Borrower::class);
     // }
+
+    public function doc()
+    {
+        return $this->hasOne(BorrowedChequesPdf::class, 'borrower_no', 'borrower_no');
+    }
 
     public function approver()
     {

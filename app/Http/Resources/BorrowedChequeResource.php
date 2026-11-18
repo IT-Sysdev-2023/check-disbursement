@@ -29,6 +29,7 @@ class BorrowedChequeResource extends JsonResource
             'isDepositSlip' => $this->is_ds,
             'checkable' => $this->whenLoaded('checkable', fn() => $this->resolveCheckable()),
             'approver' => $this->whenLoaded('approver'),
+            'doc' => $this->whenLoaded('doc', fn($doc) => $doc?->file_path),
             'exists_on_remote_server' => (bool) $this->exists_on_remote_server,
             'lastBorrowedAt' => Date::parse($this->last_borrowed_at)->format('M d, Y H:i A'),
         ];
@@ -36,7 +37,7 @@ class BorrowedChequeResource extends JsonResource
 
     protected function resolveCheckable()
     {
-        
+
         return match ($this->checkable_type) {
             'cv' => new CvResource($this->checkable),
             'crf' => new CrfResource($this->checkable),

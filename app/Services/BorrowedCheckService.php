@@ -132,4 +132,15 @@ class BorrowedCheckService
     {
         return response()->json(new BorrowedChequeResource($id->load('checkable.tagLocation')));
     }
+
+    public function viewPdf(Request $request)
+    {
+        // dd($request->all());
+        $validated = $request->validate([
+            'path' => 'required|string'
+        ]);
+        
+        return redirect()->back()->with(['status' => true, 'stream' => route('pdf.view', ['path' => $validated['path']])]);
+
+    }
 }

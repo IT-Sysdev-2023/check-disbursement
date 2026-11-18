@@ -21,7 +21,7 @@ class PdfController extends Controller
 
         $disk = Storage::disk('public'); // use the same disk your file handler uses
         abort_unless($disk->exists($path), 404);
-
+        
         return response()->file($disk->path($path), [
             'Content-Type' => 'application/pdf',
         ]);

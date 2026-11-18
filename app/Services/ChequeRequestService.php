@@ -169,7 +169,7 @@ class ChequeRequestService
             DB::raw('COUNT(*) as total_checks'),
             DB::raw('MAX(created_at) as last_borrowed_at')
         )
-            ->with('approver')
+            ->with('approver', 'doc')
             ->notDs()
             ->has('approver')
             ->when($filters['search'] ?? null, function (Builder $query, $search) {

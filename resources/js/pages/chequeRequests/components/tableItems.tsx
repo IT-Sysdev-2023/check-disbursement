@@ -5,6 +5,7 @@ import {
     borrowedNumberCheques,
     changeApprover,
     getApprovers,
+    viewBorrowedPdf,
 } from '@/routes';
 import { Borrower, Option } from '@/types';
 import { router } from '@inertiajs/react';
@@ -96,8 +97,14 @@ export default function TableItems(props: {
     };
 
     const handleDownloadPdf = () => {
-        console.log(row);
-    }
+        if (!row.doc) {
+            alert('No Pdf Found');
+            return;
+        }
+        router.post(viewBorrowedPdf(), {
+            path: row.doc,
+        });
+    };
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
