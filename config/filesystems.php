@@ -108,7 +108,9 @@ return [
     */
 
     'links' => [
-        public_path('storage') => storage_path('app/public'),
+        public_path('storage') => PHP_OS_FAMILY === 'Windows'
+        ? 'E:\ChequeDocuments\File Documents'
+        : storage_path('app/public'),
     ],
 
 ];
