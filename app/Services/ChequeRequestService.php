@@ -330,7 +330,7 @@ class ChequeRequestService
             });
         } catch (Throwable $e) {
             // Don't leave orphaned files if the DB write failed
-            Storage::disk('local')->delete($storedPaths);
+            Storage::disk('public')->delete($storedPaths);
             report($e);
 
             return back()->withErrors([

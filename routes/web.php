@@ -62,6 +62,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->middleware('auth')
         ->name('pdf.view');
 
+    Route::post('view-borrowed-pdf', [BorrowedCheckController::class, 'viewPdf'])->name('view-borrowed-pdf');
+
     Route::middleware('role:corporate_disbursing_officer|admin')->group(function () {
         //! EXTRACT CHECKS
         Route::prefix('extract')->group(function () {
@@ -75,9 +77,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::prefix('crf')->group(function () {
                 Route::get('index', [CrfController::class, 'index'])->name('check-request-form');
                 Route::post('extract-crf', [CrfController::class, 'extractCrf'])->name('extract-crf');
-
             });
-
         });
 
         //! RETRIEVED CHECKS
@@ -87,7 +87,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::get('filter-business-units', [RetrievedChecksController::class, 'businessUnits'])->name('filter-business-units');
             Route::get('get-borrower-names', [BorrowedCheckController::class, 'borrower'])->name('borrower-names');
             Route::post('store-borrow-check', [BorrowedCheckController::class, 'store'])->name('borrow-check');
-            Route::post('view-borrowed-pdf', [BorrowedCheckController::class, 'viewPdf'])->name('view-borrowed-pdf');
 
             Route::get('get-location', [RetrievedChecksController::class, 'getLocation'])->name('get-location');
             Route::put('tag-location', [RetrievedChecksController::class, 'updateLocation'])->name('tag-location');
