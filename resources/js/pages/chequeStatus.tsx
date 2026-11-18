@@ -2,7 +2,7 @@ import PageContainer from '@/components/pageContainer';
 import TableFilter from '@/components/tableFilter';
 import AppLayout from '@/layouts/app-layout';
 import { handlePagination, handleSearch, handleSort } from '@/lib/utils';
-import { chequeStatus, detailsCrf, signatureDetails } from '@/routes';
+import { chequeStatus, detailsCrf, dsImages, signatureDetails } from '@/routes';
 import {
     Auth,
     ChequeType,
@@ -31,12 +31,14 @@ import {
     ToggleButtonGroup,
     Typography,
 } from '@mui/material';
+import axios from 'axios';
 import { SyntheticEvent, useState } from 'react';
 import {
     chequeStatusColumns,
     pdcColumn,
 } from './checkStatus/components/columns';
 import TableDataGrid from './dashboard/components/TableDataGrid';
+import ImageViewing from './imageViewing';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -59,18 +61,26 @@ export default function ChequeStatus({
     auth: Auth;
 }) {
     const [loading, setLoading] = useState(false);
+    const [viewDoc, setViewDoc] = useState(false);
+    const [images, setImages] = useState([]);
 
     const handleStatusChange = (value: string, record: IdType) => {
-        console.log(record);
-        if (record.type === 'cv')
-            router.get(
-                signatureDetails(),
-                {
+        if (value === 'details') {
+            if (record.type === 'cv')
+                router.get(signatureDetails(), {
                     id: record.id,
-                    type: record.type
-                },
-            );
-        else router.visit(detailsCrf(record.id));
+                    type: record.type,
+                });
+            else router.visit(detailsCrf(record.id));
+        } else {
+            handleAction(record.borrowedId);
+        }
+    };
+
+    const handleAction = async (id: number) => {
+        const { data } = await axios.get(dsImages(id).url);
+        setImages(data.images);
+        setViewDoc(true);
     };
 
     const [tab, setTab] = useState(filter.tab);
@@ -134,7 +144,7 @@ export default function ChequeStatus({
                             <CancelPresentationOutlined
                                 sx={{ mr: 1, fontSize: 18 }}
                             />
-                           {isRegional ? 'Returned' : 'Cancelled'}
+                            {isRegional ? 'Returned' : 'Cancelled'}
                         </ToggleButton>
                         {!isRegional && (
                             <ToggleButton value="forwarded">
@@ -202,6 +212,12 @@ export default function ChequeStatus({
                         />
                     )} */}
                 </Box>
+                <ImageViewing
+                    title='Uploaded Deposit Slips'
+                    open={viewDoc}
+                    handleClose={() => setViewDoc(false)}
+                    images={images}
+                ></ImageViewing>
             </PageContainer>
         </AppLayout>
     );

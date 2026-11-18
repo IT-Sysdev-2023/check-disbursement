@@ -8,6 +8,7 @@ use App\Models\ScannedRecords;
 use App\Services\StatusService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 
 class StatusController extends Controller
 {
@@ -22,6 +23,18 @@ class StatusController extends Controller
         return $this->service->chequeStatus($request);
     }
 
+    public function dsImages(BorrowedCheque $id)
+    {
+        $images = $id->depositSlips
+            ->map(fn($slip) => Storage::disk('public')->url($slip->path))
+            ->values();
+
+        return response()->json([
+            'images' => $images,
+        ]);
+
+    }
+
     public function scannedRecordsAmountCheckNo(Request $request)
     {
         return $this->service->scannedRecordsAmountCheckNo($request);
@@ -34,14 +47,15 @@ class StatusController extends Controller
 
     public function cancelStale(BorrowedCheque $id, Request $request)
     {
-        if(!$id) return Redirect::back()->withErrors(['message' => 'Check not found.']);
-        
+        if (!$id)
+            return Redirect::back()->withErrors(['message' => 'Check not found.']);
+
         $id->checkable?->chequeStatus()->create([
-                        'status' => 'cancelled',
-                        'cancelled_reason' => $request->reason,
-                        'caused_by' => $request->user()->id,
-                    ]);
-                    
+            'status' => 'cancelled',
+            'cancelled_reason' => $request->reason,
+            'caused_by' => $request->user()->id,
+        ]);
+
         return Redirect::back()->with(['status' => 'success', 'message' => 'Check has been cancelled successfully.']);
     }
 }

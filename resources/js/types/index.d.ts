@@ -472,6 +472,7 @@ export interface CheckScannedDetails {
 export interface IdType {
     id: number | string;
     type: number | string;
+    borrowedId: number
 }
 
 export interface EventType {

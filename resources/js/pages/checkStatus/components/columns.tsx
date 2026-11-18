@@ -139,9 +139,7 @@ export const createStatusChequeColumns = (
                             handleStatusChange(e.target.value, record)
                         }
                     >
-                        <MenuItem value="details">
-                            Details
-                        </MenuItem>
+                        <MenuItem value="details">Details</MenuItem>
                         {row.checkable?.chequeStatus?.status !== 'cancel' && (
                             <MenuItem value="scannedDetails">
                                 Scanned Check Details
@@ -208,9 +206,8 @@ export const chequeStatusColumns = (
         field: 'status',
         headerName: 'Status',
         flex: 1,
-        minWidth:200,
+        minWidth: 200,
         renderCell: ({ row }) => {
-            console.log(row);
             const chequeStatus = row.checkable?.chequeStatus;
             let status = null;
 
@@ -294,6 +291,7 @@ export const chequeStatusColumns = (
             const record = {
                 id: row.checkable?.id,
                 type: row.check,
+                borrowedId: row.id
             };
             return (
                 <Box sx={{ width: '100%' }}>
@@ -304,9 +302,10 @@ export const chequeStatusColumns = (
                             handleStatusChange(e.target.value, record)
                         }
                     >
-                        <MenuItem value="details">
-                            Details
-                        </MenuItem>
+                        <MenuItem value="details">Details</MenuItem>
+                        {row.isDepositSlip && (
+                            <MenuItem value="doc">View Doc</MenuItem>
+                        )}
                     </Select>
                 </Box>
             );
@@ -455,9 +454,7 @@ export const createCancelledChequeColumns = (
                             handleStatusChange(e.target.value, record)
                         }
                     >
-                        <MenuItem value="details">
-                            Details
-                        </MenuItem>
+                        <MenuItem value="details">Details</MenuItem>
 
                         <MenuItem value="scannedDetails">
                             Scanned Check Details

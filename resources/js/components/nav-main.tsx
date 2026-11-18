@@ -240,10 +240,6 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                           href: closingCheque(),
                           icon: BookmarkX,
                       },
-                  ]
-                : []),
-            ...(isAdmin || closingOfficer
-                ? [
                       {
                           title: 'Closed Cheques',
                           href: scannedDocuments(),

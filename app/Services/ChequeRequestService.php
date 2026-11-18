@@ -294,7 +294,7 @@ class ChequeRequestService
             DB::transaction(function () use ($request, $validated, &$storedPaths) {
                 foreach ($request->file('deposit_slips') as $file) {
                     // Private disk: not publicly accessible via URL
-                    $path = $file->store('deposit-slips', 'local');
+                    $path = $file->store('deposit-slips', 'public');
                     $storedPaths[] = $path;
 
                     $slip = DepositSlip::create([

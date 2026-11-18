@@ -228,6 +228,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     });
 
+    Route::get('ds-images/{id}', [StatusController::class, 'dsImages'])->name('ds-images');
+
     Route::get('cheque-status', [StatusController::class, 'chequeStatus'])->name('cheque-status');
     Route::post('cancel-stale-check/{id}', [StatusController::class, 'cancelStale'])->name('cancel-stale-check');
 

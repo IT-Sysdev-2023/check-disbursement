@@ -31,7 +31,7 @@ class StatusService
         } else {
             $cheque = BorrowedCheque::query()
                 ->filter($filters)
-                ->with('checkable.chequeStatus.chequeForwardedStatus')
+                ->with('checkable.chequeStatus.chequeForwardedStatus', 'depositSlips')
                 ->regionalPermission()
                 ->where(function (Builder $q) use ($tab) {
                     if ($tab === 'for_releasing') { // "For Releasing Tab"
