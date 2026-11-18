@@ -53,7 +53,7 @@
         }
 
         .report-logo {
-            width: 100px;
+            width: 180px;
             height: auto;
             display: block;
             margin: 0 auto 10px;

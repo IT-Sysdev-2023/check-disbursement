@@ -101,10 +101,17 @@
     .check-list-item:last-child {
         margin-bottom: 0;
     }
+    .report-logo {
+            width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px;
+        }
 </style>
 
 <div class="document-container">
     <div class="header">
+         <img src="{{ public_path('images/alturas_logo.jpg') }}" alt="Alturas Logo" class="report-logo">
         <h1>Closing Cheque</h1>
     </div>
 

@@ -89,12 +89,20 @@
         .page-break {
             page-break-before: always;
         }
+        .report-logo {
+            width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="report-header">
+        <img src="{{ public_path('images/alturas_logo.jpg') }}" alt="Alturas Logo" class="report-logo">
+
         <h1>Released Forwarded Cheques</h1>
         {{-- <div class="location">{{ $data['location'] ?? '-' }}</div>
         <div class="report-date">{{ $data['dateRange'] ?? '-' }}</div> --}}
