@@ -7,9 +7,10 @@ import { Grid, SelectChangeEvent, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Modal from '@mui/material/Modal';
+import axios from 'axios';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import AutocompleteUser from './autocomplete-user';
-import axios from 'axios';
+import { usePdfPreview } from './PdfPreview';
 
 const reasons = [
     {
@@ -33,10 +34,8 @@ export default function BorrowedCheckModal({
         borrower: '',
         reason: '',
     });
-
-    const [stream, setStream] = useState('');
-    const [openModalPdf, setOpenModalPdf] = useState(false);
     const [approvers, setApprovers] = useState([]);
+    const { openPdf } = usePdfPreview();
 
     useEffect(() => {
         const fetchBorrower = async () => {
@@ -65,9 +64,8 @@ export default function BorrowedCheckModal({
                 handleClose();
                 handleSuccess();
 
-                if (m.status && m.stream) {
-                    setStream(m.stream);
-                    setOpenModalPdf(true);
+                if (m.status) {
+                    openPdf(m.stream!);
                 }
             },
             onError: (e) => {
@@ -115,12 +113,6 @@ export default function BorrowedCheckModal({
                                     sxWidth={'100%'}
                                     handleTextChange={handleTextChange}
                                 />
-                                {/* <SelectItem
-                                    handleChange={handleChange}
-                                    value={data.borrower}
-                                    title="Assign Laison"
-                                    items={borrowerSelection}
-                                /> */}
                             </Grid>
                             <Grid size={{ xs: 12, sm: 12 }} sx={{ mt: 2 }}>
                                 <SelectItem
@@ -138,20 +130,6 @@ export default function BorrowedCheckModal({
                                     items={reasons}
                                 />
                             </Grid>
-
-                            {/* <Grid size={{ xs: 12, sm: 12 }}>
-                                <TextField
-                                    id="outlined-multiline-static"
-                                    label="Reason For Borrowing"
-                                    onChange={(e) =>
-                                        setData('reason', e.target.value)
-                                    }
-                                    error={!!errors.reason}
-                                    helperText={errors.reason}
-                                    multiline
-                                    fullWidth
-                                />
-                            </Grid> */}
                         </Grid>
                         <Box sx={{ textAlign: 'right', mt: 2 }}>
                             <Button
@@ -167,21 +145,6 @@ export default function BorrowedCheckModal({
                     </form>
                 </Box>
             </Modal>
-
-            <Modal open={openModalPdf} onClose={() => setOpenModalPdf(false)}>
-                <Box sx={{ ...modalStyle, width: '70%' }}>
-                    {stream && (
-                        <iframe
-                            src={stream}
-                            style={{ width: '100%', height: '500px' }}
-                            frameBorder={0}
-                        />
-                    )}
-                </Box>
-            </Modal>
-            {/* <a-modal v-model:open="openModalReprint" style="width: 70%;">
-        <iframe :src="stream" frameborder="0" style="width: 100%; height: 500px;"></iframe>
-    </a-modal> */}
         </>
     );
 }

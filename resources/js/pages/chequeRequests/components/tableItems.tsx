@@ -1,4 +1,5 @@
 import AutocompleteUser from '@/components/autocomplete-user';
+import { usePdfPreview } from '@/components/PdfPreview';
 import OnlySelectionModal from '@/pages/dashboard/components/onlySelectionModal';
 import {
     borrowedChecks,
@@ -7,7 +8,7 @@ import {
     getApprovers,
     viewBorrowedPdf,
 } from '@/routes';
-import { Borrower, Option } from '@/types';
+import { Borrower, FlashReponse, Option } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -95,15 +96,27 @@ export default function TableItems(props: {
     const handleTextChange = (_: SyntheticEvent, name: Option) => {
         setBorrower(name.label);
     };
-
+    const { openPdf } = usePdfPreview();
+    
     const handleDownloadPdf = () => {
         if (!row.doc) {
             alert('No Pdf Found');
             return;
         }
-        router.post(viewBorrowedPdf(), {
-            path: row.doc,
-        });
+        router.post(
+            viewBorrowedPdf(),
+            {
+                path: row.doc,
+            },
+            {
+                onSuccess: ({ props }) => {
+                    const m = props.flash as FlashReponse;
+                    if (m.status) {
+                        openPdf(m.stream!);
+                    }
+                },
+            },
+        );
     };
     return (
         <>
