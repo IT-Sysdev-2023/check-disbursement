@@ -40,10 +40,23 @@
             vertical-align: top;
         }
 
-        .report-header .location {
+        .report-header {
             font-size: 15px;
             font-weight: bold;
             margin-bottom: 5px;
+        }
+
+        .location {
+            font-size: 10px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .report-logo {
+            width: 100px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px;
         }
 
         .report-header .report-date {
@@ -94,6 +107,8 @@
 
 <body>
     <div class="report-header">
+        <img src="{{ public_path('images/alturas_logo.jpg') }}" alt="Alturas Logo" class="report-logo">
+
         <h1>Borrower Cheque Details</h1>
         <div class="location">{{ $data['company'] }}</div>
     </div>
@@ -127,6 +142,7 @@
     <table>
         <thead>
             <tr>
+                <th>No.</th>
                 <th>CV No.</th>
                 <th>Cheque Number</th>
                 <th>Cheque Date</th>
@@ -139,9 +155,10 @@
         <tbody>
             @foreach ($data['cheques'] as $cheque)
                 <tr>
+                    <td class="center">{{ $loop->iteration }}</td>
                     <td class="center">{{ $cheque['cv_no'] ?? $cheque['crf_no'] }}</td>
                     <td class="center">{{ $cheque['cheque_number'] }}</td>
-                    <td class="center">
+                    <td class="center" style="white-space: nowrap;">
                         {{ \Carbon\Carbon::parse($cheque['cheque_date'])->format('Y-m-d') }}
                     </td>
                     <td>{{ $cheque['payee'] }}</td>

@@ -10,6 +10,7 @@ import { Borrower, Option } from '@/types';
 import { router } from '@inertiajs/react';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import {
     Box,
     Collapse,
@@ -48,7 +49,7 @@ export default function TableItems(props: {
                         check: row.check,
                     },
                 });
-                
+
                 setBorrowerData((prev) => ({
                     ...prev,
                     [row.borrowerNoClean]: data,
@@ -93,6 +94,10 @@ export default function TableItems(props: {
     const handleTextChange = (_: SyntheticEvent, name: Option) => {
         setBorrower(name.label);
     };
+
+    const handleDownloadPdf = () => {
+        console.log(row);
+    }
     return (
         <>
             <TableRow sx={{ '& > *': { borderBottom: 'unset' } }}>
@@ -116,6 +121,16 @@ export default function TableItems(props: {
                 <TableCell align="right">{row.borrower}</TableCell>
                 <TableCell align="right">{row.approver.name}</TableCell>
                 <TableCell align="right">{row.reason}</TableCell>
+                <TableCell align="right">
+                    <IconButton
+                        color="error"
+                        size="small"
+                        onClick={() => handleDownloadPdf()}
+                        title="View PDF"
+                    >
+                        <PictureAsPdfIcon />
+                    </IconButton>
+                </TableCell>
                 {isVisible && (
                     <TableCell align="center">
                         <IconButton

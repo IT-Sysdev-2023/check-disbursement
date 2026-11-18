@@ -104,7 +104,7 @@ class ChequeRequestService
                 [Cv::class, Crf::class],
                 fn(Builder $query) => $query->has('chequeStatus')
             )
-            ->paginate(5)
+            ->paginate(15)
             ->withQueryString()
             ->toResourceCollection();
 

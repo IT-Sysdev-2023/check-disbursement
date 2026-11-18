@@ -280,7 +280,7 @@ Route::get('/test', function () {
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
         // ->table('SON-OK AGRI FARM$CV Check Payment')
-        ->table('MFI REPACKING ACCOUNTING$CV Check Payment')
+        ->table('MFI - BS COMMISSARY MAIN$CV Check Payment')
 
 
 

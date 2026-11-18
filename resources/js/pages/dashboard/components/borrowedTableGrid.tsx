@@ -76,6 +76,7 @@ export default function BorrowedTableGrid({
                             <TableCell align="right">Borrower Name</TableCell>
                             <TableCell align="right">Approver</TableCell>
                             <TableCell align="right">Reason</TableCell>
+                            <TableCell align="right">File</TableCell>
                             {isCheckReceiving && (
                                 <TableCell align="right">
                                     Borrower Details

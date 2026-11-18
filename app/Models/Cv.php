@@ -51,7 +51,7 @@ class Cv extends Model
     protected function getCompany(): Attribute
     {
         return new Attribute(
-            get: fn() => $this->company?->company,
+            get: fn() => $this->businessUnit?->company?->name,
         );
     }
 

@@ -92,10 +92,10 @@ class BorrowedCheque extends Model
         return $this->hasOne(ScannedRecords::class);
     }
 
-    public function borrower()
-    {
-        return $this->belongsTo(Borrower::class);
-    }
+    // public function borrower()
+    // {
+    //     return $this->belongsTo(Borrower::class);
+    // }
 
     public function approver()
     {

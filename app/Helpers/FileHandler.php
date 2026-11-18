@@ -42,7 +42,6 @@ class FileHandler
 
         $path = $this->folder() . $this->fileName;
         $this->disk->put($path, $pdf->output());
-
         return $path; // e.g. "pdfs/borrowed/123_4.pdf"
         // Get raw PDF output
         // $output = $pdf->output();
