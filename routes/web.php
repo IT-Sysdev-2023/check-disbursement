@@ -259,6 +259,7 @@ Route::get('/test', function () {
     // $con = Schema::connection('sqlsrvCaf')->getTables();
     // $tables = collect($con)->filter(function ($table) {
     //     return Str::contains($table['name'], 'CV');
+    //     // return Str::contains($table['name'], 'Business Unit');
     // });
     // dd($tables);
 
@@ -282,9 +283,9 @@ Route::get('/test', function () {
     $con = DB::connection('sqlsrvCaf')
         // ->table('ALTA CITTA ACCOUNTING$CV Check Payment')
         // ->table('SON-OK AGRI FARM$CV Check Payment')
-        ->table('MFI - BS COMMISSARY MAIN$CV Check Payment')
-
-
+        // ->table('ALTA CITTA ACCOUNTING$Business Unit')
+        ->table('ASC_MAIN_2019$CV Line')
+        // ->table($tables->first()['name'])
 
         // ->where('Check Voucher No_', 'CRF2610039')
         // ->where('CV No_', 'CRF0000008')

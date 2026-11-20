@@ -1,6 +1,5 @@
-import { IconButton } from '@mui/material';
+
 import { GridColDef } from '@mui/x-data-grid';
-import { ArrowBigRightDash } from 'lucide-react';
 
 export const createClosingCvColumns = (
 ): GridColDef[] => [
@@ -10,6 +9,14 @@ export const createClosingCvColumns = (
         flex: 1,
         renderCell: ({ row }) => {
             return row.checkable?.chequeNumber;
+        },
+    },
+    {
+        field: 'company',
+        headerName: 'Company',
+        flex: 1,
+        renderCell: ({ row }) => {
+            return row.checkable?.businessUnit.company.company;
         },
     },
     {

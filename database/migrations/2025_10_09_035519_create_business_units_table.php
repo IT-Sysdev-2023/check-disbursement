@@ -14,8 +14,11 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('company_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
+            $table->string('code')->nullable();
             $table->boolean('status')->default(1);
             $table->timestamps();
+
+             $table->unique(['company_id', 'name']);
         });
     }
 

@@ -23,8 +23,6 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import axios from 'axios';
-// import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Trash } from 'lucide-react';
 import { useState } from 'react';
 
@@ -47,25 +45,26 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-export default function ExtractCrf({
-    auth,
-}: {
-    auth: Auth;
-}) {
+export default function ExtractCrf({ auth }: { auth: Auth }) {
     const [progress, setProgress] = useState<SingleProgressState>();
-    // const [uploadResponse, setUploadResponse] = useState<FlashReponse>({
-    //     status: false,
-    //     message: '',
-    //     duplicates: [],
-    // });
     const [files, setFiles] = useState<File[]>([]);
     const [loading, setLoading] = useState(false);
-    // const [startDate, setStartDate] = useState<Dayjs | null>(null);
-    // const [endDate, setEndDate] = useState<Dayjs | null>(null);
 
+    const [rejected, setRejected] = useState<string[]>([]);
+
+    const hasNoExtension = (name: string) => !name.includes('.');
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (!event.target.files) return;
-        setFiles(Array.from(event.target.files));
+
+        const selected = Array.from(event.target.files);
+        const valid = selected.filter((f) => hasNoExtension(f.name));
+        const invalid = selected.filter((f) => !hasNoExtension(f.name));
+
+        setFiles(valid);
+        setRejected(invalid.map((f) => f.name));
+
+        // allow re-selecting the same file(s) afterwards
+        event.target.value = '';
     };
 
     useEcho(`crf-progress.${auth.user.id}`, 'CrfProgress', (e: EventType) => {
@@ -97,13 +96,6 @@ export default function ExtractCrf({
             );
 
             setTotalInserted(data.inserted);
-            // if (data.status && progress?.progress == 100) {
-            //     setUploadResponse({
-            //         status: data.status ?? false,
-            //         message: data?.message ?? '',
-            //         duplicates: data?.duplicates ?? [],
-            //     });
-            // }
         } finally {
             setFiles([]);
         }
@@ -179,32 +171,6 @@ export default function ExtractCrf({
                             Elevate your experience with top-tier features and
                             services.
                         </Typography>
-                        {/* <SelectBu //DISABLE BU SELECTION
-                            label="Select Business Unit"
-                            permissions={bu}
-                            selectedPermission={permissionList}
-                            handleChange={handleChange}
-                        /> */}
-                        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
-                                <DatePicker
-                                    label="Start Date"
-                                    value={startDate}
-                                    onChange={(newValue) =>
-                                        setStartDate(newValue)
-                                    }
-                                    maxDate={endDate || undefined}
-                                />
-                                <DatePicker
-                                    label="End Date"
-                                    value={endDate}
-                                    onChange={(newValue) =>
-                                        setEndDate(newValue)
-                                    }
-                                    minDate={startDate || undefined}
-                                />
-                            </Box>
-                        </LocalizationProvider> */}
                         <Button
                             sx={{
                                 mt: 5,
@@ -223,6 +189,7 @@ export default function ExtractCrf({
                                 multiple
                             />
                         </Button>
+
                         <Typography
                             variant="h6" // makes it larger than "caption"
                             sx={{
@@ -332,6 +299,16 @@ export default function ExtractCrf({
                                 >
                                     Get Data
                                 </Button>
+
+                                {rejected.length > 0 && (
+                                    <Alert
+                                        severity="warning"
+                                        sx={{ width: '100%' }}
+                                    >
+                                        Only files without an extension are
+                                        allowed. Skipped: {rejected.join(', ')}
+                                    </Alert>
+                                )}
                             </>
                         )}
 
@@ -372,51 +349,6 @@ export default function ExtractCrf({
                                 )}
                             </Box>
                         )}
-
-                        {/* {uploadResponse.message && (
-                            <>
-                                <Alert
-                                    variant="outlined"
-                                    severity={
-                                        uploadResponse.status
-                                            ? 'success'
-                                            : 'error'
-                                    }
-                                >
-                                    {uploadResponse.message}
-                                </Alert>
-                                {uploadResponse.duplicates?.length > 0 && (
-                                    <List
-                                        dense
-                                        sx={{
-                                            mt: 2,
-                                            width: '100%',
-                                            maxWidth: 400,
-                                            bgcolor: 'background.paper',
-                                            borderRadius: 2,
-                                            boxShadow: 1,
-                                        }}
-                                    >
-                                        <ListSubheader disableSticky>
-                                            Duplicate Records
-                                        </ListSubheader>
-
-                                        {uploadResponse.duplicates.map(
-                                            (item, index) => (
-                                                <ListItem key={index} divider>
-                                                    <ListItemIcon>
-                                                        <WarningAmberIcon color="warning" />
-                                                    </ListItemIcon>
-                                                    <ListItemText
-                                                        primary={`File #${item}`}
-                                                    />
-                                                </ListItem>
-                                            ),
-                                        )}
-                                    </List>
-                                )}
-                            </>
-                        )} */}
                     </Stack>
                 </Container>
             </Box>

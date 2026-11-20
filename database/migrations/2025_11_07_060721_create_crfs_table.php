@@ -34,7 +34,7 @@ return new class extends Migration {
             $table->foreignId('causer_id')->constrained('users')->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['no']);
+            $table->unique(['crf_no', 'business_unit_id', 'cheque_amount']);
         });
     }
 

@@ -49,7 +49,7 @@ class ClosingService
         $docFiles = $this->getDocFiles();
 
         $cheques = ChequeStatus::
-            with(['checkable' => ['borrowedCheque', 'tagLocation']])
+            with(['checkable' => ['borrowedCheque', 'tagLocation', 'businessUnit.company']])
             ->whereNot('status', 'cancel')
             ->where('is_closed', false)
             ->where(function ($query) {

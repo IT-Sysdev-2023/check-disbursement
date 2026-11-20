@@ -210,18 +210,18 @@ export default function ScanCheques({ files }: int) {
         e.preventDefault();
 
         setLoading(true);
-
+        setOpenTagModal(false);
         // try {
-            const { data } = await axios.post(scanAnalyze().url, {
-                scanMethod: selectedChoice,
-                supplierName: inputValue,
-            });
+        const { data } = await axios.post(scanAnalyze().url, {
+            scanMethod: selectedChoice,
+            supplierName: inputValue,
+        });
 
-            if (data.status == 'success') {
-                router.reload();
-            }
+        if (data.status == 'success') {
+            router.reload();
+        }
         // } finally {
-            setOpenTagModal(false);
+
         // }
     };
 

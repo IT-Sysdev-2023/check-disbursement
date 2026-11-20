@@ -130,7 +130,7 @@ class ScannedRecordsController extends Controller
         $totalBatches = $filteredFiles->count();
         $referenceBatch = self::generateBatchReference();
         $filteredFiles->each(function ($item) use (&$count, $totalBatches, $referenceBatch, $request) {
-            ProgressStepper::dispatch($request->user()->id, 3);
+            ProgressStepper::dispatch($request->user()->id, 2);
             $count++;
             ProcessChequeJob::dispatch(
                 $request->scanMethod,
