@@ -319,6 +319,8 @@ class ClosingService
                         'cheque_date',
                         'payee',
                         'cheque_amount',
+                        'getCompany',
+                        'getLocation'
                     ]),
                 ];
 
@@ -344,9 +346,9 @@ class ClosingService
             ];
 
             return $this->fileHandler
-                ->inFolder('pdfs/documentUploaded/')
+                ->inFolder('pdfs/closed/')
                 ->createFileName("{$company}-{$bu}", $userId, '.pdf')
-                ->handlePdf($data, 'documentUploaded');
+                ->handlePdf($data, 'closingPdf');
         });
         return redirect()->route('closing-cheque')->with(['status' => true, 'stream' => route('pdf.view', ['path' => $stream])]);
     }

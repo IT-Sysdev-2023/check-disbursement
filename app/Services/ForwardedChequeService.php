@@ -112,8 +112,6 @@ class ForwardedChequeService
 
         $stream = DB::transaction(function () use ($cheques, $validated, $request) {
             $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
-            // $companies = [];
-            // $locations = [];
             $chequesDetails = [];
 
             $handleFiles = $this->fileHandler->handleFiles($validated, $transactionNo);
@@ -139,13 +137,12 @@ class ForwardedChequeService
                         'cheque_date',
                         'payee',
                         'cheque_amount',
+                        'getCompany',
+                        'getLocation'
+                        
                     ]),
                 ];
             }
-
-            // $companies[] = $chequeStatus->checkable->getCompany;
-
-            // $locations[] = $chequeStatus->checkable?->getLocation;
 
             $label = StringHelper::statusPastTense($validated['cheques'][0]['status']);
 
@@ -162,9 +159,6 @@ class ForwardedChequeService
                 'releasedLabel' => 'Released By:',
                 'releasedBy' => auth()->user()->name,
                 'signature' => $handleFiles->signatureUri,
-
-                // 'company' => implode(', ', array_unique($companies)),
-                // 'location' => implode(', ', array_unique($locations)),
 
             ];
 

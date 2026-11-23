@@ -229,7 +229,7 @@ class ChequeReleasingService
             $data = $this->releasingService->release($validated, $userId);
 
             return $this->fileHandler
-                ->inFolder('pdfs/releasing/released/')
+                ->inFolder('pdfs/released/')
                 ->createFileName('released-', $userId, '.pdf')
                 ->handlePdf($data, 'releasedPdf');
         });
@@ -251,7 +251,7 @@ class ChequeReleasingService
             $data = $this->releasingService->releaseBu($validated, $userId);
 
             return $this->fileHandler
-                ->inFolder('pdfs/releasing/releasedPerBu/')
+                ->inFolder('pdfs/releasedPerBu/')
                 ->createFileName("released-{$validated['selectedCompany']}-{$validated['selectedBu']}", $userId, '.pdf')
                 ->handlePdf($data, 'releasedPdf');
         });
@@ -300,7 +300,6 @@ class ChequeReleasingService
                     ]);
 
                 $checkable = $chequeStatus->checkable;
-
                 $chequesDetails[] = [
                     'cv_no' => $checkable instanceof Cv
                         ? $checkable->cv_no
@@ -310,6 +309,7 @@ class ChequeReleasingService
                         'cheque_date',
                         'payee',
                         'cheque_amount',
+                        'getCompany'
                     ]),
                 ];
             }
@@ -356,7 +356,7 @@ class ChequeReleasingService
 
             $data = $this->releasingService->releaseAll($validated);
             return $this->fileHandler
-                ->inFolder('pdfs/releasing/released/')
+                ->inFolder('pdfs/released/')
                 ->createFileName('released-', $request->user()->id, '.pdf')
                 ->handlePdf($data, 'releasedPdf');
         });

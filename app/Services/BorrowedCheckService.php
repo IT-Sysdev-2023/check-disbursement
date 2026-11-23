@@ -92,11 +92,7 @@ class BorrowedCheckService
             'checkable.tagLocation',
         ]);
 
-        $companyNames = $borrowed
-            ->map(fn($cheque) => $cheque->checkable?->getCompany)
-            ->filter()
-            ->unique()
-            ->implode(', ');
+       
 
         $cheques = $borrowed
             ->map(fn($b) => $b->checkable)
@@ -106,7 +102,6 @@ class BorrowedCheckService
         $details = $borrowed->first();
         $data = [
             'dateBorrowed' => $details->created_at->isoFormat('MMMM D, YYYY h:mm A'),
-            'company' => $companyNames,
             'borrowerNo' => NumberHelper::padLeft($details->borrower_no),
             'noOfChecks' => $borrowed->count(),
             'purpose' => $reason,

@@ -19,7 +19,6 @@ class ReleasingService
     public function release(array $validated, int $userId)
     {
         $transactionNo = now()->format('YmdHis') . '-' . $userId;
-        $locations = [];
         $chequesDetails = [];
         $handleFiles = $this->fileHandler->handleFiles($validated, $transactionNo);
 
@@ -52,10 +51,10 @@ class ReleasingService
                     'cheque_date',
                     'payee',
                     'cheque_amount',
+                    'getCompany',
+                    'getLocation'
                 ]),
             ];
-
-            $locations[] = $checkable?->getLocation;
         }
 
         return [
@@ -65,15 +64,12 @@ class ReleasingService
             'causedBy' => auth()->user()->name,
             'receivedBy' => $validated['receiversName'],
             'signature' => $handleFiles->signatureUri,
-            'location' => implode(', ', array_unique($locations)),
             'cheques' => $chequesDetails
-
         ];
     }
     public function releaseBu(array $validated, int $userId)
     {
         $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
-        $locations = [];
         $chequesDetails = [];
 
         $handleFiles = $this->fileHandler->handleFiles($validated, $transactionNo);
@@ -103,6 +99,7 @@ class ReleasingService
             })
             ->values()
             ->all();
+
         foreach ($cheques as $cheque) {
             $borrowedCheque = BorrowedCheque::findOrFail($cheque['id']);
             $label = StringHelper::statusPastTense($cheque['status']);
@@ -129,10 +126,10 @@ class ReleasingService
                     'cheque_date',
                     'payee',
                     'cheque_amount',
+                    'getCompany',
+                    'getLocation'
                 ]),
             ];
-
-            $locations[] = $checkable?->getLocation;
         }
 
         return [
@@ -145,7 +142,6 @@ class ReleasingService
 
             'receivedBy' => $validated['receiversName'],
             'signature' => $handleFiles->signatureUri,
-            'location' => implode(', ', array_unique($locations)),
             'cheques' => $chequesDetails
 
         ];
@@ -154,7 +150,6 @@ class ReleasingService
     public function releaseAll($validated)
     {
         $transactionNo = now()->format('YmdHis') . '-' . auth()->id();
-        $locations = [];
         $chequesDetails = [];
 
         $cheques = self::data($validated);
@@ -185,32 +180,27 @@ class ReleasingService
                     'cheque_date',
                     'payee',
                     'cheque_amount',
+                    'getCompany',
+                    'getLocation'
                 ]),
             ];
-
-            $locations[] = $checkable?->getLocation;
         }
 
         return [
             'transactionNo' => $transactionNo,
-
             'dateLabel' => 'Date Released:',
             'dateReleased' => now()->format('M d, Y H:i A'),
             'causedBy' => auth()->user()->name,
-
             'receivedBy' => $validated['receiversName'],
             'signature' => $handleFiles->signatureUri,
-
-            'location' => implode(', ', array_unique($locations)),
             'cheques' => $chequesDetails
-
         ];
     }
 
     private static function data(array $validated)
     {
         $getCheques = self::query($validated['batchReference']);
-        
+
         return $getCheques->map(function ($cheque) {
             $location = $cheque->checkable?->getLocation;
             return [

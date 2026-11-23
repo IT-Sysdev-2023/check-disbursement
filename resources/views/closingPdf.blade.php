@@ -1,157 +1,136 @@
-<style>
-    .document-container {
-        max-width: 600px;
-        margin: 20px auto;
-        padding: 40px;
-        font-family: Arial, sans-serif;
-        color: #000;
-    }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List of Cheques with Documents</title>
 
-    .header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
+    <style>
+        body {
+            font-family: 'DejaVu Sans', sans-serif;
+            font-size: 12px;
+            color: #222;
+            margin: 30px;
+        }
 
-    .header h1 {
-        margin: 0;
-        font-size: 24px;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+        .report-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
 
-    .header p {
-        margin: 5px 0;
-        font-size: 20px;
-        font-weight: bold;
-    }
+        .report-header h1 {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 0 8px;
+            text-transform: uppercase;
+        }
 
-    .info-section {
-        margin-bottom: 30px;
-    }
+        .report-header .location {
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
 
-    .info-row {
-        display: flex;
-        margin-bottom: 10px;
-        font-size: 18px;
-    }
+        .report-header .report-date {
+            font-size: 12px;
+        }
 
-    .label-fixed {
-        width: 600px;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
 
-    .value-bold {
-        font-weight: bold;
-    }
+        thead th {
+            background-color: #e9ecef;
+            font-weight: bold;
+            text-align: center;
+        }
 
-    .form-group {
-        display: flex;
-        /* Aligns label to the top of the box as it grows */
-        align-items: flex-start;
-        margin-bottom: 15px;
-    }
+        th, td {
+            border: 1px solid #333;
+            padding: 8px;
+        }
 
-    .form-label {
-        width: 180px;
-        font-size: 18px;
-        /* Matches the padding of the box to keep text level */
-        padding-top: 12px;
-    }
+        td.amount {
+            text-align: right;
+        }
 
-    .form-box {
-        flex: 1;
-        border: 2px solid #ccc;
-        padding: 12px;
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
+        td.center {
+            text-align: center;
+        }
 
-        /* THE DYNAMIC FIXES: */
-        height: auto;
-        /* Allows the box to grow vertically */
-        min-height: 50px;
-        /* Minimum size if data is empty */
-        word-wrap: break-word;
-        /* Prevents long strings from breaking layout */
-        overflow: hidden;
-        /* Ensures no scrollbars appear on the printout */
-    }
+        @media print {
+            body {
+                margin: 15mm;
+            }
 
-    .form-box2 {
-        flex: 1;
-        padding: 12px;
-        text-align: center;
-        font-size: 20px;
-        font-weight: bold;
+            thead {
+                display: table-header-group;
+            }
 
-        /* THE DYNAMIC FIXES: */
-        height: auto;
-        /* Allows the box to grow vertically */
-        min-height: 30px;
-        /* Minimum size if data is empty */
-        word-wrap: break-word;
-        /* Prevents long strings from breaking layout */
-        overflow: hidden;
-        /* Ensures no scrollbars appear on the printout */
-    }
-
-    .check-list-item {
-        margin-bottom: 4px;
-    }
-
-    .check-list-item:last-child {
-        margin-bottom: 0;
-    }
-    .report-logo {
+            tr {
+                page-break-inside: avoid;
+            }
+        }
+        .report-logo {
             width: 180px;
             height: auto;
             display: block;
             margin: 0 auto 10px;
         }
-</style>
+    </style>
+</head>
+<body>
 
-<div class="document-container">
-    <div class="header">
-         <img src="{{ public_path('images/alturas_logo.jpg') }}" alt="Alturas Logo" class="report-logo">
-        <h1>Closing Cheque</h1>
+    <div class="report-header">
+        <img src="{{ public_path('images/alturas_logo.jpg') }}" alt="Alturas Logo" class="report-logo">
+        <h1>Cheques with Documents</h1>
+
+       
     </div>
+    <table class="report-details">
+        <tr>
+            <td style="width: 50%; border: none; padding: 0 0 10px 0;">
+                <strong>Date Closed:</strong> {{ $data['date']}}
+            </td>
+            <td style="width: 50%; border: none; padding: 0 0 10px 0; text-align: right;">
+                <strong>Closed by:</strong> {{ $data['closedBy'] }}
+            </td>
+        </tr>
+    </table>
 
-    <div class="form-content">
+    <table>
+        <thead>
+            <tr>
+                <th>CV No.</th>
+                <th>Cheque Number</th>
+                <th>Cheque Date</th>
+                <th>Payee</th>
+                <th>Amount</th>
+                <th>Company</th>
+                <th>Location</th>
+            </tr>
+        </thead>
 
-        <div class="form-group">
-            <div class="form-label">Transaction No: </div>
-            <div class="form-box" style="letter-spacing: 4px;">
-                {{ $data['transactionNo'] ?? '-' }}
-            </div>
-        </div>
+        <tbody>
+            @foreach ($data['cheques'] as $cheque)
+                <tr>
+                    <td class="center">{{ $cheque['cv_no'] }}</td>
+                    <td class="center">{{ $cheque['cheque_number'] }}</td>
+                    <td class="center" style="white-space: nowrap;">
+                        {{ \Carbon\Carbon::parse($cheque['cheque_date'])->format('Y-m-d') }}
+                    </td>
+                    <td>{{ $cheque['payee'] }}</td>
+                    <td class="amount">
+                        ₱{{ number_format((float) ($cheque['cheque_amount'] ?? 0), 2) }}
+                    </td>
+                    <td>{{ $cheque['getCompany'] }}</td>
+                    <td>{{ $cheque['getLocation'] }}</td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
-        <div class="form-group">
-            <div class="form-label">Date Forwarded :</div>
-            <div class="form-box">
-                {{ $data['dateForwarded'] ?? '-' }}
-            </div>
-        </div>
-        <div class="form-group">
-            <div class="form-label">Date Received :</div>
-            <div class="form-box">
-                {{ $data['dateReceived'] ?? '-' }}
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="form-label">Closed By :</div>
-            <div class="form-box2">
-                {{ Str::upper($data['closedBy']) ?? '-' }}
-            </div>
-        </div>
-
-        {{-- <div class="form-group">
-            <div class="form-label">Received By :</div>
-            <div class="form-box2">
-                {{ $data['receivedBy'] ?? '-' }}
-            </div>
-        </div> --}}
-
-
-
-    </div>
-</div>
+</body>
+</html>

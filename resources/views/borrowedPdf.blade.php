@@ -110,7 +110,7 @@
         <img src="{{ public_path('images/alturas_logo.jpg') }}" alt="Alturas Logo" class="report-logo">
 
         <h1>Borrower Cheque Details</h1>
-        <div class="location">{{ $data['company'] }}</div>
+        {{-- <div class="location">{{ $data['company'] }}</div> --}}
     </div>
 
 
@@ -148,6 +148,7 @@
                 <th>Cheque Date</th>
                 <th>Payee</th>
                 <th>Amount</th>
+                <th>Company</th>
                 <th>Location</th>
             </tr>
         </thead>
@@ -165,6 +166,7 @@
                     <td class="amount">
                         ₱{{ number_format((float) ($cheque['cheque_amount'] ?? 0), 2) }}
                     </td>
+                    <td class="center">{{ $cheque['getCompany']?? '-' }}</td>
                     <td class="center">{{ $cheque['tag_location']['location'] ?? '-' }}</td>
                 </tr>
             @endforeach

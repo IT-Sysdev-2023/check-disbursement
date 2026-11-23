@@ -89,6 +89,7 @@
         .page-break {
             page-break-before: always;
         }
+
         .report-logo {
             width: 180px;
             height: auto;
@@ -127,6 +128,8 @@
                 <th>Cheque Date</th>
                 <th>Payee</th>
                 <th>Amount</th>
+                <th>Company</th>
+                <th>Location</th>
             </tr>
         </thead>
 
@@ -135,11 +138,14 @@
                 <tr>
                     <td class="center">{{ $cheque['cv_no'] }}</td>
                     <td class="center">{{ $cheque['cheque_number'] }}</td>
-                    <td class="center"> {{ \Carbon\Carbon::parse($cheque['cheque_date'])->format('Y-m-d') }}</td>
+                    <td class="center" style="white-space: nowrap;">
+                        {{ \Carbon\Carbon::parse($cheque['cheque_date'])->format('Y-m-d') }}</td>
                     <td>{{ $cheque['payee'] }}</td>
                     <td class="center">
                         ₱{{ number_format((float) ($cheque['cheque_amount'] ?? 0), 2) }}
                     </td>
+                    <td>{{ $cheque['getCompany'] }}</td>
+                    <td>{{ $cheque['getLocation'] }}</td>
                 </tr>
             @endforeach
         </tbody>
