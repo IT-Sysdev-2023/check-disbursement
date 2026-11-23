@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->string('crf_location');
             $table->string('payee');
             $table->string('particulars');
+            $table->json('sl_code')->nullable();
             $table->string('bank');
             $table->string('prepared_by');
 

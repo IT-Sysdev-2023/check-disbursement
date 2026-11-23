@@ -24,6 +24,7 @@ class Crf extends Model
             'cheque_date' => 'date',
             'resolved_cheque_date' => 'date',
             'tagged_at' => 'datetime',
+            'sl_code' => 'array',
         ];
 
     }

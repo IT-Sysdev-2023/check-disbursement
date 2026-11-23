@@ -23,6 +23,7 @@ use App\Http\Controllers\ScannedRecordsController;
 use App\Http\Controllers\StatusController;
 use App\Http\Controllers\VoucherSummaryController;
 use App\Models\Company;
+use App\Models\Crf;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;

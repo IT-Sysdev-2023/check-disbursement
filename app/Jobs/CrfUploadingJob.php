@@ -53,6 +53,7 @@ class CrfUploadingJob implements ShouldQueue
 
             $records->push(
                 $helper->extractNo()
+                    ->extractSlCodes()
                     ->extractLocation()
                     ->extractCrfDate()
                     ->extractPaidTo()
@@ -75,7 +76,7 @@ class CrfUploadingJob implements ShouldQueue
 
         if (!CrfHelper::checkProperties($records, [])) {
             $this->cleanup();
-            
+
             CrfProgress::dispatch(
                 'Upload failed. The file may be invalid or the company name doesn’t match with the selected Business Unit.',
                 $total,

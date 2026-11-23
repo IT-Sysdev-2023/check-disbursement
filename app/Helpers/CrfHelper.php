@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Helpers;
+use App\Models\BusinessUnit;
 use App\Models\Company;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -25,6 +26,7 @@ class CrfHelper
     private string $bank;
     private ?int $ckNo;
     private string $preparedBy;
+    private array $slCodes = [];
     public function __construct($file)
     {
         // Clean invisible characters
@@ -144,6 +146,28 @@ class CrfHelper
         return $this;
     }
 
+    public function extractSlCodes()
+    {
+        $contents = $this->fileContents;
+
+        // Handle UTF-16 files, BOM and non-breaking spaces
+        if (str_starts_with($contents, "\xFF\xFE") || str_starts_with($contents, "\xFE\xFF")) {
+            $contents = mb_convert_encoding($contents, 'UTF-8', 'UTF-16');
+        }
+        $contents = str_replace(["\xEF\xBB\xBF", "\xC2\xA0"], ['', ' '], $contents);
+
+        // account code, then spaces/pipes, then an S/L code like BU-POOL
+        preg_match_all(
+            '/\b\d+(?:\.\d+)+\/\d+[\s|¦│]+([A-Z]{2,}-[A-Z0-9]+)/u',
+            $contents,
+            $m
+        );
+
+        $this->slCodes = array_values(array_unique($m[1]));
+
+        return $this;
+    }
+
     public function extractCkNo()
     {
         // Extract Ck # and Check Date
@@ -176,16 +200,17 @@ class CrfHelper
     public function getRecords(int $userId)
     {
 
+        $buIds = BusinessUnit::whereIn('code', $this->slCodes)
+            ->pluck('id');
 
-        // $extractedCompany = explode(' ', $this->company);
-        // $companyId = Company::whereIn('name', $extractedCompany)->first()->id;
-        // $companyId = 
+        $buId = $buIds->count() === 1 ? $buIds->first() : 91; // 91 = HO
+
         return [
             'causer_id' => $userId,
             'filename' => $this->filename,
             'crf_no' => $this->crfNo,
             'crf_date' => $this->crfDate,
-            'business_unit_id' => 91, // HO
+            'business_unit_id' => $buId,
             'company_office' => $this->company,
             'no' => $this->no,
             'crf_location' => $this->location,
@@ -196,6 +221,7 @@ class CrfHelper
             'payee' => $this->paidTo,
             'cheque_amount' => $this->amount,
             'particulars' => $this->particular,
+            'sl_code' => json_encode($this->slCodes),
             'created_at' => now(),
             'updated_at' => now()
 
