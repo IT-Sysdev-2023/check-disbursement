@@ -145,7 +145,7 @@ class DashboardController extends Controller
         ];
     }
 
-    private static function banks()
+    public static function banks()
     {
         return Cv::select('bank')
             ->distinct()
@@ -159,7 +159,7 @@ class DashboardController extends Controller
                 ]);
     }
 
-    private static function bankAccounts($bank)
+    public static function bankAccounts($bank)
     {
         return Cv::select('bank_account_no')
             ->where('bank', $bank)

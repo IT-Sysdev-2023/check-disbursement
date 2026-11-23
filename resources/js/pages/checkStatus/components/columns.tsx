@@ -273,6 +273,17 @@ export const chequeStatusColumns = (
             return row.checkable?.location;
         },
     },
+    // {
+    //     field: 'company',
+    //     headerName: 'Company',
+    //     headerAlign: 'right',
+    //     align: 'right',
+    //     flex: 1,
+    //     renderCell: ({ row }) => {
+    //         console.log(row);
+    //         return row.checkable?.company;
+    //     },
+    // },
     {
         field: 'check',
         headerName: 'Type',

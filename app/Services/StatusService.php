@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Resources\ChequeCollection;
 use App\Http\Resources\ScannedRecordResource;
 use App\Models\BorrowedCheque;
@@ -21,7 +22,7 @@ class StatusService
 {
     public function chequeStatus(Request $request)
     {
-        $filters = $request->only(['company', 'search', 'sort', 'date', 'tab']);
+        $filters = $request->only(['company', 'search', 'sort', 'date', 'tab', 'bank', 'bankAccount']);
         $tab = $filters['tab'] ?? 'for_releasing';
         $staleThreshold = Date::today()->subMonths(6);
 
@@ -110,6 +111,8 @@ class StatusService
                 'label' => 'All',
                 'value' => 'all'
             ]),
+            'banks' => DashboardController::banks(),
+            'bankAccounts' => isset($filters['bank']) ? DashboardController::bankAccounts($filters['bank']) : [],
         ]);
     }
 

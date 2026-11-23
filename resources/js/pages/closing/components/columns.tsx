@@ -16,7 +16,7 @@ export const createClosingCvColumns = (
         headerName: 'Company',
         flex: 1,
         renderCell: ({ row }) => {
-            return row.checkable?.businessUnit.company.company;
+            return row.checkable?.company;
         },
     },
     {

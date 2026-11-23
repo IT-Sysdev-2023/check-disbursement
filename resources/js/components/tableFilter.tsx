@@ -2,13 +2,10 @@ import SelectItem from '@/pages/dashboard/components/SelectItem';
 import { FilterType, SelectionType } from '@/types';
 import { RouteDefinition } from '@/wayfinder';
 import { router } from '@inertiajs/react';
-import RefreshIcon from '@mui/icons-material/Refresh';
 import {
     Box,
-    IconButton,
     SelectChangeEvent,
     Stack,
-    Tooltip,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';

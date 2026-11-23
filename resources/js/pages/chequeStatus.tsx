@@ -27,6 +27,7 @@ import {
     Box,
     Card,
     CardContent,
+    SelectChangeEvent,
     ToggleButton,
     ToggleButtonGroup,
     Typography,
@@ -37,6 +38,7 @@ import {
     chequeStatusColumns,
     pdcColumn,
 } from './checkStatus/components/columns';
+import SelectItem from './dashboard/components/SelectItem';
 import TableDataGrid from './dashboard/components/TableDataGrid';
 import ImageViewing from './imageViewing';
 
@@ -52,12 +54,16 @@ export default function ChequeStatus({
     company,
     businessUnits,
     filter,
+    banks,
+    bankAccounts,
     auth,
 }: {
     cheques: InertiaPagination<ChequeType>;
     businessUnits: SelectionType[];
     company: SelectionType[];
     filter: FilterType;
+    banks: SelectionType[];
+    bankAccounts: SelectionType[];
     auth: Auth;
 }) {
     const [loading, setLoading] = useState(false);
@@ -85,6 +91,17 @@ export default function ChequeStatus({
 
     const [tab, setTab] = useState(filter.tab);
 
+    const defaultBank = banks.find((bank) => bank.label === filter.bank);
+    const defaultBankAccount = bankAccounts.find(
+        (bankAccount) => bankAccount.label === filter.bankAccount,
+    );
+    const [selectedBank, setSelectedBank] = useState(
+        defaultBank ? defaultBank.value : 'all',
+    );
+    const [selectedBankAccount, setSelectedBankAccount] = useState(
+        defaultBankAccount ? defaultBankAccount.value : 'all',
+    );
+
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         router.reload({
             only: ['cheques'],
@@ -94,6 +111,31 @@ export default function ChequeStatus({
             onBefore: () => setLoading(true),
             onFinish: () => setLoading(false),
             onSuccess: () => setTab(newValue),
+        });
+    };
+
+    const handleChange = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedBank(val);
+
+        const selected = banks.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bank: selected?.label,
+                bankAccount: null,
+            },
+        });
+    };
+
+    const handleChangeBa = async (event: SelectChangeEvent) => {
+        const val = event.target.value;
+        setSelectedBankAccount(val);
+
+        const selected = bankAccounts.find((bank) => bank.value === val);
+        router.reload({
+            data: {
+                bankAccount: selected?.label,
+            },
         });
     };
 
@@ -192,7 +234,21 @@ export default function ChequeStatus({
                         filters={filter}
                         businessUnits={businessUnits}
                         resetFilterRouter={chequeStatus()}
-                    />
+                    >
+                       
+                        <SelectItem
+                            handleChange={handleChange}
+                            value={selectedBank}
+                            title="Bank"
+                            items={banks}
+                        />
+                        <SelectItem
+                            handleChange={handleChangeBa}
+                            value={selectedBankAccount}
+                            title="Bank Accounts"
+                            items={bankAccounts}
+                        />
+                    </TableFilter>
                     <TableDataGrid
                         data={cheques}
                         isLoading={loading}
@@ -213,7 +269,7 @@ export default function ChequeStatus({
                     )} */}
                 </Box>
                 <ImageViewing
-                    title='Uploaded Deposit Slips'
+                    title="Uploaded Deposit Slips"
                     open={viewDoc}
                     handleClose={() => setViewDoc(false)}
                     images={images}
