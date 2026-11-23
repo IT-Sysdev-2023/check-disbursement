@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\ProgressStatus;
 use App\Events\CvProgress;
+use App\Helpers\CrfHelper;
 use App\Models\Crf;
 use App\Models\Cv;
 use App\Models\NavHeaderTable;
@@ -76,7 +77,7 @@ class GenerateCvService extends NavConnection
 
             $crfs = Crf::query()
                 ->get(['id', 'crf_no', 'cheque_amount', 'payee'])
-                ->keyBy(fn($crf) => str_replace('#', '', $crf->crf_no));
+                ->keyBy(fn($crf) => CrfHelper::normalizeDocNo($crf->crf_no));
 
             $headerQuery->chunkById(500, function ($chunk) use (&$start, &$duplicates, $total, $tableName, $tableId, $checkPaymentQuery, $buId, $buName, $key, $crfs) {
 
@@ -152,13 +153,13 @@ class GenerateCvService extends NavConnection
                     $merged = $newHeaders->map(function ($header) use ($otherField, $tableId, $buId, $now, $crfs) {
                         $payment = $otherField->get($header['cv_no']);
 
-                        $normalizedCvNo = str_replace('#', '', $header['cv_no']);
-                        $crf = $crfs->get($normalizedCvNo);
+                        $crf = $crfs->get(CrfHelper::normalizeDocNo($header['cv_no']));
 
                         if (
                             $crf &&
-                            (float) $crf->cheque_amount === (float) ($payment?->{'Check Amount'} ?? 0) &&
-                            trim($crf->payee ?? '') === trim($payment?->{'Payee'} ?? '')
+                            (int) $crf->business_unit_id === (int) $buId &&
+                            (float) $crf->cheque_amount === (float) ($payment?->{'Check Amount'} ?? 0)
+                            // trim($crf->payee ?? '') === trim($payment?->{'Payee'} ?? '')
                         ) {
                             $crfId = $crf->id;
                         } else {

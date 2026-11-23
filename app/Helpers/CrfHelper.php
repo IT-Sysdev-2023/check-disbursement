@@ -244,5 +244,11 @@ class CrfHelper
         });
     }
 
+    public static function normalizeDocNo(?string $no): string
+    {
+        $no = strtoupper(trim(str_replace('#', '', (string) $no)));
 
+        // CRF0004069 -> CRF4069
+        return preg_replace('/^([A-Z]*)0+(?=\d)/', '$1', $no);
+    }
 }

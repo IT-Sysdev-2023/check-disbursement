@@ -5,11 +5,13 @@ namespace App\Jobs;
 use App\Events\CrfProgress;
 use App\Models\Crf;
 use App\Helpers\CrfHelper;
+use App\Models\Cv;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Log;
@@ -88,9 +90,15 @@ class CrfUploadingJob implements ShouldQueue
 
         $inserted = DB::transaction(function () use ($records) {
             $count = Crf::insertOrIgnore($records->toArray());
-            $crfs = Crf::whereIn('crf_no', $records->pluck('crf_no'))->get();
+            // $crfs = Crf::whereIn('crf_no', $records->pluck('crf_no'))->get();
 
-            return ['inserted_count' => $count, 'crfs' => $crfs];
+            $crfs = Crf::whereIn('crf_no', $records->pluck('crf_no'))
+                ->whereIn('business_unit_id', $records->pluck('business_unit_id')->unique())
+                ->get();
+
+            $linked = $this->linkCvsToCrfs($crfs);
+
+            return ['inserted_count' => $count, 'linked_count' => $linked];
         });
 
         $this->cleanup();
@@ -116,6 +124,38 @@ class CrfUploadingJob implements ShouldQueue
         );
         $this->cleanup();
     }
+
+    private function linkCvsToCrfs(Collection $crfs): int
+    {
+        if ($crfs->isEmpty()) {
+            return 0;
+        }
+
+        // only CVs that are still unlinked, in the business units of this batch
+        $cvs = Cv::query()
+            ->whereNull('crf_id')
+            ->whereIn('business_unit_id', $crfs->pluck('business_unit_id')->unique())
+            ->get()
+            ->keyBy(fn($cv) => $cv->business_unit_id . '|' . CrfHelper::normalizeDocNo($cv->cv_no));
+
+        $linked = 0;
+
+        foreach ($crfs as $crf) {
+            $cv = $cvs->get($crf->business_unit_id . '|' . CrfHelper::normalizeDocNo($crf->crf_no));
+
+            if (
+                $cv &&
+                round((float) $cv->cheque_amount, 2) === round((float) $crf->cheque_amount, 2)
+                // trim($cv->payee ?? '') === trim($crf->payee ?? '')
+            ) {
+                $cv->update(['crf_id' => $crf->id]);
+                $linked++;
+            }
+        }
+
+        return $linked;
+    }
+
 
     private function cleanup(): void
     {
