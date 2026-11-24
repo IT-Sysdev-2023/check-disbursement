@@ -12,12 +12,13 @@ class PermissionService
         $isAdmin = $user->hasRole('admin');
 
         if ($isAdmin) {
-            $bu = Company::all();
+            $bu = Company::orderBy('name')->all();
         } else {
             $bu = $user->companyPermissions()->with('company')
                 ->get()
                 ->pluck('company')
-                ->filter();
+                ->filter()
+                ->sortBy('name');
         }
 
         $transform = $bu->map(function ($company) {

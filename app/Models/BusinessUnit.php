@@ -16,6 +16,7 @@ class BusinessUnit extends Model
                 fn($q) =>
                 $q->where('id', $company)
             ))
+            ->orderBy('name')
             ->pluck('name', 'id')
             ->map(fn($label, $value) => compact('label', 'value'))
             ->values()
