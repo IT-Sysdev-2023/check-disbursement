@@ -132,7 +132,6 @@ class ChequeReleasingService
                 'required',
                 'numeric',
                 'gte:min',
-                'max:999999999',
                 'lte:' . ($request->input('min') + 99),
             ],
             // 'max' => ['required', 'numeric', 'min:0', 'gte:min'],

@@ -147,6 +147,8 @@ class DashboardController extends Controller
 
     public static function banks()
     {
+        // dd(Cv::select('bank')
+        //     ->distinct()->limit(10)->get());
         return Cv::select('bank')
             ->distinct()
             ->orderBy('bank')

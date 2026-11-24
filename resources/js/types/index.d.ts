@@ -198,7 +198,7 @@ export interface Borrower {
     check: string;
     primaryApproverName?: string;
     borrowerNoClean: number;
-    doc?:string,
+    doc?: string;
     checkable: Crf | Cv;
 }
 
@@ -472,9 +472,16 @@ export interface CheckScannedDetails {
 export interface IdType {
     id: number | string;
     type: number | string;
-    borrowedId: number
+    borrowedId: number;
 }
 
+export interface ChequeStatusRangeMonitoring {
+    newChequeNumber?: string;
+    reason?: string;
+    isCancelled: boolean;
+    id: number | null;
+    oldChequeNumber: string;
+}
 export interface EventType {
     percentage: number;
     total: number;

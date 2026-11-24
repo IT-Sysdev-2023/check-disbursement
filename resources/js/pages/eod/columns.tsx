@@ -1,6 +1,8 @@
-import { Chip } from '@mui/material';
+import { ChequeStatusRangeMonitoring } from '@/types';
+import { Box, Chip, IconButton } from '@mui/material';
 import { GridColDef } from '@mui/x-data-grid';
 import dayjs from 'dayjs';
+import { Pencil } from 'lucide-react';
 
 export const eodColumns = (): GridColDef[] => [
     {
@@ -71,10 +73,8 @@ export const eodColumns = (): GridColDef[] => [
                 staled: { label: 'Staled', color: 'warning' },
             };
 
-            const isReturned =
-                row.forwardedStatus?.status ===
-                'returned';
-            
+            const isReturned = row.forwardedStatus?.status === 'returned';
+
             return (
                 <>
                     {isReturned && <Chip label="Returned" color="warning" />}
@@ -99,7 +99,9 @@ export const eodColumns = (): GridColDef[] => [
         },
     },
 ];
-export const chequeStatusRangeColumn = (): GridColDef[] => [
+export const chequeStatusRangeColumn = (
+    handleEdit: (data: ChequeStatusRangeMonitoring) => void,
+): GridColDef[] => [
     {
         field: 'bank',
         headerName: 'Bank',
@@ -161,10 +163,42 @@ export const chequeStatusRangeColumn = (): GridColDef[] => [
         headerAlign: 'center',
         align: 'center',
         renderCell: ({ row }) => {
-            if (row.is_used) {
+            if (row.isCancelled) {
+                return <Chip label="Replaced" color="error" size="small" />;
+            } else if (row.is_used) {
                 return <Chip label="Used" color="success" size="small" />;
+            } else {
+                return <Chip label="Unuse" color="default" size="small" />;
             }
-            return <Chip label="Unuse" color="default" size="small" />;
+        },
+    },
+    {
+        field: 'action',
+        headerName: 'Action',
+        headerAlign: 'center',
+        flex: 1,
+        align: 'center',
+        renderCell: ({ row }) => {
+            const data = {
+                id: row.chequeRangeId,
+                oldChequeNumber: row.cheque_number,
+                newChequeNumber: row.newChequeNumber,
+                reason: row.cancelReason,
+                isCancelled: row.isCancelled,
+            };
+
+            return (
+                <Box sx={{ width: '100%' }}>
+                    <IconButton
+                        size="small"
+                        color="secondary"
+                        onClick={() => handleEdit(data)}
+                        title="Edit"
+                    >
+                        <Pencil size={18} />
+                    </IconButton>
+                </Box>
+            );
         },
     },
 ];
@@ -262,7 +296,6 @@ export const voucherSummaryColumn = (): GridColDef[] => [
         flex: 1,
         align: 'center',
         renderCell: ({ row }) => {
-            console.log(row);
             if (row.exists_on_remote_server) {
                 return (
                     <Chip label="Closed-Cleared" color="success" size="small" />

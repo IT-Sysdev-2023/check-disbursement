@@ -125,6 +125,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     Route::get('cheque-status-range', [ChequeStatusMonitoringController::class, 'index'])->name('cheque-status-range');
+    Route::post('cancel-cheque-range/{id}', [ChequeStatusMonitoringController::class, 'cancel'])->name('cancel-cheque-range');
 
     Route::prefix('details')->group(function () {
         Route::get('cv/details/{id}', [CvController::class, 'details'])->name('details');

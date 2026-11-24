@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\NumberHelper;
 use App\Helpers\PaginatorHelper;
+use App\Models\ChequeRangeCancelled;
 use App\Models\ChequeRecord;
 use App\Models\ChequeRegister;
 use App\Models\Cv;
@@ -121,9 +122,11 @@ class ChequeStatusMonitoringController extends Controller
             $from = trim((string) $cheque->cheque_from);
             $to = trim((string) $cheque->cheque_to);
             $width = max(strlen($from), strlen($to));
-
             $bank = $squish($cheque->name);
             $account = $normalize($cheque->account_no);
+
+            $cancelledByNumber = $cheque->chequeRangeCancelleds
+                ->keyBy(fn($c) => (string) $c->old_cheque_number);
 
             for ($i = (int) $from; $i <= (int) $to; $i++) {
                 $number = str_pad((string) $i, $width, '0', STR_PAD_LEFT);
@@ -131,9 +134,14 @@ class ChequeStatusMonitoringController extends Controller
 
                 // Unique per register so two accounts of the same bank don't overwrite each other
                 $rowKey = $cheque->id . '-' . $number;
+                $cancelled = $cancelledByNumber->get($number); // model or null
 
                 $numbers[$rowKey] = [
                     'id' => $rowKey,
+                    'chequeRangeId' => $cheque->id,
+                    'isCancelled' => $cancelled !== null,
+                    'newChequeNumber' => $cancelled?->new_cheque_number,
+                    'cancelReason' => $cancelled?->reason,
                     'bank' => $cheque->name,
                     'account_no' => $cheque->account_no,
                     'cheque_number' => $number,
@@ -170,10 +178,28 @@ class ChequeStatusMonitoringController extends Controller
             ->values();
 
         return Inertia::render('chequeStatusRange', [
-            'data' => PaginatorHelper::paginateCollection($data, 10),
+            'records' => PaginatorHelper::paginateCollection($data, 10),
             'items' => $items,
             'bank' => $selectedFilter,
         ]);
+    }
+
+    public function cancel(ChequeRegister $id, Request $request)
+    {
+        $validated = $request->validate([
+            'new_cheque_number' => 'required|string',
+            'old_cheque_number' => 'required|string',
+            'reason' => 'required|string'
+        ]);
+
+        $isSuccess = $id->chequeRangeCancelled()->create([
+            'new_cheque_number' => $validated['new_cheque_number'],
+            'old_cheque_number' => $validated['old_cheque_number'],
+            'reason' => $validated['reason'],
+            'caused_by' => $request->user()->id
+        ]);
+
+        return redirect()->back()->with(['status' => $isSuccess, 'message' => $isSuccess ? 'Successfully saved!' : 'Something went wrong!']);
     }
 
     private static function banks()
