@@ -1,33 +1,43 @@
-import { MonthType } from "@/types";
-import { router } from "@inertiajs/react";
-import { useTheme } from "@mui/material";
-import dayjs, { Dayjs } from "dayjs";
-import { useEffect, useState } from "react";
+import { MonthType } from '@/types';
+import { router } from '@inertiajs/react';
+import { useTheme } from '@mui/material';
+import dayjs, { Dayjs } from 'dayjs';
+import { useEffect, useState } from 'react';
 
-export default function Days({ checked, month, onChangeTab, isDarkMode }: {checked: Record<string, boolean>, month: MonthType, onChangeTab: () => void, isDarkMode: boolean}) {
+export default function Days({
+    isCompleted,
+    month,
+    onChangeTab,
+    isDarkMode,
+}: {
+    isCompleted: boolean;
+    month: MonthType;
+    onChangeTab: () => void;
+    isDarkMode: boolean;
+}) {
     const theme = useTheme(); // Get the MUI theme
     const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
 
     useEffect(() => {
-            if (!selectedDate) return;
-    
-            const formattedDate = selectedDate.format('YYYY-MM-DD');
-    
-            router.reload({
-                data: {
-                    date: {
-                        start: formattedDate,
-                        end: formattedDate,
-                    },
-                    tab: 'cheques',
-                    bu: month.businessUnit
+        if (!selectedDate) return;
+
+        const formattedDate = selectedDate.format('YYYY-MM-DD');
+
+        router.reload({
+            data: {
+                date: {
+                    start: formattedDate,
+                    end: formattedDate,
                 },
-                replace: true,
-                onSuccess: () => {
-                    onChangeTab();
-                },
-            });
-        }, [selectedDate, onChangeTab, month.businessUnit]);
+                tab: 'cheques',
+                bu: month.businessUnit,
+            },
+            replace: true,
+            onSuccess: () => {
+                onChangeTab();
+            },
+        });
+    }, [selectedDate, onChangeTab, month.businessUnit]);
     return (
         <table
             style={{
@@ -40,9 +50,7 @@ export default function Days({ checked, month, onChangeTab, isDarkMode }: {check
                     style={{
                         display: 'grid',
                         gridTemplateColumns: 'repeat(7, 1fr)',
-                        background: checked[
-                            `${month.businessUnit}-${month.y}-${month.m}`
-                        ]
+                        background: isCompleted
                             ? theme.palette.secondary.main
                             : theme.palette.primary.main,
                         color: '#fff',

@@ -3,7 +3,7 @@ import { syncMissingData } from '@/routes';
 import { EventType, MonthType, ProgressState } from '@/types';
 import { router } from '@inertiajs/react';
 import { useEcho } from '@laravel/echo-react';
-import { Alert, Box, Button, CircularProgress, Switch } from '@mui/material';
+import { Alert, Box, Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { RefreshCcw } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -21,7 +21,7 @@ export default function Months({
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState<ProgressState>({});
     const [loadingMap, setLoadingMap] = useState<Record<string, boolean>>({});
-    const [checked, setChecked] = useState<Record<string, boolean>>({});
+    // const [checked, setChecked] = useState<Record<string, boolean>>({});
 
     const { appearance } = useAppearance();
 
@@ -70,33 +70,33 @@ export default function Months({
     const key = (month: MonthType) =>
         `${month.businessUnit}-${month.y}-${month.m}`;
 
-    const handleCheckChange = (
-        e: React.ChangeEvent<HTMLInputElement>,
-        month: {
-            month: number;
-            year: number;
-            businessUnit: string | undefined;
-        },
-    ) => {
-        const key = `${month.businessUnit}-${month.year}-${month.month}`;
-        const value = e.target.checked;
+    // const handleCheckChange = (
+    //     e: React.ChangeEvent<HTMLInputElement>,
+    //     month: {
+    //         month: number;
+    //         year: number;
+    //         businessUnit: string | undefined;
+    //     },
+    // ) => {
+    //     const key = `${month.businessUnit}-${month.year}-${month.month}`;
+    //     const value = e.target.checked;
 
-        setChecked(value ? { [key]: true } : {});
+    //     setChecked(value ? { [key]: true } : {});
 
-        // ✅ Side effect outside the updater
-        router.reload({
-            data: {
-                isNavSelected: value,
-                monthDetails: value ? month : null,
-            },
-            onBefore: () => {
-                setLoadingMap((prev) => ({ ...prev, [key]: true }));
-            },
-            onFinish: () => {
-                setLoadingMap((prev) => ({ ...prev, [key]: false }));
-            },
-        });
-    };
+    //     // ✅ Side effect outside the updater
+    //     router.reload({
+    //         data: {
+    //             isNavSelected: value,
+    //             monthDetails: value ? month : null,
+    //         },
+    //         onBefore: () => {
+    //             setLoadingMap((prev) => ({ ...prev, [key]: true }));
+    //         },
+    //         onFinish: () => {
+    //             setLoadingMap((prev) => ({ ...prev, [key]: false }));
+    //         },
+    //     });
+    // };
     return (
         <>
             {Object.entries(months).map(([, month], monthIndex) => (
@@ -114,7 +114,7 @@ export default function Months({
                                 fontSize: '2rem',
                                 fontWeight: 'bold',
                                 color:
-                                    month.totalMonthly !== month.totalNavRecords
+                                    month.totalNavRecords !== 0
                                         ? 'red'
                                         : 'inherit',
                             }}
@@ -138,24 +138,10 @@ export default function Months({
                                 opacity: 0.7,
                             }}
                         >
-                            {month.totalNavRecords !== month.totalMonthly ? (
-                                <>
-                                    {!checked[key(month)] &&
-                                        `${month.totalNavRecords} in Navision`}
-                                    <Switch
-                                        disabled={
-                                            loading || loadingMap[key(month)]
-                                        }
-                                        checked={checked[key(month)] || false}
-                                        onChange={(e) =>
-                                            handleCheckChange(e, {
-                                                month: month.m,
-                                                year: month.y,
-                                                businessUnit:
-                                                    month.businessUnit,
-                                            })
-                                        }
-                                    />
+                            {month.totalNavRecords !== 0 ? (
+                                <Box display="flex" alignItems="center" gap={2}>
+                                    {`${month.totalNavRecords} in Navision`}
+
                                     <Button
                                         loading={
                                             loading || loadingMap[key(month)]
@@ -173,7 +159,7 @@ export default function Months({
                                     >
                                         Sync Data
                                     </Button>
-                                </>
+                                </Box>
                             ) : (
                                 <Alert severity="success">
                                     Navision Data Matches
@@ -226,7 +212,7 @@ export default function Months({
                             </Box>
                         )}
                         <Days
-                            checked={checked}
+                            isCompleted={month.totalNavRecords !== 0}
                             month={month}
                             onChangeTab={onChangeTab}
                             isDarkMode={isDarkMode}

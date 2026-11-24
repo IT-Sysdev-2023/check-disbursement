@@ -18,15 +18,15 @@ class Calendar
     public static function calendar(array $filters)
     {
         $page = $filters['page'] ?? 1;
-        $perPage = $filters['perPage'] ?? 2; // BUs per page
-        // dd($filters);
-        if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
-            //  Nav selected: use nav records only, don't merge with base
-            $data = self::distinctMonthsNav($filters['monthDetails']);
-        } else {
+        $perPage = $filters['perPage'] ?? 3; // BUs per page
+        
+        // if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
+        //     //  Nav selected: use nav records only, don't merge with base
+        //     $data = self::distinctMonthsNav($filters['monthDetails']);
+        // } else {
             //  Normal: use base data only
             $data = self::distinctMonths($filters['company'] ?? null);
-        }
+        // }
 
         $total = $data->count();
         $data = $data->slice(($page - 1) * $perPage, $perPage);

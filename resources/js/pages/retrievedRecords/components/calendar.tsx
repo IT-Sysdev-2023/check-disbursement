@@ -3,7 +3,6 @@ import { BuType, InertiaPagination, SelectionType } from '@/types';
 import { router } from '@inertiajs/react';
 
 import {
-    Alert,
     SelectChangeEvent,
     Stack,
     TablePagination,

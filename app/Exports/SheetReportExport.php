@@ -5,6 +5,7 @@ namespace App\Exports;
 
 use App\Enums\ProgressStatus;
 use App\Events\ReportProgress;
+use App\Models\BorrowedCheque;
 use App\Models\ChequeStatus;
 use App\Models\Crf;
 use App\Models\Cv;
@@ -93,9 +94,71 @@ class SheetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
 
     private function getRecords()
     {
+        // $cheque = BorrowedCheque::query()
+        //     ->regionalPermission()
+        //     ->join('scanned_records as sr', 'sr.borrowed_cheque_id', 'borrowed_cheques.id')
+        //     ->when(
+        //         !empty($this->data['startDate']),
+        //         fn($query) => $query->whereDate(
+        //             'sr.created_at',
+        //             '>=',
+        //             $this->data['startDate']
+        //         )
+        //     )
+        //     ->when(
+        //         !empty($this->data['endDate']),
+        //         fn($query) => $query->whereDate(
+        //             'sr.created_at',
+        //             '<=',
+        //             $this->data['endDate']
+        //         )
+        //     )
+        //     ->when(
+        //         !empty($this->data['bu']) && !in_array('All', $this->data['bu']),
+        //         fn($outerQuery) =>
+        //             $outerQuery->whereHasMorph(
+        //                 'checkable',
+        //                 [Cv::class, Crf::class],
+        //                 function (Builder $query) {
+        //                     $query->whereHas('businessUnit.company', function (Builder $query) {
+        //                         $query->whereIn('name', $this->data['bu']);
+        //                     });
+        //                 }
+        //             )
+        //     );
+
+
         return ChequeStatus::with(['checkable' => ['borrowedCheque.approver', 'tagLocation', 'businessUnit']])
             ->select('id', 'receiver_name', 'status', 'checkable_id', 'checkable_type', 'created_at')
-
+            ->when(
+                !empty($this->data['startDate']),
+                fn($query) => $query->whereDate(
+                    'created_at',
+                    '>=',
+                    $this->data['startDate']
+                )
+            )
+            ->when(
+                !empty($this->data['endDate']),
+                fn($query) => $query->whereDate(
+                    'created_at',
+                    '<=',
+                    $this->data['endDate']
+                )
+            )
+            ->when(
+                !empty($this->data['bu']) && !in_array('All', $this->data['bu']),
+                fn($outerQuery) =>
+                    $outerQuery->whereHasMorph(
+                        'checkable',
+                        [Cv::class, Crf::class],
+                        function (Builder $query) {
+                            $query->whereHas('businessUnit.company', function (Builder $query) {
+                                $query->whereIn('name', $this->data['bu']);
+                            });
+                        }
+                    )
+            )
             ->when(
                 $this->acronym() === 'pdc', //Post Dated
                 fn($q) =>
@@ -188,36 +251,6 @@ class SheetReportExport implements FromQuery, WithHeadings, WithMapping, WithTit
                                 });
                             }
                         )
-            )
-
-            ->when(
-                !empty($this->data['startDate']),
-                fn($query) => $query->whereDate(
-                    'created_at',
-                    '>=',
-                    $this->data['startDate']
-                )
-            )
-            ->when(
-                !empty($this->data['endDate']),
-                fn($query) => $query->whereDate(
-                    'created_at',
-                    '<=',
-                    $this->data['endDate']
-                )
-            )
-            ->when(
-                !empty($this->data['bu']) && !in_array('All', $this->data['bu']),
-                fn($outerQuery) =>
-                    $outerQuery->whereHasMorph(
-                        'checkable',
-                        [Cv::class, Crf::class],
-                        function (Builder $query) {
-                            $query->whereHas('businessUnit.company', function (Builder $query) {
-                                $query->whereIn('name', $this->data['bu']);
-                            });
-                        }
-                    )
             );
     }
 
