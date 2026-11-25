@@ -22,7 +22,7 @@ export default function Days({
         if (!selectedDate) return;
 
         const formattedDate = selectedDate.format('YYYY-MM-DD');
-
+        
         router.reload({
             data: {
                 date: {
@@ -33,9 +33,9 @@ export default function Days({
                 bu: month.businessUnit,
             },
             replace: true,
-            onSuccess: () => {
-                onChangeTab();
-            },
+            // onSuccess: () => {
+            //     onChangeTab();
+            // },
         });
     }, [selectedDate, onChangeTab, month.businessUnit]);
     return (
@@ -116,10 +116,12 @@ export default function Days({
                             >
                                 <span
                                     style={{
+                                        fontSize: '0.75rem',
                                         fontWeight: dayObj.isCurrent
                                             ? 600
                                             : 500,
                                         color: '#fff',
+                                         opacity: dayObj.isCurrent ? 1 : 0.6,
                                     }}
                                 >
                                     {dayObj.day}
@@ -138,7 +140,7 @@ export default function Days({
                                             lineHeight: '1.2',
                                         }}
                                     >
-                                        {dayObj.crf !== undefined && (
+                                        {/* {dayObj.crf !== undefined && (
                                             <div
                                                 style={{
                                                     color: '#4caf50',
@@ -157,7 +159,7 @@ export default function Days({
                                             >
                                                 CV: {dayObj.cv}
                                             </div>
-                                        )}
+                                        )} */}
                                     </div>
                                 )}
                                 {/* Total Record Below Date */}
@@ -165,7 +167,7 @@ export default function Days({
                                     <div
                                         style={{
                                             marginTop: '0.25rem',
-                                            fontSize: '0.75rem',
+                                            fontSize: '1rem',
                                             fontWeight: 800,
 
                                             textAlign: 'center',
