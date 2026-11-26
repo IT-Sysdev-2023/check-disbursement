@@ -90,19 +90,19 @@ export default function ({
         }
     };
 
-    const handleReset = () => {
-        if (!resetFilterRouter) return;
-        setSelectedBu('all');
-        setSelectedCompany('all');
-        router.get(
-            resetFilterRouter,
-            {},
-            {
-                replace: true,
-                preserveState: true,
-            },
-        );
-    };
+    // const handleReset = () => {
+    //     if (!resetFilterRouter) return;
+    //     setSelectedBu('all');
+    //     setSelectedCompany('all');
+    //     router.get(
+    //         resetFilterRouter,
+    //         {},
+    //         {
+    //             replace: true,
+    //             preserveState: true,
+    //         },
+    //     );
+    // };
 
     return (
         <Stack

@@ -45,6 +45,7 @@ export default function RetrievedRecords({
     counts: {
         toAssign: string;
         completed: string;
+        forSignature: string;
     };
     businessUnits: SelectionType[];
     records: InertiaPagination<any>;
@@ -111,6 +112,8 @@ export default function RetrievedRecords({
                     <Box sx={{ mt: 5 }}>
                         {filter.tab === 'calendar' && (
                             <Calendar
+                                bu={filter.selectedBu}
+                                businessUnits={businessUnits}
                                 userId={auth.user.id}
                                 data={records}
                                 company={company}

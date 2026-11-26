@@ -18,13 +18,18 @@ const Calendar = ({
     data,
     onChangeTab,
     company,
+    businessUnits,
+    bu,
 }: {
     userId: number;
     onChangeTab: () => void;
     data: InertiaPagination<BuType>;
     company: SelectionType[];
+    businessUnits: SelectionType[];
+    bu: string;
 }) => {
     const [selectedCompany, setSelectedCompany] = useState<string>('all');
+    const [selectedBu, setSelectedBu] = useState<string>(bu);
 
     const handleChange = async (event: SelectChangeEvent) => {
         const val = event.target.value;
@@ -50,6 +55,18 @@ const Calendar = ({
             },
         });
     };
+    const handleChangeBu = (event: SelectChangeEvent) => {
+        setSelectedBu(event.target.value);
+
+        router.reload({
+            data: {
+                bu: event.target.value,
+            },
+            // onStart: () => onLoading?.(true),
+            // onFinish: () => onLoading?.(false),
+        });
+    };
+
     const theme = useTheme();
     return (
         <Box sx={{ mt: 2 }}>
@@ -60,14 +77,29 @@ const Calendar = ({
                 justifyContent="space-between"
                 sx={{ width: '100%', mb: 2 }}
             >
-                <Box sx={{ flex: 1 }}>
-                    <SelectItem
+                <Stack direction="row" sx={{ gap: 1 }} alignItems="center">
+                    {/* <SelectItem
                         handleChange={handleChange}
                         value={selectedCompany}
                         title="Filter Company"
                         items={company}
+                    /> */}
+                    <SelectItem
+                        handleChange={handleChange}
+                        value={selectedCompany}
+                        title="Company"
+                        items={company}
                     />
-                </Box>
+
+                    {businessUnits && (
+                        <SelectItem
+                            handleChange={handleChangeBu}
+                            value={selectedBu}
+                            title="Business Unit"
+                            items={businessUnits}
+                        />
+                    )}
+                </Stack>
 
                 <Stack direction="row" spacing={1}>
                     <CalendarLegend color="blue" label="With Records" />

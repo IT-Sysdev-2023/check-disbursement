@@ -19,13 +19,12 @@ class Calendar
     {
         $page = $filters['page'] ?? 1;
         $perPage = $filters['perPage'] ?? 3; // BUs per page
-        
         // if (isset($filters['isNavSelected']) && $filters['isNavSelected'] == 'true') {
         //     //  Nav selected: use nav records only, don't merge with base
         //     $data = self::distinctMonthsNav($filters['monthDetails']);
         // } else {
-            //  Normal: use base data only
-            $data = self::distinctMonths($filters['company'] ?? null);
+        //  Normal: use base data only
+        $data = self::distinctMonths($filters['company'] ?? null, $filters['bu'] ?? null);
         // }
 
         $total = $data->count();
@@ -133,13 +132,16 @@ class Calendar
 
         return $totalNavRecords;
     }
-    private static function distinctMonths($company)
+    private static function distinctMonths(?string $company, ?string $bu)
     {
         $result = Cv::query()
             ->join('business_units', 'business_units.id', '=', 'cvs.business_unit_id')
             ->where('business_units.company_id', '<>', 13)
             ->when($company && $company !== 'all', function ($q) use ($company) {
                 $q->where('business_units.company_id', $company);
+            })
+            ->when($bu && $bu !== 'all', function ($q) use ($bu) {
+                $q->where('business_unit_id', $bu);
             })
             ->selectRaw("
         cvs.cv_date as date,
